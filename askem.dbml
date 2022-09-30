@@ -1,0 +1,211 @@
+Project askem {
+  database_type: 'PostgreSQL'
+  Note: 'Description for SQL backend for storing datasets, models, and simulators'
+}
+
+
+/////////// DATA ///////////
+
+// Enum for 'products' table below
+Enum data.type {
+  str
+  int
+  float
+  bool
+  binary
+}
+
+Table data.datasets {
+  id int [pk]
+  name varchar [not null]
+  description blob
+  created_at int [default: `now()`]
+  maintainer_id int [ref: > public.maintainers.id]
+  user_id varchar [ref: > users.username]
+  deprecated bool
+  sensitivity blob
+  quality blob
+  published bool
+  temporal_resolution varchar
+  geospatial_resolution varchar
+}
+
+
+
+Table data.features {
+  id int [pk]
+  dataset_id int [ref: > data.datasets.id]
+  feature varchar [not null, note: 'this could be broken out into an annotation metadata table']
+  value_type data.type [not null] // move to new feature table
+  value varchar [not null]
+}
+
+Table data.values [note: 'Geo encoding will likely change'] {
+  id int [pk]
+  dataset_id int [ref: > data.features.id]
+  timestamp datetime
+  country varchar
+  admin1 varchar
+  admin2 varchar
+  admin3 varchar
+  lat float
+  lng float 
+  value varchar [not null]
+}
+
+Table data.qualifiers {
+    id int [pk]
+    feature_id int [ref: > data.features.id]
+    name varchar
+    value_type data.type [not null]
+    qualifier_value varchar [not null]
+}
+
+Table data.descriptors {
+    id int [pk]
+    qualifier_id int [ref: > data.qualifiers.id]
+    value_id int [ref: > data.values.id]
+    qualifier_value varchar [not null]
+}
+
+/////////// MODELS ///////////
+Table modeling.models {
+  id int [pk]
+  name varchar
+  description blob
+  content_hash varchar [not null, note: 'Generate from AST of acset']
+  content json [not null]
+}
+
+Table modeling.descendants{
+  id int [pk]
+  child int [ref: > modeling.models.id]
+  parent int [ref: > modeling.models.id]
+}
+
+Table modeling.operations {
+  id int [pk]
+  result int [ref: > modeling.models.id]
+  created_at int
+  type varchar
+  operation blob [note: 'Currently dont know the form']
+  prev int [ref: > modeling.operations.id, note: 'only want to fill this in ']
+}
+
+
+/////////// SIMULATORS ///////////
+
+Table simulation.plans {
+  id int [pk]
+  model_id int [ref: > modeling.models.id, not null]
+  simulator varchar [not null]
+  query varchar
+  body varchar
+  content_hash varchar [note:'Hash from plan AST + query + simulator']
+  prev int [ref: > simulation.plans.id]
+  preceding_operation json
+}
+
+Table simulation.runs {
+  id int [pk]
+  simulator_id int [ref: > simulation.plans.id, not null]
+  create_at int [default: `now()`]
+  completed_at int
+  success bool [default: true]
+  output int [ref: > data.datasets.id]
+}
+
+Table simulators.scenario_values [note: 'THIS TABLE NEEDS AN OVERHAUL'] {
+  id int [pk]
+  run_id int [ref: > simulation.runs.id, not null]
+  name varchar
+  value_type data.type
+  value varchar
+}
+
+/////////// PROJECTS ///////////
+Table projects.meta {
+  id int [pk]
+  name varchar [not null]
+  description varchar
+  created_at int [default: `now()`]
+}
+
+Table projects.datasets {
+  id int [pk]
+  dataset_id int [ref: > data.datasets.id]
+  project_id int [ref: > projects.meta.id]
+}
+
+Table projects.simulations {
+  id int [pk]
+  plan_id int [ref: > simulation.plans.id]
+  project_id int [ref: > projects.meta.id]
+  name varchar
+  description blob
+}
+
+/////////// ONTOLOGY ///////////
+
+
+Enum ontology.type {
+   feature
+   qualifier
+   dataset
+   plans
+   model 
+   project
+}
+
+Enum ontology.importance {
+   primary
+   secondary
+   other
+}
+
+Table ontology.concepts {
+  id int [pk]
+  term_id varchar
+  type ontology.type
+  obj_id int [ref: > data.features.id, ref: > data.qualifiers.id, ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
+  status ontology.importance
+}
+
+/////////// PROVENANCE ///////////
+
+Enum provenance.type {
+   dataset
+   plans
+   model 
+   project
+}
+
+Enum provenance.action {
+   append
+   remove
+   init
+   other
+}
+
+Table provenance.relations {
+  id int [pk]
+  created_at int
+  type provenance.type
+  obj_id int [ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
+  action provenance.action
+  action_content blob 
+}
+
+/// PEOPLE ////
+
+Table users {
+  username int [pk]
+}
+
+Table maintainers {
+  id int [pk]
+  maintainer_name varchar
+  maintainer_email varchar
+  maintainer_org varchar
+  maintainer_website varchar
+}
