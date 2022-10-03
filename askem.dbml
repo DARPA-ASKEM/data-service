@@ -19,9 +19,9 @@ Table data.datasets {
   id int [pk]
   name varchar [not null]
   description blob
-  created_at int [default: `now()`]
-  maintainer_id int [ref: > public.maintainers.id]
-  user_id varchar [ref: > users.username]
+  timestamp datetime [default: `now()`]
+  maintainer_id int [ref: > public.people.id]
+  user_id varchar [ref: > public.people.id]
   deprecated bool
   sensitivity blob
   quality blob
@@ -31,10 +31,10 @@ Table data.datasets {
 }
 
 
-
 Table data.features {
   id int [pk]
   dataset_id int [ref: > data.datasets.id]
+  qualified_ids [int] [ref: > data.features.id, default: null, note: 'If list exists, then this element is a qualifier']
   feature varchar [not null, note: 'this could be broken out into an annotation metadata table']
   value_type data.type [not null] // move to new feature table
   value varchar [not null]
@@ -43,6 +43,7 @@ Table data.features {
 Table data.values [note: 'Geo encoding will likely change'] {
   id int [pk]
   dataset_id int [ref: > data.features.id]
+  value_id [int] [ref: > data.values.id, default: null, note:'If the list exists, this element qualfies other elements']
   timestamp datetime
   country varchar
   admin1 varchar
@@ -51,21 +52,6 @@ Table data.values [note: 'Geo encoding will likely change'] {
   lat float
   lng float 
   value varchar [not null]
-}
-
-Table data.qualifiers {
-    id int [pk]
-    feature_id int [ref: > data.features.id]
-    name varchar
-    value_type data.type [not null]
-    qualifier_value varchar [not null]
-}
-
-Table data.descriptors {
-    id int [pk]
-    qualifier_id int [ref: > data.qualifiers.id]
-    value_id int [ref: > data.values.id]
-    qualifier_value varchar [not null]
 }
 
 /////////// MODELS ///////////
@@ -77,21 +63,6 @@ Table modeling.models {
   content json [not null]
 }
 
-Table modeling.descendants{
-  id int [pk]
-  child int [ref: > modeling.models.id]
-  parent int [ref: > modeling.models.id]
-}
-
-Table modeling.operations {
-  id int [pk]
-  result int [ref: > modeling.models.id]
-  created_at int
-  type varchar
-  operation blob [note: 'Currently dont know the form']
-  prev int [ref: > modeling.operations.id, note: 'only want to fill this in ']
-}
-
 
 /////////// SIMULATORS ///////////
 
@@ -101,21 +72,18 @@ Table simulation.plans {
   simulator varchar [not null]
   query varchar
   body varchar
-  content_hash varchar [note:'Hash from plan AST + query + simulator']
-  prev int [ref: > simulation.plans.id]
-  preceding_operation json
 }
 
 Table simulation.runs {
   id int [pk]
   simulator_id int [ref: > simulation.plans.id, not null]
-  create_at int [default: `now()`]
+  timestamp datetime [default: `now()`]
   completed_at int
   success bool [default: true]
   output int [ref: > data.datasets.id]
 }
 
-Table simulators.scenario_values [note: 'THIS TABLE NEEDS AN OVERHAUL'] {
+Table simulation.initial_values [note: 'THIS TABLE NEEDS AN OVERHAUL'] {
   id int [pk]
   run_id int [ref: > simulation.runs.id, not null]
   name varchar
@@ -124,35 +92,35 @@ Table simulators.scenario_values [note: 'THIS TABLE NEEDS AN OVERHAUL'] {
 }
 
 /////////// PROJECTS ///////////
+Enum projects.asset_type {
+   dataset
+   model
+   simulator
+}
+
 Table projects.meta {
   id int [pk]
   name varchar [not null]
   description varchar
-  created_at int [default: `now()`]
+  timestamp datetime [default: `now()`]
 }
 
-Table projects.datasets {
+Table projects.assets {
   id int [pk]
-  dataset_id int [ref: > data.datasets.id]
   project_id int [ref: > projects.meta.id]
+  asset_id int [ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id]
+  type projects.asset_type [not null]
+  external_ref varchar [default: null, note:'The external resource that is pushed to on update']
 }
 
-Table projects.simulations {
-  id int [pk]
-  plan_id int [ref: > simulation.plans.id]
-  project_id int [ref: > projects.meta.id]
-  name varchar
-  description blob
-}
 
 /////////// ONTOLOGY ///////////
 
 
 Enum ontology.type {
    feature
-   qualifier
    dataset
-   plans
+   plan
    model 
    project
 }
@@ -167,7 +135,7 @@ Table ontology.concepts {
   id int [pk]
   term_id varchar
   type ontology.type
-  obj_id int [ref: > data.features.id, ref: > data.qualifiers.id, ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
+  obj_id int [ref: > data.features.id, ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
   status ontology.importance
 }
 
@@ -189,23 +157,19 @@ Enum provenance.action {
 
 Table provenance.relations {
   id int [pk]
-  created_at int
+  timestamp datetime
   type provenance.type
   obj_id int [ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
   action provenance.action
-  action_content blob 
+  action_content blob
 }
 
 /// PEOPLE ////
-
-Table users {
-  username int [pk]
-}
-
-Table maintainers {
+Table people {
   id int [pk]
-  maintainer_name varchar
-  maintainer_email varchar
-  maintainer_org varchar
-  maintainer_website varchar
+  name varchar
+  email varchar
+  org varchar
+  website varchar
+  is_registered bool [note: 'Individuals might be listed as a maintainer but may not be a registered user.']
 }
