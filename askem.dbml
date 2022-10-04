@@ -90,7 +90,7 @@ Table simulation.plans {
   model_id int [ref: > modeling.models.id, not null]
   simulator varchar [not null]
   query varchar
-  body varchar
+  body blob
 }
 
 Table simulation.runs {
@@ -132,6 +132,7 @@ Table projects.meta {
   name varchar [not null]
   description varchar
   timestamp datetime [default: `now()`]
+  status varchar
 }
 
 Table projects.assets {
