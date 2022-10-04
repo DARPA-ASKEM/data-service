@@ -6,7 +6,6 @@ Project askem {
 
 /////////// DATA ///////////
 
-// Enum for 'products' table below
 Enum data.type {
   str
   int
@@ -55,6 +54,18 @@ Table data.values [note: 'Geo encoding will likely change'] {
 }
 
 /////////// MODELS ///////////
+Enum modeling.source {
+  mira
+  skema
+}
+
+Enum modeling.type {
+  gromet
+  bilayer
+  sbml
+  othedr
+}
+
 Table modeling.models {
   id int [pk]
   name varchar
@@ -63,6 +74,14 @@ Table modeling.models {
   content json [not null]
 }
 
+Table modeling.intermediates {
+  id int [pk]
+  timestamp datetime
+  source modeling.source
+  type modeling.type
+  representation blob
+  model_id int [default: null, ref: > modeling.models.id]
+}
 
 /////////// SIMULATORS ///////////
 
@@ -77,25 +96,35 @@ Table simulation.plans {
 Table simulation.runs {
   id int [pk]
   simulator_id int [ref: > simulation.plans.id, not null]
-  timestamp datetime [default: `now()`]
-  completed_at int
+  created_at datetime [default: `now()`]
+  completed_at datetime
   success bool [default: true]
-  output int [ref: > data.datasets.id]
+  input int [ref: > data.datasets.id, default: null]
+  output int [ref: > data.datasets.id, default: null]
+  response blob [note: 'The answer to the query whether its natural language or just a number.']
 }
 
-Table simulation.initial_values [note: 'THIS TABLE NEEDS AN OVERHAUL'] {
+/////////// PROCESSING ///////////
+
+Table processing.publications {
+  id int [pk, note:"We can't use the URI as a primary key due to the other assets using int types."]
+  xdd_uri varchar [not null]
+}
+
+Table processing.extracted_tables {
   id int [pk]
-  run_id int [ref: > simulation.runs.id, not null]
-  name varchar
-  value_type data.type
-  value varchar
+  publication_id int [ref: > processing.publications.id]
+  csv blob
+  img blob
 }
 
 /////////// PROJECTS ///////////
 Enum projects.asset_type {
    dataset
    model
+   ir
    simulator
+   papers
 }
 
 Table projects.meta {
@@ -108,7 +137,7 @@ Table projects.meta {
 Table projects.assets {
   id int [pk]
   project_id int [ref: > projects.meta.id]
-  asset_id int [ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id]
+  asset_id int [ref: > modeling.intermediates.id, ref: > processing.publications.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id]
   type projects.asset_type [not null]
   external_ref varchar [default: null, note:'The external resource that is pushed to on update']
 }
@@ -158,8 +187,10 @@ Enum provenance.action {
 Table provenance.relations {
   id int [pk]
   timestamp datetime
-  type provenance.type
-  obj_id int [ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
+  parent_type provenance.type
+  child_type provenance.type
+  parent_id int [ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
+  child_id int [ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
   action provenance.action
   action_content blob
 }
@@ -173,3 +204,6 @@ Table people {
   website varchar
   is_registered bool [note: 'Individuals might be listed as a maintainer but may not be a registered user.']
 }
+
+
+Ref: "simulation"."runs"."id" < "simulation"."plans"."query"
