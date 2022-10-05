@@ -1,4 +1,4 @@
-Project askem {
+ Project askem {
   database_type: 'PostgreSQL'
   Note: 'Description for SQL backend for storing datasets, models, and simulators'
 }
@@ -19,12 +19,9 @@ Table data.datasets {
   name varchar [not null]
   description blob
   timestamp datetime [default: `now()`]
-  maintainer_id int [ref: > public.people.id]
-  user_id varchar [ref: > public.people.id]
   deprecated bool
   sensitivity blob
   quality blob
-  published bool
   temporal_resolution varchar
   geospatial_resolution varchar
 }
@@ -80,13 +77,16 @@ Table modeling.models {
   description blob
   content_hash varchar [not null, note: 'Generate from AST of acset']
   content json [not null]
+  last_updated datetime
 }
 
 Table modeling.operations {
   id int [pk]
-  resulting_model int [ref: > modeling.models.id]
+  model_id int [ref: > modeling.models.id]
   operation_type modeling.operation
-  operation_content json
+  model_content json
+  timestamp datetime
+  user int [ref: > public.people.id]
 }
 
 Table modeling.intermediates {
@@ -102,7 +102,7 @@ Table modeling.intermediates {
 
 Table simulation.plans {
   id int [pk]
-  model_id int [ref: > modeling.models.id, not null]
+  model_ids [int] [ref: > modeling.models.id, not null]
   simulator varchar [not null]
   query varchar
   body blob
@@ -128,16 +128,23 @@ Table simulation.parameters {
 }
 
 /////////// PROCESSING ///////////
+Enum processing.extracted_type {
+   table
+   figure
+   equation
+}
+
 
 Table processing.publications {
   id int [pk, note:"We can't use the URI as a primary key due to the other assets using int types."]
   xdd_uri varchar [not null]
 }
 
-Table processing.extracted_tables {
+Table processing.extracted_data {
   id int [pk]
   publication_id int [ref: > processing.publications.id]
-  csv blob
+  type processing.extracted_type
+  data blob
   img blob
 }
 
@@ -147,7 +154,14 @@ Enum projects.asset_type {
    model
    ir
    simulator
-   papers
+   publication
+}
+
+Enum projects.role {
+  author
+  contributor
+  maintainer
+  other
 }
 
 Table projects.meta {
@@ -166,6 +180,13 @@ Table projects.assets {
   external_ref varchar [default: null, note:'The external resource that is pushed to on update']
 }
 
+Table projects.access {
+  id int
+  person_id int [ref: > public.people.id]
+  asset_id int [ref: > projects.assets.id]
+  type projects.asset_type
+  role projects.role
+}
 
 /////////// ONTOLOGY ///////////
 
@@ -212,9 +233,9 @@ Table provenance.relations {
   id int [pk]
   timestamp datetime
   relation_type provenance.relation_type
-  left int
+  left int [ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id]
   left_type provenance.type
-  right int
+  right int [ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id]
   right_type provenance.type
 }
 
@@ -227,6 +248,3 @@ Table people {
   website varchar
   is_registered bool [note: 'Individuals might be listed as a maintainer but may not be a registered user.']
 }
-
-
-Ref: "simulation"."runs"."id" < "simulation"."plans"."query"
