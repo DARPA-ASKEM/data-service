@@ -1,4 +1,4 @@
- Project askem {
+Project askem {
   database_type: 'PostgreSQL'
   Note: 'Description for SQL backend for storing datasets, models, and simulators'
 }
@@ -68,11 +68,14 @@ Enum modeling.operation {
   remove
   glue
   product
+  composition
+  decomposition
   other
 }
 
 Table modeling.models {
   id int [pk]
+  created_at datetime
   name varchar
   description blob
   content_hash varchar [not null, note: 'Generate from AST of acset']
@@ -91,11 +94,19 @@ Table modeling.operations {
 
 Table modeling.intermediates {
   id int [pk]
-  timestamp datetime
+  created_at datetime
   source modeling.source
   type modeling.type
   representation blob
-  model_id int [default: null, ref: > modeling.models.id]
+  model_id [int] [default: null, ref: > modeling.models.id]
+  software_id int [default: null, ref: > modeling.software.id]
+}
+
+Table modeling.software {
+  id int [pk]
+  created_at datetime
+  source varchar [not null, note: 'E.g. github url']
+  storage_uri varchar [not null, note: 'E.g. S3 uri for zipfile of software']
 }
 
 /////////// SIMULATORS ///////////
@@ -152,8 +163,9 @@ Table processing.extracted_data {
 Enum projects.asset_type {
    dataset
    model
-   ir
+   extracted_data
    simulator
+   intermediates
    publication
 }
 
@@ -180,7 +192,7 @@ Table projects.assets {
   external_ref varchar [default: null, note:'The external resource that is pushed to on update']
 }
 
-Table projects.access {
+Table projects.associations {
   id int
   person_id int [ref: > public.people.id]
   asset_id int [ref: > projects.assets.id]
@@ -220,6 +232,8 @@ Enum provenance.type {
    plans
    model 
    project
+   intermediates
+   software
 }
 
 Enum provenance.relation_type {
@@ -231,7 +245,7 @@ Enum provenance.relation_type {
 
 Table provenance.relations {
   id int [pk]
-  timestamp datetime
+  created_at datetime
   relation_type provenance.relation_type
   left int [ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id]
   left_type provenance.type
