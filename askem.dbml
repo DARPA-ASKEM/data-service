@@ -63,7 +63,15 @@ Enum modeling.type {
   gromet
   bilayer
   sbml
-  othedr
+  other
+}
+
+Enum modeling.operation {
+  add 
+  remove
+  glue
+  product
+  other
 }
 
 Table modeling.models {
@@ -72,6 +80,13 @@ Table modeling.models {
   description blob
   content_hash varchar [not null, note: 'Generate from AST of acset']
   content json [not null]
+}
+
+Table modeling.operations {
+  id int [pk]
+  resulting_model int [ref: > modeling.models.id]
+  operation_type modeling.operation
+  operation_content json
 }
 
 Table modeling.intermediates {
@@ -99,9 +114,17 @@ Table simulation.runs {
   created_at datetime [default: `now()`]
   completed_at datetime
   success bool [default: true]
-  input int [ref: > data.datasets.id, default: null]
-  output int [ref: > data.datasets.id, default: null]
+  input [int] [ref: > data.datasets.id, default: null]
+  result [int] [ref: > data.datasets.id, default: null]
   response blob [note: 'The answer to the query whether its natural language or just a number.']
+}
+
+Table simulation.parameters {
+  id int [pk]
+  run_id int [ref: > simulation.runs.id]
+  name varchar
+  value varchar
+  value_type varchar
 }
 
 /////////// PROCESSING ///////////
@@ -178,22 +201,21 @@ Enum provenance.type {
    project
 }
 
-Enum provenance.action {
-   append
-   remove
-   init
-   other
+Enum provenance.relation_type {
+  derives
+  glued
+  parents
+  copies
 }
 
 Table provenance.relations {
   id int [pk]
   timestamp datetime
-  parent_type provenance.type
-  child_type provenance.type
-  parent_id int [ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
-  child_id int [ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
-  action provenance.action
-  action_content blob
+  relation_type provenance.relation_type
+  left int
+  left_type provenance.type
+  right int
+  right_type provenance.type
 }
 
 /// PEOPLE ////
