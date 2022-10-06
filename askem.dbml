@@ -26,7 +26,6 @@ Table data.datasets {
   geospatial_resolution varchar
 }
 
-
 Table data.features {
   id int [pk]
   dataset_id int [ref: > data.datasets.id]
@@ -36,9 +35,9 @@ Table data.features {
   value varchar [not null]
 }
 
-Table data.values [note: 'Geo encoding will likely change'] {
+Table data.values {
   id int [pk]
-  dataset_id int [ref: > data.features.id]
+  feature_id int [ref: > data.features.id]
   value_id [int] [ref: > data.values.id, default: null, note:'If the list exists, this element qualfies other elements']
   timestamp datetime
   country varchar
@@ -52,7 +51,7 @@ Table data.values [note: 'Geo encoding will likely change'] {
 
 /////////// MODELS ///////////
 Enum modeling.source {
-  mira
+  mrepresentationa
   skema
 }
 
@@ -78,21 +77,27 @@ Table modeling.models {
   created_at datetime
   name varchar
   description blob
-  content_hash varchar [not null, note: 'Generate from AST of acset']
-  content json [not null]
-  last_updated datetime
+  head int [ref: > modeling.operations.id]
+}
+
+Table modeling.frameworks {
+  id int [pk]
+  version varchar
+  name varchar
+  semantics json
 }
 
 Table modeling.operations {
   id int [pk]
-  model_id int [ref: > modeling.models.id]
+  prev int [ref: > modeling.operations.id]
+  framework_id int [ref: > modeling.frameworks.id]
   operation_type modeling.operation
   model_content json
   timestamp datetime
   user int [ref: > public.people.id]
 }
 
-Table modeling.intermediates {
+Table modeling.representations {
   id int [pk]
   created_at datetime
   source modeling.source
@@ -165,7 +170,7 @@ Enum projects.asset_type {
    model
    extracted_data
    simulator
-   intermediates
+   representations
    publication
 }
 
@@ -187,7 +192,7 @@ Table projects.meta {
 Table projects.assets {
   id int [pk]
   project_id int [ref: > projects.meta.id]
-  asset_id int [ref: > modeling.intermediates.id, ref: > processing.publications.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id]
+  asset_id int [ref: > modeling.representations.id, ref: > processing.publications.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id]
   type projects.asset_type [not null]
   external_ref varchar [default: null, note:'The external resource that is pushed to on update']
 }
@@ -232,7 +237,7 @@ Enum provenance.type {
    plans
    model 
    project
-   intermediates
+   representations
    software
 }
 
