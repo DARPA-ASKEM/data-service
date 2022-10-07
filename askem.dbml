@@ -35,17 +35,21 @@ Table data.features {
   value varchar [not null]
 }
 
-Table data.values {
+Table data.record {
   id int [pk]
-  feature_id int [ref: > data.features.id]
-  value_id [int] [ref: > data.values.id, default: null, note:'If the list exists, this element qualfies other elements']
   timestamp datetime
   country varchar
   admin1 varchar
   admin2 varchar
   admin3 varchar
   lat float
-  lng float 
+  lng float
+}
+
+Table data.values {
+  id int [pk]
+  feature_id int [ref: > data.features.id]
+  record_id [int] [ref: > data.record.id]
   value varchar [not null]
 }
 
@@ -112,6 +116,14 @@ Table modeling.software {
   created_at datetime
   source varchar [not null, note: 'E.g. github url']
   storage_uri varchar [not null, note: 'E.g. S3 uri for zipfile of software']
+}
+
+Table modeling.runtimes {
+  id int [pk]
+  created_at datetime
+  name varchar
+  left varchar
+  right varchar
 }
 
 /////////// SIMULATORS ///////////
