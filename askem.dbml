@@ -31,7 +31,7 @@ Table data.features {
   dataset_id int [ref: > data.datasets.id]
   qualified_ids [int] [ref: > data.features.id, default: null, note: 'If list exists, then this element is a qualifier']
   feature varchar [not null, note: 'this could be broken out into an annotation metadata table']
-  value_type data.type [not null] // move to new feature table
+  value_type data.type [not null]
   value varchar [not null]
 }
 
@@ -86,6 +86,7 @@ Table modeling.models {
 
 Table modeling.frameworks {
   id int [pk]
+  runtime_id int [ref: > modeling.runtimes.id]
   version varchar
   name varchar
   semantics json
@@ -251,6 +252,7 @@ Enum provenance.type {
    project
    representations
    software
+   runtimes
 }
 
 Enum provenance.relation_type {
@@ -264,9 +266,9 @@ Table provenance.relations {
   id int [pk]
   created_at datetime
   relation_type provenance.relation_type
-  left int [ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id]
+  left int [ref: > modeling.runtimes.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id]
   left_type provenance.type
-  right int [ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id]
+  right int [ref: > modeling.runtimes.id,ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id]
   right_type provenance.type
 }
 
@@ -279,3 +281,4 @@ Table people {
   website varchar
   is_registered bool [note: 'Individuals might be listed as a maintainer but may not be a registered user.']
 }
+
