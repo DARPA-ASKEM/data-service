@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 
-from click import command, option
+from click import argument, echo, group, option
 from fastapi import FastAPI
 from importlib import import_module
 from uvicorn import run as uvicorn_run
+
+from generation.gen import generate_validation, get_schema_version
+
+DBML_PATH = '../askem.dbml'
+DBML_VERSION = 'v0.9.3'
+GENERATED_PATH = './generated'
 
 
 def attach_router(api : FastAPI, router_name : str) -> None:
@@ -18,15 +24,24 @@ def build_api(*args : str) -> FastAPI:
     return app
 
 
-@command()
+@group()
+def main() -> None:
+    """
+    Manage the data store API service
+    """
+    pass
+
+
+@main.command()
 @option('--host', default='0.0.0.0', type=str, help='Address for the API')
 @option('--port', default=8000, type=int, help='Port to expose API')
-@option('--endpoint', multiple=True, type=str, help='Set of endpoints to include in API')
-def main(host: str, port: int, endpoint: str) -> None:
+@argument('endpoint', nargs=-1)
+def start(host: str, port: int, endpoint: str) -> None:
     """
     Execute data store API using uvicorn
     """
-    api = build_api(*endpoint) 
+    assert get_schema_version(GENERATED_PATH) == DBML_VERSION
+    api = build_api(*endpoint)
     uvicorn_run(
       api,
       host=host,
@@ -34,7 +49,14 @@ def main(host: str, port: int, endpoint: str) -> None:
     )
 
 
+@main.command()
+def gen() -> None:
+    """
+    Generate validation schemas
+    """
+    generate_validation(DBML_PATH, GENERATED_PATH)
+    echo('Generated pydantic schemas')
+
+
 if __name__ == "__main__":
     main()
-
-
