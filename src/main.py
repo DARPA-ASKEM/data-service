@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from importlib import import_module
 from uvicorn import run as uvicorn_run
 
-from generation.gen import generate_validation, get_schema_version
+from generation.gen import generate_validation, verify
 
 DBML_PATH = '../askem.dbml'
 DBML_VERSION = 'v0.9.3'
@@ -40,7 +40,7 @@ def start(host: str, port: int, endpoint: str) -> None:
     """
     Execute data store API using uvicorn
     """
-    assert get_schema_version(GENERATED_PATH) == DBML_VERSION
+    assert verify(DBML_VERSION, GENERATED_PATH)
     api = build_api(*endpoint)
     uvicorn_run(
       api,
