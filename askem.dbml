@@ -1,12 +1,12 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'Description for SQL backend for storing datasets, models, and simulators'
+  Note: 'v0.9.3'
 }
 
 
 /////////// DATA ///////////
 
-Enum data.type {
+Enum data.value_type {
   str
   int
   float
@@ -17,8 +17,9 @@ Enum data.type {
 Table data.datasets {
   id int [pk]
   name varchar [not null]
-  description blob
-  timestamp datetime [default: `now()`]
+  url varchar [not null]
+  description blob [not null]
+  timestamp datetime [default: `now()`, not null]
   deprecated bool
   sensitivity blob
   quality blob
@@ -28,38 +29,27 @@ Table data.datasets {
 
 Table data.features {
   id int [pk]
-  dataset_id int [ref: > data.datasets.id]
-  qualified_ids [int] [ref: > data.features.id, default: null, note: 'If list exists, then this element is a qualifier']
+  dataset_id int [ref: > data.datasets.id, not null]
   feature varchar [not null, note: 'this could be broken out into an annotation metadata table']
-  value_type data.type [not null]
+  value_type data.value_type [not null]
   value varchar [not null]
 }
 
-Table data.record {
+Table data.qualifiers {
   id int [pk]
-  timestamp datetime
-  country varchar
-  admin1 varchar
-  admin2 varchar
-  admin3 varchar
-  lat float
-  lng float
+  qualifier_id int [ref: > data.features.id, not null]
+  qualified_id int [ref: > data.features.id, not null]
 }
 
-Table data.values {
-  id int [pk]
-  feature_id int [ref: > data.features.id]
-  record_id [int] [ref: > data.record.id]
-  value varchar [not null]
-}
 
 /////////// MODELS ///////////
+
 Enum modeling.source {
   mrepresentationa
   skema
 }
 
-Enum modeling.type {
+Enum modeling.format {
   gromet
   bilayer
   sbml
@@ -78,85 +68,101 @@ Enum modeling.operation {
 
 Table modeling.models {
   id int [pk]
-  created_at datetime
-  name varchar
+  created_at datetime [default: `now()`, not null]
+  name varchar [not null]
   description blob
-  head int [ref: > modeling.operations.id]
+  head int [ref: > modeling.operations.id, not null]
 }
 
 Table modeling.frameworks {
   id int [pk]
-  runtime_id int [ref: > modeling.runtimes.id]
-  version varchar
-  name varchar
-  semantics json
+  runtime_id int [ref: > modeling.runtimes.id, not null]
+  version varchar [not null]
+  name varchar [not null]
+  semantics json [not null]
 }
 
 Table modeling.operations {
   id int [pk]
-  prev int [ref: > modeling.operations.id]
-  framework_id int [ref: > modeling.frameworks.id]
-  operation_type modeling.operation
-  model_content json
-  timestamp datetime
-  user int [ref: > public.people.id]
+  prev int [ref: > modeling.operations.id, not null]
+  framework_id int [ref: > modeling.frameworks.id, not null]
+  operation_type modeling.operation [not null]
+  model_content json [not null]
+  timestamp datetime [default: `now()`, not null]
+  user int [ref: > public.people.id, not null]
 }
 
 Table modeling.representations {
   id int [pk]
-  created_at datetime
-  source modeling.source
-  type modeling.type
-  representation blob
-  model_id [int] [default: null, ref: > modeling.models.id]
-  software_id int [default: null, ref: > modeling.software.id]
+  created_at datetime [not null]
+  source modeling.source [not null]
+  type modeling.format [not null]
+  representation blob [not null]
+  model_id int [ref: > modeling.models.id, not null, note: 'this may become a many to one relation']
+  software_id int [ref: > modeling.software.id, not null]
 }
 
 Table modeling.software {
   id int [pk]
-  created_at datetime
+  created_at datetime [not null]
   source varchar [not null, note: 'E.g. github url']
   storage_uri varchar [not null, note: 'E.g. S3 uri for zipfile of software']
 }
 
 Table modeling.runtimes {
   id int [pk]
-  created_at datetime
-  name varchar
-  left varchar
-  right varchar
+  created_at datetime [default: `now()`, not null]
+  name varchar [not null]
+  left varchar [not null]
+  right varchar [not null]
 }
 
 /////////// SIMULATORS ///////////
 
+Enum simulation.direction {
+  input
+  output
+}
+
 Table simulation.plans {
   id int [pk]
-  model_ids [int] [ref: > modeling.models.id, not null]
   simulator varchar [not null]
-  query varchar
-  body blob
+  query varchar [not null]
+  body blob [not null]
+}
+
+Table simulation.applied_models {
+  id int [pk]
+  model_id int [ref: > modeling.models.id, not null]
+  plan_id int [ref: > simulation.plans.id, not null]
 }
 
 Table simulation.runs {
   id int [pk]
   simulator_id int [ref: > simulation.plans.id, not null]
-  created_at datetime [default: `now()`]
+  created_at datetime [default: `now()`, not null]
   completed_at datetime
   success bool [default: true]
-  input [int] [ref: > data.datasets.id, default: null]
-  result [int] [ref: > data.datasets.id, default: null]
   response blob [note: 'The answer to the query whether its natural language or just a number.']
+}
+
+Table simulation.materials {
+  id int [pk]
+  run_id int [ref: > simulation.runs.id, not null]
+  dataset_id int [ref: > data.datasets.id, not null]
+  type simulation.direction
 }
 
 Table simulation.parameters {
   id int [pk]
-  run_id int [ref: > simulation.runs.id]
-  name varchar
-  value varchar
-  value_type varchar
+  run_id int [ref: > simulation.runs.id, not null]
+  name varchar [not null]
+  value varchar [not null]
+  value_type varchar [not null]
 }
 
 /////////// PROCESSING ///////////
+
 Enum processing.extracted_type {
    table
    figure
@@ -165,19 +171,20 @@ Enum processing.extracted_type {
 
 
 Table processing.publications {
-  id int [pk, note:"We can't use the URI as a primary key due to the other assets using int types."]
+  id int [pk, note:"We cannot use the URI as a primary key due to the other assets using int types."]
   xdd_uri varchar [not null]
 }
 
 Table processing.extracted_data {
   id int [pk]
-  publication_id int [ref: > processing.publications.id]
-  type processing.extracted_type
-  data blob
-  img blob
+  publication_id int [ref: > processing.publications.id, not null]
+  type processing.extracted_type [not null]
+  data blob [not null]
+  img blob [not null]
 }
 
 /////////// PROJECTS ///////////
+
 Enum projects.asset_type {
    dataset
    model
@@ -197,31 +204,30 @@ Enum projects.role {
 Table projects.meta {
   id int [pk]
   name varchar [not null]
-  description varchar
+  description varchar [not null]
   timestamp datetime [default: `now()`]
-  status varchar
+  status varchar [not null]
 }
 
 Table projects.assets {
   id int [pk]
-  project_id int [ref: > projects.meta.id]
-  asset_id int [ref: > modeling.representations.id, ref: > processing.publications.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id]
+  project_id int [ref: > projects.meta.id, not null]
+  asset_id int [ref: > modeling.representations.id, ref: > processing.publications.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, not null]
   type projects.asset_type [not null]
-  external_ref varchar [default: null, note:'The external resource that is pushed to on update']
+  external_ref varchar [note:'The external resource that is pushed to on update']
 }
 
 Table projects.associations {
-  id int
-  person_id int [ref: > public.people.id]
-  asset_id int [ref: > projects.assets.id]
+  id int [pk]
+  person_id int [ref: > public.people.id, not null]
+  asset_id int [ref: > projects.assets.id, not null]
   type projects.asset_type
   role projects.role
 }
 
 /////////// ONTOLOGY ///////////
 
-
-Enum ontology.type {
+Enum ontology.taggable_type {
    feature
    dataset
    plan
@@ -237,15 +243,15 @@ Enum ontology.importance {
 
 Table ontology.concepts {
   id int [pk]
-  term_id varchar
-  type ontology.type
-  obj_id int [ref: > data.features.id, ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id]
-  status ontology.importance
+  term_id varchar [not null]
+  type ontology.taggable_type [not null]
+  obj_id int [ref: > data.features.id, ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id, not null]
+  status ontology.importance [not null]
 }
 
 /////////// PROVENANCE ///////////
 
-Enum provenance.type {
+Enum provenance.obj_type {
    dataset
    plans
    model 
@@ -264,21 +270,21 @@ Enum provenance.relation_type {
 
 Table provenance.relations {
   id int [pk]
-  created_at datetime
-  relation_type provenance.relation_type
-  left int [ref: > modeling.runtimes.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id]
-  left_type provenance.type
-  right int [ref: > modeling.runtimes.id,ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id]
-  right_type provenance.type
+  created_at datetime [default: `now()`, not null]
+  relation_type provenance.relation_type [not null]
+  left int [ref: > modeling.runtimes.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id, not null]
+  left_type provenance.obj_type [not null]
+  right int [ref: > modeling.runtimes.id,ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id, not null]
+  right_type provenance.obj_type [not null]
 }
 
 /// PEOPLE ////
+
 Table people {
   id int [pk]
-  name varchar
-  email varchar
-  org varchar
-  website varchar
-  is_registered bool [note: 'Individuals might be listed as a maintainer but may not be a registered user.']
+  name varchar [not null]
+  email varchar [not null]
+  org varchar [not null]
+  website varchar [not null]
+  is_registered bool [not null, note: 'Individuals might be listed as a maintainer but may not be a registered user.']
 }
-
