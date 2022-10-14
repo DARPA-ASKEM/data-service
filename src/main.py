@@ -40,7 +40,12 @@ def start(host: str, port: int, endpoint: str) -> None:
     """
     Execute data store API using uvicorn
     """
-    assert verify(DBML_VERSION, GENERATED_PATH)
+    try:
+        assert verify(DBML_VERSION, GENERATED_PATH)
+    except AssertionError:
+        echo('Failed to start: version mismatch. DBML has either been updated or generated schemas have been modified by users')
+        exit()
+        
     api = build_api(*endpoint)
     uvicorn_run(
       api,
