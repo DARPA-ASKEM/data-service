@@ -1,14 +1,15 @@
 version: "3.9"
 services:
   api:
-    build:
-      context: ./
-      dockerfile: ./docker/Dockerfile.api
+    build: ./
     ports:
       - "8000:8000"
   db:
-    build:
-      dockerfile: ./docker/Dockerfile.postgres
+    image: "postgres:latest"
     ports:
       - "8001:5432"
+    environment:
+      - POSTGRES_PASSWORD=dev
+      - POSTGRES_USER=dev
+      - POSTGRES_DB=askem
     profiles: ["dev"]
