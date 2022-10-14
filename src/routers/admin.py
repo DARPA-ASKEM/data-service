@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+from db import ENGINE
+
 router = APIRouter()
 
 @router.get('/admin/db')
