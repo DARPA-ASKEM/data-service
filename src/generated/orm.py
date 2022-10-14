@@ -310,7 +310,7 @@ class Associations(Base):
 
     __tablename__ = 'associations'
 
-    id = sa.Column(sa.Integer())
+    id = sa.Column(sa.Integer(), primary_key=True)
     person_id = sa.Column(sa.Integer(), sa.ForeignKey('people.id'), nullable=False)
     asset_id = sa.Column(sa.Integer(), sa.ForeignKey('assets.id'), nullable=False)
     type = sa.Column(sa.Enum(AssetType))

@@ -9,10 +9,13 @@ services:
     environment:
       - SQL_URL
       - SQL_PORT
+      - SQL_USER
+      - SQL_PASSWORD
+
   db:
     image: "postgres:latest"
     ports:
-      - "8001:5432"
+      - "5432:5432"
     environment:
       - POSTGRES_PASSWORD=dev
       - POSTGRES_USER=dev

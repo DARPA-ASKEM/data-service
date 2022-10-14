@@ -268,7 +268,7 @@ class Assets(BaseModel):
 
 class Associations(BaseModel):
 
-    id: Optional[int]
+    id: int
     person_id: int
     asset_id: int
     type: Optional[AssetType]

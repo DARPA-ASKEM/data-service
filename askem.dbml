@@ -218,7 +218,7 @@ Table projects.assets {
 }
 
 Table projects.associations {
-  id int
+  id int [pk]
   person_id int [ref: > public.people.id, not null]
   asset_id int [ref: > projects.assets.id, not null]
   type projects.asset_type
