@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile.api
+    ports:
+      - "8000:8000"
+  sql:
+    build:
+      dockerfile: ./docker/Dockerfile.postgres
+    ports:
+      - "8001:5432"

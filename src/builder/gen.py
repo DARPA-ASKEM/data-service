@@ -6,7 +6,7 @@ from os import makedirs
 from os.path import exists, join
 from pathlib import Path
 
-from generation.fix import patch
+from builder.fix import patch
 
 INFO = 'info.json'
 SCHEMAS = 'schema.py'

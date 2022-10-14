@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from importlib import import_module
 from uvicorn import run as uvicorn_run
 
-from generation.gen import generate_validation, verify
+from builder.gen import generate_validation, verify
 
 DBML_PATH = '../askem.dbml'
 DBML_VERSION = 'v0.9.3'

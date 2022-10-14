@@ -1,0 +1,4 @@
+FROM postgres:latest
+ENV POSTGRES_PASSWORD=dev
+ENV POSTGRES_USER=dev
+ENV POSTGRES_DB=askem

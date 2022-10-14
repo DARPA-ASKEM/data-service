@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from src.main import build_api, DBML_PATH, DBML_VERSION
-from src.generation.gen import get_dbml_version
+from src.builder.gen import get_dbml_version
 
 
 def test_version() -> None:
