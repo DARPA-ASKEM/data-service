@@ -6,8 +6,9 @@ services:
       dockerfile: ./docker/Dockerfile.api
     ports:
       - "8000:8000"
-  sql:
+  db:
     build:
       dockerfile: ./docker/Dockerfile.postgres
     ports:
       - "8001:5432"
+    profiles: ["dev"]
