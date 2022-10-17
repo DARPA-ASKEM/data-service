@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+main - The script builds and hosts the API using a command line interface.
+"""
+
 
 from click import argument, echo, group, option
 from fastapi import FastAPI
@@ -13,11 +17,20 @@ GENERATED_PATH = './generated'
 
 
 def attach_router(api : FastAPI, router_name : str) -> None:
+    """
+    Import router module dynamically and attach it to the API
+
+    At runtime, the routes to be used can be specified instead of
+    being hardcoded.
+    """
     router_package = import_module(f'routers.{router_name}')
     api.include_router(router_package.router, prefix=f'/{router_name}', tags=[router_name])
 
 
 def build_api(*args : str) -> FastAPI:
+    """
+    Build an API using a group of specified router modules
+    """
     app = FastAPI(docs_url='/') 
     for router_name in args:
         attach_router(app, router_name)
@@ -57,7 +70,9 @@ def start(host: str, port: int, endpoint: str) -> None:
 @main.command()
 def gen() -> None:
     """
-    Generate validation schemas
+    Generate model code.
+
+    `gen` should only be called when developing using a new version of the DBML.
     """
     generate_validation(DBML_PATH, GENERATED_PATH)
     echo('Generated pydantic schemas')

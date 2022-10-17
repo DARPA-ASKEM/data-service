@@ -1,3 +1,7 @@
+"""
+db - A universal configuration for the database.
+"""
+
 from os import getenv
 from sqlalchemy import create_engine
 
