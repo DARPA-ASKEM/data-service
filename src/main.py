@@ -5,11 +5,10 @@ main - The script builds and hosts the API using a command line interface.
 
 
 from click import argument, echo, group, option
+from dbml_builder import verify
 from fastapi import FastAPI
 from importlib import import_module
 from uvicorn import run as uvicorn_run
-
-from builder.gen import generate_validation, verify
 
 DBML_PATH = '../askem.dbml'
 DBML_VERSION = 'v0.9.3'
@@ -67,6 +66,8 @@ def start(host: str, port: int, endpoint: str) -> None:
     )
 
 
+<<<<<<< HEAD
+=======
 @main.command()
 def gen() -> None:
     """
@@ -78,5 +79,6 @@ def gen() -> None:
     echo('Generated pydantic schemas')
 
 
+>>>>>>> main
 if __name__ == "__main__":
     main()
