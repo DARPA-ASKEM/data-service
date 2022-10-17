@@ -66,5 +66,19 @@ def start(host: str, port: int, endpoint: str) -> None:
     )
 
 
+<<<<<<< HEAD
+=======
+@main.command()
+def gen() -> None:
+    """
+    Generate model code.
+
+    `gen` should only be called when developing using a new version of the DBML.
+    """
+    generate_validation(DBML_PATH, GENERATED_PATH)
+    echo('Generated pydantic schemas')
+
+
+>>>>>>> main
 if __name__ == "__main__":
     main()
