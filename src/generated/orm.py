@@ -115,11 +115,11 @@ class Datasets(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     name = sa.Column(sa.String(), nullable=False)
     url = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.String(), nullable=False)
+    description = sa.Column(sa.LargeBinary(), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     deprecated = sa.Column(sa.Boolean())
-    sensitivity = sa.Column(sa.String())
-    quality = sa.Column(sa.String())
+    sensitivity = sa.Column(sa.LargeBinary())
+    quality = sa.Column(sa.LargeBinary())
     temporal_resolution = sa.Column(sa.String())
     geospatial_resolution = sa.Column(sa.String())
 
@@ -151,7 +151,7 @@ class Models(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     name = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.String())
+    description = sa.Column(sa.LargeBinary())
     head = sa.Column(sa.Integer(), sa.ForeignKey('operations.id'), nullable=False)
 
 
@@ -187,7 +187,7 @@ class Representations(Base):
     created_at = sa.Column(sa.DateTime(), nullable=False)
     source = sa.Column(sa.Enum(Source), nullable=False)
     type = sa.Column(sa.Enum(Format), nullable=False)
-    representation = sa.Column(sa.String(), nullable=False)
+    representation = sa.Column(sa.LargeBinary(), nullable=False)
     model_id = sa.Column(sa.Integer(), sa.ForeignKey('models.id'), nullable=False)
     software_id = sa.Column(sa.Integer(), sa.ForeignKey('software.id'), nullable=False)
 
@@ -220,7 +220,7 @@ class Plans(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     simulator = sa.Column(sa.String(), nullable=False)
     query = sa.Column(sa.String(), nullable=False)
-    body = sa.Column(sa.String(), nullable=False)
+    body = sa.Column(sa.LargeBinary(), nullable=False)
 
 
 class AppliedModels(Base):
@@ -241,7 +241,7 @@ class Runs(Base):
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     completed_at = sa.Column(sa.DateTime())
     success = sa.Column(sa.Boolean(), server_default='True')
-    response = sa.Column(sa.String())
+    response = sa.Column(sa.LargeBinary())
 
 
 class Materials(Base):
@@ -280,8 +280,8 @@ class ExtractedData(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     publication_id = sa.Column(sa.Integer(), sa.ForeignKey('publications.id'), nullable=False)
     type = sa.Column(sa.Enum(ExtractedType), nullable=False)
-    data = sa.Column(sa.String(), nullable=False)
-    img = sa.Column(sa.String(), nullable=False)
+    data = sa.Column(sa.LargeBinary(), nullable=False)
+    img = sa.Column(sa.LargeBinary(), nullable=False)
 
 
 class Meta(Base):
