@@ -18,9 +18,7 @@ router = APIRouter()
 @router.get("/datasets")
 def get_datasets(count: int) -> str:
     with Session(ENGINE) as session:
-        result = (
-            session.query(orm.Datasets).order_by(orm.Datasets.id.desc()).limit(count)
-        )
+        result = session.query(orm.Dataset).order_by(orm.Dataset.id.desc()).limit(count)
         logger.info(f"Pre manip result: {result}")
         result = result[::-1]
         logger.info(f"Latest output: {result}")
@@ -30,14 +28,14 @@ def get_datasets(count: int) -> str:
 @router.get("/datasets/{id}")
 def get_datasets(id: int) -> str:
     with Session(ENGINE) as session:
-        result = session.query(orm.Datasets).get(id)
+        result = session.query(orm.Dataset).get(id)
         logger.info(f"Latest output: {result}")
         return result
 
 
 class CreateDatasetRequest(BaseModel):
-    dataset: schema.Datasets
-    features: List[schema.Features]
+    dataset: schema.Dataset
+    features: List[schema.Feature]
 
 
 @router.post("/datasets")
@@ -45,21 +43,21 @@ def create_dataset(payload: CreateDatasetRequest) -> str:
     with Session(ENGINE) as session:
         datasetp = payload.dataset.dict()
         del datasetp["id"]
-        dataset = orm.Datasets(**datasetp)
+        dataset = orm.Dataset(**datasetp)
         session.add(dataset)
         session.commit()
         for f in payload.features:
             feat = f.dict()
             del feat["id"]
             feat["dataset_id"] = dataset.id
-            feature = orm.Features(**feat)
+            feature = orm.Feature(**feat)
             session.add(feature)
         session.commit()
     return "Created dataset"
 
 
 @router.patch("/datasets/update/{id}")
-def update_dataset(payload: schema.Datasets, id: int) -> str:
+def update_dataset(payload: schema.Dataset, id: int) -> str:
     with Session(ENGINE) as session:
         data_payload = payload.dict(
             exclude_unset=True
@@ -67,7 +65,7 @@ def update_dataset(payload: schema.Datasets, id: int) -> str:
         data_payload["id"] = id
         logger.info(data_payload)
 
-        data_to_update = session.query(orm.Datasets).filter(orm.Datasets.id == id)
+        data_to_update = session.query(orm.Dataset).filter(orm.Dataset.id == id)
         data_to_update.update(data_payload)
         session.commit()
     return "Updated dataset"
@@ -77,5 +75,5 @@ def update_dataset(payload: schema.Datasets, id: int) -> str:
 @router.post("/datasets/delete/{id}")
 def delete_dataset(id: int) -> str:
     with Session(ENGINE) as session:
-        session.query(orm.Datasets).filter(orm.Datasets.id == id).delete()
+        session.query(orm.Dataset).filter(orm.Dataset.id == id).delete()
         session.commit()
