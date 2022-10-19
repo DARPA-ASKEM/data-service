@@ -31,7 +31,7 @@ class Format(str, Enum):
     sbml = 'sbml'
     
 
-class Operation(str, Enum):
+class OperationType(str, Enum):
 
     add = 'add'
     composition = 'composition'
@@ -173,7 +173,7 @@ class Operation(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     prev = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'), nullable=False)
     framework_id = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
-    operation_type = sa.Column(sa.Enum(Operation), nullable=False)
+    operation_type = sa.Column(sa.Enum(OperationType), nullable=False)
     model_content = sa.Column(JSON(), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     user = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
