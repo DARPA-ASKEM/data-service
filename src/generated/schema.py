@@ -57,7 +57,7 @@ class AssetType(str, Enum):
     extracted_data = 'extracted_data'
     model = 'model'
     publication = 'publication'
-    representations = 'representations'
+    representation = 'representation'
     simulator = 'simulator'
     
 
@@ -89,10 +89,10 @@ class ObjType(str, Enum):
 
     dataset = 'dataset'
     model = 'model'
-    plans = 'plans'
+    plan = 'plan'
     project = 'project'
-    representations = 'representations'
-    runtimes = 'runtimes'
+    representation = 'representation'
+    runtime = 'runtime'
     software = 'software'
     
 
@@ -104,21 +104,21 @@ class RelationType(str, Enum):
     parents = 'parents'
     
 
-class Datasets(BaseModel):
+class Dataset(BaseModel):
 
     id: Optional[int] = None
     name: str
     url: str
-    description: bytes
+    description: str
     timestamp: datetime.datetime = datetime.datetime.now()
     deprecated: Optional[bool]
-    sensitivity: Optional[bytes]
-    quality: Optional[bytes]
+    sensitivity: Optional[str]
+    quality: Optional[str]
     temporal_resolution: Optional[str]
     geospatial_resolution: Optional[str]
 
 
-class Features(BaseModel):
+class Feature(BaseModel):
 
     id: Optional[int] = None
     dataset_id: Optional[int] = None
@@ -127,23 +127,23 @@ class Features(BaseModel):
     value: str
 
 
-class Qualifiers(BaseModel):
+class Qualifier(BaseModel):
 
     id: Optional[int] = None
     qualifier_id: Optional[int] = None
     qualified_id: Optional[int] = None
 
 
-class Models(BaseModel):
+class Model(BaseModel):
 
     id: Optional[int] = None
     created_at: datetime.datetime = datetime.datetime.now()
     name: str
-    description: Optional[bytes]
+    description: Optional[str]
     head: int
 
 
-class Frameworks(BaseModel):
+class Framework(BaseModel):
 
     id: Optional[int] = None
     runtime_id: Optional[int] = None
@@ -152,7 +152,7 @@ class Frameworks(BaseModel):
     semantics: Json
 
 
-class Operations(BaseModel):
+class Operation(BaseModel):
 
     id: Optional[int] = None
     prev: int
@@ -163,7 +163,7 @@ class Operations(BaseModel):
     user: int
 
 
-class Representations(BaseModel):
+class Representation(BaseModel):
 
     id: Optional[int] = None
     created_at: datetime.datetime
@@ -182,7 +182,7 @@ class Software(BaseModel):
     storage_uri: str
 
 
-class Runtimes(BaseModel):
+class Runtime(BaseModel):
 
     id: Optional[int] = None
     created_at: datetime.datetime = datetime.datetime.now()
@@ -191,22 +191,22 @@ class Runtimes(BaseModel):
     right: str
 
 
-class Plans(BaseModel):
+class Plan(BaseModel):
 
     id: Optional[int] = None
     simulator: str
     query: str
-    body: bytes
+    body: Json
 
 
-class AppliedModels(BaseModel):
+class AppliedModel(BaseModel):
 
     id: Optional[int] = None
     model_id: Optional[int] = None
     plan_id: Optional[int] = None
 
 
-class Runs(BaseModel):
+class Run(BaseModel):
 
     id: Optional[int] = None
     simulator_id: Optional[int] = None
@@ -216,7 +216,7 @@ class Runs(BaseModel):
     response: Optional[bytes]
 
 
-class Materials(BaseModel):
+class Material(BaseModel):
 
     id: Optional[int] = None
     run_id: Optional[int] = None
@@ -224,7 +224,7 @@ class Materials(BaseModel):
     type: Optional[Direction]
 
 
-class Parameters(BaseModel):
+class Parameter(BaseModel):
 
     id: Optional[int] = None
     run_id: Optional[int] = None
@@ -233,7 +233,7 @@ class Parameters(BaseModel):
     value_type: str
 
 
-class Publications(BaseModel):
+class Publication(BaseModel):
 
     id: Optional[int] = None
     xdd_uri: str
@@ -257,7 +257,7 @@ class Meta(BaseModel):
     status: str
 
 
-class Assets(BaseModel):
+class Asset(BaseModel):
 
     id: Optional[int] = None
     project_id: Optional[int] = None
@@ -266,7 +266,7 @@ class Assets(BaseModel):
     external_ref: Optional[str]
 
 
-class Associations(BaseModel):
+class Association(BaseModel):
 
     id: Optional[int] = None
     person_id: Optional[int] = None
@@ -275,7 +275,7 @@ class Associations(BaseModel):
     role: Optional[Role]
 
 
-class Concepts(BaseModel):
+class Concept(BaseModel):
 
     id: Optional[int] = None
     term_id: str
@@ -284,7 +284,7 @@ class Concepts(BaseModel):
     status: Importance
 
 
-class Relations(BaseModel):
+class Relation(BaseModel):
 
     id: Optional[int] = None
     created_at: datetime.datetime = datetime.datetime.now()
@@ -295,7 +295,7 @@ class Relations(BaseModel):
     right_type: ObjType
 
 
-class People(BaseModel):
+class Person(BaseModel):
 
     id: Optional[int] = None
     name: str

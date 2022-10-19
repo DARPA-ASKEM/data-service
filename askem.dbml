@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v0.9.3'
+  Note: 'v0.10.0'
 }
 
 
@@ -14,35 +14,35 @@ Enum data.value_type {
   binary
 }
 
-Table data.datasets {
+Table data.dataset {
   id int [pk]
   name varchar [not null]
   url varchar [not null]
-  description blob [not null]
+  description text [not null]
   timestamp datetime [default: `now()`, not null]
   deprecated bool
-  sensitivity blob
-  quality blob
+  sensitivity text
+  quality text
   temporal_resolution varchar
   geospatial_resolution varchar
 }
 
-Table data.features {
+Table data.feature {
   id int [pk]
-  dataset_id int [ref: > data.datasets.id, not null]
+  dataset_id int [ref: > data.dataset.id, not null]
   feature varchar [not null, note: 'this could be broken out into an annotation metadata table']
   value_type data.value_type [not null]
   value varchar [not null]
 }
 
-Table data.qualifiers {
+Table data.qualifier {
   id int [pk]
-  qualifier_id int [ref: > data.features.id, not null]
-  qualified_id int [ref: > data.features.id, not null]
+  qualifier_id int [ref: > data.feature.id, not null]
+  qualified_id int [ref: > data.feature.id, not null]
 }
 
 
-/////////// MODELS ///////////
+/////////// model ///////////
 
 Enum modeling.source {
   mrepresentationa
@@ -66,39 +66,39 @@ Enum modeling.operation {
   other
 }
 
-Table modeling.models {
+Table modeling.model {
   id int [pk]
   created_at datetime [default: `now()`, not null]
   name varchar [not null]
-  description blob
-  head int [ref: > modeling.operations.id, not null]
+  description text
+  head int [ref: > modeling.operation.id, not null]
 }
 
-Table modeling.frameworks {
+Table modeling.framework {
   id int [pk]
-  runtime_id int [ref: > modeling.runtimes.id, not null]
+  runtime_id int [ref: > modeling.runtime.id, not null]
   version varchar [not null]
   name varchar [not null]
   semantics json [not null]
 }
 
-Table modeling.operations {
+Table modeling.operation {
   id int [pk]
-  prev int [ref: > modeling.operations.id, not null]
-  framework_id int [ref: > modeling.frameworks.id, not null]
+  prev int [ref: > modeling.operation.id, not null]
+  framework_id int [ref: > modeling.framework.id, not null]
   operation_type modeling.operation [not null]
   model_content json [not null]
   timestamp datetime [default: `now()`, not null]
-  user int [ref: > public.people.id, not null]
+  user int [ref: > public.person.id, not null]
 }
 
-Table modeling.representations {
+Table modeling.representation {
   id int [pk]
   created_at datetime [not null]
   source modeling.source [not null]
   type modeling.format [not null]
   representation blob [not null]
-  model_id int [ref: > modeling.models.id, not null, note: 'this may become a many to one relation']
+  model_id int [ref: > modeling.model.id, not null, note: 'this may become a many to one relation']
   software_id int [ref: > modeling.software.id, not null]
 }
 
@@ -109,7 +109,7 @@ Table modeling.software {
   storage_uri varchar [not null, note: 'E.g. S3 uri for zipfile of software']
 }
 
-Table modeling.runtimes {
+Table modeling.runtime {
   id int [pk]
   created_at datetime [default: `now()`, not null]
   name varchar [not null]
@@ -124,38 +124,38 @@ Enum simulation.direction {
   output
 }
 
-Table simulation.plans {
+Table simulation.plan {
   id int [pk]
   simulator varchar [not null]
   query varchar [not null]
-  body blob [not null]
+  body json [not null]
 }
 
-Table simulation.applied_models {
+Table simulation.applied_model {
   id int [pk]
-  model_id int [ref: > modeling.models.id, not null]
-  plan_id int [ref: > simulation.plans.id, not null]
+  model_id int [ref: > modeling.model.id, not null]
+  plan_id int [ref: > simulation.plan.id, not null]
 }
 
-Table simulation.runs {
+Table simulation.run {
   id int [pk]
-  simulator_id int [ref: > simulation.plans.id, not null]
+  simulator_id int [ref: > simulation.plan.id, not null]
   created_at datetime [default: `now()`, not null]
   completed_at datetime
   success bool [default: true]
   response blob [note: 'The answer to the query whether its natural language or just a number.']
 }
 
-Table simulation.materials {
+Table simulation.material {
   id int [pk]
-  run_id int [ref: > simulation.runs.id, not null]
-  dataset_id int [ref: > data.datasets.id, not null]
+  run_id int [ref: > simulation.run.id, not null]
+  dataset_id int [ref: > data.dataset.id, not null]
   type simulation.direction
 }
 
-Table simulation.parameters {
+Table simulation.parameter {
   id int [pk]
-  run_id int [ref: > simulation.runs.id, not null]
+  run_id int [ref: > simulation.run.id, not null]
   name varchar [not null]
   value varchar [not null]
   value_type varchar [not null]
@@ -170,14 +170,14 @@ Enum processing.extracted_type {
 }
 
 
-Table processing.publications {
-  id int [pk, note:"We cannot use the URI as a primary key due to the other assets using int types."]
+Table processing.publication {
+  id int [pk, note:"We cannot use the URI as a primary key due to the other asset using int types."]
   xdd_uri varchar [not null]
 }
 
 Table processing.extracted_data {
   id int [pk]
-  publication_id int [ref: > processing.publications.id, not null]
+  publication_id int [ref: > processing.publication.id, not null]
   type processing.extracted_type [not null]
   data blob [not null]
   img blob [not null]
@@ -190,7 +190,7 @@ Enum projects.asset_type {
    model
    extracted_data
    simulator
-   representations
+   representation
    publication
 }
 
@@ -209,18 +209,18 @@ Table projects.meta {
   status varchar [not null]
 }
 
-Table projects.assets {
+Table projects.asset {
   id int [pk]
   project_id int [ref: > projects.meta.id, not null]
-  asset_id int [ref: > modeling.representations.id, ref: > processing.publications.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, not null]
+  asset_id int [ref: > modeling.representation.id, ref: > processing.publication.id, ref: > data.dataset.id, ref: > simulation.plan.id, ref: > modeling.model.id, not null]
   type projects.asset_type [not null]
   external_ref varchar [note:'The external resource that is pushed to on update']
 }
 
-Table projects.associations {
+Table projects.association {
   id int [pk]
-  person_id int [ref: > public.people.id, not null]
-  asset_id int [ref: > projects.assets.id, not null]
+  person_id int [ref: > public.person.id, not null]
+  asset_id int [ref: > projects.asset.id, not null]
   type projects.asset_type
   role projects.role
 }
@@ -241,11 +241,11 @@ Enum ontology.importance {
    other
 }
 
-Table ontology.concepts {
+Table ontology.concept {
   id int [pk]
   term_id varchar [not null]
   type ontology.taggable_type [not null]
-  obj_id int [ref: > data.features.id, ref: > modeling.models.id, ref: > simulation.plans.id, ref: > data.datasets.id, not null]
+  obj_id int [ref: > data.feature.id, ref: > modeling.model.id, ref: > simulation.plan.id, ref: > data.dataset.id, not null]
   status ontology.importance [not null]
 }
 
@@ -253,12 +253,12 @@ Table ontology.concepts {
 
 Enum provenance.obj_type {
    dataset
-   plans
+   plan
    model 
    project
-   representations
+   representation
    software
-   runtimes
+   runtime
 }
 
 Enum provenance.relation_type {
@@ -268,19 +268,19 @@ Enum provenance.relation_type {
   copies
 }
 
-Table provenance.relations {
+Table provenance.relation {
   id int [pk]
   created_at datetime [default: `now()`, not null]
   relation_type provenance.relation_type [not null]
-  left int [ref: > modeling.runtimes.id, ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id, not null]
+  left int [ref: > modeling.runtime.id, ref: > data.dataset.id, ref: > simulation.plan.id, ref: > modeling.model.id, ref: > projects.meta.id, not null]
   left_type provenance.obj_type [not null]
-  right int [ref: > modeling.runtimes.id,ref: > data.datasets.id, ref: > simulation.plans.id, ref: > modeling.models.id, ref: > projects.meta.id, not null]
+  right int [ref: > modeling.runtime.id,ref: > data.dataset.id, ref: > simulation.plan.id, ref: > modeling.model.id, ref: > projects.meta.id, not null]
   right_type provenance.obj_type [not null]
 }
 
-/// PEOPLE ////
+/// person ////
 
-Table people {
+Table person {
   id int [pk]
   name varchar [not null]
   email varchar [not null]

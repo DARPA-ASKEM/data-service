@@ -18,22 +18,22 @@ def get_datasets() -> str:
     return 'No data'
 
 class CreateDatasetRequest(BaseModel):
-    dataset : schema.Datasets
-    features : List[schema.Features]
+    dataset : schema.Dataset
+    features : List[schema.Feature]
 
 @router.post('/datasets')
 def create_dataset(payload : CreateDatasetRequest ) -> str:
     with Session(ENGINE) as session:
         datasetp = payload.dataset.dict()
         del datasetp['id']
-        dataset = orm.Datasets(**datasetp)
+        dataset = orm.Dataset(**datasetp)
         session.add(dataset)
         session.commit()
         for f in payload.features:
             feat = f.dict()
             del feat['id']
             feat['dataset_id'] = dataset.id
-            feature = orm.Features(**feat)
+            feature = orm.Feature(**feat)
             session.add(feature)
         session.commit()
     return 'Created dataset'
