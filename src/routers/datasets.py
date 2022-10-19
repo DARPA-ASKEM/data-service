@@ -56,7 +56,7 @@ def create_dataset(payload: CreateDatasetRequest) -> str:
     return "Created dataset"
 
 
-@router.patch("/datasets/update/{id}")
+@router.patch("/datasets/{id}")
 def update_dataset(payload: schema.Dataset, id: int) -> str:
     with Session(ENGINE) as session:
         data_payload = payload.dict(
@@ -82,7 +82,7 @@ def deprecate_dataset(id: int) -> str:
 
 
 # Not working because of lack of cascade settings in ORM? Features foreign key blocks the delete.
-@router.post("/datasets/delete/{id}")
+@router.delete("/datasets/{id}")
 def delete_dataset(id: int) -> str:
     with Session(ENGINE) as session:
         session.query(orm.Dataset).filter(orm.Dataset.id == id).delete()
