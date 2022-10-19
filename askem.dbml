@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v0.10.1'
+  Note: 'v0.11.0'
 }
 
 
@@ -42,7 +42,7 @@ Table data.qualifier {
 }
 
 
-/////////// model ///////////
+/////////// MODELS ///////////
 
 Enum modeling.source {
   mrepresentationa
@@ -185,11 +185,11 @@ Table processing.extracted_data {
 
 /////////// PROJECTS ///////////
 
-Enum projects.asset_type {
+Enum projects.asset_table {
    dataset
    model
    extracted_data
-   simulator
+   plan
    representation
    publication
 }
@@ -212,8 +212,8 @@ Table projects.meta {
 Table projects.asset {
   id int [pk]
   project_id int [ref: > projects.meta.id, not null]
-  asset_id int [ref: > modeling.representation.id, ref: > processing.publication.id, ref: > data.dataset.id, ref: > simulation.plan.id, ref: > modeling.model.id, not null]
-  type projects.asset_type [not null]
+  asset_id int [not null]
+  type projects.asset_table [not null]
   external_ref varchar [note:'The external resource that is pushed to on update']
 }
 
@@ -221,13 +221,13 @@ Table projects.association {
   id int [pk]
   person_id int [ref: > public.person.id, not null]
   asset_id int [ref: > projects.asset.id, not null]
-  type projects.asset_type
+  type projects.asset_table
   role projects.role
 }
 
 /////////// ONTOLOGY ///////////
 
-Enum ontology.taggable_type {
+Enum ontology.taggable_table {
    feature
    dataset
    plan
@@ -244,8 +244,8 @@ Enum ontology.importance {
 Table ontology.concept {
   id int [pk]
   term_id varchar [not null]
-  type ontology.taggable_type [not null]
-  obj_id int [ref: > data.feature.id, ref: > modeling.model.id, ref: > simulation.plan.id, ref: > data.dataset.id, not null]
+  type ontology.taggable_table [not null]
+  obj_id int [not null]
   status ontology.importance [not null]
 }
 
@@ -272,9 +272,9 @@ Table provenance.relation {
   id int [pk]
   created_at datetime [default: `now()`, not null]
   relation_type provenance.relation_type [not null]
-  left int [ref: > modeling.runtime.id, ref: > data.dataset.id, ref: > simulation.plan.id, ref: > modeling.model.id, ref: > projects.meta.id, not null]
+  left int [not null]
   left_type provenance.obj_type [not null]
-  right int [ref: > modeling.runtime.id,ref: > data.dataset.id, ref: > simulation.plan.id, ref: > modeling.model.id, ref: > projects.meta.id, not null]
+  right int [not null]
   right_type provenance.obj_type [not null]
 }
 

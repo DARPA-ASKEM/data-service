@@ -7,6 +7,7 @@ from db import ENGINE
 from pydantic import BaseModel
 from fastapi import APIRouter
 from generated import schema, orm
+import api_schema
 from logging import Logger
 from sqlalchemy.orm import Session
 from typing import List
@@ -33,15 +34,10 @@ def get_datasets(id: int) -> str:
         return result
 
 
-class CreateDatasetRequest(BaseModel):
-    dataset: schema.Dataset
-    features: List[schema.Feature]
-
-
 @router.post("/datasets")
-def create_dataset(payload: CreateDatasetRequest) -> str:
+def create_dataset(payload: api_schema.Dataset) -> str:
     with Session(ENGINE) as session:
-        datasetp = payload.dataset.dict()
+        datasetp = payload.dict()
         del datasetp["id"]
         dataset = orm.Dataset(**datasetp)
         session.add(dataset)

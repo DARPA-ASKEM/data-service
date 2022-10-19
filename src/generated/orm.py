@@ -55,14 +55,14 @@ class ExtractedType(str, Enum):
     table = 'table'
     
 
-class AssetType(str, Enum):
+class AssetTable(str, Enum):
 
     dataset = 'dataset'
     extracted_data = 'extracted_data'
     model = 'model'
+    plan = 'plan'
     publication = 'publication'
     representation = 'representation'
-    simulator = 'simulator'
     
 
 class Role(str, Enum):
@@ -73,7 +73,7 @@ class Role(str, Enum):
     other = 'other'
     
 
-class TaggableType(str, Enum):
+class TaggableTable(str, Enum):
 
     dataset = 'dataset'
     feature = 'feature'
@@ -130,9 +130,10 @@ class Feature(Base):
 
     id = sa.Column(sa.Integer(), primary_key=True)
     dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
-    feature = sa.Column(sa.String(), nullable=False)
+    description = sa.Column(sa.Text())
+    display_name = sa.Column(sa.String())
+    name = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
-    value = sa.Column(sa.String(), nullable=False)
 
 
 class Qualifier(Base):
@@ -140,8 +141,19 @@ class Qualifier(Base):
     __tablename__ = 'qualifier'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    qualifier_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
-    qualified_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
+    description = sa.Column(sa.Text())
+    name = sa.Column(sa.String(), nullable=False)
+    value_type = sa.Column(sa.Enum(ValueType), nullable=False)
+
+
+class QualifierXref(Base):
+
+    __tablename__ = 'qualifier_xref'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    qualifier_id = sa.Column(sa.Integer(), sa.ForeignKey('qualifier.id'), nullable=False)
+    feature_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
 
 
 class Model(Base):
@@ -152,7 +164,7 @@ class Model(Base):
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     name = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.Text())
-    head = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'), nullable=False)
+    head_id = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'), nullable=False)
 
 
 class Framework(Base):
@@ -301,8 +313,8 @@ class Asset(Base):
 
     id = sa.Column(sa.Integer(), primary_key=True)
     project_id = sa.Column(sa.Integer(), sa.ForeignKey('meta.id'), nullable=False)
-    asset_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
-    type = sa.Column(sa.Enum(AssetType), nullable=False)
+    asset_id = sa.Column(sa.Integer(), nullable=False)
+    type = sa.Column(sa.Enum(AssetTable), nullable=False)
     external_ref = sa.Column(sa.String())
 
 
@@ -313,7 +325,7 @@ class Association(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
     asset_id = sa.Column(sa.Integer(), sa.ForeignKey('asset.id'), nullable=False)
-    type = sa.Column(sa.Enum(AssetType))
+    type = sa.Column(sa.Enum(AssetTable))
     role = sa.Column(sa.Enum(Role))
 
 
@@ -323,8 +335,8 @@ class Concept(Base):
 
     id = sa.Column(sa.Integer(), primary_key=True)
     term_id = sa.Column(sa.String(), nullable=False)
-    type = sa.Column(sa.Enum(TaggableType), nullable=False)
-    obj_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
+    type = sa.Column(sa.Enum(TaggableTable), nullable=False)
+    obj_id = sa.Column(sa.Integer(), nullable=False)
     status = sa.Column(sa.Enum(Importance), nullable=False)
 
 
@@ -335,9 +347,9 @@ class Relation(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     relation_type = sa.Column(sa.Enum(RelationType), nullable=False)
-    left = sa.Column(sa.Integer(), sa.ForeignKey('meta.id'), nullable=False)
+    left = sa.Column(sa.Integer(), nullable=False)
     left_type = sa.Column(sa.Enum(ObjType), nullable=False)
-    right = sa.Column(sa.Integer(), sa.ForeignKey('meta.id'), nullable=False)
+    right = sa.Column(sa.Integer(), nullable=False)
     right_type = sa.Column(sa.Enum(ObjType), nullable=False)
 
 
