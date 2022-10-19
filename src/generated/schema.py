@@ -122,16 +122,26 @@ class Feature(BaseModel):
 
     id: Optional[int] = None
     dataset_id: Optional[int] = None
-    feature: str
+    description: Optional[str]
+    display_name: Optional[str]
+    name: str
     value_type: ValueType
-    value: str
 
 
 class Qualifier(BaseModel):
 
     id: Optional[int] = None
+    dataset_id: Optional[int] = None
+    description: Optional[str]
+    name: str
+    value_type: ValueType
+
+
+class QualifierXref(BaseModel):
+
+    id: Optional[int] = None
     qualifier_id: Optional[int] = None
-    qualified_id: Optional[int] = None
+    feature_id: Optional[int] = None
 
 
 class Model(BaseModel):
@@ -140,7 +150,7 @@ class Model(BaseModel):
     created_at: datetime.datetime = datetime.datetime.now()
     name: str
     description: Optional[str]
-    head: int
+    head_id: Optional[int] = None
 
 
 class Framework(BaseModel):
