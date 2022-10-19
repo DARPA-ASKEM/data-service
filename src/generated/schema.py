@@ -27,7 +27,7 @@ class Format(str, Enum):
     sbml = 'sbml'
     
 
-class Operation(str, Enum):
+class OperationType(str, Enum):
 
     add = 'add'
     composition = 'composition'
@@ -157,7 +157,7 @@ class Operation(BaseModel):
     id: Optional[int] = None
     prev: int
     framework_id: Optional[int] = None
-    operation_type: Operation
+    operation_type: OperationType
     model_content: Json
     timestamp: datetime.datetime = datetime.datetime.now()
     user: int

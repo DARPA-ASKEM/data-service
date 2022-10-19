@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v0.10.0'
+  Note: 'v0.10.1'
 }
 
 
@@ -56,7 +56,7 @@ Enum modeling.format {
   other
 }
 
-Enum modeling.operation {
+Enum modeling.operation_type {
   add 
   remove
   glue
@@ -86,7 +86,7 @@ Table modeling.operation {
   id int [pk]
   prev int [ref: > modeling.operation.id, not null]
   framework_id int [ref: > modeling.framework.id, not null]
-  operation_type modeling.operation [not null]
+  operation_type modeling.operation_type [not null]
   model_content json [not null]
   timestamp datetime [default: `now()`, not null]
   user int [ref: > public.person.id, not null]
