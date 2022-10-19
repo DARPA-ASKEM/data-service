@@ -71,6 +71,16 @@ def update_dataset(payload: schema.Dataset, id: int) -> str:
     return "Updated dataset"
 
 
+@router.post("/datasets/deprecate/{id}")
+def deprecate_dataset(id: int) -> str:
+    with Session(ENGINE) as session:
+        to_toggle_deprecated = session.query(orm.Dataset).filter(orm.Dataset.id == id)
+        deprecated_value = not to_toggle_deprecated.first().deprecated
+        to_toggle_deprecated.update({"deprecated": deprecated_value})
+        session.commit()
+        return f"Set dataset with id {id} to deprecated state {deprecated_value}"
+
+
 # Not working because of lack of cascade settings in ORM? Features foreign key blocks the delete.
 @router.post("/datasets/delete/{id}")
 def delete_dataset(id: int) -> str:
