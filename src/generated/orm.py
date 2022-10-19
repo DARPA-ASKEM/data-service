@@ -55,14 +55,14 @@ class ExtractedType(str, Enum):
     table = 'table'
     
 
-class AssetType(str, Enum):
+class AssetTable(str, Enum):
 
     dataset = 'dataset'
     extracted_data = 'extracted_data'
     model = 'model'
+    plan = 'plan'
     publication = 'publication'
     representation = 'representation'
-    simulator = 'simulator'
     
 
 class Role(str, Enum):
@@ -73,7 +73,7 @@ class Role(str, Enum):
     other = 'other'
     
 
-class TaggableType(str, Enum):
+class TaggableTable(str, Enum):
 
     dataset = 'dataset'
     feature = 'feature'
@@ -301,8 +301,8 @@ class Asset(Base):
 
     id = sa.Column(sa.Integer(), primary_key=True)
     project_id = sa.Column(sa.Integer(), sa.ForeignKey('meta.id'), nullable=False)
-    asset_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
-    type = sa.Column(sa.Enum(AssetType), nullable=False)
+    asset_id = sa.Column(sa.Integer(), nullable=False)
+    type = sa.Column(sa.Enum(AssetTable), nullable=False)
     external_ref = sa.Column(sa.String())
 
 
@@ -313,7 +313,7 @@ class Association(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
     asset_id = sa.Column(sa.Integer(), sa.ForeignKey('asset.id'), nullable=False)
-    type = sa.Column(sa.Enum(AssetType))
+    type = sa.Column(sa.Enum(AssetTable))
     role = sa.Column(sa.Enum(Role))
 
 
@@ -323,8 +323,8 @@ class Concept(Base):
 
     id = sa.Column(sa.Integer(), primary_key=True)
     term_id = sa.Column(sa.String(), nullable=False)
-    type = sa.Column(sa.Enum(TaggableType), nullable=False)
-    obj_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
+    type = sa.Column(sa.Enum(TaggableTable), nullable=False)
+    obj_id = sa.Column(sa.Integer(), nullable=False)
     status = sa.Column(sa.Enum(Importance), nullable=False)
 
 
@@ -335,9 +335,9 @@ class Relation(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     relation_type = sa.Column(sa.Enum(RelationType), nullable=False)
-    left = sa.Column(sa.Integer(), sa.ForeignKey('meta.id'), nullable=False)
+    left = sa.Column(sa.Integer(), nullable=False)
     left_type = sa.Column(sa.Enum(ObjType), nullable=False)
-    right = sa.Column(sa.Integer(), sa.ForeignKey('meta.id'), nullable=False)
+    right = sa.Column(sa.Integer(), nullable=False)
     right_type = sa.Column(sa.Enum(ObjType), nullable=False)
 
 

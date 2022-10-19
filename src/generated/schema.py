@@ -51,14 +51,14 @@ class ExtractedType(str, Enum):
     table = 'table'
     
 
-class AssetType(str, Enum):
+class AssetTable(str, Enum):
 
     dataset = 'dataset'
     extracted_data = 'extracted_data'
     model = 'model'
+    plan = 'plan'
     publication = 'publication'
     representation = 'representation'
-    simulator = 'simulator'
     
 
 class Role(str, Enum):
@@ -69,7 +69,7 @@ class Role(str, Enum):
     other = 'other'
     
 
-class TaggableType(str, Enum):
+class TaggableTable(str, Enum):
 
     dataset = 'dataset'
     feature = 'feature'
@@ -262,7 +262,7 @@ class Asset(BaseModel):
     id: Optional[int] = None
     project_id: Optional[int] = None
     asset_id: Optional[int] = None
-    type: AssetType
+    type: AssetTable
     external_ref: Optional[str]
 
 
@@ -271,7 +271,7 @@ class Association(BaseModel):
     id: Optional[int] = None
     person_id: Optional[int] = None
     asset_id: Optional[int] = None
-    type: Optional[AssetType]
+    type: Optional[AssetTable]
     role: Optional[Role]
 
 
@@ -279,7 +279,7 @@ class Concept(BaseModel):
 
     id: Optional[int] = None
     term_id: str
-    type: TaggableType
+    type: TaggableTable
     obj_id: Optional[int] = None
     status: Importance
 
