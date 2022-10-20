@@ -32,8 +32,13 @@ class Dataset(schema.Dataset):
     concept : Concept
 
 
+class ModelBody(schema.Operation):
+    framework_name: str
+    
+    
+
 class Model(schema.Model):
-    body : dict
+    body : ModelBody
 
 
 """

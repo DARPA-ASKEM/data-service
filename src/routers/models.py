@@ -25,6 +25,8 @@ def create_model(payload: Model) -> str:
     with Session(ENGINE) as session:
         model_payload = payload.dict()
         operation_payload = model_payload.pop('body')
+
+
         model = orm.Model(**model_payload)
         session.add(model)
         session.commit()
