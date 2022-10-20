@@ -37,6 +37,7 @@ class OperationType(str, Enum):
     composition = 'composition'
     decomposition = 'decomposition'
     glue = 'glue'
+    init = 'init'
     other = 'other'
     product = 'product'
     remove = 'remove'
@@ -191,17 +192,17 @@ class Operation(Base):
     user = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
 
 
-class Representation(Base):
+class Intermediate(Base):
 
-    __tablename__ = 'representation'
+    __tablename__ = 'intermediate'
 
     id = sa.Column(sa.Integer(), primary_key=True)
     created_at = sa.Column(sa.DateTime(), nullable=False)
     source = sa.Column(sa.Enum(Source), nullable=False)
     type = sa.Column(sa.Enum(Format), nullable=False)
     representation = sa.Column(sa.LargeBinary(), nullable=False)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
-    software_id = sa.Column(sa.Integer(), sa.ForeignKey('software.id'), nullable=False)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'))
+    software_id = sa.Column(sa.Integer(), sa.ForeignKey('software.id'))
 
 
 class Software(Base):

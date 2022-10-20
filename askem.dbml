@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v0.11.0'
+  Note: 'v0.11.2'
 }
 
 
@@ -30,15 +30,24 @@ Table data.dataset {
 Table data.feature {
   id int [pk]
   dataset_id int [ref: > data.dataset.id, not null]
-  feature varchar [not null, note: 'this could be broken out into an annotation metadata table']
+  description text
+  display_name varchar
+  name varchar [not null]
   value_type data.value_type [not null]
-  value varchar [not null]
 }
 
 Table data.qualifier {
   id int [pk]
-  qualifier_id int [ref: > data.feature.id, not null]
-  qualified_id int [ref: > data.feature.id, not null]
+  dataset_id int [ref: > data.dataset.id, not null]
+  description text
+  name varchar [not null]
+  value_type data.value_type [not null]
+}
+
+Table data.qualifier_xref {
+  id int [pk]
+  qualifier_id int [ref: > data.qualifier.id, not null]
+  feature_id int [ref: > data.feature.id, not null]
 }
 
 
@@ -57,6 +66,7 @@ Enum modeling.format {
 }
 
 Enum modeling.operation_type {
+  init
   add 
   remove
   glue
@@ -71,7 +81,7 @@ Table modeling.model {
   created_at datetime [default: `now()`, not null]
   name varchar [not null]
   description text
-  head int [ref: > modeling.operation.id, not null]
+  head_id int [ref: > modeling.operation.id, not null]
 }
 
 Table modeling.framework {
@@ -92,14 +102,14 @@ Table modeling.operation {
   user int [ref: > public.person.id, not null]
 }
 
-Table modeling.representation {
+Table modeling.intermediate {
   id int [pk]
   created_at datetime [not null]
   source modeling.source [not null]
   type modeling.format [not null]
   representation blob [not null]
-  model_id int [ref: > modeling.model.id, not null, note: 'this may become a many to one relation']
-  software_id int [ref: > modeling.software.id, not null]
+  model_id int [ref: > modeling.model.id, note: 'this may become a many to one relation']
+  software_id int [ref: > modeling.software.id]
 }
 
 Table modeling.software {
@@ -278,7 +288,7 @@ Table provenance.relation {
   right_type provenance.obj_type [not null]
 }
 
-/// person ////
+/// PERSON ////
 
 Table person {
   id int [pk]
