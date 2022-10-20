@@ -5,7 +5,8 @@ router.admin - Wraps administrative functions for interacting with the DB.
 from fastapi import APIRouter
 
 from db import ENGINE
-from generated.orm import Base
+from generated import orm
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
@@ -23,6 +24,23 @@ def init_tables() -> str:
     """
     Initialize tables in the connected DB
     """
-    Base.metadata.create_all(ENGINE)
-    return "Tables initialized" 
+    orm.Base.metadata.create_all(ENGINE)
+    return "Tables initialized"
+
+
+@router.post('/admin/framework/init')
+def init_catlab_data() -> str:
+    """
+    Initialize dummy frameworks
+    """
+    with Session(ENGINE) as session:
+        framework = orm.Framework(
+            id = 0,
+            version = "dummy",
+            name = "dummy",
+            semantics = {},
+        )
+        session.add(framework)
+        session.commit()
+    return "Dummy framework created"
 

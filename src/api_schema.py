@@ -1,15 +1,10 @@
 """
-validation - does nothing yet
+api_schema - does nothing yet
 """
 
 from pydantic import BaseModel, Extra
 from generated import schema
 from typing import List
-
-
-class PatchObj(BaseModel):
-    class Config:
-        extra = Extra.allow
 
 
 class Concept(BaseModel):
@@ -36,7 +31,6 @@ class ModelBody(schema.Operation):
     framework_name: str
     
     
-
 class Model(schema.Model):
     body : ModelBody
 

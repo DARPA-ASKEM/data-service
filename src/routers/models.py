@@ -65,7 +65,7 @@ def create_raw_model(payload: schema.Software) -> str:
         model = orm.Software(**model_payload)
         session.add(model)
         session.commit()
-    return "Created raw model"
+    return "Stored original software for model"
 
 
 @router.patch("/models/raw/{id}")
@@ -75,7 +75,7 @@ def update_raw_model(payload, id: int) -> str:
         model = session.query(orm.Software).filter(orm.Software.id == id)
         model.update(model_payload)
         session.commit()
-    return "Updated raw model"
+    return "Updated original software for model"
 
 
 @router.delete("/models/raw/{id}")
@@ -83,5 +83,5 @@ def delete_raw_model(id: int) -> str:
     with Session(ENGINE) as session:
         session.query(orm.Model).filter(orm.Software.id == id).delete()
         session.commit()
-    return "Deleted raw model"
+    return "Deleted original software for model"
 
