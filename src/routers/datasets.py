@@ -1,14 +1,14 @@
 """
 router.datasets - crud operations for datasets and related tables in the DB
 """
+import api_schema
 
-import json
 from db import ENGINE
 from pydantic import BaseModel
 from fastapi import APIRouter
 from generated import schema, orm
-import api_schema
 from logging import Logger
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -17,17 +17,24 @@ router = APIRouter()
 
 
 @router.get("/datasets")
-def get_datasets(count: int) -> str:
+def get_datasets(count: int):
     with Session(ENGINE) as session:
-        result = session.query(orm.Dataset).order_by(orm.Dataset.id.desc()).limit(count)
-        logger.info(f"Pre manip result: {result}")
-        result = result[::-1]
-        logger.info(f"Latest output: {result}")
+        # result = (
+        #     session.query(orm.Dataset)
+        #     .order_by(desc(orm.Dataset.timestamp))
+        #     .limit(count)
+        # )
+        result = (
+            session.query(orm.Dataset)
+            .order_by(orm.Dataset.timestamp.asc())
+            .limit(count)
+        )
+        result = result[::]
         return result
 
 
 @router.get("/datasets/{id}")
-def get_datasets(id: int) -> str:
+def get_dataset(id: int) -> str:
     with Session(ENGINE) as session:
         result = session.query(orm.Dataset).get(id)
         logger.info(f"Latest output: {result}")
@@ -39,12 +46,16 @@ def create_dataset(payload: api_schema.Dataset) -> str:
     with Session(ENGINE) as session:
         datasetp = payload.dict()
         del datasetp["id"]
+        del datasetp["features"]
+        del datasetp["qualifiers"]
+        del datasetp["concept"]
         dataset = orm.Dataset(**datasetp)
         session.add(dataset)
         session.commit()
         for f in payload.features:
             feat = f.dict()
             del feat["id"]
+            del feat["concept"]
             feat["dataset_id"] = dataset.id
             feature = orm.Feature(**feat)
             session.add(feature)
