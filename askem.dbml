@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v0.11.2'
+  Note: 'v0.11.3'
 }
 
 
@@ -67,6 +67,7 @@ Enum modeling.format {
 
 Enum modeling.operation_type {
   init
+  edit
   add 
   remove
   glue
@@ -86,7 +87,6 @@ Table modeling.model {
 
 Table modeling.framework {
   id int [pk]
-  runtime_id int [ref: > modeling.runtime.id, not null]
   version varchar [not null]
   name varchar [not null]
   semantics json [not null]
@@ -123,8 +123,8 @@ Table modeling.runtime {
   id int [pk]
   created_at datetime [default: `now()`, not null]
   name varchar [not null]
-  left varchar [not null]
-  right varchar [not null]
+  left int [ref: > modeling.framework.id, not null]
+  right int [ref: > modeling.framework.id, not null]
 }
 
 /////////// SIMULATORS ///////////
