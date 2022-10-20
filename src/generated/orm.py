@@ -36,6 +36,7 @@ class OperationType(str, Enum):
     add = 'add'
     composition = 'composition'
     decomposition = 'decomposition'
+    edit = 'edit'
     glue = 'glue'
     init = 'init'
     other = 'other'
@@ -173,7 +174,6 @@ class Framework(Base):
     __tablename__ = 'framework'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    runtime_id = sa.Column(sa.Integer(), sa.ForeignKey('runtime.id'), nullable=False)
     version = sa.Column(sa.String(), nullable=False)
     name = sa.Column(sa.String(), nullable=False)
     semantics = sa.Column(JSON(), nullable=False)
@@ -222,8 +222,8 @@ class Runtime(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     name = sa.Column(sa.String(), nullable=False)
-    left = sa.Column(sa.String(), nullable=False)
-    right = sa.Column(sa.String(), nullable=False)
+    left = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
+    right = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
 
 
 class Plan(Base):
