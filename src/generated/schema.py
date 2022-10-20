@@ -32,7 +32,9 @@ class OperationType(str, Enum):
     add = 'add'
     composition = 'composition'
     decomposition = 'decomposition'
+    edit = 'edit'
     glue = 'glue'
+    init = 'init'
     other = 'other'
     product = 'product'
     remove = 'remove'
@@ -156,7 +158,6 @@ class Model(BaseModel):
 class Framework(BaseModel):
 
     id: Optional[int] = None
-    runtime_id: Optional[int] = None
     version: str
     name: str
     semantics: Json
@@ -173,15 +174,15 @@ class Operation(BaseModel):
     user: int
 
 
-class Representation(BaseModel):
+class Intermediate(BaseModel):
 
     id: Optional[int] = None
     created_at: datetime.datetime
     source: Source
     type: Format
     representation: bytes
-    model_id: Optional[int] = None
-    software_id: Optional[int] = None
+    model_id: Optional[int]
+    software_id: Optional[int]
 
 
 class Software(BaseModel):
@@ -197,8 +198,8 @@ class Runtime(BaseModel):
     id: Optional[int] = None
     created_at: datetime.datetime = datetime.datetime.now()
     name: str
-    left: str
-    right: str
+    left: int
+    right: int
 
 
 class Plan(BaseModel):

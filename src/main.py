@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from uvicorn import run as uvicorn_run
 
 DBML_PATH = "../askem.dbml"
-DBML_VERSION = "v0.11.1"
+DBML_VERSION = "v0.11.3"
 GENERATED_PATH = "./generated"
 
 
