@@ -38,6 +38,6 @@ endpoint.
 
 ## ASKEM Data Model
 
-![The generated graphic](./misc/askem.png)
+![The generated graphic](./img/askem.png)
 
 ERD was created using [DBML](https://www.dbml.org/home/) and rendered and edited using [dbdiagram](https://dbdiagram.io/)
