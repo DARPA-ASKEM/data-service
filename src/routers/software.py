@@ -1,0 +1,60 @@
+"""
+router.software - very basic crud operations for software
+"""
+
+from db import ENGINE
+from fastapi import APIRouter
+from generated import schema, orm
+from api_schema import Model, ModelBody
+from logging import Logger
+from sqlalchemy.orm import Session
+
+logger = Logger(__file__)
+router = APIRouter()
+
+
+@router.get("/software/{id}")
+def get_software(id: int) -> schema.Software:
+    """
+    Retrieve software metadata
+    """
+    with Session(ENGINE) as session:
+        return session.query(orm.Software).get(id)
+
+
+@router.post("/software")
+def create_software(payload: schema.Software) -> str:
+    """
+    Create software metadata
+    """
+    with Session(ENGINE) as session:
+        model_payload = payload.dict()
+        model = orm.Software(**model_payload)
+        session.add(model)
+        session.commit()
+    return "Stored original software for model"
+
+
+@router.patch("/software/{id}")
+def update_software(payload, id: int) -> str:
+    """
+    Update software metadata
+    """
+
+    with Session(ENGINE) as session:
+        model_payload = payload.dict()
+        model = session.query(orm.Software).filter(orm.Software.id == id).update(model_payload)
+        session.commit()
+    return "Updated original software for model"
+
+
+@router.delete("/software/{id}")
+def delete_software(id: int) -> str:
+    """
+    Delete software metadata
+    """
+    with Session(ENGINE) as session:
+        session.query(orm.Model).filter(orm.Software.id == id).delete()
+        session.commit()
+    return "Deleted original software for model"
+

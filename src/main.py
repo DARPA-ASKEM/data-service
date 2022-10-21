@@ -3,16 +3,22 @@
 main - The script builds and hosts the API using a command line interface.
 """
 
-
 from importlib import import_module
 from click import argument, echo, group, option
 from dbml_builder import verify
 from fastapi import FastAPI
 from uvicorn import run as uvicorn_run
+from pkgutil import iter_modules
+from typing import List
 
 DBML_PATH = '../askem.dbml'
 DBML_VERSION = 'v0.11.4'
 GENERATED_PATH = './generated'
+
+
+def find_valid_routers() -> List[str]:
+    router = import_module(f'routers')
+    return [module.name for module in iter_modules(router.__path__)]
 
 
 def attach_router(api : FastAPI, router_name : str) -> None:
@@ -31,7 +37,7 @@ def build_api(*args : str) -> FastAPI:
     Build an API using a group of specified router modules
     """
     app = FastAPI(docs_url='/') 
-    for router_name in args:
+    for router_name in args if len(args) != 0 else find_valid_routers():
         attach_router(app, router_name)
     return app
 

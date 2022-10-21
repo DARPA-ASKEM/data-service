@@ -1,5 +1,5 @@
 """
-api_schema - does nothing yet
+api_schema - Provides the API interface with the data store contents.
 """
 
 from json import dumps
@@ -38,8 +38,12 @@ class ModelBody(schema.Operation):
 
     @classmethod
     def from_orm(cls, body : orm.Operation) -> 'ModelBody':
+        """
+        Handle ORM conversion while coercing `dict` to JSON
+        """
         setattr(body, 'model_content', dumps(body.model_content))
         return super().from_orm(body)
+
 
 class Model(schema.Model):
     body : ModelBody
@@ -50,6 +54,9 @@ class Model(schema.Model):
 
     @classmethod
     def from_orm(cls, metadata : orm.Model, body : orm.Operation) -> 'Model':
+        """
+        Handle ORM conversion with insertion of model body into schema
+        """
         model_body = ModelBody.from_orm(body)
         setattr(metadata, 'body', model_body)
         return super().from_orm(metadata)
