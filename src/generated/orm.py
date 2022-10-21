@@ -184,7 +184,7 @@ class Operation(Base):
     __tablename__ = 'operation'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    prev = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'), nullable=False)
+    prev = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'))
     framework_id = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
     operation_type = sa.Column(sa.Enum(OperationType), nullable=False)
     model_content = sa.Column(JSON(), nullable=False)
@@ -361,6 +361,6 @@ class Person(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     name = sa.Column(sa.String(), nullable=False)
     email = sa.Column(sa.String(), nullable=False)
-    org = sa.Column(sa.String(), nullable=False)
-    website = sa.Column(sa.String(), nullable=False)
+    org = sa.Column(sa.String())
+    website = sa.Column(sa.String())
     is_registered = sa.Column(sa.Boolean(), nullable=False)

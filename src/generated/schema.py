@@ -166,7 +166,7 @@ class Framework(BaseModel):
 class Operation(BaseModel):
 
     id: Optional[int] = None
-    prev: int
+    prev: Optional[int]
     framework_id: Optional[int] = None
     operation_type: OperationType
     model_content: Json
@@ -311,6 +311,6 @@ class Person(BaseModel):
     id: Optional[int] = None
     name: str
     email: str
-    org: str
-    website: str
+    org: Optional[str]
+    website: Optional[str]
     is_registered: bool

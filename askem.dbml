@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v0.11.3'
+  Note: 'v0.11.4'
 }
 
 
@@ -94,7 +94,7 @@ Table modeling.framework {
 
 Table modeling.operation {
   id int [pk]
-  prev int [ref: > modeling.operation.id, not null]
+  prev int [ref: > modeling.operation.id]
   framework_id int [ref: > modeling.framework.id, not null]
   operation_type modeling.operation_type [not null]
   model_content json [not null]
@@ -294,7 +294,7 @@ Table person {
   id int [pk]
   name varchar [not null]
   email varchar [not null]
-  org varchar [not null]
-  website varchar [not null]
+  org varchar
+  website varchar
   is_registered bool [not null, note: 'Individuals might be listed as a maintainer but may not be a registered user.']
 }

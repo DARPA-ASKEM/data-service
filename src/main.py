@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from uvicorn import run as uvicorn_run
 
 DBML_PATH = '../askem.dbml'
-DBML_VERSION = 'v0.11.3'
+DBML_VERSION = 'v0.11.4'
 GENERATED_PATH = './generated'
 
 
