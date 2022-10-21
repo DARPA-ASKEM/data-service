@@ -23,7 +23,7 @@ def attach_router(api : FastAPI, router_name : str) -> None:
     being hardcoded.
     """
     router_package = import_module(f'routers.{router_name}')
-    api.include_router(router_package.router, prefix=f'/{router_name}', tags=[router_name])
+    api.include_router(router_package.router, tags=[router_name])
 
 
 def build_api(*args : str) -> FastAPI:

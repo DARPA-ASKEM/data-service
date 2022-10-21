@@ -2,9 +2,9 @@
 api_schema - does nothing yet
 """
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 from generated import schema
-from typing import List
+from typing import List, Optional
 
 
 class Concept(BaseModel):
@@ -14,25 +14,28 @@ class Concept(BaseModel):
 
 class Qualifier(schema.Qualifier):
     feature_names : List[str]
-    concept : Concept
+    concept : Optional[Concept]
 
 
 class Feature(schema.Feature):
-    concept : Concept
+    concept : Optional[Concept]
 
 
 class Dataset(schema.Dataset):
     features : List[Feature]
     qualifiers : List[Qualifier]
-    concept : Concept
+    concept : Optional[Concept]
 
 
 class ModelBody(schema.Operation):
-    framework_name: str
-    
-    
+    framework_id = 0 # TODO(five): Implement framework crud
+    #framework_name : str = 'dummy' # TODO(five): Look up id using name
+    user = 0 # TODO(five): Implement person crud
+
+
 class Model(schema.Model):
     body : ModelBody
+    concept : Optional[Concept]
 
 
 """

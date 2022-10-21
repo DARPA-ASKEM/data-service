@@ -44,3 +44,20 @@ def init_catlab_data() -> str:
         session.commit()
     return "Dummy framework created"
 
+@router.post('/admin/person/init')
+def init_fake_user() -> str:
+    """
+    Initialize dummy person
+    """
+    with Session(ENGINE) as session:
+        person = orm.Person(
+            id = 0,
+            name = "Jane Doe",
+            email = "sample",
+            org = "sample",
+            website = "sample",
+            is_registered = True
+        )
+        session.add(person)
+        session.commit()
+    return "Dummy person created"

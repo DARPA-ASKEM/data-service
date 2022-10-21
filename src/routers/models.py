@@ -25,8 +25,10 @@ def create_model(payload: Model) -> str:
     with Session(ENGINE) as session:
         model_payload = payload.dict()
         operation_payload = model_payload.pop('body')
-
-
+        operation = orm.Operation(**operation_payload)
+        session.add(operation)
+        session.commit()
+        model_payload['head_id'] = operation.id
         model = orm.Model(**model_payload)
         session.add(model)
         session.commit()
@@ -37,16 +39,27 @@ def create_model(payload: Model) -> str:
 def update_model(payload, id: int) -> str:
     with Session(ENGINE) as session:
         model_payload = payload.dict()
-        model = session.query(orm.Model).filter(orm.Model.id == id)
+        model = session.query(orm.Model).get(id)
         model.update(model_payload)
         session.commit()
     return "Updated model"
 
 
+@router.post("/models/{id}")
+def undo_model(id: int) -> str:
+    with Session(ENGINE) as session:
+        model = session.query(orm.Model).get(id)
+        operation = session.query(orm.Operation).get(model.head_id)
+        model.update({'head_id':operation.prev})
+        session.commit()
+        result = session.query(orm.Model).get(id)
+        return result
+
+
 @router.delete("/models/{id}")
 def delete_model(id: int) -> str:
     with Session(ENGINE) as session:
-        session.query(orm.Model).filter(orm.Model.id == id).delete()
+        session.query(orm.Model).get(id).delete()
         session.commit()
     return "Deleted model"
 
