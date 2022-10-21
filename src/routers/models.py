@@ -5,7 +5,7 @@ router.models - crud operations for models
 from db import ENGINE
 from fastapi import APIRouter
 from generated import schema, orm
-from api_schema import Model
+from api_schema import Model, ModelBody
 from logging import Logger
 from sqlalchemy.orm import Session
 
@@ -16,8 +16,9 @@ router = APIRouter()
 @router.get("/models/{id}")
 def get_model(id: int) -> Model:
     with Session(ENGINE) as session:
-        result = session.query(orm.Model).get(id)
-        return result
+        model = session.query(orm.Model).get(id)
+        operation = session.query(orm.Operation).get(model.head_id)
+        return Model.from_orm(model, operation)
 
 
 @router.post("/models")
@@ -26,6 +27,7 @@ def create_model(payload: Model) -> str:
         model_payload = payload.dict()
         operation_payload = model_payload.pop('body')
         operation = orm.Operation(**operation_payload)
+        concept_payload = model_payload.pop('concept') #TODO: Save ontology term
         session.add(operation)
         session.commit()
         model_payload['head_id'] = operation.id
@@ -36,24 +38,26 @@ def create_model(payload: Model) -> str:
 
 
 @router.patch("/models/{id}")
-def update_model(payload, id: int) -> str:
+def update_model(payload : ModelBody, id: int) -> Model:
     with Session(ENGINE) as session:
-        model_payload = payload.dict()
         model = session.query(orm.Model).get(id)
-        model.update(model_payload)
+        operation_payload = payload.dict()
+        operation = orm.Operation(**operation_payload, prev=model.head_id)
+        session.add(operation)
         session.commit()
-    return "Updated model"
+        model.update(head_id=operation.id)
+        session.commit()
+    return get_model(id)
 
 
 @router.post("/models/{id}")
-def undo_model(id: int) -> str:
+def undo_model(id: int) -> Model:
     with Session(ENGINE) as session:
         model = session.query(orm.Model).get(id)
         operation = session.query(orm.Operation).get(model.head_id)
         model.update({'head_id':operation.prev})
         session.commit()
-        result = session.query(orm.Model).get(id)
-        return result
+    return get_model(id)
 
 
 @router.delete("/models/{id}")

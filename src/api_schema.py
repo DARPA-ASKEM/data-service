@@ -2,8 +2,9 @@
 api_schema - does nothing yet
 """
 
+from json import dumps
 from pydantic import BaseModel
-from generated import schema
+from generated import schema, orm
 from typing import List, Optional
 
 
@@ -32,11 +33,27 @@ class ModelBody(schema.Operation):
     #framework_name : str = 'dummy' # TODO(five): Look up id using name
     user = 0 # TODO(five): Implement person crud
 
+    class Config:
+        orm_mode = True
+
+    @classmethod
+    def from_orm(cls, body : orm.Operation) -> 'ModelBody':
+        setattr(body, 'model_content', dumps(body.model_content))
+        return super().from_orm(body)
 
 class Model(schema.Model):
     body : ModelBody
     concept : Optional[Concept]
 
+    class Config:
+        orm_mode = True
+
+    @classmethod
+    def from_orm(cls, metadata : orm.Model, body : orm.Operation) -> 'Model':
+        model_body = ModelBody.from_orm(body)
+        setattr(metadata, 'body', model_body)
+        return super().from_orm(metadata)
+        
 
 """
 class Association(BaseModel):
