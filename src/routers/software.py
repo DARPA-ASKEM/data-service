@@ -2,10 +2,9 @@
 router.software - very basic crud operations for software
 """
 
-from db import ENGINE
+from config.db import engine
 from fastapi import APIRouter
 from generated import schema, orm
-from api_schema import Model, ModelBody
 from logging import Logger
 from sqlalchemy.orm import Session
 
@@ -18,7 +17,7 @@ def get_software(id: int) -> schema.Software:
     """
     Retrieve software metadata
     """
-    with Session(ENGINE) as session:
+    with Session(engine) as session:
         return session.query(orm.Software).get(id)
 
 
@@ -27,7 +26,7 @@ def create_software(payload: schema.Software) -> str:
     """
     Create software metadata
     """
-    with Session(ENGINE) as session:
+    with Session(engine) as session:
         model_payload = payload.dict()
         model = orm.Software(**model_payload)
         session.add(model)
@@ -41,7 +40,7 @@ def update_software(payload, id: int) -> str:
     Update software metadata
     """
 
-    with Session(ENGINE) as session:
+    with Session(engine) as session:
         model_payload = payload.dict()
         model = session.query(orm.Software).filter(orm.Software.id == id).update(model_payload)
         session.commit()
@@ -53,7 +52,7 @@ def delete_software(id: int) -> str:
     """
     Delete software metadata
     """
-    with Session(ENGINE) as session:
+    with Session(engine) as session:
         session.query(orm.Model).filter(orm.Software.id == id).delete()
         session.commit()
     return "Deleted original software for model"

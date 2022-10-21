@@ -2,10 +2,10 @@
 router.models - crud operations for models
 """
 
-from db import ENGINE
+from config.db import engine
 from fastapi import APIRouter
 from generated import orm
-from api_schema import Model, ModelBody
+from config.schema import Model, ModelBody
 from logging import Logger
 from sqlalchemy.orm import Session
 
@@ -18,7 +18,7 @@ def get_model(id: int) -> Model:
     """
     Retrieve model
     """
-    with Session(ENGINE) as session:
+    with Session(engine) as session:
         model = session.query(orm.Model).get(id)
         operation = session.query(orm.Operation).get(model.head_id)
         return Model.from_orm(model, operation)
@@ -29,7 +29,7 @@ def create_model(payload: Model) -> str:
     """
     Create model
     """
-    with Session(ENGINE) as session:
+    with Session(engine) as session:
         model_payload = payload.dict()
         operation_payload = model_payload.pop('body')
         operation = orm.Operation(**operation_payload)
@@ -48,7 +48,7 @@ def update_model(payload : ModelBody, id: int) -> Model:
     """
     Update model content
     """
-    with Session(ENGINE) as session:
+    with Session(engine) as session:
         model = session.query(orm.Model).get(id)
         operation_payload = payload.dict()
         operation_payload['prev'] = model.head_id
@@ -67,7 +67,7 @@ def delete_model(id: int) -> str:
 
     WARNING: The operation history is left dangling.
     """
-    with Session(ENGINE) as session:
+    with Session(engine) as session:
         session.query(orm.Model).get(id).delete()
         session.commit()
     return "Deleted model"

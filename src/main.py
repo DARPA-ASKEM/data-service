@@ -4,13 +4,13 @@ main - The script builds and hosts the API using a command line interface.
 """
 
 from importlib import import_module
+from pkgutil import iter_modules
+from typing import List
 from click import argument, echo, group, option
 from dbml_builder import verify
 from fastapi import FastAPI
 from uvicorn import run as uvicorn_run
-from pkgutil import iter_modules
-from typing import List
-from db import ENGINE
+from config.db import engine
 from generated import orm
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
@@ -53,8 +53,8 @@ def init_dev_db_content():
     """
     Initialize tables in the connected DB
     """
-    orm.Base.metadata.create_all(ENGINE)
-    with Session(ENGINE) as session:
+    orm.Base.metadata.create_all(engine)
+    with Session(engine) as session:
         need_framework = session.query(orm.Framework).first() == None
         need_person = session.query(orm.Person).first() == None
         if need_framework: 
