@@ -4,7 +4,7 @@ test.test_main - A basic healthcheck
 
 from fastapi.testclient import TestClient
 from dbml_builder import get_dbml_version
-from src.main import build_api, DBML_PATH, DBML_VERSION
+from main import build_api, DBML_PATH, DBML_VERSION
 
 
 def test_version() -> None:
