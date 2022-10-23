@@ -10,9 +10,10 @@ from click import argument, echo, command, option
 from dbml_builder import verify
 from fastapi import FastAPI
 from uvicorn import run as uvicorn_run
+from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
-from config.db import engine
+from config import db
 from generated import orm
 
 DBML_PATH = '../askem.dbml'
@@ -28,7 +29,7 @@ def find_valid_routers() -> List[str]:
     return [module.name for module in iter_modules(router.__path__)]
 
 
-def attach_router(api : FastAPI, router_name : str) -> None:
+def attach_router(api : FastAPI, engine : Engine, router_name : str) -> None:
     """
     Import router module dynamically and attach it to the API
 
@@ -36,20 +37,20 @@ def attach_router(api : FastAPI, router_name : str) -> None:
     being hardcoded.
     """
     router_package = import_module(f'routers.{router_name}')
-    api.include_router(router_package.router, tags=[router_name])
+    api.include_router(router_package.gen_router(engine), tags=[router_name])
 
 
-def build_api(*args : str) -> FastAPI:
+def build_api(engine : Engine, *args : str) -> FastAPI:
     """
     Build an API using a group of specified router modules
     """
     app = FastAPI(docs_url='/')
     for router_name in args if len(args) != 0 else find_valid_routers():
-        attach_router(app, router_name)
+        attach_router(app, engine, router_name)
     return app
 
 
-def init_dev_db_content():
+def init_dev_db_content(engine):
     """
     Initialize tables in the connected DB
     """
@@ -95,11 +96,11 @@ def start(host: str, port: int, dev: bool, endpoint: str) -> None:
         sys_exit()
     if dev:
         try:
-            #init_dev_db_content()
+            #init_dev_db_content(db.engine)
             echo("Dev DB content initialized.")
         except OperationalError:
             echo('WARNING: DB NOT CONNECTED')
-    api = build_api(*endpoint)
+    api = build_api(db.engine, *endpoint)
     uvicorn_run(
       api,
       host=host,
