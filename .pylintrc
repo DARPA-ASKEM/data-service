@@ -1,0 +1,21 @@
+[MASTER]
+
+# Since the data store is part of an R&D project, it makes sense to move fast
+# and leave TODOs for later.
+disable=fixme
+
+# Pylint should not run on the the generated files
+ignore=generated
+
+extension-pkg-whitelist=pydantic
+
+[BASIC]
+
+good-names=id
+
+[VARIABLES]
+
+allowed-redefined-builtins=id
+
+
+

@@ -1,11 +1,10 @@
 """
-test.test_main - A basic healthceck 
+test.test_main - A basic healthcheck
 """
 
 from fastapi.testclient import TestClient
-
+from dbml_builder import get_dbml_version
 from src.main import build_api, DBML_PATH, DBML_VERSION
-from src.builder.gen import get_dbml_version
 
 
 def test_version() -> None:

@@ -2,12 +2,12 @@
 router.models - crud operations for models
 """
 
-from config.db import engine
+from logging import Logger
 from fastapi import APIRouter
+from sqlalchemy.orm import Session
 from generated import orm
 from config.schema import Model, ModelBody
-from logging import Logger
-from sqlalchemy.orm import Session
+from config.db import engine
 
 logger = Logger(__file__)
 router = APIRouter()
@@ -33,6 +33,7 @@ def create_model(payload: Model) -> str:
         model_payload = payload.dict()
         operation_payload = model_payload.pop('body')
         operation = orm.Operation(**operation_payload)
+        # pylint: disable-next=unused-variable
         concept_payload = model_payload.pop('concept') #TODO: Save ontology term
         session.add(operation)
         session.commit()
@@ -71,4 +72,3 @@ def delete_model(id: int) -> str:
         session.query(orm.Model).get(id).delete()
         session.commit()
     return "Deleted model"
-

@@ -14,5 +14,3 @@ def db_status() -> str:
     Print kind of DB being used
     """
     return engine.name.upper()
-
-

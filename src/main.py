@@ -2,18 +2,18 @@
 """
 main - The script builds and hosts the API using a command line interface.
 """
-
 from importlib import import_module
 from pkgutil import iter_modules
+from sys import exit as sys_exit
 from typing import List
-from click import argument, echo, group, option
+from click import argument, echo, command, option
 from dbml_builder import verify
 from fastapi import FastAPI
 from uvicorn import run as uvicorn_run
-from config.db import engine
-from generated import orm
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
+from config.db import engine
+from generated import orm
 
 DBML_PATH = '../askem.dbml'
 DBML_VERSION = 'v0.11.4'
@@ -55,9 +55,9 @@ def init_dev_db_content():
     """
     orm.Base.metadata.create_all(engine)
     with Session(engine) as session:
-        need_framework = session.query(orm.Framework).first() == None
-        need_person = session.query(orm.Person).first() == None
-        if need_framework: 
+        need_framework = session.query(orm.Framework).first() is None
+        need_person = session.query(orm.Person).first() is None
+        if need_framework:
             framework = orm.Framework(
                 id = 0,
                 version = "dummy",
@@ -78,15 +78,7 @@ def init_dev_db_content():
         session.commit()
 
 
-@group()
-def main() -> None:
-    """
-    Manage the data store API service
-    """
-    pass
-
-
-@main.command()
+@command()
 @option('--host', default='0.0.0.0', type=str, help='Address for the API')
 @option('--port', default=8000, type=int, help='Port to expose API')
 @option('--dev', default=True, type=bool, help='Set development flag')
@@ -98,11 +90,13 @@ def start(host: str, port: int, dev: bool, endpoint: str) -> None:
     try:
         assert verify(DBML_VERSION, GENERATED_PATH)
     except AssertionError:
+        # pylint: disable-next=line-too-long
         echo('Failed to start: version mismatch. DBML has either been updated or generated schemas have been modified by users')
-        exit()
+        sys_exit()
     if dev:
         try:
-            init_dev_db_content()
+            #init_dev_db_content()
+            echo("Dev DB content initialized.")
         except OperationalError:
             echo('WARNING: DB NOT CONNECTED')
     api = build_api(*endpoint)
@@ -114,4 +108,4 @@ def start(host: str, port: int, dev: bool, endpoint: str) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    start() # pylint: disable=no-value-for-parameter

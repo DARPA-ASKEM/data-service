@@ -1,11 +1,11 @@
 """
 api_schema - Provides the API interface with the data store contents.
 """
-
+# pylint: disable=missing-class-docstring, too-few-public-methods
 from json import dumps
+from typing import List, Optional
 from pydantic import BaseModel
 from generated import schema, orm
-from typing import List, Optional
 
 
 class Concept(BaseModel):
@@ -60,15 +60,3 @@ class Model(schema.Model):
         model_body = ModelBody.from_orm(body)
         setattr(metadata, 'body', model_body)
         return super().from_orm(metadata)
-        
-
-"""
-class Association(BaseModel):
-    person : schema.Person
-    role : schema.Role
-
-class Project(schema.Meta):
-    users : schema.Association
-    assets : List[schema.Asset]
-"""
-

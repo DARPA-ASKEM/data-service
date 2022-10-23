@@ -1,12 +1,11 @@
 """
 router.software - very basic crud operations for software
 """
-
-from config.db import engine
-from fastapi import APIRouter
-from generated import schema, orm
 from logging import Logger
+from fastapi import APIRouter
 from sqlalchemy.orm import Session
+from config.db import engine
+from generated import schema, orm
 
 logger = Logger(__file__)
 router = APIRouter()
@@ -42,7 +41,7 @@ def update_software(payload, id: int) -> str:
 
     with Session(engine) as session:
         model_payload = payload.dict()
-        model = session.query(orm.Software).filter(orm.Software.id == id).update(model_payload)
+        session.query(orm.Software).filter(orm.Software.id == id).update(model_payload)
         session.commit()
     return "Updated original software for model"
 
@@ -56,4 +55,3 @@ def delete_software(id: int) -> str:
         session.query(orm.Model).filter(orm.Software.id == id).delete()
         session.commit()
     return "Deleted original software for model"
-

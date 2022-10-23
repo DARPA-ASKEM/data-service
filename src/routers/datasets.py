@@ -1,36 +1,32 @@
 """
-router.datasets - does nothing yet 
+router.datasets - doesn't do much yet
 """
-
-from db import ENGINE
-from pydantic import BaseModel
-from fastapi import APIRouter
-from generated import schema, orm
-import config.schema
 from logging import Logger
+from fastapi import APIRouter
 from sqlalchemy.orm import Session
-from typing import List
+from generated import  orm
+from config.db import engine
+import config.schema
 
 logger = Logger(__file__)
 router = APIRouter()
 
-@router.get('/datasets')
-def get_datasets() -> str:
-    return 'No data'
-
 @router.post('/datasets')
 def create_dataset(payload : config.schema.Dataset ) -> str:
-    with Session(ENGINE) as session:
+    """
+    Create dataset naively
+    """
+    with Session(engine) as session:
         datasetp = payload.dict()
         del datasetp['id']
         dataset = orm.Dataset(**datasetp)
         session.add(dataset)
         session.commit()
-        for f in payload.features:
-            feat = f.dict()
-            del feat['id']
-            feat['dataset_id'] = dataset.id
-            feature = orm.Feature(**feat)
+        for feature_payload in payload.features:
+            feature_dict = feature_payload.dict()
+            del feature_dict['id']
+            feature_dict['dataset_id'] = dataset.id
+            feature = orm.Feature(**feature_dict)
             session.add(feature)
         session.commit()
     return 'Created dataset'
