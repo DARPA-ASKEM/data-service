@@ -124,6 +124,7 @@ class Dataset(Base):
     quality = sa.Column(sa.Text())
     temporal_resolution = sa.Column(sa.String())
     geospatial_resolution = sa.Column(sa.String())
+    annotations = sa.Column(JSON())
 
 
 class Feature(Base):
@@ -200,7 +201,7 @@ class Intermediate(Base):
     created_at = sa.Column(sa.DateTime(), nullable=False)
     source = sa.Column(sa.Enum(Source), nullable=False)
     type = sa.Column(sa.Enum(Format), nullable=False)
-    representation = sa.Column(sa.LargeBinary(), nullable=False)
+    representation = sa.Column(sa.String(), nullable=False)
     model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'))
     software_id = sa.Column(sa.Integer(), sa.ForeignKey('software.id'))
 
@@ -254,7 +255,7 @@ class Run(Base):
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     completed_at = sa.Column(sa.DateTime())
     success = sa.Column(sa.Boolean(), server_default='True')
-    response = sa.Column(sa.LargeBinary())
+    response = sa.Column(sa.String())
 
 
 class Material(Base):
@@ -293,8 +294,8 @@ class ExtractedData(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     publication_id = sa.Column(sa.Integer(), sa.ForeignKey('publication.id'), nullable=False)
     type = sa.Column(sa.Enum(ExtractedType), nullable=False)
-    data = sa.Column(sa.LargeBinary(), nullable=False)
-    img = sa.Column(sa.LargeBinary(), nullable=False)
+    data = sa.Column(sa.String(), nullable=False)
+    img = sa.Column(sa.String(), nullable=False)
 
 
 class Meta(Base):

@@ -108,7 +108,7 @@ class RelationType(str, Enum):
 
 class Dataset(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     name: str
     url: str
     description: str
@@ -118,12 +118,13 @@ class Dataset(BaseModel):
     quality: Optional[str]
     temporal_resolution: Optional[str]
     geospatial_resolution: Optional[str]
+    annotations: Optional[Json]
 
 
 class Feature(BaseModel):
 
-    id: Optional[int] = None
-    dataset_id: Optional[int] = None
+    id: int
+    dataset_id: int
     description: Optional[str]
     display_name: Optional[str]
     name: str
@@ -132,8 +133,8 @@ class Feature(BaseModel):
 
 class Qualifier(BaseModel):
 
-    id: Optional[int] = None
-    dataset_id: Optional[int] = None
+    id: int
+    dataset_id: int
     description: Optional[str]
     name: str
     value_type: ValueType
@@ -141,23 +142,23 @@ class Qualifier(BaseModel):
 
 class QualifierXref(BaseModel):
 
-    id: Optional[int] = None
-    qualifier_id: Optional[int] = None
-    feature_id: Optional[int] = None
+    id: int
+    qualifier_id: int
+    feature_id: int
 
 
 class Model(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     created_at: datetime.datetime = datetime.datetime.now()
     name: str
     description: Optional[str]
-    head_id: Optional[int] = None
+    head_id: int
 
 
 class Framework(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     version: str
     name: str
     semantics: Json
@@ -165,9 +166,9 @@ class Framework(BaseModel):
 
 class Operation(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     prev: int
-    framework_id: Optional[int] = None
+    framework_id: int
     operation_type: OperationType
     model_content: Json
     timestamp: datetime.datetime = datetime.datetime.now()
@@ -176,18 +177,18 @@ class Operation(BaseModel):
 
 class Intermediate(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     created_at: datetime.datetime
     source: Source
     type: Format
-    representation: bytes
+    representation: str
     model_id: Optional[int]
     software_id: Optional[int]
 
 
 class Software(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     created_at: datetime.datetime
     source: str
     storage_uri: str
@@ -195,7 +196,7 @@ class Software(BaseModel):
 
 class Runtime(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     created_at: datetime.datetime = datetime.datetime.now()
     name: str
     left: int
@@ -204,7 +205,7 @@ class Runtime(BaseModel):
 
 class Plan(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     simulator: str
     query: str
     body: Json
@@ -212,33 +213,33 @@ class Plan(BaseModel):
 
 class AppliedModel(BaseModel):
 
-    id: Optional[int] = None
-    model_id: Optional[int] = None
-    plan_id: Optional[int] = None
+    id: int
+    model_id: int
+    plan_id: int
 
 
 class Run(BaseModel):
 
-    id: Optional[int] = None
-    simulator_id: Optional[int] = None
+    id: int
+    simulator_id: int
     created_at: datetime.datetime = datetime.datetime.now()
     completed_at: Optional[datetime.datetime]
     success: Optional[bool] = True
-    response: Optional[bytes]
+    response: Optional[str]
 
 
 class Material(BaseModel):
 
-    id: Optional[int] = None
-    run_id: Optional[int] = None
-    dataset_id: Optional[int] = None
+    id: int
+    run_id: int
+    dataset_id: int
     type: Optional[Direction]
 
 
 class Parameter(BaseModel):
 
-    id: Optional[int] = None
-    run_id: Optional[int] = None
+    id: int
+    run_id: int
     name: str
     value: str
     value_type: str
@@ -246,22 +247,22 @@ class Parameter(BaseModel):
 
 class Publication(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     xdd_uri: str
 
 
 class ExtractedData(BaseModel):
 
-    id: Optional[int] = None
-    publication_id: Optional[int] = None
+    id: int
+    publication_id: int
     type: ExtractedType
-    data: bytes
-    img: bytes
+    data: str
+    img: str
 
 
 class Meta(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     name: str
     description: str
     timestamp: Optional[datetime.datetime] = datetime.datetime.now()
@@ -270,34 +271,34 @@ class Meta(BaseModel):
 
 class Asset(BaseModel):
 
-    id: Optional[int] = None
-    project_id: Optional[int] = None
-    asset_id: Optional[int] = None
+    id: int
+    project_id: int
+    asset_id: int
     type: AssetTable
     external_ref: Optional[str]
 
 
 class Association(BaseModel):
 
-    id: Optional[int] = None
-    person_id: Optional[int] = None
-    asset_id: Optional[int] = None
+    id: int
+    person_id: int
+    asset_id: int
     type: Optional[AssetTable]
     role: Optional[Role]
 
 
 class Concept(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     term_id: str
     type: TaggableTable
-    obj_id: Optional[int] = None
+    obj_id: int
     status: Importance
 
 
 class Relation(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     created_at: datetime.datetime = datetime.datetime.now()
     relation_type: RelationType
     left: int
@@ -308,7 +309,7 @@ class Relation(BaseModel):
 
 class Person(BaseModel):
 
-    id: Optional[int] = None
+    id: int
     name: str
     email: str
     org: str

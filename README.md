@@ -30,11 +30,10 @@ model-build generate ./askem.dbml ./src/generated
 and check if they are valid by running
 
 ```
-model-build check CURRENT_SEMANTIC_VERSION ./src/generated
+model-build check [current semantic version] ./src/generated
 ```
 
-If the tables don't exist yet it in Postgres, make sure to POST to the `/admin/db/init`
-endpoint.
+Where [current semantic version] is the version of your dbml - ex. v0.11.3 . If the tables don't exist yet it in Postgres, make sure to POST to the `/admin/db/init` endpoint.
 
 ## ASKEM Data Model
 
