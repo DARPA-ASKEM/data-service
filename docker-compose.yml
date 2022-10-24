@@ -1,4 +1,8 @@
 version: "3.9"
+networks:
+  data-api:
+    driver: bridge
+    name: data-api
 services:
   api:
     build: ./
@@ -20,4 +24,45 @@ services:
       - POSTGRES_PASSWORD=dev
       - POSTGRES_USER=dev
       - POSTGRES_DB=askem
-    profiles: ["dev"]
+    profiles: [ "dev" ]
+  redis:
+    container_name: data-api-redis1
+    environment:
+      - POSTGRES_PASSWORD=dev
+      - POSTGRES_USER=dev
+      - POSTGRES_DB=askem
+      - REDIS_HOST=redis.data-api
+      - REDIS_PORT='6379'
+    image: redis
+    networks:
+      data-api: {}
+    ports:
+      - published: 6379
+        target: 6379
+  rqworker:
+    build:
+      context: ./tasks
+    command:
+      - rq
+      - worker
+      - --url
+      - redis://redis.data-api:6379
+      - high
+      - default
+      - low
+    container_name: data-api-rq-worker
+    depends_on:
+      redis:
+        condition: service_started
+    environment:
+      - POSTGRES_PASSWORD=dev
+      - POSTGRES_USER=dev
+      - POSTGRES_DB=askem
+      - REDIS_HOST=redis.data-api
+      - REDIS_PORT='6379'
+    networks:
+      data-api: {}
+    volumes:
+      - dataset-storage:/datasets:rw
+volumes:
+  dataset-storage: {}

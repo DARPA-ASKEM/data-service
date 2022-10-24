@@ -1,7 +1,9 @@
 """
 router.datasets - crud operations for datasets and related tables in the DB
 """
+import json
 import api_schema
+import datetime
 
 from db import ENGINE
 from pydantic import BaseModel
@@ -94,3 +96,25 @@ def delete_dataset(id: int) -> str:
     with Session(ENGINE) as session:
         session.query(orm.Dataset).filter(orm.Dataset.id == id).delete()
         session.commit()
+
+
+# TODO: REFACTOR THESE ENDPOINTS
+# Intended as replicas to old dojoapi endpoints for data registration.
+
+
+@router.post("/register")
+def register_step(data) -> int:
+    registration_dataset = orm.Dataset(
+        name=data.name,
+        url=data.maintainer.website,
+        description=data.description,
+        timestamp=datetime.datetime.now(),
+        deprecated=False,
+        sensitivity=data.data_sensitivity,
+        quality=data.data_quality,
+        temporal_resolution=data.temporal_resolution,
+    )
+    with Session(ENGINE) as session:
+        session.add(registration_dataset)
+        session.commit()
+        return registration_dataset.id
