@@ -5,7 +5,7 @@ api_schema - Provides the API interface with the data store contents.
 from json import dumps
 from typing import List, Optional
 from pydantic import BaseModel
-from generated import schema, orm
+from src.generated import schema, orm
 
 
 class Concept(BaseModel):

@@ -110,20 +110,80 @@ class RelationType(str, Enum):
     parents = 'parents'
     
 
-class Dataset(Base):
+class Operation(Base):
 
-    __tablename__ = 'dataset'
+    __tablename__ = 'operation'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    url = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.Text(), nullable=False)
+    prev = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'))
+    framework_id = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
+    operation_type = sa.Column(sa.Enum(OperationType), nullable=False)
+    model_content = sa.Column(JSON(), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    deprecated = sa.Column(sa.Boolean())
-    sensitivity = sa.Column(sa.Text())
-    quality = sa.Column(sa.Text())
-    temporal_resolution = sa.Column(sa.String())
-    geospatial_resolution = sa.Column(sa.String())
+    user = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
+
+
+class QualifierXref(Base):
+
+    __tablename__ = 'qualifier_xref'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    qualifier_id = sa.Column(sa.Integer(), sa.ForeignKey('qualifier.id'), nullable=False)
+    feature_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
+
+
+class Intermediate(Base):
+
+    __tablename__ = 'intermediate'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    created_at = sa.Column(sa.DateTime(), nullable=False)
+    source = sa.Column(sa.Enum(Source), nullable=False)
+    type = sa.Column(sa.Enum(Format), nullable=False)
+    representation = sa.Column(sa.LargeBinary(), nullable=False)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'))
+    software_id = sa.Column(sa.Integer(), sa.ForeignKey('software.id'))
+
+
+class Runtime(Base):
+
+    __tablename__ = 'runtime'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
+    name = sa.Column(sa.String(), nullable=False)
+    left = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
+    right = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
+
+
+class AppliedModel(Base):
+
+    __tablename__ = 'applied_model'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
+    plan_id = sa.Column(sa.Integer(), sa.ForeignKey('plan.id'), nullable=False)
+
+
+class Material(Base):
+
+    __tablename__ = 'material'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    run_id = sa.Column(sa.Integer(), sa.ForeignKey('run.id'), nullable=False)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
+    type = sa.Column(sa.Enum(Direction))
+
+
+class Association(Base):
+
+    __tablename__ = 'association'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
+    asset_id = sa.Column(sa.Integer(), sa.ForeignKey('asset.id'), nullable=False)
+    type = sa.Column(sa.Enum(AssetTable))
+    role = sa.Column(sa.Enum(Role))
 
 
 class Feature(Base):
@@ -149,15 +209,6 @@ class Qualifier(Base):
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class QualifierXref(Base):
-
-    __tablename__ = 'qualifier_xref'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    qualifier_id = sa.Column(sa.Integer(), sa.ForeignKey('qualifier.id'), nullable=False)
-    feature_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
-
-
 class Model(Base):
 
     __tablename__ = 'model'
@@ -167,82 +218,6 @@ class Model(Base):
     name = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.Text())
     head_id = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'), nullable=False)
-
-
-class Framework(Base):
-
-    __tablename__ = 'framework'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    version = sa.Column(sa.String(), nullable=False)
-    name = sa.Column(sa.String(), nullable=False)
-    semantics = sa.Column(JSON(), nullable=False)
-
-
-class Operation(Base):
-
-    __tablename__ = 'operation'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    prev = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'))
-    framework_id = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
-    operation_type = sa.Column(sa.Enum(OperationType), nullable=False)
-    model_content = sa.Column(JSON(), nullable=False)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    user = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
-
-
-class Intermediate(Base):
-
-    __tablename__ = 'intermediate'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    created_at = sa.Column(sa.DateTime(), nullable=False)
-    source = sa.Column(sa.Enum(Source), nullable=False)
-    type = sa.Column(sa.Enum(Format), nullable=False)
-    representation = sa.Column(sa.LargeBinary(), nullable=False)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'))
-    software_id = sa.Column(sa.Integer(), sa.ForeignKey('software.id'))
-
-
-class Software(Base):
-
-    __tablename__ = 'software'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    created_at = sa.Column(sa.DateTime(), nullable=False)
-    source = sa.Column(sa.String(), nullable=False)
-    storage_uri = sa.Column(sa.String(), nullable=False)
-
-
-class Runtime(Base):
-
-    __tablename__ = 'runtime'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    name = sa.Column(sa.String(), nullable=False)
-    left = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
-    right = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
-
-
-class Plan(Base):
-
-    __tablename__ = 'plan'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    simulator = sa.Column(sa.String(), nullable=False)
-    query = sa.Column(sa.String(), nullable=False)
-    body = sa.Column(JSON(), nullable=False)
-
-
-class AppliedModel(Base):
-
-    __tablename__ = 'applied_model'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
-    plan_id = sa.Column(sa.Integer(), sa.ForeignKey('plan.id'), nullable=False)
 
 
 class Run(Base):
@@ -257,16 +232,6 @@ class Run(Base):
     response = sa.Column(sa.LargeBinary())
 
 
-class Material(Base):
-
-    __tablename__ = 'material'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    run_id = sa.Column(sa.Integer(), sa.ForeignKey('run.id'), nullable=False)
-    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
-    type = sa.Column(sa.Enum(Direction))
-
-
 class Parameter(Base):
 
     __tablename__ = 'parameter'
@@ -276,14 +241,6 @@ class Parameter(Base):
     name = sa.Column(sa.String(), nullable=False)
     value = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.String(), nullable=False)
-
-
-class Publication(Base):
-
-    __tablename__ = 'publication'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    xdd_uri = sa.Column(sa.String(), nullable=False)
 
 
 class ExtractedData(Base):
@@ -297,17 +254,6 @@ class ExtractedData(Base):
     img = sa.Column(sa.LargeBinary(), nullable=False)
 
 
-class Meta(Base):
-
-    __tablename__ = 'meta'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.String(), nullable=False)
-    timestamp = sa.Column(sa.DateTime(), server_default=func.now())
-    status = sa.Column(sa.String(), nullable=False)
-
-
 class Asset(Base):
 
     __tablename__ = 'asset'
@@ -319,15 +265,69 @@ class Asset(Base):
     external_ref = sa.Column(sa.String())
 
 
-class Association(Base):
+class Dataset(Base):
 
-    __tablename__ = 'association'
+    __tablename__ = 'dataset'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
-    asset_id = sa.Column(sa.Integer(), sa.ForeignKey('asset.id'), nullable=False)
-    type = sa.Column(sa.Enum(AssetTable))
-    role = sa.Column(sa.Enum(Role))
+    name = sa.Column(sa.String(), nullable=False)
+    url = sa.Column(sa.String(), nullable=False)
+    description = sa.Column(sa.Text(), nullable=False)
+    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
+    deprecated = sa.Column(sa.Boolean())
+    sensitivity = sa.Column(sa.Text())
+    quality = sa.Column(sa.Text())
+    temporal_resolution = sa.Column(sa.String())
+    geospatial_resolution = sa.Column(sa.String())
+
+
+class Framework(Base):
+
+    __tablename__ = 'framework'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    version = sa.Column(sa.String(), nullable=False)
+    name = sa.Column(sa.String(), nullable=False)
+    semantics = sa.Column(JSON(), nullable=False)
+
+
+class Software(Base):
+
+    __tablename__ = 'software'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    created_at = sa.Column(sa.DateTime(), nullable=False)
+    source = sa.Column(sa.String(), nullable=False)
+    storage_uri = sa.Column(sa.String(), nullable=False)
+
+
+class Plan(Base):
+
+    __tablename__ = 'plan'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    simulator = sa.Column(sa.String(), nullable=False)
+    query = sa.Column(sa.String(), nullable=False)
+    body = sa.Column(JSON(), nullable=False)
+
+
+class Publication(Base):
+
+    __tablename__ = 'publication'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    xdd_uri = sa.Column(sa.String(), nullable=False)
+
+
+class Meta(Base):
+
+    __tablename__ = 'meta'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    name = sa.Column(sa.String(), nullable=False)
+    description = sa.Column(sa.String(), nullable=False)
+    timestamp = sa.Column(sa.DateTime(), server_default=func.now())
+    status = sa.Column(sa.String(), nullable=False)
 
 
 class Concept(Base):

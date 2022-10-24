@@ -4,7 +4,7 @@ router.software - very basic crud operations for software
 from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
-from generated import schema, orm
+from src.generated import schema, orm
 
 
 def gen_router(engine: Engine) -> APIRouter:

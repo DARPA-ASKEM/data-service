@@ -9,11 +9,14 @@ from sqlalchemy.engine.base import Engine
 logger = Logger(__file__)
 
 def gen_router(engine: Engine) -> APIRouter:
+    """
+    Generate simulations router with given DB engine
+    """
     router = APIRouter()
 
 
     @router.get("/simulations")
-    def get_concepts() -> str:
+    def get_sims() -> str:
         """
         Mock simulations endpoint
         """

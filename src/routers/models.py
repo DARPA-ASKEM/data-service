@@ -6,8 +6,8 @@ from logging import Logger
 from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
-from generated import orm
-from config.schema import Model, ModelBody
+from src.generated import orm
+from src.config.schema import Model, ModelBody
 
 logger = Logger(__file__)
 

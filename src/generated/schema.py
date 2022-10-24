@@ -106,18 +106,66 @@ class RelationType(str, Enum):
     parents = 'parents'
     
 
-class Dataset(BaseModel):
+class Operation(BaseModel):
 
     id: Optional[int] = None
-    name: str
-    url: str
-    description: str
+    prev: Optional[int]
+    framework_id: Optional[int] = None
+    operation_type: OperationType
+    model_content: Json
     timestamp: datetime.datetime = datetime.datetime.now()
-    deprecated: Optional[bool]
-    sensitivity: Optional[str]
-    quality: Optional[str]
-    temporal_resolution: Optional[str]
-    geospatial_resolution: Optional[str]
+    user: int
+
+
+class QualifierXref(BaseModel):
+
+    id: Optional[int] = None
+    qualifier_id: Optional[int] = None
+    feature_id: Optional[int] = None
+
+
+class Intermediate(BaseModel):
+
+    id: Optional[int] = None
+    created_at: datetime.datetime
+    source: Source
+    type: Format
+    representation: bytes
+    model_id: Optional[int]
+    software_id: Optional[int]
+
+
+class Runtime(BaseModel):
+
+    id: Optional[int] = None
+    created_at: datetime.datetime = datetime.datetime.now()
+    name: str
+    left: int
+    right: int
+
+
+class AppliedModel(BaseModel):
+
+    id: Optional[int] = None
+    model_id: Optional[int] = None
+    plan_id: Optional[int] = None
+
+
+class Material(BaseModel):
+
+    id: Optional[int] = None
+    run_id: Optional[int] = None
+    dataset_id: Optional[int] = None
+    type: Optional[Direction]
+
+
+class Association(BaseModel):
+
+    id: Optional[int] = None
+    person_id: Optional[int] = None
+    asset_id: Optional[int] = None
+    type: Optional[AssetTable]
+    role: Optional[Role]
 
 
 class Feature(BaseModel):
@@ -139,13 +187,6 @@ class Qualifier(BaseModel):
     value_type: ValueType
 
 
-class QualifierXref(BaseModel):
-
-    id: Optional[int] = None
-    qualifier_id: Optional[int] = None
-    feature_id: Optional[int] = None
-
-
 class Model(BaseModel):
 
     id: Optional[int] = None
@@ -153,68 +194,6 @@ class Model(BaseModel):
     name: str
     description: Optional[str]
     head_id: Optional[int] = None
-
-
-class Framework(BaseModel):
-
-    id: Optional[int] = None
-    version: str
-    name: str
-    semantics: Json
-
-
-class Operation(BaseModel):
-
-    id: Optional[int] = None
-    prev: Optional[int]
-    framework_id: Optional[int] = None
-    operation_type: OperationType
-    model_content: Json
-    timestamp: datetime.datetime = datetime.datetime.now()
-    user: int
-
-
-class Intermediate(BaseModel):
-
-    id: Optional[int] = None
-    created_at: datetime.datetime
-    source: Source
-    type: Format
-    representation: bytes
-    model_id: Optional[int]
-    software_id: Optional[int]
-
-
-class Software(BaseModel):
-
-    id: Optional[int] = None
-    created_at: datetime.datetime
-    source: str
-    storage_uri: str
-
-
-class Runtime(BaseModel):
-
-    id: Optional[int] = None
-    created_at: datetime.datetime = datetime.datetime.now()
-    name: str
-    left: int
-    right: int
-
-
-class Plan(BaseModel):
-
-    id: Optional[int] = None
-    simulator: str
-    query: str
-    body: Json
-
-
-class AppliedModel(BaseModel):
-
-    id: Optional[int] = None
-    model_id: Optional[int] = None
-    plan_id: Optional[int] = None
 
 
 class Run(BaseModel):
@@ -227,14 +206,6 @@ class Run(BaseModel):
     response: Optional[bytes]
 
 
-class Material(BaseModel):
-
-    id: Optional[int] = None
-    run_id: Optional[int] = None
-    dataset_id: Optional[int] = None
-    type: Optional[Direction]
-
-
 class Parameter(BaseModel):
 
     id: Optional[int] = None
@@ -242,12 +213,6 @@ class Parameter(BaseModel):
     name: str
     value: str
     value_type: str
-
-
-class Publication(BaseModel):
-
-    id: Optional[int] = None
-    xdd_uri: str
 
 
 class ExtractedData(BaseModel):
@@ -259,15 +224,6 @@ class ExtractedData(BaseModel):
     img: bytes
 
 
-class Meta(BaseModel):
-
-    id: Optional[int] = None
-    name: str
-    description: str
-    timestamp: Optional[datetime.datetime] = datetime.datetime.now()
-    status: str
-
-
 class Asset(BaseModel):
 
     id: Optional[int] = None
@@ -277,13 +233,57 @@ class Asset(BaseModel):
     external_ref: Optional[str]
 
 
-class Association(BaseModel):
+class Dataset(BaseModel):
 
     id: Optional[int] = None
-    person_id: Optional[int] = None
-    asset_id: Optional[int] = None
-    type: Optional[AssetTable]
-    role: Optional[Role]
+    name: str
+    url: str
+    description: str
+    timestamp: datetime.datetime = datetime.datetime.now()
+    deprecated: Optional[bool]
+    sensitivity: Optional[str]
+    quality: Optional[str]
+    temporal_resolution: Optional[str]
+    geospatial_resolution: Optional[str]
+
+
+class Framework(BaseModel):
+
+    id: Optional[int] = None
+    version: str
+    name: str
+    semantics: Json
+
+
+class Software(BaseModel):
+
+    id: Optional[int] = None
+    created_at: datetime.datetime
+    source: str
+    storage_uri: str
+
+
+class Plan(BaseModel):
+
+    id: Optional[int] = None
+    simulator: str
+    query: str
+    body: Json
+
+
+class Publication(BaseModel):
+
+    id: Optional[int] = None
+    xdd_uri: str
+
+
+class Meta(BaseModel):
+
+    id: Optional[int] = None
+    name: str
+    description: str
+    timestamp: Optional[datetime.datetime] = datetime.datetime.now()
+    status: str
 
 
 class Concept(BaseModel):

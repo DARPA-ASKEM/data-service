@@ -13,19 +13,18 @@ from uvicorn import run as uvicorn_run
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
-from config import db
-from generated import orm
+from src.config import db
+from src.generated import orm
 
-DBML_PATH = '../askem.dbml'
 DBML_VERSION = 'v0.11.4'
-GENERATED_PATH = './generated'
+GENERATED_PATH = './src/generated'
 
 
 def find_valid_routers() -> List[str]:
     """
     Generate list of module names that are possible to import
     """
-    router = import_module('routers')
+    router = import_module('src.routers')
     return [module.name for module in iter_modules(router.__path__)]
 
 
@@ -36,7 +35,7 @@ def attach_router(api : FastAPI, engine : Engine, router_name : str) -> None:
     At runtime, the routes to be used can be specified instead of
     being hardcoded.
     """
-    router_package = import_module(f'routers.{router_name}')
+    router_package = import_module(f'src.routers.{router_name}')
     api.include_router(router_package.gen_router(engine), tags=[router_name])
 
 
@@ -84,7 +83,7 @@ def init_dev_db_content(engine):
 @option('--port', default=8000, type=int, help='Port to expose API')
 @option('--dev', default=True, type=bool, help='Set development flag')
 @argument('endpoint', nargs=-1)
-def start(host: str, port: int, dev: bool, endpoint: str) -> None:
+def main(host: str, port: int, dev: bool, endpoint: str) -> None:
     """
     Execute data store API using uvicorn
     """
@@ -109,4 +108,4 @@ def start(host: str, port: int, dev: bool, endpoint: str) -> None:
 
 
 if __name__ == "__main__":
-    start() # pylint: disable=no-value-for-parameter
+    main() # pylint: disable=no-value-for-parameter

@@ -8,6 +8,7 @@ disable=fixme
 ignore=generated
 
 extension-pkg-whitelist=pydantic
+jobs=4
 
 [BASIC]
 

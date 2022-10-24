@@ -1,4 +1,6 @@
 # Python
 __pycache__
+dist
 .venv
 .tmp
+.cache
