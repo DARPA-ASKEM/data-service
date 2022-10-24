@@ -16,7 +16,7 @@ jobs:
         with:
           poetry-version: 1.2.2
       - name: Create environment
-        uses: poetry install
+        run: poetry install
       - name: Pylint
         run: poetry run pylint ./src
       - name: Pytest
