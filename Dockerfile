@@ -8,5 +8,4 @@ ADD pyproject.toml pyproject.toml
 ADD askem.dbml askem.dbml
 COPY src src 
 EXPOSE 8000
-WORKDIR /api/src
 CMD ["poetry", "run", "ads"]
