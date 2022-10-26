@@ -73,7 +73,7 @@ def main() -> None:
 @main.command()
 @option("--host", default="0.0.0.0", type=str, help="Address for the API")
 @option(
-    "--port", default=8001, type=int, help="Port to expose API"
+    "--port", default=8000, type=int, help="Port to expose API"
 )  # Port 8001 here since it has to run side by side with data-annotation stack.
 @argument("endpoint", nargs=-1)
 def start(host: str, port: int, endpoint: str) -> None:

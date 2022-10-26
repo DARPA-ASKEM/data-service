@@ -7,7 +7,7 @@ services:
   api:
     build: ./
     ports:
-      - "8000:8000"
+      - "8001:8000"
     env_file:
       - api.env
     environment:
