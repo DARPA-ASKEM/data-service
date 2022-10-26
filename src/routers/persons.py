@@ -2,7 +2,6 @@
 router.datasets - crud operations for datasets and related tables in the DB
 """
 
-import api_schema
 import json
 
 from db import ENGINE
@@ -17,33 +16,33 @@ router = APIRouter()
 
 
 @router.get("/")
-def get_concepts(count: int):
+def get_person(count: int):
     with Session(ENGINE) as session:
-        result = session.query(orm.Dataset).order_by(orm.Concept.id.asc()).limit(count)
+        result = session.query(orm.Person).order_by(orm.Person.id.asc()).limit(count)
         result = result[::]
         return result
 
 
 @router.get("/{id}")
-def get_concept(id: int) -> str:
+def get_person(id: int) -> str:
     with Session(ENGINE) as session:
-        result = session.query(orm.Concept).get(id)
+        result = session.query(orm.Person).get(id)
         logger.info(f"Latest output: {result}")
         return result
 
 
 @router.post("/")
-def create_concept(payload: api_schema.Concept):
+def create_person(payload: schema.Person):
     with Session(ENGINE) as session:
-        conceptp = payload.dict()
-        concept = orm.Concept(**conceptp)
-        session.add(concept)
+        personp = payload.dict()
+        person = orm.Person(**personp)
+        session.add(person)
         session.commit()
-        payload["id"] = concept.id
+        payload["id"] = person.id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/concepts/{concept.id}",
+                "location": f"/api/persons/{person.id}",
                 "content-type": "application/json",
             },
             content=json.dumps(payload),
@@ -51,20 +50,20 @@ def create_concept(payload: api_schema.Concept):
 
 
 @router.patch("/{id}")
-def update_concept(payload: schema.Concept, id: int) -> str:
+def update_person(payload: schema.Person, id: int) -> str:
     with Session(ENGINE) as session:
         data_payload = payload.dict(exclude_unset=True)
         data_payload["id"] = id
         logger.info(data_payload)
 
-        data_to_update = session.query(orm.Concept).filter(orm.Concept.id == id)
+        data_to_update = session.query(orm.Person).filter(orm.Person.id == id)
         data_to_update.update(data_payload)
         session.commit()
-    return "Updated Concept"
+    return "Updated Person"
 
 
 @router.delete("/{id}")
-def delete_concept(id: int) -> str:
+def delete_person(id: int) -> str:
     with Session(ENGINE) as session:
-        session.query(orm.Concept).filter(orm.Concept.id == id).delete()
+        session.query(orm.Person).filter(orm.Person.id == id).delete()
         session.commit()

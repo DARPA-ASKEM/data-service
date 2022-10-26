@@ -1,20 +1,18 @@
 """
 router.datasets - crud operations for datasets and related tables in the DB
 """
-import json
+
 import api_schema
-import datetime
+import json
 
 from db import ENGINE
-from pydantic import BaseModel
-from fastapi import APIRouter
+from fastapi import APIRouter, Response, status
 from generated import schema, orm
-from logging import Logger
-from sqlalchemy import desc
+from logging import Logger, DEBUG
 from sqlalchemy.orm import Session
-from typing import List
 
 logger = Logger(__file__)
+logger.setLevel(DEBUG)
 router = APIRouter()
 
 
@@ -44,7 +42,7 @@ def get_dataset(id: int) -> str:
 
 
 @router.post("/datasets")
-def create_dataset(payload: api_schema.Dataset) -> str:
+def create_dataset(payload: api_schema.Dataset):
     with Session(ENGINE) as session:
         datasetp = payload.dict()
         del datasetp["id"]
@@ -54,15 +52,23 @@ def create_dataset(payload: api_schema.Dataset) -> str:
         dataset = orm.Dataset(**datasetp)
         session.add(dataset)
         session.commit()
-        for f in payload.features:
-            feat = f.dict()
-            del feat["id"]
-            del feat["concept"]
-            feat["dataset_id"] = dataset.id
-            feature = orm.Feature(**feat)
-            session.add(feature)
-        session.commit()
-    return "Created dataset"
+        # for f in payload.features:
+        #     feat = f.dict()
+        #     del feat["id"]
+        #     del feat["concept"]
+        #     feat["dataset_id"] = dataset.id
+        #     feature = orm.Feature(**feat)
+        #     session.add(feature)
+        # session.commit()
+        payload["id"] = dataset.id
+        return Response(
+            status_code=status.HTTP_201_CREATED,
+            headers={
+                "location": f"/api/datasets/{dataset.id}",
+                "content-type": "application/json",
+            },
+            content=json.dumps(payload),
+        )
 
 
 @router.patch("/datasets/{id}")
@@ -96,25 +102,3 @@ def delete_dataset(id: int) -> str:
     with Session(ENGINE) as session:
         session.query(orm.Dataset).filter(orm.Dataset.id == id).delete()
         session.commit()
-
-
-# TODO: REFACTOR THESE ENDPOINTS
-# Intended as replicas to old dojoapi endpoints for data registration.
-
-
-@router.post("/register")
-def register_step(data) -> int:
-    registration_dataset = orm.Dataset(
-        name=data.name,
-        url=data.maintainer.website,
-        description=data.description,
-        timestamp=datetime.datetime.now(),
-        deprecated=False,
-        sensitivity=data.data_sensitivity,
-        quality=data.data_quality,
-        temporal_resolution=data.temporal_resolution,
-    )
-    with Session(ENGINE) as session:
-        session.add(registration_dataset)
-        session.commit()
-        return registration_dataset.id
