@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 COPY src src 
 EXPOSE 8000
 WORKDIR /api/src
-CMD ["./main.py", "start", "admin", "projects", "datasets"]
+CMD ["./main.py", "start", "admin", "projects", "datasets", "features", "persons", "qualifiers", "concepts"]
