@@ -30,9 +30,9 @@ def gen_router(engine: Engine) -> APIRouter:
 
 
     @router.post("/models")
-    def create_model(payload: Model) -> str:
+    def create_model(payload: Model) -> int:
         """
-        Create model
+        Create model and return its ID
         """
         with Session(engine) as session:
             model_payload = payload.dict()
@@ -46,7 +46,8 @@ def gen_router(engine: Engine) -> APIRouter:
             model = orm.Model(**model_payload)
             session.add(model)
             session.commit()
-        return "Created model"
+            id : int= model.id
+        return id
 
 
     @router.post("/models/{id}")

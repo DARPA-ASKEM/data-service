@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v0.11.4'
+  Note: 'v0.11.5'
 }
 
 
@@ -114,7 +114,7 @@ Table modeling.intermediate {
 
 Table modeling.software {
   id int [pk]
-  created_at datetime [not null]
+  timestamp datetime [default:`now()`, not null]
   source varchar [not null, note: 'E.g. github url']
   storage_uri varchar [not null, note: 'E.g. S3 uri for zipfile of software']
 }

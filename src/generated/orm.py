@@ -296,7 +296,7 @@ class Software(Base):
     __tablename__ = 'software'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    created_at = sa.Column(sa.DateTime(), nullable=False)
+    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     source = sa.Column(sa.String(), nullable=False)
     storage_uri = sa.Column(sa.String(), nullable=False)
 

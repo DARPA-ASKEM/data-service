@@ -4,7 +4,7 @@ test.test_main - A basic healthcheck
 
 from fastapi.testclient import TestClient
 from dbml_builder import get_dbml_version
-from src.tests.config.db import TestAccessLayer
+from src.tests.utils.db import demo_engine
 from src.main import build_api, DBML_VERSION
 
 DBML_PATH="./askem.dbml"
@@ -21,7 +21,7 @@ def test_build_api() -> None:
     """
     Ensure that the API can be built
     """
-    with TestAccessLayer() as engine:
+    with demo_engine() as engine:
         client = TestClient(build_api(engine))
         response = client.get("/")
         assert response.status_code == 200

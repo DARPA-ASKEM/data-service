@@ -10,13 +10,13 @@ from click import argument, echo, command, option
 from dbml_builder import verify
 from fastapi import FastAPI
 from uvicorn import run as uvicorn_run
-from sqlalchemy.engine.base import Engine
+from sqlalchemy.engine.base import Engine, Connection
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
 from src.config import db
 from src.generated import orm
 
-DBML_VERSION = 'v0.11.4'
+DBML_VERSION = 'v0.11.5'
 GENERATED_PATH = './src/generated'
 
 
@@ -49,12 +49,12 @@ def build_api(engine : Engine, *args : str) -> FastAPI:
     return app
 
 
-def init_dev_db_content(engine):
+def init_dev_db_content(connection : Connection):
     """
     Initialize tables in the connected DB
     """
-    orm.Base.metadata.create_all(engine)
-    with Session(engine) as session:
+    orm.Base.metadata.create_all(connection)
+    with Session(connection) as session:
         need_framework = session.query(orm.Framework).first() is None
         need_person = session.query(orm.Person).first() is None
         if need_framework:
@@ -95,10 +95,14 @@ def main(host: str, port: int, dev: bool, endpoint: str) -> None:
         sys_exit()
     if dev:
         try:
-            #init_dev_db_content(db.engine)
-            echo("Dev DB content initialized.")
+            echo("Connecting to DB... ", nl=False)
+            connection = db.engine.connect()
         except OperationalError:
-            echo('WARNING: DB NOT CONNECTED')
+            echo('FAILED: DB NOT CONNECTED')
+        else:
+            echo('SUCCESS')
+            init_dev_db_content(connection)
+
     api = build_api(db.engine, *endpoint)
     uvicorn_run(
       api,

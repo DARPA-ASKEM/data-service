@@ -258,7 +258,7 @@ class Framework(BaseModel):
 class Software(BaseModel):
 
     id: Optional[int] = None
-    created_at: datetime.datetime
+    timestamp: datetime.datetime = datetime.datetime.now()
     source: str
     storage_uri: str
 

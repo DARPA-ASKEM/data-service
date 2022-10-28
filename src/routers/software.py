@@ -24,7 +24,7 @@ def gen_router(engine: Engine) -> APIRouter:
 
 
     @router.post("/software")
-    def create_software(payload: schema.Software) -> str:
+    def create_software(payload: schema.Software) -> int:
         """
         Create software metadata
         """
@@ -33,20 +33,8 @@ def gen_router(engine: Engine) -> APIRouter:
             model = orm.Software(**model_payload)
             session.add(model)
             session.commit()
-        return "Stored original software for model"
-
-
-    @router.patch("/software/{id}")
-    def update_software(payload, id: int) -> str:
-        """
-        Update software metadata
-        """
-
-        with Session(engine) as session:
-            model_payload = payload.dict()
-            session.query(orm.Software).filter(orm.Software.id == id).update(model_payload)
-            session.commit()
-        return "Updated original software for model"
+            id : int = model.id
+        return id
 
 
     @router.delete("/software/{id}")
