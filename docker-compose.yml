@@ -3,6 +3,9 @@ networks:
   data-api:
     driver: bridge
     name: data-api
+  dojo-stack:
+    driver: bridge
+    name: dojo-stack
 services:
   api:
     build: ./
@@ -15,6 +18,9 @@ services:
       - SQL_PORT
       - SQL_USER
       - SQL_PASSWORD
+    networks:
+      - dojo-stack
+      - data-api
 
   db:
     image: "postgres:latest"
@@ -24,6 +30,8 @@ services:
       - POSTGRES_PASSWORD=dev
       - POSTGRES_USER=dev
       - POSTGRES_DB=askem
+    networks:
+      - data-api
     profiles: [ "dev" ]
 volumes:
   dataset-storage: {}

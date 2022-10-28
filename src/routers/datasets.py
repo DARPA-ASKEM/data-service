@@ -60,14 +60,16 @@ def create_dataset(payload: api_schema.Dataset):
         #     feature = orm.Feature(**feat)
         #     session.add(feature)
         # session.commit()
-        payload["id"] = dataset.id
+        logger.debug(dataset)
+        data_id = dataset.id
+        datasetp["id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/datasets/{dataset.id}",
+                "location": f"/api/datasets/{data_id}",
                 "content-type": "application/json",
             },
-            content=json.dumps(payload),
+            content=json.dumps(datasetp, default=str),
         )
 
 
