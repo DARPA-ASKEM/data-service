@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ads"
+name = "tds"
 version = "0.1.1"
 description = "The API that sits on top of the data store for the ASKEM program."
 authors = ["Five Grant <five@jataware.com>"]
@@ -25,7 +25,7 @@ psycopg2-binary = "^2.9.4"
 
 
 [tool.poetry.scripts]
-ads = "src.main:main"
+tds = "src.main:main"
 
 [build-system]
 requires = ["poetry-core"]

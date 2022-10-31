@@ -11,7 +11,8 @@ services:
       - SQL_PORT
       - SQL_USER
       - SQL_PASSWORD
-
+    volumes:
+      - $PWD/src:/api/src
   db:
     image: "postgres:latest"
     ports:

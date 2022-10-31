@@ -1,16 +1,16 @@
-FROM python:latest
+FROM python:3.10
 RUN apt update 2> /dev/null
 RUN apt install -y postgresql postgresql-contrib
 RUN pip install poetry
 WORKDIR /api
 ADD poetry.lock poetry.lock
 ADD pyproject.toml pyproject.toml
-ADD askem.dbml askem.dbml
 RUN poetry config virtualenvs.create false
+RUN poetry install --no-root
+ADD askem.dbml askem.dbml
 COPY src src 
 # Poetry complains if the README doesn't exist
 COPY README.md README.md
-# Optimally, the install would BEFORE copying `src`
-RUN poetry install
+RUN poetry install --only-root
 EXPOSE 8000
-CMD ["poetry", "run", "ads"]
+CMD ["poetry", "run", "tds"]
