@@ -1,8 +1,6 @@
 """
-tests.routers.software - NOT FULLY IMPLEMENTED
+tests.routers.software - tests basic software crud
 """
-
-from sqlalchemy.exc import InvalidRequestError
 
 from src.autogen.schema import Software
 from tests.utils import demo_api
@@ -36,12 +34,9 @@ def test_software_crd():
             and software.storage_uri == result.storage_uri
         )
         # Deletion
-        client.delete(f"/software/{id}")
-        try:
-            response_get = client.get(
-                f"/software/{id}", headers={"Accept": "application/json"}
-            )
-        except Exception as e:
-            print(e)
-        else:
-            raise AssertionError("Item failed to delete")
+        response_delete = client.delete(f"/software/{id}")
+        assert 204 == response_delete.status_code
+        response_get_fail = client.get(
+            f"/software/{id}", headers={"Accept": "application/json"}
+        )
+        assert response_get_fail.status_code == 404

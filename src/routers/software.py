@@ -1,7 +1,7 @@
 """
 router.software - very basic crud operations for software
 """
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -20,7 +20,9 @@ def gen_router(engine: Engine) -> APIRouter:
         Retrieve software metadata
         """
         with Session(engine) as session:
-            return session.query(orm.Software).get(id)
+            if session.query(orm.Software).filter(orm.Software.id == id).count() == 1:
+                return session.query(orm.Software).get(id)
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     @router.post("/software")
     def create_software(payload: schema.Software) -> int:
@@ -36,15 +38,20 @@ def gen_router(engine: Engine) -> APIRouter:
         return id
 
     @router.delete("/software/{id}")
-    def delete_software(id: int) -> str:
+    def delete_software(id: int) -> Response:
         """
         Delete software metadata
         """
         with Session(engine) as session:
-            software = session.query(orm.Model).filter(orm.Software.id == id).first()
-            if software is not None:
-                software.delete()
+            if session.query(orm.Software).filter(orm.Software.id == id).count() == 1:
+                software = session.query(orm.Software).get(id)
+                session.delete(software)
                 session.commit()
-        return "Deleted original software for model"
+            else:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        return Response(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content=f"Deleted software with ID {id}",
+        )
 
     return router

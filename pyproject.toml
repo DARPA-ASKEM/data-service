@@ -30,6 +30,8 @@ tds = "src.main:main"
 isort = "^5.10.1"
 black = "^22.10.0"
 pylint = "^2.15.5"
+mypy = "^0.982"
+sqlalchemy-stubs = "^0.4"
 
 [build-system]
 requires = ["poetry-core"]
