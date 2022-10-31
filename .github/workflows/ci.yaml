@@ -3,6 +3,7 @@ on: [push]
 
 jobs:
   ci:
+    runs-on: ubuntu-latest
     steps:
       - uses: ./.github/workflows/ads.yaml
       - name: Create environment
