@@ -2,19 +2,19 @@
 tests.main - A basic healthcheck
 """
 
-from fastapi.testclient import TestClient
 from dbml_builder import get_dbml_version
-from tests.utils import demo_engine
-from src.main import build_api, DBML_VERSION
+from fastapi.testclient import TestClient
 
-DBML_PATH="./askem.dbml"
+from src.main import build_api
+from src.settings import settings
+from tests.utils import demo_engine
 
 
 def test_version() -> None:
     """
     Ensure the code is not using an outdated version of the DBML
     """
-    assert DBML_VERSION == get_dbml_version(DBML_PATH)
+    assert settings.dbml_version == get_dbml_version(settings.dbml_path)
 
 
 def test_build_api() -> None:

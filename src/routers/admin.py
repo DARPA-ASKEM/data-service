@@ -12,13 +12,11 @@ def gen_router(engine: Engine) -> APIRouter:
     """
     router = APIRouter()
 
-
-    @router.get('/admin/db/info')
+    @router.get("/admin/db/info")
     def db_status() -> str:
         """
         Print kind of DB being used
         """
         return engine.name.upper()
-
 
     return router

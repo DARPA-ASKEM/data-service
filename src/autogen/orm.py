@@ -1,197 +1,201 @@
-import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
 from enum import Enum
-from sqlalchemy.sql import func
-from sqlalchemy.dialects.postgresql import JSON
 
+import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 
 
 class ValueType(str, Enum):
 
-    binary = 'binary'
-    bool = 'bool'
-    float = 'float'
-    int = 'int'
-    str = 'str'
-    
+    binary = "binary"
+    bool = "bool"
+    float = "float"
+    int = "int"
+    str = "str"
+
 
 class Source(str, Enum):
 
-    mrepresentationa = 'mrepresentationa'
-    skema = 'skema'
-    
+    mrepresentationa = "mrepresentationa"
+    skema = "skema"
+
 
 class Format(str, Enum):
 
-    bilayer = 'bilayer'
-    gromet = 'gromet'
-    other = 'other'
-    sbml = 'sbml'
-    
+    bilayer = "bilayer"
+    gromet = "gromet"
+    other = "other"
+    sbml = "sbml"
+
 
 class OperationType(str, Enum):
 
-    add = 'add'
-    composition = 'composition'
-    decomposition = 'decomposition'
-    edit = 'edit'
-    glue = 'glue'
-    init = 'init'
-    other = 'other'
-    product = 'product'
-    remove = 'remove'
-    
+    add = "add"
+    composition = "composition"
+    decomposition = "decomposition"
+    edit = "edit"
+    glue = "glue"
+    init = "init"
+    other = "other"
+    product = "product"
+    remove = "remove"
+
 
 class Direction(str, Enum):
 
-    input = 'input'
-    output = 'output'
-    
+    input = "input"
+    output = "output"
+
 
 class ExtractedType(str, Enum):
 
-    equation = 'equation'
-    figure = 'figure'
-    table = 'table'
-    
+    equation = "equation"
+    figure = "figure"
+    table = "table"
+
 
 class AssetTable(str, Enum):
 
-    dataset = 'dataset'
-    extracted_data = 'extracted_data'
-    model = 'model'
-    plan = 'plan'
-    publication = 'publication'
-    representation = 'representation'
-    
+    dataset = "dataset"
+    extracted_data = "extracted_data"
+    model = "model"
+    plan = "plan"
+    publication = "publication"
+    representation = "representation"
+
 
 class Role(str, Enum):
 
-    author = 'author'
-    contributor = 'contributor'
-    maintainer = 'maintainer'
-    other = 'other'
-    
+    author = "author"
+    contributor = "contributor"
+    maintainer = "maintainer"
+    other = "other"
+
 
 class TaggableTable(str, Enum):
 
-    dataset = 'dataset'
-    feature = 'feature'
-    model = 'model'
-    plan = 'plan'
-    project = 'project'
-    
+    dataset = "dataset"
+    feature = "feature"
+    model = "model"
+    plan = "plan"
+    project = "project"
+
 
 class Importance(str, Enum):
 
-    other = 'other'
-    primary = 'primary'
-    secondary = 'secondary'
-    
+    other = "other"
+    primary = "primary"
+    secondary = "secondary"
+
 
 class ObjType(str, Enum):
 
-    dataset = 'dataset'
-    model = 'model'
-    plan = 'plan'
-    project = 'project'
-    representation = 'representation'
-    runtime = 'runtime'
-    software = 'software'
-    
+    dataset = "dataset"
+    model = "model"
+    plan = "plan"
+    project = "project"
+    representation = "representation"
+    runtime = "runtime"
+    software = "software"
+
 
 class RelationType(str, Enum):
 
-    copies = 'copies'
-    derives = 'derives'
-    glued = 'glued'
-    parents = 'parents'
-    
+    copies = "copies"
+    derives = "derives"
+    glued = "glued"
+    parents = "parents"
+
 
 class Operation(Base):
 
-    __tablename__ = 'operation'
+    __tablename__ = "operation"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    prev = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'))
-    framework_id = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
+    prev = sa.Column(sa.Integer(), sa.ForeignKey("operation.id"))
+    framework_id = sa.Column(
+        sa.Integer(), sa.ForeignKey("framework.id"), nullable=False
+    )
     operation_type = sa.Column(sa.Enum(OperationType), nullable=False)
     model_content = sa.Column(JSON(), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    user = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
+    user = sa.Column(sa.Integer(), sa.ForeignKey("person.id"), nullable=False)
 
 
 class QualifierXref(Base):
 
-    __tablename__ = 'qualifier_xref'
+    __tablename__ = "qualifier_xref"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    qualifier_id = sa.Column(sa.Integer(), sa.ForeignKey('qualifier.id'), nullable=False)
-    feature_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
+    qualifier_id = sa.Column(
+        sa.Integer(), sa.ForeignKey("qualifier.id"), nullable=False
+    )
+    feature_id = sa.Column(sa.Integer(), sa.ForeignKey("feature.id"), nullable=False)
 
 
 class Intermediate(Base):
 
-    __tablename__ = 'intermediate'
+    __tablename__ = "intermediate"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     created_at = sa.Column(sa.DateTime(), nullable=False)
     source = sa.Column(sa.Enum(Source), nullable=False)
     type = sa.Column(sa.Enum(Format), nullable=False)
     representation = sa.Column(sa.LargeBinary(), nullable=False)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'))
-    software_id = sa.Column(sa.Integer(), sa.ForeignKey('software.id'))
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey("model.id"))
+    software_id = sa.Column(sa.Integer(), sa.ForeignKey("software.id"))
 
 
 class Runtime(Base):
 
-    __tablename__ = 'runtime'
+    __tablename__ = "runtime"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     name = sa.Column(sa.String(), nullable=False)
-    left = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
-    right = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
+    left = sa.Column(sa.Integer(), sa.ForeignKey("framework.id"), nullable=False)
+    right = sa.Column(sa.Integer(), sa.ForeignKey("framework.id"), nullable=False)
 
 
 class AppliedModel(Base):
 
-    __tablename__ = 'applied_model'
+    __tablename__ = "applied_model"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
-    plan_id = sa.Column(sa.Integer(), sa.ForeignKey('plan.id'), nullable=False)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey("model.id"), nullable=False)
+    plan_id = sa.Column(sa.Integer(), sa.ForeignKey("plan.id"), nullable=False)
 
 
 class Material(Base):
 
-    __tablename__ = 'material'
+    __tablename__ = "material"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    run_id = sa.Column(sa.Integer(), sa.ForeignKey('run.id'), nullable=False)
-    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
+    run_id = sa.Column(sa.Integer(), sa.ForeignKey("run.id"), nullable=False)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
     type = sa.Column(sa.Enum(Direction))
 
 
 class Association(Base):
 
-    __tablename__ = 'association'
+    __tablename__ = "association"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
-    asset_id = sa.Column(sa.Integer(), sa.ForeignKey('asset.id'), nullable=False)
+    person_id = sa.Column(sa.Integer(), sa.ForeignKey("person.id"), nullable=False)
+    asset_id = sa.Column(sa.Integer(), sa.ForeignKey("asset.id"), nullable=False)
     type = sa.Column(sa.Enum(AssetTable))
     role = sa.Column(sa.Enum(Role))
 
 
 class Feature(Base):
 
-    __tablename__ = 'feature'
+    __tablename__ = "feature"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
     description = sa.Column(sa.Text())
     display_name = sa.Column(sa.String())
     name = sa.Column(sa.String(), nullable=False)
@@ -200,10 +204,10 @@ class Feature(Base):
 
 class Qualifier(Base):
 
-    __tablename__ = 'qualifier'
+    __tablename__ = "qualifier"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
     description = sa.Column(sa.Text())
     name = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
@@ -211,33 +215,33 @@ class Qualifier(Base):
 
 class Model(Base):
 
-    __tablename__ = 'model'
+    __tablename__ = "model"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     name = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.Text())
-    head_id = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'), nullable=False)
+    head_id = sa.Column(sa.Integer(), sa.ForeignKey("operation.id"), nullable=False)
 
 
 class Run(Base):
 
-    __tablename__ = 'run'
+    __tablename__ = "run"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    simulator_id = sa.Column(sa.Integer(), sa.ForeignKey('plan.id'), nullable=False)
+    simulator_id = sa.Column(sa.Integer(), sa.ForeignKey("plan.id"), nullable=False)
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     completed_at = sa.Column(sa.DateTime())
-    success = sa.Column(sa.Boolean(), server_default='True')
+    success = sa.Column(sa.Boolean(), server_default="True")
     response = sa.Column(sa.LargeBinary())
 
 
 class Parameter(Base):
 
-    __tablename__ = 'parameter'
+    __tablename__ = "parameter"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    run_id = sa.Column(sa.Integer(), sa.ForeignKey('run.id'), nullable=False)
+    run_id = sa.Column(sa.Integer(), sa.ForeignKey("run.id"), nullable=False)
     name = sa.Column(sa.String(), nullable=False)
     value = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.String(), nullable=False)
@@ -245,10 +249,12 @@ class Parameter(Base):
 
 class ExtractedData(Base):
 
-    __tablename__ = 'extracted_data'
+    __tablename__ = "extracted_data"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    publication_id = sa.Column(sa.Integer(), sa.ForeignKey('publication.id'), nullable=False)
+    publication_id = sa.Column(
+        sa.Integer(), sa.ForeignKey("publication.id"), nullable=False
+    )
     type = sa.Column(sa.Enum(ExtractedType), nullable=False)
     data = sa.Column(sa.LargeBinary(), nullable=False)
     img = sa.Column(sa.LargeBinary(), nullable=False)
@@ -256,10 +262,10 @@ class ExtractedData(Base):
 
 class Asset(Base):
 
-    __tablename__ = 'asset'
+    __tablename__ = "asset"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    project_id = sa.Column(sa.Integer(), sa.ForeignKey('meta.id'), nullable=False)
+    project_id = sa.Column(sa.Integer(), sa.ForeignKey("meta.id"), nullable=False)
     asset_id = sa.Column(sa.Integer(), nullable=False)
     type = sa.Column(sa.Enum(AssetTable), nullable=False)
     external_ref = sa.Column(sa.String())
@@ -267,7 +273,7 @@ class Asset(Base):
 
 class Dataset(Base):
 
-    __tablename__ = 'dataset'
+    __tablename__ = "dataset"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     name = sa.Column(sa.String(), nullable=False)
@@ -283,7 +289,7 @@ class Dataset(Base):
 
 class Framework(Base):
 
-    __tablename__ = 'framework'
+    __tablename__ = "framework"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     version = sa.Column(sa.String(), nullable=False)
@@ -293,7 +299,7 @@ class Framework(Base):
 
 class Software(Base):
 
-    __tablename__ = 'software'
+    __tablename__ = "software"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
@@ -303,7 +309,7 @@ class Software(Base):
 
 class Plan(Base):
 
-    __tablename__ = 'plan'
+    __tablename__ = "plan"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     simulator = sa.Column(sa.String(), nullable=False)
@@ -313,7 +319,7 @@ class Plan(Base):
 
 class Publication(Base):
 
-    __tablename__ = 'publication'
+    __tablename__ = "publication"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     xdd_uri = sa.Column(sa.String(), nullable=False)
@@ -321,7 +327,7 @@ class Publication(Base):
 
 class Meta(Base):
 
-    __tablename__ = 'meta'
+    __tablename__ = "meta"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     name = sa.Column(sa.String(), nullable=False)
@@ -332,7 +338,7 @@ class Meta(Base):
 
 class Concept(Base):
 
-    __tablename__ = 'concept'
+    __tablename__ = "concept"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     term_id = sa.Column(sa.String(), nullable=False)
@@ -343,7 +349,7 @@ class Concept(Base):
 
 class Relation(Base):
 
-    __tablename__ = 'relation'
+    __tablename__ = "relation"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
@@ -356,7 +362,7 @@ class Relation(Base):
 
 class Person(Base):
 
-    __tablename__ = 'person'
+    __tablename__ = "person"
 
     id = sa.Column(sa.Integer(), primary_key=True)
     name = sa.Column(sa.String(), nullable=False)

@@ -1,110 +1,111 @@
-from enum import Enum
 import datetime
+from enum import Enum
 from typing import Optional
+
 from pydantic import BaseModel, Json
 
 
 class ValueType(str, Enum):
 
-    binary = 'binary'
-    bool = 'bool'
-    float = 'float'
-    int = 'int'
-    str = 'str'
-    
+    binary = "binary"
+    bool = "bool"
+    float = "float"
+    int = "int"
+    str = "str"
+
 
 class Source(str, Enum):
 
-    mrepresentationa = 'mrepresentationa'
-    skema = 'skema'
-    
+    mrepresentationa = "mrepresentationa"
+    skema = "skema"
+
 
 class Format(str, Enum):
 
-    bilayer = 'bilayer'
-    gromet = 'gromet'
-    other = 'other'
-    sbml = 'sbml'
-    
+    bilayer = "bilayer"
+    gromet = "gromet"
+    other = "other"
+    sbml = "sbml"
+
 
 class OperationType(str, Enum):
 
-    add = 'add'
-    composition = 'composition'
-    decomposition = 'decomposition'
-    edit = 'edit'
-    glue = 'glue'
-    init = 'init'
-    other = 'other'
-    product = 'product'
-    remove = 'remove'
-    
+    add = "add"
+    composition = "composition"
+    decomposition = "decomposition"
+    edit = "edit"
+    glue = "glue"
+    init = "init"
+    other = "other"
+    product = "product"
+    remove = "remove"
+
 
 class Direction(str, Enum):
 
-    input = 'input'
-    output = 'output'
-    
+    input = "input"
+    output = "output"
+
 
 class ExtractedType(str, Enum):
 
-    equation = 'equation'
-    figure = 'figure'
-    table = 'table'
-    
+    equation = "equation"
+    figure = "figure"
+    table = "table"
+
 
 class AssetTable(str, Enum):
 
-    dataset = 'dataset'
-    extracted_data = 'extracted_data'
-    model = 'model'
-    plan = 'plan'
-    publication = 'publication'
-    representation = 'representation'
-    
+    dataset = "dataset"
+    extracted_data = "extracted_data"
+    model = "model"
+    plan = "plan"
+    publication = "publication"
+    representation = "representation"
+
 
 class Role(str, Enum):
 
-    author = 'author'
-    contributor = 'contributor'
-    maintainer = 'maintainer'
-    other = 'other'
-    
+    author = "author"
+    contributor = "contributor"
+    maintainer = "maintainer"
+    other = "other"
+
 
 class TaggableTable(str, Enum):
 
-    dataset = 'dataset'
-    feature = 'feature'
-    model = 'model'
-    plan = 'plan'
-    project = 'project'
-    
+    dataset = "dataset"
+    feature = "feature"
+    model = "model"
+    plan = "plan"
+    project = "project"
+
 
 class Importance(str, Enum):
 
-    other = 'other'
-    primary = 'primary'
-    secondary = 'secondary'
-    
+    other = "other"
+    primary = "primary"
+    secondary = "secondary"
+
 
 class ObjType(str, Enum):
 
-    dataset = 'dataset'
-    model = 'model'
-    plan = 'plan'
-    project = 'project'
-    representation = 'representation'
-    runtime = 'runtime'
-    software = 'software'
-    
+    dataset = "dataset"
+    model = "model"
+    plan = "plan"
+    project = "project"
+    representation = "representation"
+    runtime = "runtime"
+    software = "software"
+
 
 class RelationType(str, Enum):
 
-    copies = 'copies'
-    derives = 'derives'
-    glued = 'glued'
-    parents = 'parents'
-    
+    copies = "copies"
+    derives = "derives"
+    glued = "glued"
+    parents = "parents"
+
 
 class Operation(BaseModel):
 

@@ -24,13 +24,13 @@ file contents. (Version is tracked using the DBML project `Note`).
 
 To generate new model files, run:
 ```
-model-build generate ./askem.dbml ./src/generated
+poetry run model-build generate ./askem.dbml ./src/autogen
 ```
 
 and check if they are valid by running
 
 ```
-model-build check CURRENT_SEMANTIC_VERSION ./src/generated
+poetry run model-build check CURRENT_SEMANTIC_VERSION ./src/autogen
 ```
 
 If the tables don't exist yet it in Postgres, make sure to POST to the `/admin/db/init`
