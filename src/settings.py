@@ -10,7 +10,7 @@ class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
     """
 
     dbml_version: str = "v0.11.5"
-    generated_path: str = "./src/generated"
+    generated_path: str = "./src/autogen"
     dbml_path: str = "./askem.dbml"
     sql_url: str = "db"
     sql_port: int = 8032

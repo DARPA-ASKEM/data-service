@@ -58,11 +58,10 @@ def main(host: str, port: int, dev: bool, endpoint: str) -> None:
     """
     Execute data store API using uvicorn
     """
-    if not verify(settings.dbml_version, settings.generated_path):
+    is_success, message = verify(settings.dbml_version, settings.generated_path)
+    if not is_success:
         # pylint: disable-next=line-too-long
-        echo(
-            "Failed to start: version mismatch. DBML has either been updated or generated schemas have been modified by users"
-        )
+        echo(f"Failed to start: {message}.")
         sys_exit()
     if dev:
         try:
