@@ -8,6 +8,7 @@ ADD pyproject.toml pyproject.toml
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
 ADD askem.dbml askem.dbml
+COPY tests tests
 COPY src src 
 # Poetry complains if the README doesn't exist
 COPY README.md README.md

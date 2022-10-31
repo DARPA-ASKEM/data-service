@@ -43,8 +43,10 @@ def gen_router(engine: Engine) -> APIRouter:
         Delete software metadata
         """
         with Session(engine) as session:
-            session.query(orm.Model).filter(orm.Software.id == id).delete()
-            session.commit()
+            software = session.query(orm.Model).filter(orm.Software.id == id).first()
+            if software is not None:
+                software.delete()
+                session.commit()
         return "Deleted original software for model"
 
 

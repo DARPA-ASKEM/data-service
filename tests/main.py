@@ -1,10 +1,10 @@
 """
-test.test_main - A basic healthcheck
+tests.main - A basic healthcheck
 """
 
 from fastapi.testclient import TestClient
 from dbml_builder import get_dbml_version
-from src.tests.utils.db import demo_engine
+from tests.utils import demo_engine
 from src.main import build_api, DBML_VERSION
 
 DBML_PATH="./askem.dbml"

@@ -10,11 +10,9 @@ from click import argument, echo, command, option
 from dbml_builder import verify
 from fastapi import FastAPI
 from uvicorn import run as uvicorn_run
-from sqlalchemy.engine.base import Engine, Connection
-from sqlalchemy.orm import Session
+from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import OperationalError
-from src.config import db
-from src.generated import orm
+from src.config.db import engine, init_dev_content
 
 DBML_VERSION = 'v0.11.5'
 GENERATED_PATH = './src/generated'
@@ -49,35 +47,6 @@ def build_api(engine : Engine, *args : str) -> FastAPI:
     return app
 
 
-def init_dev_db_content(connection : Connection):
-    """
-    Initialize tables in the connected DB
-    """
-    orm.Base.metadata.create_all(connection)
-    with Session(connection) as session:
-        need_framework = session.query(orm.Framework).first() is None
-        need_person = session.query(orm.Person).first() is None
-        if need_framework:
-            framework = orm.Framework(
-                id = 0,
-                version = "dummy",
-                name = "dummy",
-                semantics = {},
-            )
-            session.add(framework)
-        if need_person:
-            person = orm.Person(
-                id = 0,
-                name = "Jane Doe",
-                email = "sample",
-                org = "sample",
-                website = "sample",
-                is_registered = True
-            )
-            session.add(person)
-        session.commit()
-
-
 @command()
 @option('--host', default='0.0.0.0', type=str, help='Address for the API')
 @option('--port', default=8000, type=int, help='Port to expose API')
@@ -94,14 +63,14 @@ def main(host: str, port: int, dev: bool, endpoint: str) -> None:
     if dev:
         try:
             echo("Connecting to DB... ", nl=False)
-            connection = db.engine.connect()
+            connection = engine.connect()
         except OperationalError:
             echo('FAILED: DB NOT CONNECTED')
         else:
             echo('SUCCESS')
-            init_dev_db_content(connection)
+            init_dev_content(connection)
 
-    api = build_api(db.engine, *endpoint)
+    api = build_api(engine, *endpoint)
     uvicorn_run(
       api,
       host=host,
