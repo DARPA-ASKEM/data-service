@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   ci:
-    uses: .github/workflows/ads.yaml
+    uses: ./.github/workflows/ads.yaml
     steps:
       - name: Create environment
         run:  poetry install
