@@ -42,24 +42,13 @@ def get_dataset(id: int) -> str:
 
 
 @router.post("/datasets")
-def create_dataset(payload: api_schema.Dataset):
+def create_dataset(payload: schema.Dataset):
     with Session(ENGINE) as session:
         datasetp = payload.dict()
         del datasetp["id"]
-        del datasetp["features"]
-        del datasetp["qualifiers"]
-        del datasetp["concept"]
         dataset = orm.Dataset(**datasetp)
         session.add(dataset)
         session.commit()
-        # for f in payload.features:
-        #     feat = f.dict()
-        #     del feat["id"]
-        #     del feat["concept"]
-        #     feat["dataset_id"] = dataset.id
-        #     feature = orm.Feature(**feat)
-        #     session.add(feature)
-        # session.commit()
         logger.debug(dataset)
         data_id = dataset.id
         datasetp["id"] = data_id
