@@ -7,8 +7,8 @@ from logging import Logger
 from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
-
 from src.autogen import orm
+from src.operation import create, delete, retrieve, update
 from src.schema.model import Model, ModelBody
 
 logger = Logger(__file__)
@@ -20,7 +20,7 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
     """
     router = APIRouter(prefix=router_name)
 
-    @router.get("/{id}")
+    @router.get("/{id}", **retrieve.fastapi_endpoint_config)
     def get_model(id: int) -> Model:
         """
         Retrieve model
@@ -30,7 +30,7 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
             operation = session.query(orm.Operation).get(model.head_id)
             return Model.from_orm(model, operation)
 
-    @router.post("")
+    @router.post("", **create.fastapi_endpoint_config)
     def create_model(payload: Model) -> int:
         """
         Create model and return its ID
@@ -50,7 +50,7 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
             id: int = model.id
         return id
 
-    @router.post("/{id}")
+    @router.post("/{id}", **update.fastapi_endpoint_config)
     def update_model(payload: ModelBody, id: int) -> Model:
         """
         Update model content
@@ -66,7 +66,7 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
             session.commit()
         return get_model(id)
 
-    @router.delete("/{id}")
+    @router.delete("/{id}", **delete.fastapi_endpoint_config)
     def delete_model(id: int) -> str:
         """
         Delete model head

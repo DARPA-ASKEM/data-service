@@ -4,8 +4,8 @@ router.datasets - doesn't do much yet
 from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
-
 from src.autogen import orm
+from src.operation import create
 from src.schema.dataset import Dataset
 
 
@@ -16,7 +16,7 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
 
     router = APIRouter(prefix=router_name)
 
-    @router.post("")
+    @router.post("", **create.fastapi_endpoint_config)
     def create_dataset(payload: Dataset) -> str:
         """
         Create dataset naively

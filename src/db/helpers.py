@@ -3,7 +3,6 @@ src.db.helpers - Easy initialization and deletion of db content
 """
 from sqlalchemy.engine.base import Connection
 from sqlalchemy.orm import Session
-
 from src.autogen import orm
 
 

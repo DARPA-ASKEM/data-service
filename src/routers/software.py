@@ -4,8 +4,8 @@ router.software - very basic crud operations for software
 from fastapi import APIRouter, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
-
 from src.autogen import orm, schema
+from src.operation import create, delete, retrieve
 
 
 def gen_router(engine: Engine, resource_name) -> APIRouter:
@@ -14,7 +14,7 @@ def gen_router(engine: Engine, resource_name) -> APIRouter:
     """
     router = APIRouter(prefix=resource_name)
 
-    @router.get("/{id}")
+    @router.get("/{id}", **retrieve.fastapi_endpoint_config)
     def get_software(id: int) -> schema.Software:
         """
         Retrieve software metadata
@@ -24,7 +24,7 @@ def gen_router(engine: Engine, resource_name) -> APIRouter:
                 return session.query(orm.Software).get(id)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    @router.post("")
+    @router.post("", **create.fastapi_endpoint_config)
     def create_software(payload: schema.Software) -> int:
         """
         Create software metadata
@@ -37,7 +37,7 @@ def gen_router(engine: Engine, resource_name) -> APIRouter:
             id: int = model.id
         return id
 
-    @router.delete("/{id}")
+    @router.delete("/{id}", **delete.fastapi_endpoint_config)
     def delete_software(id: int) -> Response:
         """
         Delete software metadata

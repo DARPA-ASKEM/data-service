@@ -3,7 +3,6 @@ src.db.engine - The configured DB engine
 """
 
 from sqlalchemy import create_engine
-
 from src.settings import settings
 
 # pylint: disable-next=line-too-long
