@@ -3,7 +3,7 @@ tests.routers.software - tests basic software crud
 """
 
 from src.autogen.schema import Software
-from tests.utils import demo_api
+from tests.helpers import demo_api
 
 
 def test_software_crd():

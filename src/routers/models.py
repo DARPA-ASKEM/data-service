@@ -14,13 +14,13 @@ from src.schema.model import Model, ModelBody
 logger = Logger(__file__)
 
 
-def gen_router(engine: Engine) -> APIRouter:
+def gen_router(engine: Engine, router_name: str) -> APIRouter:
     """
     Generate model router with given DB engine
     """
-    router = APIRouter()
+    router = APIRouter(prefix=router_name)
 
-    @router.get("/models/{id}")
+    @router.get("/{id}")
     def get_model(id: int) -> Model:
         """
         Retrieve model
@@ -30,7 +30,7 @@ def gen_router(engine: Engine) -> APIRouter:
             operation = session.query(orm.Operation).get(model.head_id)
             return Model.from_orm(model, operation)
 
-    @router.post("/models")
+    @router.post("")
     def create_model(payload: Model) -> int:
         """
         Create model and return its ID
@@ -50,7 +50,7 @@ def gen_router(engine: Engine) -> APIRouter:
             id: int = model.id
         return id
 
-    @router.post("/models/{id}")
+    @router.post("/{id}")
     def update_model(payload: ModelBody, id: int) -> Model:
         """
         Update model content
@@ -66,7 +66,7 @@ def gen_router(engine: Engine) -> APIRouter:
             session.commit()
         return get_model(id)
 
-    @router.delete("/models/{id}")
+    @router.delete("/{id}")
     def delete_model(id: int) -> str:
         """
         Delete model head

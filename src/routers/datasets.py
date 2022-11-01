@@ -9,14 +9,14 @@ from src.autogen import orm
 from src.schema.dataset import Dataset
 
 
-def gen_router(engine: Engine) -> APIRouter:
+def gen_router(engine: Engine, router_name: str) -> APIRouter:
     """
     Generate software router with given DB engine
     """
 
-    router = APIRouter()
+    router = APIRouter(prefix=router_name)
 
-    @router.post("/datasets")
+    @router.post("")
     def create_dataset(payload: Dataset) -> str:
         """
         Create dataset naively

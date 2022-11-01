@@ -8,13 +8,13 @@ from sqlalchemy.orm import Session
 from src.autogen import orm, schema
 
 
-def gen_router(engine: Engine) -> APIRouter:
+def gen_router(engine: Engine, resource_name) -> APIRouter:
     """
     Generate software router with given DB engine
     """
-    router = APIRouter()
+    router = APIRouter(prefix=resource_name)
 
-    @router.get("/software/{id}")
+    @router.get("/{id}")
     def get_software(id: int) -> schema.Software:
         """
         Retrieve software metadata
@@ -24,7 +24,7 @@ def gen_router(engine: Engine) -> APIRouter:
                 return session.query(orm.Software).get(id)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    @router.post("/software")
+    @router.post("")
     def create_software(payload: schema.Software) -> int:
         """
         Create software metadata
@@ -37,7 +37,7 @@ def gen_router(engine: Engine) -> APIRouter:
             id: int = model.id
         return id
 
-    @router.delete("/software/{id}")
+    @router.delete("/{id}")
     def delete_software(id: int) -> Response:
         """
         Delete software metadata

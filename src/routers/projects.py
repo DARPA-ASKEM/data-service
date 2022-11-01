@@ -10,13 +10,13 @@ from sqlalchemy.engine.base import Engine
 logger = Logger(__file__)
 
 
-def gen_router(engine: Engine) -> APIRouter:
+def gen_router(engine: Engine, router_name: str) -> APIRouter:
     """
     Generate projects router with given DB engine
     """
-    router = APIRouter()
+    router = APIRouter(prefix=router_name)
 
-    @router.get("/projects")
+    @router.get("")
     def get_projects() -> str:
         """
         Mock project endpoint

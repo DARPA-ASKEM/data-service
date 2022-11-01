@@ -6,13 +6,13 @@ from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 
 
-def gen_router(engine: Engine) -> APIRouter:
+def gen_router(engine: Engine, router_name: str) -> APIRouter:
     """
     Generate admin router with given DB engine
     """
-    router = APIRouter()
+    router = APIRouter(prefix=router_name)
 
-    @router.get("/admin/db/info")
+    @router.get("/db/info")
     def db_status() -> str:
         """
         Print kind of DB being used

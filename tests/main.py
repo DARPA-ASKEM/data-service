@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from src.server.build import build_api
 from src.settings import settings
-from tests.utils import demo_engine
+from tests.helpers import demo_engine
 
 
 def test_version() -> None:

@@ -26,7 +26,9 @@ def attach_router(api: FastAPI, engine: Engine, router_name: str) -> None:
     being hardcoded.
     """
     router_package = import_module(f"src.routers.{router_name}")
-    api.include_router(router_package.gen_router(engine), tags=[router_name])
+    api.include_router(
+        router_package.gen_router(engine, "/" + router_name), tags=[router_name]
+    )
 
 
 def build_api(engine: Engine, *args: str) -> FastAPI:
