@@ -5,8 +5,8 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/workflows/ads.yaml
+      - uses: actions/checkout@v1
+      - uses: ./.github/workflows/ads.yaml@v1
       - name: Create environment
         run:  poetry install
       - name: Black 
