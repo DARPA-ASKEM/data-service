@@ -12,8 +12,11 @@ will forbid the API from starting.)
 
 ## Development
 
-After cloning the repository, initialize the project using the following commands:
+Assuming you have [Poetry](https://python-poetry.org/) (and preferably Docker), 
+initialize the project using the following commands:
 ```
+git clone git@github.com:DARPA-ASKEM/data-service.git
+cd data-service
 poetry install
 poetry run pre-commit install
 ```

@@ -51,7 +51,6 @@ def gen_router(engine: Engine) -> APIRouter:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         return Response(
             status_code=status.HTTP_204_NO_CONTENT,
-            content=f"Deleted software with ID {id}",
         )
 
     return router
