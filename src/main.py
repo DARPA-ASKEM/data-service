@@ -58,7 +58,7 @@ def main(host: str, port: int, dev: bool, endpoint: str) -> None:
     """
     Execute data store API using uvicorn
     """
-    is_success, message = verify(settings.dbml_version, settings.generated_path)
+    is_success, message = verify(settings.DBML_VERSION, settings.GENERATED_PATH)
     if not is_success:
         # pylint: disable-next=line-too-long
         echo(f"Failed to start: {message}.")

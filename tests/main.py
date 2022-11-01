@@ -14,7 +14,7 @@ def test_version() -> None:
     """
     Ensure the code is not using an outdated version of the DBML
     """
-    assert settings.dbml_version == get_dbml_version(settings.dbml_path)
+    assert settings.DBML_VERSION == get_dbml_version(settings.DBML_PATH)
 
 
 def test_build_api() -> None:

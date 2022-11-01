@@ -9,13 +9,13 @@ class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
     Data store configuration
     """
 
-    dbml_version: str = "v0.11.5"
-    generated_path: str = "./src/autogen"
-    dbml_path: str = "./askem.dbml"
-    sql_url: str = "db"
-    sql_port: int = 8032
-    sql_user: str = "dev"
-    sql_password: str = "dev"
+    DBML_VERSION: str = "v0.11.5"
+    GENERATED_PATH: str = "./src/autogen"
+    DBML_PATH: str = "./askem.dbml"
+    SQL_URL: str = "db"
+    SQL_PORT: int = 8032
+    SQL_USER: str = "dev"
+    SQL_PASSWORD: str = "dev"
 
 
 settings = Settings()
