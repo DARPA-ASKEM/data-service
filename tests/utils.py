@@ -10,7 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
 from src.db import drop_content, init_dev_content
-from src.main import build_api
+from src.server.build import build_api
 
 
 @contextmanager
