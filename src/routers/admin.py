@@ -2,6 +2,8 @@
 router.admin - Wraps administrative functions for interacting with the DB.
 """
 
+from logging import Logger
+
 from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 
@@ -10,6 +12,7 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
     """
     Generate admin router with given DB engine
     """
+    logger = Logger(router_name)
     router = APIRouter(prefix=router_name)
 
     @router.get("/db/info")
@@ -17,6 +20,7 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
         """
         Print kind of DB being used
         """
+        logger.debug("admin endpoint called")
         return engine.name.upper()
 
     return router

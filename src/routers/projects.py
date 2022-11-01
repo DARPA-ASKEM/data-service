@@ -7,13 +7,12 @@ from logging import Logger
 from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 
-logger = Logger(__file__)
-
 
 def gen_router(engine: Engine, router_name: str) -> APIRouter:
     """
     Generate projects router with given DB engine
     """
+    logger = Logger(router_name)
     router = APIRouter(prefix=router_name)
 
     @router.get("")

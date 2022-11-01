@@ -8,9 +8,10 @@ from sys import exit as sys_exit
 from click import command, echo, option
 from dbml_builder import verify
 from sqlalchemy.exc import OperationalError
+from uvicorn import run as uvicorn_run
+
 from src.db import engine, init_dev_content
 from src.settings import settings
-from uvicorn import run as uvicorn_run
 
 
 @command()

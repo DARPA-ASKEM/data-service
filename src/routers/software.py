@@ -1,18 +1,23 @@
 """
 router.software - very basic crud operations for software
 """
+
+from logging import Logger
+
 from fastapi import APIRouter, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
+
 from src.autogen import orm, schema
 from src.operation import create, delete, retrieve
 
 
-def gen_router(engine: Engine, resource_name) -> APIRouter:
+def gen_router(engine: Engine, router_name) -> APIRouter:
     """
     Generate software router with given DB engine
     """
-    router = APIRouter(prefix=resource_name)
+    logger = Logger(router_name)
+    router = APIRouter(prefix=router_name)
 
     @router.get("/{id}", **retrieve.fastapi_endpoint_config)
     def get_software(id: int) -> schema.Software:
@@ -35,6 +40,7 @@ def gen_router(engine: Engine, resource_name) -> APIRouter:
             session.add(model)
             session.commit()
             id: int = model.id
+        logger.info("new software with %i", id)
         return id
 
     @router.delete("/{id}", **delete.fastapi_endpoint_config)

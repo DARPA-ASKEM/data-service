@@ -7,17 +7,17 @@ from logging import Logger
 from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
+
 from src.autogen import orm
 from src.operation import create, delete, retrieve, update
 from src.schema.model import Model, ModelBody
-
-logger = Logger(__file__)
 
 
 def gen_router(engine: Engine, router_name: str) -> APIRouter:
     """
     Generate model router with given DB engine
     """
+    logger = Logger(router_name)
     router = APIRouter(prefix=router_name)
 
     @router.get("/{id}", **retrieve.fastapi_endpoint_config)
@@ -48,6 +48,7 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
             session.add(model)
             session.commit()
             id: int = model.id
+        logger.info("new model created: %i", id)
         return id
 
     @router.post("/{id}", **update.fastapi_endpoint_config)

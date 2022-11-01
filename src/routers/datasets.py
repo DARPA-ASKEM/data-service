@@ -1,9 +1,13 @@
 """
 router.datasets - doesn't do much yet
 """
+
+from logging import Logger
+
 from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
+
 from src.autogen import orm
 from src.operation import create
 from src.schema.dataset import Dataset
@@ -14,6 +18,7 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
     Generate software router with given DB engine
     """
 
+    logger = Logger(router_name)
     router = APIRouter(prefix=router_name)
 
     @router.post("", **create.fastapi_endpoint_config)
@@ -34,6 +39,8 @@ def gen_router(engine: Engine, router_name: str) -> APIRouter:
                 feature = orm.Feature(**feature_dict)
                 session.add(feature)
             session.commit()
+
+        logger.info("new dataset created")
         return "Created dataset"
 
     return router
