@@ -35,17 +35,19 @@ def get_person(id: int) -> str:
 def create_person(payload: schema.Person):
     with Session(ENGINE) as session:
         personp = payload.dict()
+        del personp["id"]
         person = orm.Person(**personp)
         session.add(person)
         session.commit()
-        payload["id"] = person.id
+        data_id = person.id
+        personp["id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/persons/{person.id}",
+                "location": f"/api/persons/{data_id}",
                 "content-type": "application/json",
             },
-            content=json.dumps(payload),
+            content=json.dumps(personp),
         )
 
 

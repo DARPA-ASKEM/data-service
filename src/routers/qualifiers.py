@@ -41,17 +41,19 @@ def get_qualifier(id: int) -> str:
 def create_qualifier(payload: api_schema.Qualifier):
     with Session(ENGINE) as session:
         qualifierp = payload.dict()
+        del qualifierp["id"]
         qualifier = orm.Qualifier(**qualifierp)
         session.add(qualifier)
         session.commit()
-        payload["id"] = qualifier.id
+        data_id = qualifier.id
+        qualifierp["id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/qualifiers/{qualifier.id}",
+                "location": f"/api/qualifiers/{data_id}",
                 "content-type": "application/json",
             },
-            content=json.dumps(payload),
+            content=json.dumps(qualifierp),
         )
 
 

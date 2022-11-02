@@ -33,20 +33,22 @@ def get_feature(id: int) -> str:
 
 
 @router.post("/")
-def create_feature(payload: api_schema.Feature):
+def create_feature(payload: schema.Feature):
     with Session(ENGINE) as session:
         featurep = payload.dict()
+        del featurep["id"]
         feature = orm.Feature(**featurep)
         session.add(feature)
         session.commit()
-        payload["id"] = feature.id
+        data_id = feature.id
+        featurep["id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/features/{feature.id}",
+                "location": f"/api/features/{data_id}",
                 "content-type": "application/json",
             },
-            content=json.dumps(payload),
+            content=json.dumps(featurep),
         )
 
 
