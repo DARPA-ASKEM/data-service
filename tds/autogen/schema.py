@@ -53,24 +53,6 @@ class ExtractedType(str, Enum):
     table = 'table'
     
 
-class AssetTable(str, Enum):
-
-    dataset = 'dataset'
-    extracted_data = 'extracted_data'
-    model = 'model'
-    plan = 'plan'
-    publication = 'publication'
-    representation = 'representation'
-    
-
-class Role(str, Enum):
-
-    author = 'author'
-    contributor = 'contributor'
-    maintainer = 'maintainer'
-    other = 'other'
-    
-
 class TaggableTable(str, Enum):
 
     dataset = 'dataset'
@@ -104,6 +86,24 @@ class RelationType(str, Enum):
     derives = 'derives'
     glued = 'glued'
     parents = 'parents'
+    
+
+class ResourceType(str, Enum):
+
+    dataset = 'dataset'
+    extracted_data = 'extracted_data'
+    model = 'model'
+    plan = 'plan'
+    publication = 'publication'
+    representation = 'representation'
+    
+
+class Role(str, Enum):
+
+    author = 'author'
+    contributor = 'contributor'
+    maintainer = 'maintainer'
+    other = 'other'
     
 
 class Operation(BaseModel):
@@ -159,13 +159,19 @@ class Material(BaseModel):
     type: Optional[Direction]
 
 
-class Association(BaseModel):
+class Dataset(BaseModel):
 
     id: Optional[int] = None
-    person_id: Optional[int] = None
-    asset_id: Optional[int] = None
-    type: Optional[AssetTable]
-    role: Optional[Role]
+    name: str
+    url: str
+    description: str
+    timestamp: datetime.datetime = datetime.datetime.now()
+    deprecated: Optional[bool]
+    sensitivity: Optional[str]
+    quality: Optional[str]
+    temporal_resolution: Optional[str]
+    geospatial_resolution: Optional[str]
+    maintainer: int
 
 
 class Feature(BaseModel):
@@ -228,23 +234,18 @@ class Asset(BaseModel):
 
     id: Optional[int] = None
     project_id: Optional[int] = None
-    asset_id: Optional[int] = None
-    type: AssetTable
+    resource_id: Optional[int] = None
+    resource_type: ResourceType
     external_ref: Optional[str]
 
 
-class Dataset(BaseModel):
+class Association(BaseModel):
 
     id: Optional[int] = None
-    name: str
-    url: str
-    description: str
-    timestamp: datetime.datetime = datetime.datetime.now()
-    deprecated: Optional[bool]
-    sensitivity: Optional[str]
-    quality: Optional[str]
-    temporal_resolution: Optional[str]
-    geospatial_resolution: Optional[str]
+    person_id: Optional[int] = None
+    resource_id: Optional[int] = None
+    resource_type: Optional[ResourceType]
+    role: Optional[Role]
 
 
 class Framework(BaseModel):
@@ -277,7 +278,7 @@ class Publication(BaseModel):
     xdd_uri: str
 
 
-class Meta(BaseModel):
+class Project(BaseModel):
 
     id: Optional[int] = None
     name: str

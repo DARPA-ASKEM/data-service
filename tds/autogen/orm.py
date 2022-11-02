@@ -57,24 +57,6 @@ class ExtractedType(str, Enum):
     table = 'table'
     
 
-class AssetTable(str, Enum):
-
-    dataset = 'dataset'
-    extracted_data = 'extracted_data'
-    model = 'model'
-    plan = 'plan'
-    publication = 'publication'
-    representation = 'representation'
-    
-
-class Role(str, Enum):
-
-    author = 'author'
-    contributor = 'contributor'
-    maintainer = 'maintainer'
-    other = 'other'
-    
-
 class TaggableTable(str, Enum):
 
     dataset = 'dataset'
@@ -108,6 +90,24 @@ class RelationType(str, Enum):
     derives = 'derives'
     glued = 'glued'
     parents = 'parents'
+    
+
+class ResourceType(str, Enum):
+
+    dataset = 'dataset'
+    extracted_data = 'extracted_data'
+    model = 'model'
+    plan = 'plan'
+    publication = 'publication'
+    representation = 'representation'
+    
+
+class Role(str, Enum):
+
+    author = 'author'
+    contributor = 'contributor'
+    maintainer = 'maintainer'
+    other = 'other'
     
 
 class Operation(Base):
@@ -175,15 +175,21 @@ class Material(Base):
     type = sa.Column(sa.Enum(Direction))
 
 
-class Association(Base):
+class Dataset(Base):
 
-    __tablename__ = 'association'
+    __tablename__ = 'dataset'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
-    asset_id = sa.Column(sa.Integer(), sa.ForeignKey('asset.id'), nullable=False)
-    type = sa.Column(sa.Enum(AssetTable))
-    role = sa.Column(sa.Enum(Role))
+    name = sa.Column(sa.String(), nullable=False)
+    url = sa.Column(sa.String(), nullable=False)
+    description = sa.Column(sa.Text(), nullable=False)
+    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
+    deprecated = sa.Column(sa.Boolean())
+    sensitivity = sa.Column(sa.Text())
+    quality = sa.Column(sa.Text())
+    temporal_resolution = sa.Column(sa.String())
+    geospatial_resolution = sa.Column(sa.String())
+    maintainer = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
 
 
 class Feature(Base):
@@ -259,26 +265,21 @@ class Asset(Base):
     __tablename__ = 'asset'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    project_id = sa.Column(sa.Integer(), sa.ForeignKey('meta.id'), nullable=False)
-    asset_id = sa.Column(sa.Integer(), nullable=False)
-    type = sa.Column(sa.Enum(AssetTable), nullable=False)
+    project_id = sa.Column(sa.Integer(), sa.ForeignKey('project.id'), nullable=False)
+    resource_id = sa.Column(sa.Integer(), nullable=False)
+    resource_type = sa.Column(sa.Enum(ResourceType), nullable=False)
     external_ref = sa.Column(sa.String())
 
 
-class Dataset(Base):
+class Association(Base):
 
-    __tablename__ = 'dataset'
+    __tablename__ = 'association'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    url = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.Text(), nullable=False)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    deprecated = sa.Column(sa.Boolean())
-    sensitivity = sa.Column(sa.Text())
-    quality = sa.Column(sa.Text())
-    temporal_resolution = sa.Column(sa.String())
-    geospatial_resolution = sa.Column(sa.String())
+    person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
+    resource_id = sa.Column(sa.Integer(), nullable=False)
+    resource_type = sa.Column(sa.Enum(ResourceType))
+    role = sa.Column(sa.Enum(Role))
 
 
 class Framework(Base):
@@ -319,9 +320,9 @@ class Publication(Base):
     xdd_uri = sa.Column(sa.String(), nullable=False)
 
 
-class Meta(Base):
+class Project(Base):
 
-    __tablename__ = 'meta'
+    __tablename__ = 'project'
 
     id = sa.Column(sa.Integer(), primary_key=True)
     name = sa.Column(sa.String(), nullable=False)

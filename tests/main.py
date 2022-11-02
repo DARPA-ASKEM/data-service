@@ -7,7 +7,6 @@ from fastapi.testclient import TestClient
 
 from tds.server.build import build_api
 from tds.settings import settings
-from tests.helpers import demo_engine
 
 
 def test_version() -> None:
@@ -21,7 +20,6 @@ def test_build_api() -> None:
     """
     Ensure that the API can be built
     """
-    with demo_engine() as engine:
-        client = TestClient(build_api(engine))
-        response = client.get("/")
-        assert response.status_code == 200
+    client = TestClient(build_api())
+    response = client.get("/")
+    assert response.status_code == 200
