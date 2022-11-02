@@ -37,7 +37,7 @@ def get_datasets(count: int):
 def get_dataset(id: int) -> str:
     with Session(ENGINE) as session:
         result = session.query(orm.Dataset).get(id)
-        logger.info(f"Latest output: {result}")
+        # logger.info(f"Latest output: {result}")
         return result
 
 
@@ -67,7 +67,7 @@ def update_dataset(payload: schema.Dataset, id: int) -> str:
     with Session(ENGINE) as session:
         data_payload = payload.dict(
             exclude_unset=True
-        )  # Exclude unset not working, throws 422 if schema.Datasets in malformed.
+        )  # Exclude unset not working, throws 422 if schema.Datasets is malformed.
         data_payload["id"] = id
         logger.info(data_payload)
 
