@@ -18,7 +18,12 @@ from tds.settings import settings
 @option("--host", default="0.0.0.0", type=str, help="Address for the API")
 @option("--port", default=8000, type=int, help="Port to expose API")
 @option("--dev", default=True, type=bool, help="Set development flag")
-@option("--name", default="full", type=str, help="Name of configured API to use")
+@option(
+    "--config-name",
+    default="full",
+    type=str,
+    help="Config name of configured API to use",
+)
 def cli(host: str, port: int, dev: bool, name: str) -> None:
     """
     Execute data store API using uvicorn
