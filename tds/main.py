@@ -10,7 +10,7 @@ from dbml_builder import verify
 from sqlalchemy.exc import OperationalError
 from uvicorn import run as uvicorn_run
 
-from tds.db import engine, init_dev_content
+from tds.db import init_dev_content, rdb
 from tds.settings import settings
 
 
@@ -30,7 +30,7 @@ def cli(host: str, port: int, dev: bool, name: str) -> None:
     if dev:
         try:
             echo("Connecting to DB... ", nl=False)
-            connection = engine.connect()
+            connection = rdb.connect()
         except OperationalError:
             echo("FAILED: DB NOT CONNECTED")
         else:

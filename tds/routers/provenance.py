@@ -5,22 +5,15 @@ router.provenance - does nothing yet
 from logging import Logger
 
 from fastapi import APIRouter
-from sqlalchemy.engine.base import Engine
+
+logger = Logger(__name__)
+router = APIRouter()
 
 
-def gen_router(engine: Engine, router_name: str) -> APIRouter:
+@router.get("")
+def get_provenance() -> str:
     """
-    Generate provenance router with given DB engine
+    Mock provenance
     """
-    logger = Logger(router_name)
-    router = APIRouter(prefix=router_name)
-
-    @router.get("")
-    def get_provenance() -> str:
-        """
-        Mock provenance
-        """
-        logger.info(engine)
-        return "PROVENANCE NOT IMPLEMENTED!"
-
-    return router
+    logger.info("PROVENANCE ENDPOINT NOT YET CREATED")
+    return "PROVENANCE NOT IMPLEMENTED!"

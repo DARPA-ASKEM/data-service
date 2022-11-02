@@ -7,7 +7,6 @@ from pkgutil import iter_modules
 from typing import List
 
 from fastapi import FastAPI
-from sqlalchemy.engine.base import Engine
 
 
 def find_valid_routers() -> List[str]:
@@ -18,7 +17,7 @@ def find_valid_routers() -> List[str]:
     return [module.name for module in iter_modules(router.__path__)]
 
 
-def attach_router(api: FastAPI, engine: Engine, router_name: str) -> None:
+def attach_router(api: FastAPI, router_name: str) -> None:
     """
     Import router module dynamically and attach it to the API
 
@@ -27,15 +26,15 @@ def attach_router(api: FastAPI, engine: Engine, router_name: str) -> None:
     """
     router_package = import_module(f"tds.routers.{router_name}")
     api.include_router(
-        router_package.gen_router(engine, "/" + router_name), tags=[router_name]
+        router_package.router, tags=[router_name], prefix="/" + router_name
     )
 
 
-def build_api(engine: Engine, *args: str) -> FastAPI:
+def build_api(*args: str) -> FastAPI:
     """
     Build an API using a group of specified router modules
     """
     app = FastAPI(docs_url="/")
     for router_name in args if len(args) != 0 else find_valid_routers():
-        attach_router(app, engine, router_name)
+        attach_router(app, router_name)
     return app
