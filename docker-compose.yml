@@ -16,4 +16,4 @@ services:
     env_file:
       - api.env
     volumes:
-      - $PWD/src:/api/src
+      - $PWD/tds:/api/tds

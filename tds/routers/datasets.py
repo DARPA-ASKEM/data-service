@@ -8,9 +8,9 @@ from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from src.autogen import orm
-from src.operation import create
-from src.schema.dataset import Dataset
+from tds.autogen import orm
+from tds.operation import create
+from tds.schema.dataset import Dataset
 
 
 def gen_router(engine: Engine, router_name: str) -> APIRouter:

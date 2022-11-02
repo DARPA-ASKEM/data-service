@@ -9,7 +9,7 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
 ADD askem.dbml askem.dbml
 COPY tests tests
-COPY src src 
+COPY tds tds 
 # Poetry complains if the README doesn't exist
 COPY README.md README.md
 RUN poetry install --only-root

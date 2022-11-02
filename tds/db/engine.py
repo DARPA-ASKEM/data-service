@@ -1,10 +1,10 @@
 """
-src.db.engine - The configured DB engine
+tds.db.engine - The configured DB engine
 """
 
 from sqlalchemy import create_engine
 
-from src.settings import settings
+from tds.settings import settings
 
 # pylint: disable-next=line-too-long
 url = f"postgresql://{settings.SQL_USER}:{settings.SQL_PASSWORD}@{settings.SQL_URL}:{settings.SQL_PORT}/askem"

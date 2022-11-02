@@ -8,8 +8,8 @@ from fastapi import APIRouter, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from src.autogen import orm, schema
-from src.operation import create, delete, retrieve
+from tds.autogen import orm, schema
+from tds.operation import create, delete, retrieve
 
 
 def gen_router(engine: Engine, router_name) -> APIRouter:

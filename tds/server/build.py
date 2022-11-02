@@ -1,5 +1,5 @@
 """
-src.server.build - Constructs API given specified router
+tds.server.build - Constructs API given specified router
 """
 
 from importlib import import_module
@@ -14,7 +14,7 @@ def find_valid_routers() -> List[str]:
     """
     Generate list of module names that are possible to import
     """
-    router = import_module("src.routers")
+    router = import_module("tds.routers")
     return [module.name for module in iter_modules(router.__path__)]
 
 
@@ -25,7 +25,7 @@ def attach_router(api: FastAPI, engine: Engine, router_name: str) -> None:
     At runtime, the routes to be used can be specified instead of
     being hardcoded.
     """
-    router_package = import_module(f"src.routers.{router_name}")
+    router_package = import_module(f"tds.routers.{router_name}")
     api.include_router(
         router_package.gen_router(engine, "/" + router_name), tags=[router_name]
     )

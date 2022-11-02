@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-src.main - The script hosts the API using a command line interface.
+tds.main - The script hosts the API using a command line interface.
 """
 
 from sys import exit as sys_exit
@@ -10,8 +10,8 @@ from dbml_builder import verify
 from sqlalchemy.exc import OperationalError
 from uvicorn import run as uvicorn_run
 
-from src.db import engine, init_dev_content
-from src.settings import settings
+from tds.db import engine, init_dev_content
+from tds.settings import settings
 
 
 @command()
@@ -36,7 +36,7 @@ def cli(host: str, port: int, dev: bool, name: str) -> None:
         else:
             echo("SUCCESS")
             init_dev_content(connection)
-    uvicorn_run(f"src.server.configs:{name}", host=host, port=port, reload=dev)
+    uvicorn_run(f"tds.server.configs:{name}", host=host, port=port, reload=dev)
 
 
 if __name__ == "__main__":

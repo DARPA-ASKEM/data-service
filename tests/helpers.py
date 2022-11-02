@@ -9,8 +9,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
-from src.db import drop_content, init_dev_content
-from src.server.build import build_api
+from tds.db import drop_content, init_dev_content
+from tds.server.build import build_api
 
 
 @contextmanager

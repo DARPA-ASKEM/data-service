@@ -8,9 +8,9 @@ from fastapi import APIRouter
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from src.autogen import orm
-from src.operation import create, delete, retrieve, update
-from src.schema.model import Model, ModelBody
+from tds.autogen import orm
+from tds.operation import create, delete, retrieve, update
+from tds.schema.model import Model, ModelBody
 
 
 def gen_router(engine: Engine, router_name: str) -> APIRouter:

@@ -1,10 +1,10 @@
 """
-src.db.helpers - Easy initialization and deletion of db content
+tds.db.helpers - Easy initialization and deletion of db content
 """
 from sqlalchemy.engine.base import Connection
 from sqlalchemy.orm import Session
 
-from src.autogen import orm
+from tds.autogen import orm
 
 
 def init_dev_content(connection: Connection):

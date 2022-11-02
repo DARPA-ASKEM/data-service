@@ -7,7 +7,7 @@ The API can be started by simply calling
 ```
 docker compose up
 ```
-(Please note that any changes in the `src/generated` directory
+(Please note that any changes in the `tds/generated` directory
 will forbid the API from starting.)
 
 ## Development
@@ -35,13 +35,13 @@ handles the code generation.
 
 To generate new model files, run:
 ```
-poetry run model-build generate ./askem.dbml ./src/autogen
+poetry run model-build generate ./askem.dbml ./tds/autogen
 ```
 
 and check if they are valid by running
 
 ```
-poetry run model-build check CURRENT_SEMANTIC_VERSION ./src/autogen
+poetry run model-build check CURRENT_SEMANTIC_VERSION ./tds/autogen
 ```
 
 If the tables don't exist yet it in Postgres, make sure to POST to the `/admin/db/init`

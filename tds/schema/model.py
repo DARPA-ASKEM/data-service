@@ -5,8 +5,8 @@ schema.dataset - Provides the API interface for datasets.
 from json import dumps
 from typing import Optional
 
-from src.autogen import orm, schema
-from src.schema.concept import Concept
+from tds.autogen import orm, schema
+from tds.schema.concept import Concept
 
 
 class ModelBody(schema.Operation):

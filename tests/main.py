@@ -5,8 +5,8 @@ tests.main - A basic healthcheck
 from dbml_builder import get_dbml_version
 from fastapi.testclient import TestClient
 
-from src.server.build import build_api
-from src.settings import settings
+from tds.server.build import build_api
+from tds.settings import settings
 from tests.helpers import demo_engine
 
 

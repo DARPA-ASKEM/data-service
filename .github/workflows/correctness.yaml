@@ -18,7 +18,7 @@ jobs:
       - name: Create environment
         run:  poetry install
       - name: Pylint source
-        run:  poetry run pylint ./src
+        run:  poetry run pylint ./tds
       - name: Pylint tests
         run:  poetry run pylint ./tests
       - name: Pytest

@@ -4,8 +4,8 @@ schema.dataset - Provides the API interface for datasets.
 # pylint: disable=missing-class-docstring, too-few-public-methods
 from typing import List, Optional
 
-from src.autogen import schema
-from src.schema.concept import Concept
+from tds.autogen import schema
+from tds.schema.concept import Concept
 
 
 class Qualifier(schema.Qualifier):

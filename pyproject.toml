@@ -4,7 +4,7 @@ version = "0.1.1"
 description = "The API that sits on top of the data store for the ASKEM program."
 authors = ["Five Grant <five@jataware.com>"]
 readme = "README.md"
-packages = [{include = "src"}, {include="tests"}]
+packages = [{include = "tds"}, {include="tests"}]
 license = "MIT"
 
 [tool.poetry.urls]
@@ -22,7 +22,7 @@ requests = "^2.28.1"
 psycopg2-binary = "^2.9.4"
 
 [tool.poetry.scripts]
-tds = "src.main:cli"
+tds = "tds.main:cli"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.10.1"
