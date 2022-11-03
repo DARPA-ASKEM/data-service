@@ -19,7 +19,7 @@ router = APIRouter()
 @router.get("/")
 def get_concepts(count: int):
     with Session(ENGINE) as session:
-        result = session.query(orm.Dataset).order_by(orm.Concept.id.asc()).limit(count)
+        result = session.query(orm.Concept).order_by(orm.Concept.id.asc()).limit(count)
         result = result[::]
         return result
 

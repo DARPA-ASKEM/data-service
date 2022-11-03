@@ -19,7 +19,7 @@ router = APIRouter()
 @router.get("/")
 def get_features(count: int):
     with Session(ENGINE) as session:
-        result = session.query(orm.Dataset).order_by(orm.Feature.id.asc()).limit(count)
+        result = session.query(orm.Feature).order_by(orm.Feature.id.asc()).limit(count)
         result = result[::]
         return result
 
@@ -38,6 +38,16 @@ def create_feature(payload: schema.Feature):
         featurep = payload.dict()
         del featurep["id"]
         feature = orm.Feature(**featurep)
+        exists = session.query(orm.Feature).filter(**featurep).scalar() is not None
+        if exists:
+            return Response(
+                status_code=status.HTTP_200_OK,
+                headers={
+                    "location": f"/api/features/{data_id}",
+                    "content-type": "application/json",
+                },
+                content=json.dumps(featurep),
+            )
         session.add(feature)
         session.commit()
         data_id = feature.id

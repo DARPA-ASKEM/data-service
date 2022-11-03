@@ -23,7 +23,7 @@ router = APIRouter()
 def get_qualifiers(count: int):
     with Session(ENGINE) as session:
         result = (
-            session.query(orm.Dataset).order_by(orm.Qualifier.id.asc()).limit(count)
+            session.query(orm.Qualifier).order_by(orm.Qualifier.id.asc()).limit(count)
         )
         result = result[::]
         return result

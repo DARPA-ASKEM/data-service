@@ -74,7 +74,14 @@ def update_dataset(payload: schema.Dataset, id: int) -> str:
         data_to_update = session.query(orm.Dataset).filter(orm.Dataset.id == id)
         data_to_update.update(data_payload)
         session.commit()
-    return "Updated dataset"
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "location": f"/api/datasets/{id}",
+            "content-type": "application/json",
+        },
+        content=json.dumps(data_to_update, default=str),
+    )
 
 
 @router.post("/datasets/deprecate/{id}")
