@@ -1,11 +1,17 @@
-FROM python:latest
+FROM python:3.10
 RUN apt update 2> /dev/null
 RUN apt install -y postgresql postgresql-contrib
+RUN pip install poetry
 WORKDIR /api
-ADD requirements.txt requirements.txt
+ADD poetry.lock poetry.lock
+ADD pyproject.toml pyproject.toml
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-root
 ADD askem.dbml askem.dbml
-RUN pip install -r requirements.txt
-COPY src src 
+COPY tests tests
+COPY tds tds 
+# Poetry complains if the README doesn't exist
+COPY README.md README.md
+RUN poetry install --only-root
 EXPOSE 8000
-WORKDIR /api/src
-CMD ["./main.py", "start"]
+CMD ["poetry", "run", "tds"]

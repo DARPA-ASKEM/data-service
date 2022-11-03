@@ -1,8 +1,7 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v0.11.4'
+  Note: 'v0.11.6'
 }
-
 
 /////////// DATA ///////////
 
@@ -25,6 +24,7 @@ Table data.dataset {
   quality text
   temporal_resolution varchar
   geospatial_resolution varchar
+  maintainer int [not null, ref: > public.person.id]
 }
 
 Table data.feature {
@@ -49,7 +49,6 @@ Table data.qualifier_xref {
   qualifier_id int [ref: > data.qualifier.id, not null]
   feature_id int [ref: > data.feature.id, not null]
 }
-
 
 /////////// MODELS ///////////
 
@@ -114,7 +113,7 @@ Table modeling.intermediate {
 
 Table modeling.software {
   id int [pk]
-  created_at datetime [not null]
+  timestamp datetime [default:`now()`, not null]
   source varchar [not null, note: 'E.g. github url']
   storage_uri varchar [not null, note: 'E.g. S3 uri for zipfile of software']
 }
@@ -195,23 +194,7 @@ Table processing.extracted_data {
 
 /////////// PROJECTS ///////////
 
-Enum projects.asset_table {
-   dataset
-   model
-   extracted_data
-   plan
-   representation
-   publication
-}
-
-Enum projects.role {
-  author
-  contributor
-  maintainer
-  other
-}
-
-Table projects.meta {
+Table projects.project {
   id int [pk]
   name varchar [not null]
   description varchar [not null]
@@ -221,18 +204,10 @@ Table projects.meta {
 
 Table projects.asset {
   id int [pk]
-  project_id int [ref: > projects.meta.id, not null]
-  asset_id int [not null]
-  type projects.asset_table [not null]
+  project_id int [ref: > projects.project.id, not null]
+  resource_id int [not null]
+  resource_type public.resource_type [not null]
   external_ref varchar [note:'The external resource that is pushed to on update']
-}
-
-Table projects.association {
-  id int [pk]
-  person_id int [ref: > public.person.id, not null]
-  asset_id int [ref: > projects.asset.id, not null]
-  type projects.asset_table
-  role projects.role
 }
 
 /////////// ONTOLOGY ///////////
@@ -288,7 +263,23 @@ Table provenance.relation {
   right_type provenance.obj_type [not null]
 }
 
-/// PERSON ////
+/// PUBLIC ////
+
+Enum public.resource_type {
+   dataset
+   model
+   extracted_data
+   plan
+   representation
+   publication
+}
+
+Enum public.role {
+  author
+  contributor
+  maintainer
+  other
+}
 
 Table person {
   id int [pk]
@@ -297,4 +288,12 @@ Table person {
   org varchar
   website varchar
   is_registered bool [not null, note: 'Individuals might be listed as a maintainer but may not be a registered user.']
+}
+
+Table association {
+  id int [pk]
+  person_id int [ref: > public.person.id, not null]
+  resource_id int [not null]
+  resource_type public.resource_type
+  role public.role
 }
