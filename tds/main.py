@@ -19,12 +19,12 @@ from tds.settings import settings
 @option("--port", default=8000, type=int, help="Port to expose API")
 @option("--dev", default=True, type=bool, help="Set development flag")
 @option(
-    "--config-name",
+    "--server-config",
     default="full",
     type=str,
-    help="Config name of configured API to use",
+    help="Name of server config to use from `tds.server.configs`",
 )
-def cli(host: str, port: int, dev: bool, name: str) -> None:
+def cli(host: str, port: int, dev: bool, server_config: str) -> None:
     """
     Execute data store API using uvicorn
     """
@@ -41,7 +41,7 @@ def cli(host: str, port: int, dev: bool, name: str) -> None:
         else:
             echo("SUCCESS")
             init_dev_content(connection)
-    uvicorn_run(f"tds.server.configs:{name}", host=host, port=port, reload=dev)
+    uvicorn_run(f"tds.server.configs:{server_config}", host=host, port=port, reload=dev)
 
 
 if __name__ == "__main__":
