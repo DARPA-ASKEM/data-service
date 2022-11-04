@@ -10,14 +10,15 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.autogen.schema import Provenance, RelationType
+from tds.autogen.schema import RelationType
 from tds.db import request_rdb
+from tds.schema.provenance import Provenance
 from tds.schema.resources import get_resource_type
 
 
 class RelationHandler:
     """
-    The hanlder wraps relation crud operations and writes to both the relational and graph DBs
+    The handler wraps crud operations and writes to both the relational and graph DBs
     """
 
     def __init__(self, rdb, enable_graph_cache: bool = True):
@@ -27,6 +28,9 @@ class RelationHandler:
     def create(
         self, left: Type[BaseModel], right: Type[BaseModel], label: RelationType
     ) -> int:
+        """
+        Draws a relation between two resources
+        """
         left_type = get_resource_type(left)
         right_type = get_resource_type(right)
         if left_type is not None and right_type is not None:
@@ -45,29 +49,41 @@ class RelationHandler:
                 session.commit()
                 id: int = provenance.id
             return id
-        else:
-            raise Exception("Invalid object in relation")
+        raise Exception("Invalid object in relation")
 
     def retrieve(self, id: int) -> Optional[Provenance]:
+        """
+        Retrieves a relation between two resources
+        """
         with Session(self.__connection__) as session:
-            if session.query(orm.Provenance).filter(orm.Software.id == id).count() == 1:
+            if (
+                session.query(orm.Provenance).filter(orm.Provenance.id == id).count()
+                == 1
+            ):
                 provenance = session.query(orm.Provenance).get(id)
                 return Provenance.from_orm(provenance)
-            else:
-                return None
+            return None
 
     def delete(self, id: int) -> bool:
+        """
+        Deletes the edge between two resources (not the nodes)
+        """
         with Session(self.__connection__) as session:
-            if session.query(orm.Provenance).filter(orm.Software.id == id).count() == 1:
+            if (
+                session.query(orm.Provenance).filter(orm.Provenance.id == id).count()
+                == 1
+            ):
                 provenance = session.query(orm.Provenance).get(id)
                 session.delete(provenance)
                 session.commit()
                 return True
-            else:
-                return False
+            return False
 
 
 async def request_relation_handler(
     rdb: Engine = Depends(request_rdb),
 ) -> RelationHandler:
+    """
+    Create a fastapi dependency relational handler
+    """
     return RelationHandler(rdb)
