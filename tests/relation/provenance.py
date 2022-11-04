@@ -2,25 +2,34 @@
 tests.relation.provenance - Test provenance wrapper
 """
 from tds.autogen.schema import (
-    Intermediate,
     IntermediateFormat,
     IntermediateSource,
-    Publication,
     RelationType,
+    ResourceType,
 )
 from tds.relation.provenance import RelationHandler
+from tds.schema.resources import Intermediate, Publication, get_resource_type
 from tests.helpers import demo_rdb
 
 
 def test_relation_handler_rdb_only():
-    relation_handler = RelationHandler(demo_rdb(), False)
-    intermediate = Intermediate(
-        source=IntermediateSource.skema,
-        type=IntermediateFormat.other,
-        representation=b"",
-    )
-    publication = Publication(xdd_uri="https://")
-    id = relation_handler.create(intermediate, publication, RelationType.derivedfrom)
-    assert relation_handler.retrieve(id) is not None
-    assert relation_handler.delete(id)
-    assert relation_handler.retrieve(id) is None
+    with demo_rdb() as rdb:
+        relation_handler = RelationHandler(rdb, False)
+        intermediate = Intermediate(
+            id=0,
+            source=IntermediateSource.skema,
+            type=IntermediateFormat.other,
+            representation=b"",
+        )
+        publication = Publication(id=0, xdd_uri="https://")
+
+        # NOTE: Should these two asserts be their own test?
+        assert get_resource_type(intermediate) == ResourceType.intermediate
+        assert get_resource_type(publication) == ResourceType.publication
+
+        id = relation_handler.create(
+            intermediate, publication, RelationType.derivedfrom
+        )
+        assert relation_handler.retrieve(id) is not None
+        assert relation_handler.delete(id)
+        assert relation_handler.retrieve(id) is None

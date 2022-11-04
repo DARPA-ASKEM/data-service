@@ -1,31 +1,52 @@
+"""
+tds.schema.resources - Redirects general types to restricted resource typing
+"""
+# pylint: disable=missing-class-docstring
+
 from typing import Optional, Type
 
 from pydantic import BaseModel
 
-from tds.autogen.schema import (
-    ExtractedData,
-    Intermediate,
-    Publication,
-    ResourceType,
-    SimulationPlan,
-)
+from tds.autogen import schema
+from tds.autogen.schema import ResourceType
 from tds.schema.dataset import Dataset
 from tds.schema.model import Model
+from tds.schema.simulation import Plan
+
+
+class ExtractedData(schema.ExtractedData):
+    class Config:
+        orm_mode = True
+
+
+class Publication(schema.Publication):
+    class Config:
+        orm_mode = True
+
+
+class Intermediate(schema.Intermediate):
+    class Config:
+        orm_mode = True
 
 
 def get_resource_type(resource: Type[BaseModel]) -> Optional[ResourceType]:
-    match resource.__qualname__:
-        case Dataset.__qualname__:
-            return ResourceType.dataset
-        case ExtractedData.__qualname__:
-            return ResourceType.extracted_data
-        case Model.__qualname__:
-            return ResourceType.model
-        case SimulationPlan.__qualname__:
-            return ResourceType.plan
-        case Publication.__qualname__:
-            return ResourceType.publication
-        case Intermediate.__qualname__:
-            return ResourceType.intermediate
+    """
+    Maps class to resource enum
+    """
+    resource_type = None
+    match resource:
+        case Dataset():
+            resource_type = ResourceType.dataset
+        case ExtractedData():
+            resource_type = ResourceType.extracted_data
+        case Model():
+            resource_type = ResourceType.model
+        case Plan():
+            resource_type = ResourceType.plan
+        case Publication():
+            resource_type = ResourceType.publication
+        case Intermediate():
+            resource_type = ResourceType.intermediate
         case _:
-            return None
+            resource_type = None
+    return resource_type
