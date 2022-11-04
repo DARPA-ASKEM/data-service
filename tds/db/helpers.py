@@ -13,26 +13,15 @@ def init_dev_content(connection: Connection):
     """
     orm.Base.metadata.create_all(connection)
     with Session(connection) as session:
-        need_framework = session.query(orm.Framework).first() is None
-        need_person = session.query(orm.Person).first() is None
+        need_framework = session.query(orm.ModelingFramework).first() is None
         if need_framework:
-            framework = orm.Framework(
+            framework = orm.ModelingFramework(
                 id=0,
                 version="dummy",
                 name="dummy",
                 semantics={},
             )
             session.add(framework)
-        if need_person:
-            person = orm.Person(
-                id=0,
-                name="Jane Doe",
-                email="sample",
-                org="sample",
-                website="sample",
-                is_registered=True,
-            )
-            session.add(person)
         session.commit()
 
 

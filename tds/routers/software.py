@@ -23,7 +23,7 @@ def get_software(id: int, rdb: Engine = Depends(request_rdb)) -> schema.Software
     """
     with Session(rdb) as session:
         if session.query(orm.Software).filter(orm.Software.id == id).count() == 1:
-            return session.query(orm.Software).get(id)
+            return schema.Software.from_orm(session.query(orm.Software).get(id))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
