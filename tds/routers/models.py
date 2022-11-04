@@ -9,9 +9,11 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
+from tds.autogen.schema import RelationType
 from tds.db import request_rdb
-from tds.operation import create, delete, retrieve, update
-from tds.schema.model import Model, ModelBody
+from tds.operation import create, retrieve, update
+from tds.relation.provenance import RelationHandler, request_relation_handler
+from tds.schema.model import Model
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -24,8 +26,7 @@ def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
     """
     with Session(rdb) as session:
         model = session.query(orm.Model).get(id)
-        operation = session.query(orm.Operation).get(model.head_id)
-        return Model.from_orm(model, operation)
+        return Model.from_orm(model)
 
 
 @router.post("", **create.fastapi_endpoint_config)
@@ -35,13 +36,8 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
     """
     with Session(rdb) as session:
         model_payload = payload.dict()
-        operation_payload = model_payload.pop("body")
-        operation = orm.Operation(**operation_payload)
         # pylint: disable-next=unused-variable
         concept_payload = model_payload.pop("concept")  # TODO: Save ontology term
-        session.add(operation)
-        session.commit()
-        model_payload["head_id"] = operation.id
         model = orm.Model(**model_payload)
         session.add(model)
         session.commit()
@@ -52,31 +48,24 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
 
 @router.post("/{id}", **update.fastapi_endpoint_config)
 def update_model(
-    payload: ModelBody, id: int, rdb: Engine = Depends(request_rdb)
+    payload: Model,
+    id: int,
+    rdb: Engine = Depends(request_rdb),
+    relation_handler: RelationHandler = Depends(request_relation_handler),
 ) -> Model:
     """
     Update model content
     """
     with Session(rdb) as session:
-        model = session.query(orm.Model).get(id)
-        operation_payload = payload.dict()
-        operation_payload["prev"] = model.head_id
-        operation = orm.Operation(**operation_payload)
-        session.add(operation)
+        model_payload = payload.dict()
+        # pylint: disable-next=unused-variable
+        concept_payload = model_payload.pop("concept")  # TODO: Save ontology term
+        model_payload["id"] = None
+        model = orm.Model(**model_payload)
+        session.add(model)
         session.commit()
-        model.head_id = operation.id
-        session.commit()
+        old_model = session.query(orm.Model).get(id)
+    relation_handler.create(
+        Model.from_orm(model), Model.from_orm(old_model), RelationType.editedFrom
+    )
     return get_model(id)
-
-
-@router.delete("/{id}", **delete.fastapi_endpoint_config)
-def delete_model(id: int, rdb: Engine = Depends(request_rdb)) -> str:
-    """
-    Delete model head
-
-    WARNING: The operation history is left dangling.
-    """
-    with Session(rdb) as session:
-        session.query(orm.Model).get(id).delete()
-        session.commit()
-    return "Deleted model"
