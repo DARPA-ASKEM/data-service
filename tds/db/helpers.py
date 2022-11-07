@@ -17,7 +17,10 @@ def init_dev_content(connection: Connection):
         need_person = session.query(orm.Person).first() is None
         if need_framework:
             framework = orm.Framework(
-                id=0, version="dummy", name="dummy", semantics={},
+                id=0,
+                version="dummy",
+                name="dummy",
+                semantics={},
             )
             session.add(framework)
         if need_person:

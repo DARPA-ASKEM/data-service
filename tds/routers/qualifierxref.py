@@ -94,8 +94,8 @@ def create_xref_component(payload: schema.QualifierXref, rdb: Engine):
         qualifier_xrefp = {}
         try:
             qualifier_xrefp = payload.dict()
-        except Exception as e:
-            logger.error(e)
+        except TypeError as error:
+            logger.error(error)
             qualifier_xrefp = payload
         del qualifier_xrefp["id"]
         qualifier_xref = orm.QualifierXref(**qualifier_xrefp)
