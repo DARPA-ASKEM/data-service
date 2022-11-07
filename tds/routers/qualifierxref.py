@@ -44,7 +44,7 @@ def create_qualifer_xref(
     payload: schema.QualifierXref, rdb: Engine = Depends(request_rdb)
 ):
 
-    create_xref_function(payload, rdb)
+    create_xref_component(payload, rdb)
 
 
 @router.patch("/{id}")
@@ -81,6 +81,20 @@ def create_xref_component(payload: schema.QualifierXref, rdb: Engine):
             qualifer_xrefp = payload
         del qualifer_xrefp["id"]
         qualifer_xref = orm.QualifierXref(**qualifer_xrefp)
+        exists = (
+            session.query(orm.QualifierXref).filter_by(**qualifer_xrefp).first()
+            is not None
+        )
+        if exists:
+            return Response(
+                status_code=status.HTTP_200_OK,
+                headers={
+                    "location": f"/api/qualifierxref/",
+                    "content-type": "application/json",
+                },
+                content=json.dumps(qualifer_xrefp),
+            )
+
         session.add(qualifer_xref)
         session.commit()
         data_id = qualifer_xref.id

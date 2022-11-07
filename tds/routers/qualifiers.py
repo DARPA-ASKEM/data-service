@@ -49,6 +49,19 @@ def create_qualifier(
         qualifierp = payload.dict()
         del qualifierp["id"]
         qualifier = orm.Qualifier(**qualifierp)
+        exists = (
+            session.query(orm.Qualifier).filter_by(**qualifierp).first() is not None
+        )
+        if exists:
+            return Response(
+                status_code=status.HTTP_200_OK,
+                headers={
+                    "location": f"/api/qualfiers/",
+                    "content-type": "application/json",
+                },
+                content=json.dumps(qualifierp),
+            )
+
         session.add(qualifier)
         session.commit()
         data_id = qualifier.id

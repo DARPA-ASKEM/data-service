@@ -28,8 +28,8 @@ def cli(host: str, port: int, dev: bool, server_config: str) -> None:
     """
     Execute data store API using uvicorn
     """
-    echo(settings.SQL_PORT)
-    echo(settings.SQL_URL)
+    # echo(settings.SQL_PORT)
+    # echo(settings.SQL_URL)
     is_success, message = verify(settings.DBML_VERSION, settings.GENERATED_PATH)
     if not is_success:
         echo(f"Failed to start: {message}.")
