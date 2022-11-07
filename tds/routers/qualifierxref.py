@@ -1,5 +1,5 @@
 """
-router.qualifier xrefs - crud operations for qualifier xrefs and 
+router.qualifier xrefs - crud operations for qualifier xrefs and
 related tables in the DB
 """
 
@@ -94,7 +94,8 @@ def create_xref_component(payload: schema.QualifierXref, rdb: Engine):
         qualifier_xrefp = {}
         try:
             qualifier_xrefp = payload.dict()
-        except:
+        except Exception as e:
+            logger.error(e)
             qualifier_xrefp = payload
         del qualifier_xrefp["id"]
         qualifier_xref = orm.QualifierXref(**qualifier_xrefp)

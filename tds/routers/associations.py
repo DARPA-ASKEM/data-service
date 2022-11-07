@@ -3,7 +3,7 @@ router.associations - crud operations for associations and related tables in the
 """
 
 import json
-from logging import DEBUG, Logger
+from logging import Logger
 
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.engine.base import Engine
@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.get("/")
-def get_association(count: int, rdb: Engine = Depends(request_rdb)):
+def get_associations(count: int, rdb: Engine = Depends(request_rdb)):
     """
     Get a specific number of associations
     """

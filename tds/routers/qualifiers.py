@@ -2,13 +2,11 @@
 router.qualifiers - crud operations for qualifiers and related tables in the DB
 """
 
-import datetime
 import json
-from logging import DEBUG, Logger
-from typing import Any, Dict, List
+from logging import Logger
+from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
-from sqlalchemy import desc
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
