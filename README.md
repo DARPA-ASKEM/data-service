@@ -7,13 +7,19 @@ The API can be started by simply calling
 ```
 docker compose up
 ```
+
+Run the following command instead to start the data service api and a postgresql docker container
+```
+docker compose --profile dev up
+```
 (Please note that any changes in the `tds/generated` directory
 will forbid the API from starting.)
 
 ## Development
 
-Assuming you have [Poetry](https://python-poetry.org/) (and preferably Docker), 
-initialize the project using the following commands:
+The requirements for developing this project locally are [Poetry](https://python-poetry.org/) and Docker.
+
+Initialize the project using the following commands:
 ```
 git clone git@github.com:DARPA-ASKEM/data-service.git
 cd data-service
