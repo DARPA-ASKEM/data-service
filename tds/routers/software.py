@@ -56,6 +56,4 @@ def delete_software(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
             session.commit()
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Response(
-        status_code=status.HTTP_204_NO_CONTENT,
-    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT,)
