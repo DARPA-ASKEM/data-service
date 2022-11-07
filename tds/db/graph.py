@@ -11,17 +11,17 @@ from sqlalchemy.orm import Session
 
 from tds.autogen import orm
 from tds.autogen.schema import RelationType
-from tds.db import request_rdb
+from tds.db.relational import request_engine as request_rdb
 from tds.schema.provenance import Provenance
 from tds.schema.resources import get_resource_type
 
 
-class RelationHandler:
+class ProvenanceHandler:
     """
     The handler wraps crud operations and writes to both the relational and graph DBs
     """
 
-    def __init__(self, rdb, enable_graph_cache: bool = True):
+    def __init__(self, rdb: Engine, enable_graph_cache: bool = True):
         self.__connection__ = rdb.connect()
         self.graph_cache_enabled = enable_graph_cache  # TODO: create neo4j connection
 
@@ -80,10 +80,10 @@ class RelationHandler:
             return False
 
 
-async def request_relation_handler(
+async def request_provenance_handler(
     rdb: Engine = Depends(request_rdb),
-) -> RelationHandler:
+) -> ProvenanceHandler:
     """
     Create a fastapi dependency relational handler
     """
-    return RelationHandler(rdb)
+    return ProvenanceHandler(rdb)

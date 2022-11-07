@@ -21,7 +21,9 @@ def demo_rdb() -> Generator[Engine, None, None]:
 
     engine = create_engine(
         "sqlite://",
-        creator=lambda: connect("file:test:?mode=memory&cache=shared", uri=True),
+        creator=lambda: connect(
+            "file:test:?mode=memory&cache=shared", uri=True, check_same_thread=False
+        ),
     )
     connection = engine.connect()
     init_dev_content(connection)

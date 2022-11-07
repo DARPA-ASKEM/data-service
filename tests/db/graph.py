@@ -7,14 +7,14 @@ from tds.autogen.schema import (
     RelationType,
     ResourceType,
 )
-from tds.relation.provenance import RelationHandler
+from tds.db import ProvenanceHandler
 from tds.schema.resources import Intermediate, Publication, get_resource_type
 from tests.helpers import demo_rdb
 
 
 def test_relation_handler_rdb_only():
     with demo_rdb() as rdb:
-        relation_handler = RelationHandler(rdb, False)
+        relation_handler = ProvenanceHandler(rdb, False)
         intermediate = Intermediate(
             id=0,
             source=IntermediateSource.skema,
