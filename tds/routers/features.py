@@ -3,7 +3,7 @@ router.features - crud operations for features and related tables in the DB
 """
 
 import json
-from logging import DEBUG, Logger
+from logging import Logger
 
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.engine.base import Engine
@@ -29,13 +29,13 @@ def get_features(count: int, rdb: Engine = Depends(request_rdb)):
 
 
 @router.get("/{id}")
-def get_feature(id: int) -> str:
+def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific feature by ID
     """
     with Session(rdb) as session:
         result = session.query(orm.Feature).get(id)
-        logger.info(f"Latest output: {result}")
+        # logger.info(f"Latest output: {result}")
         return result
 
 
@@ -53,7 +53,7 @@ def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
             return Response(
                 status_code=status.HTTP_200_OK,
                 headers={
-                    "location": f"/api/features/",
+                    "location": "/api/features/",
                     "content-type": "application/json",
                 },
                 content=json.dumps(featurep),

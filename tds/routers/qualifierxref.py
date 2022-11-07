@@ -1,14 +1,12 @@
 """
-router.qualifier xrefs - crud operations for qualifier xrefs and related tables in the DB
+router.qualifier xrefs - crud operations for qualifier xrefs and 
+related tables in the DB
 """
 
-import datetime
 import json
-from logging import DEBUG, Logger
-from typing import Any, Dict
+from logging import Logger
 
 from fastapi import APIRouter, Depends, Response, status
-from sqlalchemy import desc
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -42,7 +40,7 @@ def get_qualifier_xref(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     with Session(rdb) as session:
         result = session.query(orm.QualifierXref).get(id)
-        logger.info(f"Latest output: {result}")
+        # logger.info(f"Latest output: {result}")
         return result
 
 
@@ -69,7 +67,7 @@ def update_qualifier_xref(
         logger.info(data_payload)
 
         data_to_update = session.query(orm.QualifierXref).filter(
-            orm.QualiferXref.id == id
+            orm.QualifierXref.id == id
         )
         data_to_update.update(data_payload)
         session.commit()
@@ -89,6 +87,9 @@ def delete_qualifier_xref(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 # Has to be separate so that the qualifiers router can use this
 # function inside of the API.
 def create_xref_component(payload: schema.QualifierXref, rdb: Engine):
+    """
+    Function to create an xref component that can also be used internally.
+    """
     with Session(rdb) as session:
         qualifier_xrefp = {}
         try:
@@ -105,7 +106,7 @@ def create_xref_component(payload: schema.QualifierXref, rdb: Engine):
             return Response(
                 status_code=status.HTTP_200_OK,
                 headers={
-                    "location": f"/api/qualifierxref/",
+                    "location": "/api/qualifierxref/",
                     "content-type": "application/json",
                 },
                 content=json.dumps(qualifier_xrefp),

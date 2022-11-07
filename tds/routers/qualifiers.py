@@ -41,7 +41,7 @@ def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     with Session(rdb) as session:
         result = session.query(orm.Qualifier).get(id)
-        logger.info(f"Latest output: {result}")
+        # logger.info(f"Latest output: {result}")
         return result
 
 
@@ -65,7 +65,7 @@ def create_qualifier(
             return Response(
                 status_code=status.HTTP_200_OK,
                 headers={
-                    "location": f"/api/qualfiers/",
+                    "location": "/api/qualfiers/",
                     "content-type": "application/json",
                 },
                 content=json.dumps(qualifierp),
@@ -74,10 +74,10 @@ def create_qualifier(
         session.add(qualifier)
         session.commit()
         data_id = qualifier.id
-        for q in qualifies_array:
+        for qual in qualifies_array:
             feature = (
                 session.query(orm.Feature)
-                .filter_by(name=q, qualifier_id=qualifierp["qualifier_id"])
+                .filter_by(name=qual, qualifier_id=qualifierp["qualifier_id"])
                 .first()
             )
             qualifier_xrefp = {

@@ -35,7 +35,7 @@ def get_person(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     with Session(rdb) as session:
         result = session.query(orm.Person).get(id)
-        logger.info(f"Latest output: {result}")
+        # logger.info(f"Latest output: {result}")
         return result
 
 
