@@ -1,5 +1,5 @@
 """
-router.datasets - crud operations for datasets and related tables in the DB
+router.features - crud operations for features and related tables in the DB
 """
 
 import json
@@ -19,6 +19,9 @@ router = APIRouter()
 
 @router.get("/")
 def get_features(count: int, rdb: Engine = Depends(request_rdb)):
+    """
+    Get a specified number of features
+    """
     with Session(rdb) as session:
         result = session.query(orm.Feature).order_by(orm.Feature.id.asc()).limit(count)
         result = result[::]
@@ -27,6 +30,9 @@ def get_features(count: int, rdb: Engine = Depends(request_rdb)):
 
 @router.get("/{id}")
 def get_feature(id: int) -> str:
+    """
+    Get a specific feature by ID
+    """
     with Session(rdb) as session:
         result = session.query(orm.Feature).get(id)
         logger.info(f"Latest output: {result}")
@@ -35,6 +41,9 @@ def get_feature(id: int) -> str:
 
 @router.post("/")
 def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
+    """
+    Create a feature
+    """
     with Session(rdb) as session:
         featurep = payload.dict()
         del featurep["id"]
@@ -67,6 +76,9 @@ def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
 def update_feature(
     payload: schema.Feature, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
+    """
+    Update a feature by ID
+    """
     with Session(rdb) as session:
         data_payload = payload.dict(exclude_unset=True)
         data_payload["id"] = id
@@ -80,6 +92,9 @@ def update_feature(
 
 @router.delete("/{id}")
 def delete_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Delete a feature by ID
+    """
     with Session(rdb) as session:
         session.query(orm.Feature).filter(orm.Feature.id == id).delete()
         session.commit()

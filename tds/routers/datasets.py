@@ -20,7 +20,7 @@ router = APIRouter()
 @router.get("/datasets")
 def get_datasets(count: int, rdb: Engine = Depends(request_rdb)):
     """
-    Get a count of datasets
+    Get a specific number of datasets
     """
     with Session(rdb) as session:
         result = (
@@ -107,7 +107,8 @@ def deprecate_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return f"Set dataset with id {id} to deprecated state {deprecated_value}"
 
 
-# Not working because of lack of cascade settings in ORM? Features foreign key blocks the delete.
+# Not working because of lack of cascade settings in ORM?
+# Features foreign key blocks the delete.
 @router.delete("/datasets/{id}")
 def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """

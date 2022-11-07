@@ -1,5 +1,5 @@
 """
-router.datasets - crud operations for datasets and related tables in the DB
+router.concepts - crud operations for concepts and related tables in the DB
 """
 
 import json
@@ -19,6 +19,9 @@ router = APIRouter()
 
 @router.get("/")
 def get_concepts(count: int, rdb: Engine = Depends(request_rdb)):
+    """
+    Get a specific number of concepts
+    """
     with Session(rdb) as session:
         result = session.query(orm.Concept).order_by(orm.Concept.id.asc()).limit(count)
         result = result[::]
@@ -27,6 +30,9 @@ def get_concepts(count: int, rdb: Engine = Depends(request_rdb)):
 
 @router.get("/{id}")
 def get_concept(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Get a specific concept by ID
+    """
     with Session(rdb) as session:
         result = session.query(orm.Concept).get(id)
         logger.info(f"Latest output: {result}")
@@ -35,6 +41,9 @@ def get_concept(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 @router.post("/")
 def create_concept(payload: schema.Concept, rdb: Engine = Depends(request_rdb)):
+    """
+    Create a concept
+    """
     with Session(rdb) as session:
         conceptp = payload.dict()
         del conceptp["id"]
@@ -57,6 +66,9 @@ def create_concept(payload: schema.Concept, rdb: Engine = Depends(request_rdb)):
 def update_concept(
     payload: schema.Concept, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
+    """
+    Update a concept by ID
+    """
     with Session(rdb) as session:
         data_payload = payload.dict(exclude_unset=True)
         data_payload["id"] = id
@@ -70,6 +82,9 @@ def update_concept(
 
 @router.delete("/{id}")
 def delete_concept(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Delete a concept by ID
+    """
     with Session(rdb) as session:
         session.query(orm.Concept).filter(orm.Concept.id == id).delete()
         session.commit()

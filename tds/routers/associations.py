@@ -1,5 +1,5 @@
 """
-router.datasets - crud operations for datasets and related tables in the DB
+router.associations - crud operations for associations and related tables in the DB
 """
 
 import json
@@ -19,6 +19,9 @@ router = APIRouter()
 
 @router.get("/")
 def get_association(count: int, rdb: Engine = Depends(request_rdb)):
+    """
+    Get a specific number of associations
+    """
     with Session(rdb) as session:
         result = (
             session.query(orm.Association)
@@ -31,6 +34,9 @@ def get_association(count: int, rdb: Engine = Depends(request_rdb)):
 
 @router.get("/{id}")
 def get_association(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Get a specific association by ID
+    """
     with Session(rdb) as session:
         result = session.query(orm.Association).get(id)
         logger.info(f"Latest output: {result}")
@@ -39,6 +45,9 @@ def get_association(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 @router.post("/")
 def create_association(payload: schema.Association, rdb: Engine = Depends(request_rdb)):
+    """
+    Create a association
+    """
     with Session(rdb) as session:
         associationp = payload.dict()
         del associationp["id"]
@@ -61,6 +70,9 @@ def create_association(payload: schema.Association, rdb: Engine = Depends(reques
 def update_association(
     payload: schema.Association, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
+    """
+    Update a association by ID
+    """
     with Session(rdb) as session:
         data_payload = payload.dict(exclude_unset=True)
         data_payload["id"] = id
@@ -74,6 +86,9 @@ def update_association(
 
 @router.delete("/{id}")
 def delete_association(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Delete a association by ID
+    """
     with Session(rdb) as session:
         session.query(orm.Association).filter(orm.Association.id == id).delete()
         session.commit()

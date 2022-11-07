@@ -1,5 +1,5 @@
 """
-router.datasets - crud operations for datasets and related tables in the DB
+router.persons - crud operations for persons and related tables in the DB
 """
 
 import json
@@ -19,6 +19,9 @@ router = APIRouter()
 
 @router.get("/")
 def get_person(count: int, rdb: Engine = Depends(request_rdb)):
+    """
+    Get a count of persons
+    """
     with Session(rdb) as session:
         result = session.query(orm.Person).order_by(orm.Person.id.asc()).limit(count)
         result = result[::]
@@ -27,6 +30,9 @@ def get_person(count: int, rdb: Engine = Depends(request_rdb)):
 
 @router.get("/{id}")
 def get_person(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Get a specific person by ID
+    """
     with Session(rdb) as session:
         result = session.query(orm.Person).get(id)
         logger.info(f"Latest output: {result}")
@@ -35,6 +41,9 @@ def get_person(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 @router.post("/")
 def create_person(payload: schema.Person, rdb: Engine = Depends(request_rdb)):
+    """
+    Create a person
+    """
     with Session(rdb) as session:
         personp = payload.dict()
         del personp["id"]
@@ -57,6 +66,9 @@ def create_person(payload: schema.Person, rdb: Engine = Depends(request_rdb)):
 def update_person(
     payload: schema.Person, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
+    """
+    Update a person by ID
+    """
     with Session(rdb) as session:
         data_payload = payload.dict(exclude_unset=True)
         data_payload["id"] = id
@@ -70,6 +82,9 @@ def update_person(
 
 @router.delete("/{id}")
 def delete_person(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Delete a person by ID
+    """
     with Session(rdb) as session:
         session.query(orm.Person).filter(orm.Person.id == id).delete()
         session.commit()

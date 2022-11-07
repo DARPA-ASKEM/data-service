@@ -1,5 +1,5 @@
 """
-router.datasets - crud operations for datasets and related tables in the DB
+router.qualifiers - crud operations for qualifiers and related tables in the DB
 """
 
 import datetime
@@ -23,6 +23,9 @@ router = APIRouter()
 
 @router.get("/")
 def get_qualifiers(count: int, rdb: Engine = Depends(request_rdb)):
+    """
+    Get a specific number of qualifiers
+    """
     with Session(rdb) as session:
         result = (
             session.query(orm.Qualifier).order_by(orm.Qualifier.id.asc()).limit(count)
@@ -33,6 +36,9 @@ def get_qualifiers(count: int, rdb: Engine = Depends(request_rdb)):
 
 @router.get("/{id}")
 def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Get a specific qualifier by ID
+    """
     with Session(rdb) as session:
         result = session.query(orm.Qualifier).get(id)
         logger.info(f"Latest output: {result}")
@@ -45,6 +51,9 @@ def create_qualifier(
     qualifies_array: List[str],
     rdb: Engine = Depends(request_rdb),
 ):
+    """
+    Create a qualifier
+    """
     with Session(rdb) as session:
         qualifierp = payload.dict()
         del qualifierp["id"]
@@ -68,7 +77,7 @@ def create_qualifier(
         for q in qualifies_array:
             feature = (
                 session.query(orm.Feature)
-                .filter_by(name=q, dataset_id=qualifierp["dataset_id"])
+                .filter_by(name=q, qualifier_id=qualifierp["qualifier_id"])
                 .first()
             )
             qualifier_xrefp = {
@@ -92,6 +101,9 @@ def create_qualifier(
 def update_qualifier(
     payload: schema.Qualifier, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
+    """
+    Update a qualifier by ID
+    """
     with Session(rdb) as session:
         data_payload = payload.dict(exclude_unset=True)
         data_payload["id"] = id
@@ -105,6 +117,9 @@ def update_qualifier(
 
 @router.delete("/{id}")
 def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Delete a qualifier by ID
+    """
     with Session(rdb) as session:
         session.query(orm.Qualifier).filter(orm.Qualifier.id == id).delete()
         session.commit()

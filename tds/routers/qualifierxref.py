@@ -1,5 +1,5 @@
 """
-router.datasets - crud operations for datasets and related tables in the DB
+router.qualifier xrefs - crud operations for qualifier xrefs and related tables in the DB
 """
 
 import datetime
@@ -21,7 +21,10 @@ router = APIRouter()
 
 
 @router.get("/")
-def get_qualifer_xrefs(count: int, rdb: Engine = Depends(request_rdb)):
+def get_qualifier_xrefs(count: int, rdb: Engine = Depends(request_rdb)):
+    """
+    Get a specified number of qualifier xrefs
+    """
     with Session(rdb) as session:
         result = (
             session.query(orm.QualifierXref)
@@ -33,7 +36,10 @@ def get_qualifer_xrefs(count: int, rdb: Engine = Depends(request_rdb)):
 
 
 @router.get("/{id}")
-def get_qualifer_xref(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+def get_qualifier_xref(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Get a specific qualifier xref by ID
+    """
     with Session(rdb) as session:
         result = session.query(orm.QualifierXref).get(id)
         logger.info(f"Latest output: {result}")
@@ -41,17 +47,22 @@ def get_qualifer_xref(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 
 @router.post("/")
-def create_qualifer_xref(
+def create_qualifier_xref(
     payload: schema.QualifierXref, rdb: Engine = Depends(request_rdb)
 ):
-
+    """
+    Create a qualifier xref
+    """
     create_xref_component(payload, rdb)
 
 
 @router.patch("/{id}")
-def update_qualifer_xref(
+def update_qualifier_xref(
     payload: schema.Qualifier, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
+    """
+    Update a qualifier xref by ID
+    """
     with Session(rdb) as session:
         data_payload = payload.dict(exclude_unset=True)
         data_payload["id"] = id
@@ -66,24 +77,28 @@ def update_qualifer_xref(
 
 
 @router.delete("/{id}")
-def delete_qualifer_xref(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+def delete_qualifier_xref(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Delete a qualifier xref by ID
+    """
     with Session(rdb) as session:
         session.query(orm.QualifierXref).filter(orm.QualifierXref.id == id).delete()
         session.commit()
 
 
-# Has to be separate so that the qualifiers router can use this function inside of the API.
+# Has to be separate so that the qualifiers router can use this
+# function inside of the API.
 def create_xref_component(payload: schema.QualifierXref, rdb: Engine):
     with Session(rdb) as session:
-        qualifer_xrefp = {}
+        qualifier_xrefp = {}
         try:
-            qualifer_xrefp = payload.dict()
+            qualifier_xrefp = payload.dict()
         except:
-            qualifer_xrefp = payload
-        del qualifer_xrefp["id"]
-        qualifer_xref = orm.QualifierXref(**qualifer_xrefp)
+            qualifier_xrefp = payload
+        del qualifier_xrefp["id"]
+        qualifier_xref = orm.QualifierXref(**qualifier_xrefp)
         exists = (
-            session.query(orm.QualifierXref).filter_by(**qualifer_xrefp).first()
+            session.query(orm.QualifierXref).filter_by(**qualifier_xrefp).first()
             is not None
         )
         if exists:
@@ -93,18 +108,18 @@ def create_xref_component(payload: schema.QualifierXref, rdb: Engine):
                     "location": f"/api/qualifierxref/",
                     "content-type": "application/json",
                 },
-                content=json.dumps(qualifer_xrefp),
+                content=json.dumps(qualifier_xrefp),
             )
 
-        session.add(qualifer_xref)
+        session.add(qualifier_xref)
         session.commit()
-        data_id = qualifer_xref.id
-        qualifer_xrefp["id"] = data_id
+        data_id = qualifier_xref.id
+        qualifier_xrefp["id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/qualifer_xrefs/{data_id}",
+                "location": f"/api/qualifier_xrefs/{data_id}",
                 "content-type": "application/json",
             },
-            content=json.dumps(qualifer_xrefp),
+            content=json.dumps(qualifier_xrefp),
         )
