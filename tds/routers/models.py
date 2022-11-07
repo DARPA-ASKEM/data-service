@@ -10,9 +10,8 @@ from sqlalchemy.orm import Session
 
 from tds.autogen import orm
 from tds.autogen.schema import RelationType
-from tds.db import request_rdb
+from tds.db import ProvenanceHandler, request_provenance_handler, request_rdb
 from tds.operation import create, retrieve, update
-from tds.relation.provenance import RelationHandler, request_relation_handler
 from tds.schema.model import Model
 
 logger = Logger(__name__)
@@ -51,8 +50,8 @@ def update_model(
     payload: Model,
     id: int,
     rdb: Engine = Depends(request_rdb),
-    relation_handler: RelationHandler = Depends(request_relation_handler),
-) -> Model:
+    provenance_handler: ProvenanceHandler = Depends(request_provenance_handler),
+) -> int:
     """
     Update model content
     """
@@ -64,8 +63,7 @@ def update_model(
         model = orm.Model(**model_payload)
         session.add(model)
         session.commit()
-        old_model = session.query(orm.Model).get(id)
-    relation_handler.create(
-        Model.from_orm(model), Model.from_orm(old_model), RelationType.editedFrom
-    )
-    return get_model(id)
+        old_model = Model.from_orm(session.query(orm.Model).get(id))
+        new_model = Model.from_orm(model)
+    provenance_handler.create(new_model, old_model, RelationType.editedFrom)
+    return new_model.id

@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  db:
+  rdb:
     image: "postgres:15.0"
     ports:
       - "8032:5432"
@@ -8,12 +8,13 @@ services:
       - POSTGRES_PASSWORD=dev
       - POSTGRES_USER=dev
       - POSTGRES_DB=askem
-    profiles: ["dev"]
   api:
     build: ./
     ports:
       - "8000:8000"
     env_file:
       - api.env
+    depends_on:
+      - rdb
     volumes:
       - $PWD/tds:/api/tds
