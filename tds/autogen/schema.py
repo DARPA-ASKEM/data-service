@@ -106,9 +106,62 @@ class Role(str, Enum):
     other = 'other'
     
 
+class Operation(BaseModel):
+
+    id: Optional[int] = None
+    prev: Optional[int]
+    framework_id: Optional[int] = None
+    operation_type: OperationType
+    model_content: Json
+    timestamp: datetime.datetime = datetime.datetime.now()
+    user: int
+
+
+class QualifierXref(BaseModel):
+
+    id: Optional[int] = None
+    qualifier_id: Optional[int] = None
+    feature_id: Optional[int] = None
+
+
+class Intermediate(BaseModel):
+
+    id: Optional[int] = None
+    created_at: datetime.datetime
+    source: Source
+    type: Format
+    representation: bytes
+    model_id: Optional[int]
+    software_id: Optional[int]
+
+
+class Runtime(BaseModel):
+
+    id: Optional[int] = None
+    created_at: datetime.datetime = datetime.datetime.now()
+    name: str
+    left: int
+    right: int
+
+
+class AppliedModel(BaseModel):
+
+    id: Optional[int] = None
+    model_id: Optional[int] = None
+    plan_id: Optional[int] = None
+
+
+class Material(BaseModel):
+
+    id: Optional[int] = None
+    run_id: Optional[int] = None
+    dataset_id: Optional[int] = None
+    type: Optional[Direction]
+
+
 class Dataset(BaseModel):
 
-    id: int
+    id: Optional[int] = None
     name: str
     url: str
     description: str
@@ -124,8 +177,8 @@ class Dataset(BaseModel):
 
 class Feature(BaseModel):
 
-    id: int
-    dataset_id: int
+    id: Optional[int] = None
+    dataset_id: Optional[int] = None
     description: Optional[str]
     display_name: Optional[str]
     name: str
@@ -134,163 +187,119 @@ class Feature(BaseModel):
 
 class Qualifier(BaseModel):
 
-    id: int
-    dataset_id: int
+    id: Optional[int] = None
+    dataset_id: Optional[int] = None
     description: Optional[str]
     name: str
     value_type: ValueType
 
 
-class QualifierXref(BaseModel):
-
-    id: int
-    qualifier_id: int
-    feature_id: int
-
-
 class Model(BaseModel):
 
-    id: int
+    id: Optional[int] = None
     created_at: datetime.datetime = datetime.datetime.now()
     name: str
     description: Optional[str]
-    head_id: int
-
-
-class Framework(BaseModel):
-
-    id: int
-    version: str
-    name: str
-    semantics: Json
-
-
-class Operation(BaseModel):
-
-    id: int
-    prev: Optional[int]
-    framework_id: int
-    operation_type: OperationType
-    model_content: Json
-    timestamp: datetime.datetime = datetime.datetime.now()
-    user: int
-
-
-class Intermediate(BaseModel):
-
-    id: int
-    created_at: datetime.datetime
-    source: Source
-    type: Format
-    representation: str
-    model_id: Optional[int]
-    software_id: Optional[int]
-
-
-class Software(BaseModel):
-
-    id: int
-    timestamp: datetime.datetime = datetime.datetime.now()
-    source: str
-    storage_uri: str
-
-
-class Runtime(BaseModel):
-
-    id: int
-    created_at: datetime.datetime = datetime.datetime.now()
-    name: str
-    left: int
-    right: int
-
-
-class Plan(BaseModel):
-
-    id: int
-    simulator: str
-    query: str
-    body: Json
-
-
-class AppliedModel(BaseModel):
-
-    id: int
-    model_id: int
-    plan_id: int
+    head_id: Optional[int] = None
 
 
 class Run(BaseModel):
 
-    id: int
-    simulator_id: int
+    id: Optional[int] = None
+    simulator_id: Optional[int] = None
     created_at: datetime.datetime = datetime.datetime.now()
     completed_at: Optional[datetime.datetime]
     success: Optional[bool] = True
-    response: Optional[str]
-
-
-class Material(BaseModel):
-
-    id: int
-    run_id: int
-    dataset_id: int
-    type: Optional[Direction]
+    response: Optional[bytes]
 
 
 class Parameter(BaseModel):
 
-    id: int
-    run_id: int
+    id: Optional[int] = None
+    run_id: Optional[int] = None
     name: str
     value: str
     value_type: str
 
 
-class Publication(BaseModel):
-
-    id: int
-    xdd_uri: str
-
-
 class ExtractedData(BaseModel):
 
-    id: int
-    publication_id: int
+    id: Optional[int] = None
+    publication_id: Optional[int] = None
     type: ExtractedType
-    data: str
-    img: str
+    data: bytes
+    img: bytes
+
+
+class Asset(BaseModel):
+
+    id: Optional[int] = None
+    project_id: Optional[int] = None
+    resource_id: Optional[int] = None
+    resource_type: ResourceType
+    external_ref: Optional[str]
+
+
+class Association(BaseModel):
+
+    id: Optional[int] = None
+    person_id: Optional[int] = None
+    resource_id: Optional[int] = None
+    resource_type: Optional[ResourceType]
+    role: Optional[Role]
+
+
+class Framework(BaseModel):
+
+    id: Optional[int] = None
+    version: str
+    name: str
+    semantics: Json
+
+
+class Software(BaseModel):
+
+    id: Optional[int] = None
+    timestamp: datetime.datetime = datetime.datetime.now()
+    source: str
+    storage_uri: str
+
+
+class Plan(BaseModel):
+
+    id: Optional[int] = None
+    simulator: str
+    query: str
+    body: Json
+
+
+class Publication(BaseModel):
+
+    id: Optional[int] = None
+    xdd_uri: str
 
 
 class Project(BaseModel):
 
-    id: int
+    id: Optional[int] = None
     name: str
     description: str
     timestamp: Optional[datetime.datetime] = datetime.datetime.now()
     status: str
 
 
-class Asset(BaseModel):
-
-    id: int
-    project_id: int
-    resource_id: int
-    resource_type: ResourceType
-    external_ref: Optional[str]
-
-
 class Concept(BaseModel):
 
-    id: int
+    id: Optional[int] = None
     term_id: str
     type: TaggableTable
-    obj_id: int
+    obj_id: Optional[int] = None
     status: Importance
 
 
 class Relation(BaseModel):
 
-    id: int
+    id: Optional[int] = None
     created_at: datetime.datetime = datetime.datetime.now()
     relation_type: RelationType
     left: int
@@ -301,18 +310,9 @@ class Relation(BaseModel):
 
 class Person(BaseModel):
 
-    id: int
+    id: Optional[int] = None
     name: str
     email: str
     org: Optional[str]
     website: Optional[str]
     is_registered: bool
-
-
-class Association(BaseModel):
-
-    id: int
-    person_id: int
-    resource_id: int
-    resource_type: Optional[ResourceType]
-    role: Optional[Role]

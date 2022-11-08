@@ -110,6 +110,71 @@ class Role(str, Enum):
     other = 'other'
     
 
+class Operation(Base):
+
+    __tablename__ = 'operation'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    prev = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'))
+    framework_id = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
+    operation_type = sa.Column(sa.Enum(OperationType), nullable=False)
+    model_content = sa.Column(JSON(), nullable=False)
+    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
+    user = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
+
+
+class QualifierXref(Base):
+
+    __tablename__ = 'qualifier_xref'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    qualifier_id = sa.Column(sa.Integer(), sa.ForeignKey('qualifier.id'), nullable=False)
+    feature_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
+
+
+class Intermediate(Base):
+
+    __tablename__ = 'intermediate'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    created_at = sa.Column(sa.DateTime(), nullable=False)
+    source = sa.Column(sa.Enum(Source), nullable=False)
+    type = sa.Column(sa.Enum(Format), nullable=False)
+    representation = sa.Column(sa.LargeBinary(), nullable=False)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'))
+    software_id = sa.Column(sa.Integer(), sa.ForeignKey('software.id'))
+
+
+class Runtime(Base):
+
+    __tablename__ = 'runtime'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
+    name = sa.Column(sa.String(), nullable=False)
+    left = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
+    right = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
+
+
+class AppliedModel(Base):
+
+    __tablename__ = 'applied_model'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
+    plan_id = sa.Column(sa.Integer(), sa.ForeignKey('plan.id'), nullable=False)
+
+
+class Material(Base):
+
+    __tablename__ = 'material'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    run_id = sa.Column(sa.Integer(), sa.ForeignKey('run.id'), nullable=False)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
+    type = sa.Column(sa.Enum(Direction))
+
+
 class Dataset(Base):
 
     __tablename__ = 'dataset'
@@ -151,15 +216,6 @@ class Qualifier(Base):
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class QualifierXref(Base):
-
-    __tablename__ = 'qualifier_xref'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    qualifier_id = sa.Column(sa.Integer(), sa.ForeignKey('qualifier.id'), nullable=False)
-    feature_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
-
-
 class Model(Base):
 
     __tablename__ = 'model'
@@ -171,82 +227,6 @@ class Model(Base):
     head_id = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'), nullable=False)
 
 
-class Framework(Base):
-
-    __tablename__ = 'framework'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    version = sa.Column(sa.String(), nullable=False)
-    name = sa.Column(sa.String(), nullable=False)
-    semantics = sa.Column(JSON(), nullable=False)
-
-
-class Operation(Base):
-
-    __tablename__ = 'operation'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    prev = sa.Column(sa.Integer(), sa.ForeignKey('operation.id'))
-    framework_id = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
-    operation_type = sa.Column(sa.Enum(OperationType), nullable=False)
-    model_content = sa.Column(JSON(), nullable=False)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    user = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
-
-
-class Intermediate(Base):
-
-    __tablename__ = 'intermediate'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    created_at = sa.Column(sa.DateTime(), nullable=False)
-    source = sa.Column(sa.Enum(Source), nullable=False)
-    type = sa.Column(sa.Enum(Format), nullable=False)
-    representation = sa.Column(sa.String(), nullable=False)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'))
-    software_id = sa.Column(sa.Integer(), sa.ForeignKey('software.id'))
-
-
-class Software(Base):
-
-    __tablename__ = 'software'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    source = sa.Column(sa.String(), nullable=False)
-    storage_uri = sa.Column(sa.String(), nullable=False)
-
-
-class Runtime(Base):
-
-    __tablename__ = 'runtime'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    name = sa.Column(sa.String(), nullable=False)
-    left = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
-    right = sa.Column(sa.Integer(), sa.ForeignKey('framework.id'), nullable=False)
-
-
-class Plan(Base):
-
-    __tablename__ = 'plan'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    simulator = sa.Column(sa.String(), nullable=False)
-    query = sa.Column(sa.String(), nullable=False)
-    body = sa.Column(JSON(), nullable=False)
-
-
-class AppliedModel(Base):
-
-    __tablename__ = 'applied_model'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
-    plan_id = sa.Column(sa.Integer(), sa.ForeignKey('plan.id'), nullable=False)
-
-
 class Run(Base):
 
     __tablename__ = 'run'
@@ -256,17 +236,7 @@ class Run(Base):
     created_at = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     completed_at = sa.Column(sa.DateTime())
     success = sa.Column(sa.Boolean(), server_default='True')
-    response = sa.Column(sa.String())
-
-
-class Material(Base):
-
-    __tablename__ = 'material'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    run_id = sa.Column(sa.Integer(), sa.ForeignKey('run.id'), nullable=False)
-    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
-    type = sa.Column(sa.Enum(Direction))
+    response = sa.Column(sa.LargeBinary())
 
 
 class Parameter(Base):
@@ -280,14 +250,6 @@ class Parameter(Base):
     value_type = sa.Column(sa.String(), nullable=False)
 
 
-class Publication(Base):
-
-    __tablename__ = 'publication'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    xdd_uri = sa.Column(sa.String(), nullable=False)
-
-
 class ExtractedData(Base):
 
     __tablename__ = 'extracted_data'
@@ -295,19 +257,8 @@ class ExtractedData(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     publication_id = sa.Column(sa.Integer(), sa.ForeignKey('publication.id'), nullable=False)
     type = sa.Column(sa.Enum(ExtractedType), nullable=False)
-    data = sa.Column(sa.String(), nullable=False)
-    img = sa.Column(sa.String(), nullable=False)
-
-
-class Project(Base):
-
-    __tablename__ = 'project'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.String(), nullable=False)
-    timestamp = sa.Column(sa.DateTime(), server_default=func.now())
-    status = sa.Column(sa.String(), nullable=False)
+    data = sa.Column(sa.LargeBinary(), nullable=False)
+    img = sa.Column(sa.LargeBinary(), nullable=False)
 
 
 class Asset(Base):
@@ -319,6 +270,66 @@ class Asset(Base):
     resource_id = sa.Column(sa.Integer(), nullable=False)
     resource_type = sa.Column(sa.Enum(ResourceType), nullable=False)
     external_ref = sa.Column(sa.String())
+
+
+class Association(Base):
+
+    __tablename__ = 'association'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
+    resource_id = sa.Column(sa.Integer(), nullable=False)
+    resource_type = sa.Column(sa.Enum(ResourceType))
+    role = sa.Column(sa.Enum(Role))
+
+
+class Framework(Base):
+
+    __tablename__ = 'framework'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    version = sa.Column(sa.String(), nullable=False)
+    name = sa.Column(sa.String(), nullable=False)
+    semantics = sa.Column(JSON(), nullable=False)
+
+
+class Software(Base):
+
+    __tablename__ = 'software'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
+    source = sa.Column(sa.String(), nullable=False)
+    storage_uri = sa.Column(sa.String(), nullable=False)
+
+
+class Plan(Base):
+
+    __tablename__ = 'plan'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    simulator = sa.Column(sa.String(), nullable=False)
+    query = sa.Column(sa.String(), nullable=False)
+    body = sa.Column(JSON(), nullable=False)
+
+
+class Publication(Base):
+
+    __tablename__ = 'publication'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    xdd_uri = sa.Column(sa.String(), nullable=False)
+
+
+class Project(Base):
+
+    __tablename__ = 'project'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    name = sa.Column(sa.String(), nullable=False)
+    description = sa.Column(sa.String(), nullable=False)
+    timestamp = sa.Column(sa.DateTime(), server_default=func.now())
+    status = sa.Column(sa.String(), nullable=False)
 
 
 class Concept(Base):
@@ -355,14 +366,3 @@ class Person(Base):
     org = sa.Column(sa.String())
     website = sa.Column(sa.String())
     is_registered = sa.Column(sa.Boolean(), nullable=False)
-
-
-class Association(Base):
-
-    __tablename__ = 'association'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
-    resource_id = sa.Column(sa.Integer(), nullable=False)
-    resource_type = sa.Column(sa.Enum(ResourceType))
-    role = sa.Column(sa.Enum(Role))

@@ -12,7 +12,7 @@ Run the following command instead to start the data service api and a postgresql
 ```
 docker compose --profile dev up
 ```
-(Please note that any changes in the `tds/generated` directory
+(Please note that any changes in the `tds/autogen` directory
 will forbid the API from starting.)
 
 ## Development
@@ -47,7 +47,7 @@ poetry run model-build generate ./askem.dbml ./tds/autogen
 and check if they are valid by running
 
 ```
-model-build check [current semantic version] ./src/generated
+model-build check [current semantic version] ./src/autogen
 ```
 
 Where [current semantic version] is the version of your dbml - ex. v0.11.3 . If the tables don't exist yet it in Postgres, make sure to POST to the `/admin/db/init` endpoint.
