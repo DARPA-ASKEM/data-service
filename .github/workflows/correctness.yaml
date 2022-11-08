@@ -20,6 +20,7 @@ jobs:
           export PATH="/usr/local/lib:$PATH"
         working-directory: sqlite-autoconf-3390400
 
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
       - name: Run image
