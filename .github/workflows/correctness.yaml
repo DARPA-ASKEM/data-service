@@ -8,19 +8,6 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v1
-
-      # Fix SQLite issue. Tests pass locally but no in this Action
-      # See https://stackoverflow.com/questions/72165451/pytest-is-failing-on-github-actions-but-succeeds-locally
-      - run: |
-          wget https://sqlite.org/2022/sqlite-autoconf-3380500.tar.gz
-          tar -xvf sqlite-autoconf-3380500.tar.gz
-      - run: |
-          ./configure
-          make
-          sudo make install
-          export PATH="/usr/local/lib:$PATH"
-        working-directory: sqlite-autoconf-3380500
-
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
