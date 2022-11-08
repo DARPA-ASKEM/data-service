@@ -3,9 +3,7 @@ tds.schema.resources - Redirects general types to restricted resource typing
 """
 # pylint: disable=missing-class-docstring
 
-from typing import Optional, Type
-
-from pydantic import BaseModel
+from typing import Optional
 
 from tds.autogen import schema
 from tds.autogen.schema import ResourceType
@@ -29,7 +27,10 @@ class Intermediate(schema.Intermediate):
         orm_mode = True
 
 
-def get_resource_type(resource: Type[BaseModel]) -> Optional[ResourceType]:
+Resource = Dataset | ExtractedData | Model | Plan | Publication | Intermediate
+
+
+def get_resource_type(resource: Resource) -> Optional[ResourceType]:
     """
     Maps class to resource enum
     """

@@ -13,7 +13,7 @@ from tds.autogen import orm
 from tds.autogen.schema import RelationType
 from tds.db.relational import request_engine as request_rdb
 from tds.schema.provenance import Provenance
-from tds.schema.resources import get_resource_type
+from tds.schema.resources import Resource, get_resource_type
 
 
 class ProvenanceHandler:
@@ -25,9 +25,7 @@ class ProvenanceHandler:
         self.__connection__ = rdb.connect()
         self.graph_cache_enabled = enable_graph_cache  # TODO: create neo4j connection
 
-    def create(
-        self, left: Type[BaseModel], right: Type[BaseModel], label: RelationType
-    ) -> int:
+    def create(self, left: Resource, right: Resource, label: RelationType) -> int:
         """
         Draws a relation between two resources
         """
