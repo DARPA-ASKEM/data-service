@@ -15,7 +15,6 @@ from tds.db import request_rdb
 from tds.routers.qualifierxref import create_xref_component
 
 logger = Logger(__file__)
-# logger.setLevel(DEBUG)
 router = APIRouter()
 
 
@@ -39,7 +38,6 @@ def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     with Session(rdb) as session:
         result = session.query(orm.Qualifier).get(id)
-        # logger.info(f"Latest output: {result}")
         return result
 
 

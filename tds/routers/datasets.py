@@ -39,7 +39,6 @@ def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     with Session(rdb) as session:
         result = session.query(orm.Dataset).get(id)
-        # logger.info(f"Latest output: {result}")
         return result
 
 

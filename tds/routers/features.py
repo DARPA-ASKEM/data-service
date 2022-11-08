@@ -13,7 +13,6 @@ from tds.autogen import orm, schema
 from tds.db import request_rdb
 
 logger = Logger(__file__)
-# logger.setLevel(DEBUG)
 router = APIRouter()
 
 
@@ -35,7 +34,6 @@ def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     with Session(rdb) as session:
         result = session.query(orm.Feature).get(id)
-        # logger.info(f"Latest output: {result}")
         return result
 
 
