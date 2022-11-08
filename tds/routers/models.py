@@ -4,13 +4,18 @@ router.models - crud operations for models
 
 from logging import Logger
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
 from tds.autogen.schema import RelationType
-from tds.db import ProvenanceHandler, request_provenance_handler, request_rdb
+from tds.db import (
+    ProvenanceHandler,
+    entry_exists,
+    request_provenance_handler,
+    request_rdb,
+)
 from tds.operation import create, retrieve, update
 from tds.schema.model import Model
 
@@ -23,9 +28,15 @@ def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
     """
     Retrieve model
     """
-    with Session(rdb) as session:
-        model = session.query(orm.Model).get(id)
-        return Model.from_orm(model)
+    if entry_exists(rdb.connect(), orm.Model, id):
+        with Session(rdb) as session:
+            model = session.query(orm.Model).get(id)
+            parameters: Query[orm.ModelParameter] = session.query(
+                orm.ModelParameter
+            ).filter(orm.ModelParameter.model_id == id)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return Model.from_orm(model, list(parameters))
 
 
 @router.post("", **create.fastapi_endpoint_config)
@@ -37,10 +48,14 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
         model_payload = payload.dict()
         # pylint: disable-next=unused-variable
         concept_payload = model_payload.pop("concept")  # TODO: Save ontology term
+        parameters = model_payload.pop("parameters")
         model = orm.Model(**model_payload)
         session.add(model)
         session.commit()
         id: int = model.id
+        for name, type in parameters.items():
+            session.add(orm.ModelParameter(model_id=id, name=name, type=type))
+            session.commit()
     logger.info("new model created: %i", id)
     return id
 
@@ -55,15 +70,11 @@ def update_model(
     """
     Update model content
     """
-    with Session(rdb) as session:
-        model_payload = payload.dict()
-        # pylint: disable-next=unused-variable
-        concept_payload = model_payload.pop("concept")  # TODO: Save ontology term
-        model_payload["id"] = None
-        model = orm.Model(**model_payload)
-        session.add(model)
-        session.commit()
-        old_model = Model.from_orm(session.query(orm.Model).get(id))
-        new_model = Model.from_orm(model)
-    provenance_handler.create(new_model, old_model, RelationType.editedFrom)
+    if entry_exists(rdb.connect(), orm.Model, id):
+        new_id = create_model(payload, rdb)
+        old_model = get_model(id, rdb)
+        new_model = get_model(new_id, rdb)
+        provenance_handler.create(new_model, old_model, RelationType.editedFrom)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return new_model.id

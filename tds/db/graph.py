@@ -2,10 +2,9 @@
 tds.relation.provenance - Handler for object relations
 """
 
-from typing import Optional, Type
+from typing import Optional
 
 from fastapi import Depends
-from pydantic import BaseModel
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 

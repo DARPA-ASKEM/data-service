@@ -29,7 +29,7 @@ Enum taggable_type {
    project
 }
 
-Enum feature_value_type {
+Enum value_type {
   str
   int
   float
@@ -93,7 +93,7 @@ Table feature {
   description text
   display_name varchar
   name varchar [not null]
-  value_type feature_value_type [not null]
+  value_type value_type [not null]
 }
 
 Table qualifier {
@@ -101,7 +101,7 @@ Table qualifier {
   dataset_id int [ref: > dataset.id, not null]
   description text
   name varchar [not null]
-  value_type feature_value_type [not null]
+  value_type value_type [not null]
 }
 
 Table qualifier_xref {
@@ -110,7 +110,7 @@ Table qualifier_xref {
   feature_id int [ref: > feature.id, not null]
 }
 
-Table modeling_framework {
+Table model_framework {
   id int [pk]
   version varchar [not null]
   name varchar [not null]
@@ -121,7 +121,7 @@ Table model {
   id int [pk]
   name varchar [not null]
   description text
-  framework_id int [ref: > modeling_framework.id, not null]
+  framework_id int [ref: > model_framework.id, not null]
   timestamp datetime [default: `now()`, not null]
   content json
 }
@@ -145,8 +145,8 @@ Table model_runtime {
   id int [pk]
   timestamp datetime [default: `now()`, not null]
   name varchar [not null]
-  left int [ref: > modeling_framework.id, not null]
-  right int [ref: > modeling_framework.id, not null]
+  left int [ref: > model_framework.id, not null]
+  right int [ref: > model_framework.id, not null]
 }
 
 Table simulation_plan {
@@ -180,10 +180,9 @@ Table simulation_material {
 
 Table model_parameter {
   id int [pk]
-  run_id int [ref: > simulation_run.id, not null]
+  model_id int [ref: > model.id, not null]
   name varchar [not null]
-  value varchar [not null]
-  value_type varchar [not null]
+  type value_type [not null]
 }
 
 Table publication {

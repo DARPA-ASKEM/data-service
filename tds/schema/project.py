@@ -4,7 +4,7 @@ tds.schema.project - Provides the API interface for models.
 # pylint: disable=missing-class-docstring
 from typing import List, Optional
 
-from tds.autogen import orm, schema
+from tds.autogen import schema
 from tds.schema.concept import Concept
 from tds.schema.resources import Resource
 

@@ -37,7 +37,7 @@ class TaggableType(str, Enum):
     simulation_plan = 'simulation_plan'
     
 
-class FeatureValueType(str, Enum):
+class ValueType(str, Enum):
 
     binary = 'binary'
     bool = 'bool'
@@ -103,8 +103,8 @@ class ModelRuntime(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     name = sa.Column(sa.String(), nullable=False)
-    left = sa.Column(sa.Integer(), sa.ForeignKey('modeling_framework.id'), nullable=False)
-    right = sa.Column(sa.Integer(), sa.ForeignKey('modeling_framework.id'), nullable=False)
+    left = sa.Column(sa.Integer(), sa.ForeignKey('model_framework.id'), nullable=False)
+    right = sa.Column(sa.Integer(), sa.ForeignKey('model_framework.id'), nullable=False)
 
 
 class AppliedModel(Base):
@@ -153,7 +153,7 @@ class Feature(Base):
     description = sa.Column(sa.Text())
     display_name = sa.Column(sa.String())
     name = sa.Column(sa.String(), nullable=False)
-    value_type = sa.Column(sa.Enum(FeatureValueType), nullable=False)
+    value_type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
 class Qualifier(Base):
@@ -164,7 +164,7 @@ class Qualifier(Base):
     dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
     description = sa.Column(sa.Text())
     name = sa.Column(sa.String(), nullable=False)
-    value_type = sa.Column(sa.Enum(FeatureValueType), nullable=False)
+    value_type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
 class Model(Base):
@@ -174,7 +174,7 @@ class Model(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     name = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.Text())
-    framework_id = sa.Column(sa.Integer(), sa.ForeignKey('modeling_framework.id'), nullable=False)
+    framework_id = sa.Column(sa.Integer(), sa.ForeignKey('model_framework.id'), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     content = sa.Column(JSON())
 
@@ -196,10 +196,9 @@ class ModelParameter(Base):
     __tablename__ = 'model_parameter'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    run_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_run.id'), nullable=False)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
     name = sa.Column(sa.String(), nullable=False)
-    value = sa.Column(sa.String(), nullable=False)
-    value_type = sa.Column(sa.String(), nullable=False)
+    type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
 class ExtractedData(Base):
@@ -249,9 +248,9 @@ class Association(Base):
     role = sa.Column(sa.Enum(Role))
 
 
-class ModelingFramework(Base):
+class ModelFramework(Base):
 
-    __tablename__ = 'modeling_framework'
+    __tablename__ = 'model_framework'
 
     id = sa.Column(sa.Integer(), primary_key=True)
     version = sa.Column(sa.String(), nullable=False)
