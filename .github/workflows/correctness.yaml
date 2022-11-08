@@ -8,7 +8,18 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-python@v4
+
+      # Use updated version of SQLite
+      - run: |
+          wget https://sqlite.org/2022/sqlite-autoconf-3390400.tar.gz
+          tar -xvf sqlite-autoconf-3390400.tar.gz
+      - run: |
+          ./configure
+          make
+          sudo make install
+          export PATH="/usr/local/lib:$PATH"
+        working-directory: sqlite-autoconf-3390400
+
         with:
           python-version: "3.10"
       - name: Run image
