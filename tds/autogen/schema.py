@@ -33,7 +33,7 @@ class TaggableType(str, Enum):
     simulation_plan = 'simulation_plan'
     
 
-class FeatureValueType(str, Enum):
+class ValueType(str, Enum):
 
     binary = 'binary'
     bool = 'bool'
@@ -136,7 +136,7 @@ class Feature(BaseModel):
     description: Optional[str]
     display_name: Optional[str]
     name: str
-    value_type: FeatureValueType
+    value_type: ValueType
 
 
 class Qualifier(BaseModel):
@@ -145,7 +145,7 @@ class Qualifier(BaseModel):
     dataset_id: Optional[int] = None
     description: Optional[str]
     name: str
-    value_type: FeatureValueType
+    value_type: ValueType
 
 
 class Model(BaseModel):
@@ -171,10 +171,9 @@ class SimulationRun(BaseModel):
 class ModelParameter(BaseModel):
 
     id: Optional[int] = None
-    run_id: Optional[int] = None
+    model_id: Optional[int] = None
     name: str
-    value: str
-    value_type: str
+    type: ValueType
 
 
 class ExtractedData(BaseModel):
@@ -216,7 +215,7 @@ class Association(BaseModel):
     role: Optional[Role]
 
 
-class ModelingFramework(BaseModel):
+class ModelFramework(BaseModel):
 
     id: Optional[int] = None
     version: str

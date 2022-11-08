@@ -60,10 +60,10 @@ extension-pkg-whitelist=["pydantic"]
 jobs=4
 
 [tool.pylint.basic]
-good-names=["id"]
+good-names=["id", "type"]
 
 [tool.pylint.variables]
-allowed-redefined-builtins=["id"]
+allowed-redefined-builtins=["id", "type"]
 
 [tool.pylint.format]
 max-line-length=88
