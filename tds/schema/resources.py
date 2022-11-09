@@ -3,7 +3,7 @@ tds.schema.resources - Redirects general types to restricted resource typing
 """
 # pylint: disable=missing-class-docstring
 
-from typing import Any, Optional
+from typing import Optional
 
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType

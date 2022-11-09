@@ -22,7 +22,11 @@ def get_concepts(count: int, rdb: Engine = Depends(request_rdb)):
     Get a specific number of concepts
     """
     with Session(rdb) as session:
-        result = session.query(orm.Concept).order_by(orm.Concept.id.asc()).limit(count)
+        result = (
+            session.query(orm.OntologyConcept)
+            .order_by(orm.OntologyConcept.id.asc())
+            .limit(count)
+        )
         result = result[::]
         return result
 
@@ -33,19 +37,19 @@ def get_concept(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     Get a specific concept by ID
     """
     with Session(rdb) as session:
-        result = session.query(orm.Concept).get(id)
+        result = session.query(orm.OntologyConcept).get(id)
         return result
 
 
 @router.post("/")
-def create_concept(payload: schema.Concept, rdb: Engine = Depends(request_rdb)):
+def create_concept(payload: schema.OntologyConcept, rdb: Engine = Depends(request_rdb)):
     """
     Create a concept
     """
     with Session(rdb) as session:
         conceptp = payload.dict()
         del conceptp["id"]
-        concept = orm.Concept(**conceptp)
+        concept = orm.OntologyConcept(**conceptp)
         session.add(concept)
         session.commit()
         data_id = concept.id
@@ -62,7 +66,7 @@ def create_concept(payload: schema.Concept, rdb: Engine = Depends(request_rdb)):
 
 @router.patch("/{id}")
 def update_concept(
-    payload: schema.Concept, id: int, rdb: Engine = Depends(request_rdb)
+    payload: schema.OntologyConcept, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
     """
     Update a concept by ID
@@ -72,7 +76,9 @@ def update_concept(
         data_payload["id"] = id
         logger.info(data_payload)
 
-        data_to_update = session.query(orm.Concept).filter(orm.Concept.id == id)
+        data_to_update = session.query(orm.OntologyConcept).filter(
+            orm.OntologyConcept.id == id
+        )
         data_to_update.update(data_payload)
         session.commit()
     return "Updated Concept"
@@ -84,5 +90,5 @@ def delete_concept(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     Delete a concept by ID
     """
     with Session(rdb) as session:
-        session.query(orm.Concept).filter(orm.Concept.id == id).delete()
+        session.query(orm.OntologyConcept).filter(orm.OntologyConcept.id == id).delete()
         session.commit()

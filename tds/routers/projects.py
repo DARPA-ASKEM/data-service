@@ -10,19 +10,29 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
-from tds.autogen.schema import RelationType
-from tds.db import (
-    ProvenanceHandler,
-    entry_exists,
-    request_provenance_handler,
-    request_rdb,
-)
+from tds.db import entry_exists, request_rdb
+from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, retrieve, update
 from tds.schema.project import Project
 from tds.schema.resources import get_resource_orm
 
 logger = Logger(__name__)
 router = APIRouter()
+
+
+@router.get("")
+def list_projects(rdb: Engine = Depends(request_rdb)) -> List[Project]:
+    """
+    Retrieve all projects
+    """
+    results = []
+    with Session(rdb) as session:
+        for entry in session.query(orm.Project).all():
+            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
+                orm.ProjectAsset.resource_id == entry.id
+            )
+            results.append(Project.from_orm(entry, list(assets)))
+    return results
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
@@ -54,10 +64,10 @@ def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> int:
         for resource_type in assets:
             current_orm = get_resource_orm(resource_type)
             if not all(
-                [
+                (
                     entry_exists(rdb.connect(), current_orm, id)
                     for id in assets[resource_type]
-                ]
+                )
             ):
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -67,17 +77,30 @@ def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> int:
         session.add(project)
         session.commit()
         id: int = project.id
-        for resource_type, resource_ids in assets.items():
-            assets = [
-                orm.ProjectAsset(
-                    project_id=id,
-                    resource_id=resource_id,
-                    resource_type=resource_type,
-                    external_ref="",
-                )
-                for resource_id in resource_ids
-            ]
-            session.bulk_save_objects(assets)
+        save_project_assets(id, assets, session)
         session.commit()
     logger.info("new project created: %i", id)
+    return id
+
+
+@router.post("/{id}", **update.fastapi_endpoint_config)
+def update_project(
+    id: int, payload: Project, rdb: Engine = Depends(request_rdb)
+) -> int:
+    """
+    Update project
+    """
+    if entry_exists(rdb.connect(), orm.Project, id):
+        project_payload = payload.dict()
+        project_payload.pop("concept")  # TODO: Save ontology term
+        project_payload.pop("id")
+        assets = project_payload.pop("assets")
+        with Session(rdb) as session:
+            session.query(orm.Project).filter(orm.Project.id == id).update(
+                project_payload
+            )
+            adjust_project_assets(id, assets, session)
+            session.commit()
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return id

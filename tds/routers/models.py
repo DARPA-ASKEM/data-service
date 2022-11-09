@@ -24,7 +24,7 @@ logger = Logger(__name__)
 router = APIRouter()
 
 
-@router.get("", **retrieve.fastapi_endpoint_config)
+@router.get("")
 def list_models(rdb: Engine = Depends(request_rdb)) -> List[Model]:
     """
     Retrieve all models

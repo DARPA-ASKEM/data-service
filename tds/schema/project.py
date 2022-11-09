@@ -17,6 +17,9 @@ class Project(schema.Project):
     def from_orm(
         cls, body: orm.Project, project_assets: List[orm.ProjectAsset]
     ) -> "Project":
+        """
+        Handle the creation of asset dict
+        """
         assets = defaultdict(list)
         for asset in project_assets:
             assets[asset.resource_type].append(asset.resource_id)
