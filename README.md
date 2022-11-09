@@ -7,13 +7,19 @@ The API can be started by simply calling
 ```
 docker compose up
 ```
-(Please note that any changes in the `tds/generated` directory
+
+Run the following command instead to start the data service api and a postgresql docker container
+```
+docker compose --profile dev up
+```
+(Please note that any changes in the `tds/autogen` directory
 will forbid the API from starting.)
 
 ## Development
 
-Assuming you have [Poetry](https://python-poetry.org/) (and preferably Docker), 
-initialize the project using the following commands:
+The requirements for developing this project locally are [Poetry](https://python-poetry.org/) and Docker.
+
+Initialize the project using the following commands:
 ```
 git clone git@github.com:DARPA-ASKEM/data-service.git
 cd data-service
@@ -41,11 +47,10 @@ poetry run model-build generate ./askem.dbml ./tds/autogen
 and check if they are valid by running
 
 ```
-poetry run model-build check CURRENT_SEMANTIC_VERSION ./tds/autogen
+model-build check [current semantic version] ./src/autogen
 ```
 
-If the tables don't exist yet it in Postgres, make sure to POST to the `/admin/db/init`
-endpoint.
+Where [current semantic version] is the version of your dbml - ex. v0.11.3 . If the tables don't exist yet it in Postgres, make sure to POST to the `/admin/db/init` endpoint.
 
 ## ASKEM Data Model
 

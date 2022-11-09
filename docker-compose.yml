@@ -1,4 +1,11 @@
 version: "3.9"
+networks:
+  data-api:
+    driver: bridge
+    name: data-api
+  dojo-stack:
+    driver: bridge
+    name: dojo-stack
 services:
   db:
     image: "postgres:15.0"
@@ -8,12 +15,19 @@ services:
       - POSTGRES_PASSWORD=dev
       - POSTGRES_USER=dev
       - POSTGRES_DB=askem
-    profiles: ["dev"]
+    networks:
+      - data-api
+    profiles: [ "dev" ]
   api:
     build: ./
+    depends_on:
+      - "db"
     ports:
-      - "8000:8000"
+      - "8001:8000"
     env_file:
       - api.env
+    networks:
+      - dojo-stack
+      - data-api
     volumes:
       - $PWD/tds:/api/tds
