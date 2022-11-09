@@ -10,7 +10,6 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
-from tds.db import request_rdb
 
 logger = Logger(__file__)
 
