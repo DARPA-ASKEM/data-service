@@ -3,9 +3,9 @@ tds.schema.resources - Redirects general types to restricted resource typing
 """
 # pylint: disable=missing-class-docstring
 
-from typing import Optional
+from typing import Any, Optional
 
-from tds.autogen import schema
+from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
 from tds.schema.dataset import Dataset
 from tds.schema.model import Model
@@ -28,6 +28,14 @@ class Intermediate(schema.Intermediate):
 
 
 Resource = Dataset | ExtractedData | Model | Plan | Publication | Intermediate
+ORMResource = (
+    orm.Dataset
+    | orm.ExtractedData
+    | orm.Model
+    | orm.SimulationPlan
+    | orm.Publication
+    | orm.Intermediate
+)
 
 
 def get_resource_type(resource: Resource) -> Optional[ResourceType]:
@@ -51,3 +59,26 @@ def get_resource_type(resource: Resource) -> Optional[ResourceType]:
         case _:
             resource_type = None
     return resource_type
+
+
+def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
+    """
+    Maps resource type to ORM
+    """
+    result_orm = None
+    match resource_type:
+        case ResourceType.dataset:
+            result_orm = orm.Dataset
+        case ResourceType.extracted_data:
+            result_orm = orm.ExtractedData
+        case ResourceType.model:
+            result_orm = orm.Model
+        case ResourceType.plan:
+            result_orm = orm.SimulationPlan
+        case ResourceType.publication:
+            result_orm = orm.Publication
+        case Intermediate():
+            result_orm = orm.Intermediate
+        case _:
+            result_orm = None
+    return result_orm

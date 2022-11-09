@@ -5,18 +5,8 @@ tds.schema.model - Provides the API interface for models.
 from json import dumps
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel
-
 from tds.autogen import orm, schema
 from tds.schema.concept import Concept
-
-
-class Parameter(BaseModel):
-    name: str
-    type: schema.ValueType
-
-    class Config:
-        orm_mode = True
 
 
 class Model(schema.Model):
@@ -40,6 +30,6 @@ class Model(schema.Model):
                 "name": "Foo",
                 "description": "Lorem ipsum dolor sit amet.",
                 "content": "[]",
-                "parameters": {"x": "int"},
+                "parameters": {"epsilon": "int"},
             }
         }

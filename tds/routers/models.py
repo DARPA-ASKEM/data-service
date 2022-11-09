@@ -1,8 +1,9 @@
 """
-router.models - crud operations for models
+tds.router.models - crud operations for models
 """
 
 from logging import Logger
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.engine.base import Engine
@@ -21,6 +22,24 @@ from tds.schema.model import Model
 
 logger = Logger(__name__)
 router = APIRouter()
+
+
+@router.get("", **retrieve.fastapi_endpoint_config)
+def list_models(rdb: Engine = Depends(request_rdb)) -> List[Model]:
+    """
+    Retrieve all models
+
+    This will return the full list of models, even the previous ones from
+    edit history.
+    """
+    results = []
+    with Session(rdb) as session:
+        for entry in session.query(orm.Model).all():
+            parameters: Query[orm.ModelParameter] = session.query(
+                orm.ModelParameter
+            ).filter(orm.ModelParameter.model_id == entry.id)
+            results.append(Model.from_orm(entry, list(parameters)))
+    return results
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
@@ -55,7 +74,7 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
         id: int = model.id
         for name, type in parameters.items():
             session.add(orm.ModelParameter(model_id=id, name=name, type=type))
-            session.commit()
+        session.commit()
     logger.info("new model created: %i", id)
     return id
 
