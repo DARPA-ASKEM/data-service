@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
 from tds.db import request_rdb
-from tds.routers.qualifierxref import create_xref_component
+from tds.lib.qualifiers import create_qualifier_xref
 
 logger = Logger(__file__)
 router = APIRouter()
@@ -73,7 +73,7 @@ def create_qualifier(
         for qual in qualifies_array:
             feature = (
                 session.query(orm.Feature)
-                .filter_by(name=qual, qualifier_id=qualifierp["qualifier_id"])
+                .filter_by(name=qual, dataset_id=qualifierp["dataset_id"])
                 .first()
             )
             qualifier_xrefp = {
@@ -81,7 +81,7 @@ def create_qualifier(
                 "qualifier_id": data_id,
                 "feature_id": feature.id,
             }
-            create_xref_component(qualifier_xrefp, rdb)
+            create_qualifier_xref(qualifier_xrefp, rdb)
         qualifierp["id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
