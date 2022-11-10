@@ -8,12 +8,8 @@ The API can be started by simply calling
 docker compose up
 ```
 
-Run the following command instead to start the data service api and a postgresql docker container
-```
-docker compose up
-```
-(Please note that any changes in the `tds/autogen` directory
-will forbid the API from starting.)
+Navigate to [http://localhost:8001/](http://localhost:8001/) to view the documentation for the endpoints
+
 
 ## Development
 
@@ -29,7 +25,7 @@ poetry run pre-commit install
 
 To start the server in a docker container, run:
 ```
-docker compose up
+docker compose up --build
 ```
 which will also start a development instance of Postgres.
 
