@@ -7,7 +7,7 @@ networks:
     driver: bridge
     name: dojo-stack
 services:
-  db:
+  rdb:
     image: "postgres:15.0"
     ports:
       - "8032:5432"
@@ -17,7 +17,6 @@ services:
       - POSTGRES_DB=askem
     networks:
       - data-api
-    profiles: [ "dev" ]
   api:
     build: ./
     depends_on:
@@ -29,5 +28,7 @@ services:
     networks:
       - dojo-stack
       - data-api
+    depends_on:
+      - rdb
     volumes:
       - $PWD/tds:/api/tds

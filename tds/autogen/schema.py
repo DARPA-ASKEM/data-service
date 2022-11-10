@@ -4,6 +4,35 @@ from typing import Optional
 from pydantic import BaseModel, Json
 
 
+class ResourceType(str, Enum):
+
+    dataset = 'dataset'
+    extracted_data = 'extracted_data'
+    intermediate = 'intermediate'
+    model = 'model'
+    plan = 'plan'
+    publication = 'publication'
+    
+
+class RelationType(str, Enum):
+
+    cites = 'cites'
+    copiedfrom = 'copiedfrom'
+    derivedfrom = 'derivedfrom'
+    editedFrom = 'editedFrom'
+    gluedFrom = 'gluedFrom'
+    stratifiedFrom = 'stratifiedFrom'
+    
+
+class TaggableType(str, Enum):
+
+    dataset = 'dataset'
+    feature = 'feature'
+    model = 'model'
+    project = 'project'
+    simulation_plan = 'simulation_plan'
+    
+
 class ValueType(str, Enum):
 
     binary = 'binary'
@@ -13,89 +42,24 @@ class ValueType(str, Enum):
     str = 'str'
     
 
-class Source(str, Enum):
+class OntologicalField(str, Enum):
+
+    obj = 'obj'
+    unit = 'unit'
+    
+
+class IntermediateSource(str, Enum):
 
     mrepresentationa = 'mrepresentationa'
     skema = 'skema'
     
 
-class Format(str, Enum):
+class IntermediateFormat(str, Enum):
 
     bilayer = 'bilayer'
     gromet = 'gromet'
     other = 'other'
     sbml = 'sbml'
-    
-
-class OperationType(str, Enum):
-
-    add = 'add'
-    composition = 'composition'
-    decomposition = 'decomposition'
-    edit = 'edit'
-    glue = 'glue'
-    init = 'init'
-    other = 'other'
-    product = 'product'
-    remove = 'remove'
-    
-
-class Direction(str, Enum):
-
-    input = 'input'
-    output = 'output'
-    
-
-class ExtractedType(str, Enum):
-
-    equation = 'equation'
-    figure = 'figure'
-    table = 'table'
-    
-
-class TaggableTable(str, Enum):
-
-    dataset = 'dataset'
-    feature = 'feature'
-    model = 'model'
-    plan = 'plan'
-    project = 'project'
-    
-
-class Importance(str, Enum):
-
-    other = 'other'
-    primary = 'primary'
-    secondary = 'secondary'
-    
-
-class ObjType(str, Enum):
-
-    dataset = 'dataset'
-    model = 'model'
-    plan = 'plan'
-    project = 'project'
-    representation = 'representation'
-    runtime = 'runtime'
-    software = 'software'
-    
-
-class RelationType(str, Enum):
-
-    copies = 'copies'
-    derives = 'derives'
-    glued = 'glued'
-    parents = 'parents'
-    
-
-class ResourceType(str, Enum):
-
-    dataset = 'dataset'
-    extracted_data = 'extracted_data'
-    model = 'model'
-    plan = 'plan'
-    publication = 'publication'
-    representation = 'representation'
     
 
 class Role(str, Enum):
@@ -106,16 +70,18 @@ class Role(str, Enum):
     other = 'other'
     
 
-class Operation(BaseModel):
+class ExtractedType(str, Enum):
 
-    id: Optional[int] = None
-    prev: Optional[int]
-    framework_id: Optional[int] = None
-    operation_type: OperationType
-    model_content: Json
-    timestamp: datetime.datetime = datetime.datetime.now()
-    user: int
+    equation = 'equation'
+    figure = 'figure'
+    table = 'table'
+    
 
+class Direction(str, Enum):
+
+    input = 'input'
+    output = 'output'
+    
 
 class QualifierXref(BaseModel):
 
@@ -124,39 +90,13 @@ class QualifierXref(BaseModel):
     feature_id: Optional[int] = None
 
 
-class Intermediate(BaseModel):
+class ModelRuntime(BaseModel):
 
     id: Optional[int] = None
-    created_at: datetime.datetime
-    source: Source
-    type: Format
-    representation: bytes
-    model_id: Optional[int]
-    software_id: Optional[int]
-
-
-class Runtime(BaseModel):
-
-    id: Optional[int] = None
-    created_at: datetime.datetime = datetime.datetime.now()
+    timestamp: datetime.datetime = datetime.datetime.now()
     name: str
-    left: int
-    right: int
-
-
-class AppliedModel(BaseModel):
-
-    id: Optional[int] = None
-    model_id: Optional[int] = None
-    plan_id: Optional[int] = None
-
-
-class Material(BaseModel):
-
-    id: Optional[int] = None
-    run_id: Optional[int] = None
-    dataset_id: Optional[int] = None
-    type: Optional[Direction]
+    left: str
+    right: str
 
 
 class Dataset(BaseModel):
@@ -197,29 +137,47 @@ class Qualifier(BaseModel):
 class Model(BaseModel):
 
     id: Optional[int] = None
-    created_at: datetime.datetime = datetime.datetime.now()
     name: str
     description: Optional[str]
-    head_id: Optional[int] = None
+    framework: str
+    timestamp: datetime.datetime = datetime.datetime.now()
+    content: Optional[Json]
 
 
-class Run(BaseModel):
+class SimulationPlan(BaseModel):
+
+    id: Optional[int] = None
+    model_id: Optional[int] = None
+    simulator: str
+    query: str
+    content: Json
+
+
+class SimulationRun(BaseModel):
 
     id: Optional[int] = None
     simulator_id: Optional[int] = None
-    created_at: datetime.datetime = datetime.datetime.now()
+    timestamp: datetime.datetime = datetime.datetime.now()
     completed_at: Optional[datetime.datetime]
     success: Optional[bool] = True
     response: Optional[bytes]
 
 
-class Parameter(BaseModel):
+class ModelParameter(BaseModel):
 
     id: Optional[int] = None
-    run_id: Optional[int] = None
+    model_id: Optional[int] = None
+    name: str
+    type: ValueType
+
+
+class SimulationParameter(BaseModel):
+
+    id: Optional[int] = None
+    plan_id: Optional[int] = None
     name: str
     value: str
-    value_type: str
+    type: ValueType
 
 
 class ExtractedData(BaseModel):
@@ -231,13 +189,25 @@ class ExtractedData(BaseModel):
     img: bytes
 
 
-class Asset(BaseModel):
+class ProjectAsset(BaseModel):
 
     id: Optional[int] = None
     project_id: Optional[int] = None
     resource_id: Optional[int] = None
     resource_type: ResourceType
     external_ref: Optional[str]
+
+
+class Provenance(BaseModel):
+
+    id: Optional[int] = None
+    timestamp: datetime.datetime = datetime.datetime.now()
+    relation_type: RelationType
+    left: int
+    left_type: ResourceType
+    right: int
+    right_type: ResourceType
+    user_id: Optional[int]
 
 
 class Association(BaseModel):
@@ -249,12 +219,20 @@ class Association(BaseModel):
     role: Optional[Role]
 
 
-class Framework(BaseModel):
+class ModelFramework(BaseModel):
+
+    name: str
+    version: str
+    semantics: Json
+
+
+class Intermediate(BaseModel):
 
     id: Optional[int] = None
-    version: str
-    name: str
-    semantics: Json
+    timestamp: datetime.datetime = datetime.datetime.now()
+    source: IntermediateSource
+    type: IntermediateFormat
+    content: bytes
 
 
 class Software(BaseModel):
@@ -263,14 +241,6 @@ class Software(BaseModel):
     timestamp: datetime.datetime = datetime.datetime.now()
     source: str
     storage_uri: str
-
-
-class Plan(BaseModel):
-
-    id: Optional[int] = None
-    simulator: str
-    query: str
-    body: Json
 
 
 class Publication(BaseModel):
@@ -288,24 +258,13 @@ class Project(BaseModel):
     status: str
 
 
-class Concept(BaseModel):
+class OntologyConcept(BaseModel):
 
     id: Optional[int] = None
     term_id: str
-    type: TaggableTable
+    type: TaggableType
     obj_id: Optional[int] = None
-    status: Importance
-
-
-class Relation(BaseModel):
-
-    id: Optional[int] = None
-    created_at: datetime.datetime = datetime.datetime.now()
-    relation_type: RelationType
-    left: int
-    left_type: ObjType
-    right: int
-    right_type: ObjType
+    status: OntologicalField
 
 
 class Person(BaseModel):

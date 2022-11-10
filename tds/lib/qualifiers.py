@@ -1,6 +1,5 @@
 """
-router.qualifier xrefs - crud operations for qualifier xrefs and
-related tables in the DB
+tds.lib.qualifers - qualifer specific logic
 """
 
 import json

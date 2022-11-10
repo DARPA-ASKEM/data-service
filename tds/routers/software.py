@@ -8,38 +8,37 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm, schema
+from tds.autogen import orm
 from tds.db import request_rdb
 from tds.operation import create, delete, retrieve
+from tds.schema.software import Software
 
 logger = Logger(__name__)
 router = APIRouter()
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
-def get_software(id: int, rdb: Engine = Depends(request_rdb)) -> schema.Software:
+def get_software(id: int, rdb: Engine = Depends(request_rdb)) -> Software:
     """
     Retrieve software metadata
     """
     with Session(rdb) as session:
         if session.query(orm.Software).filter(orm.Software.id == id).count() == 1:
-            return session.query(orm.Software).get(id)
+            return Software.from_orm(session.query(orm.Software).get(id))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @router.post("", **create.fastapi_endpoint_config)
-def create_software(
-    payload: schema.Software, rdb: Engine = Depends(request_rdb)
-) -> int:
+def create_software(payload: Software, rdb: Engine = Depends(request_rdb)) -> int:
     """
     Create software metadata
     """
     with Session(rdb) as session:
-        model_payload = payload.dict()
-        model = orm.Software(**model_payload)
-        session.add(model)
+        software_payload = payload.dict()
+        software = orm.Software(**software_payload)
+        session.add(software)
         session.commit()
-        id: int = model.id
+        id: int = software.id
     logger.info("new software with %i", id)
     return id
 

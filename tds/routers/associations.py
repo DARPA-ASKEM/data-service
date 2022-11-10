@@ -16,19 +16,17 @@ logger = Logger(__file__)
 router = APIRouter()
 
 
-@router.get("/")
-def get_associations(count: int, rdb: Engine = Depends(request_rdb)):
+@router.get("")
+def get_associations(count: int = 100, rdb: Engine = Depends(request_rdb)):
     """
     Get a specific number of associations
     """
     with Session(rdb) as session:
-        result = (
+        return list(
             session.query(orm.Association)
             .order_by(orm.Association.id.asc())
             .limit(count)
         )
-        result = result[::]
-        return result
 
 
 @router.get("/{id}")
@@ -41,7 +39,7 @@ def get_association(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("/")
+@router.post("")
 def create_association(payload: schema.Association, rdb: Engine = Depends(request_rdb)):
     """
     Create a association

@@ -9,4 +9,7 @@ from tds.autogen import schema
 
 class Concept(BaseModel):
     term_id: str
-    status: schema.Importance
+    status: schema.OntologicalField
+
+    class Config:
+        orm_mode = True

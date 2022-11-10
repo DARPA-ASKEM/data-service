@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tds"
-version = "0.1.1"
+version = "0.2.0"
 description = "The API that sits on top of the data store for the ASKEM program."
 authors = ["Five Grant <five@jataware.com>"]
 readme = "README.md"
@@ -53,17 +53,17 @@ filterwarnings = ["ignore::DeprecationWarning"]
 [tool.pylint.master]
 # Since the data store is part of an R&D project, it makes sense to move fast
 # and leave TODOs for later.
-disable=["fixme"]
+disable=["fixme", "too-few-public-methods"]
 # Pylint should not run on the the generated files
 ignore=["autogen"]
 extension-pkg-whitelist=["pydantic"]
 jobs=4
 
 [tool.pylint.basic]
-good-names=["id"]
+good-names=["id", "type"]
 
 [tool.pylint.variables]
-allowed-redefined-builtins=["id"]
+allowed-redefined-builtins=["id", "type"]
 
 [tool.pylint.format]
 max-line-length=88

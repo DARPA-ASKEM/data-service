@@ -1,20 +1,45 @@
 """
-router.models - crud operations for models
+tds.router.models - crud operations for models
 """
 
 from logging import Logger
+from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
-from tds.db import request_rdb
-from tds.operation import create, delete, retrieve, update
-from tds.schema.model import Model, ModelBody
+from tds.autogen.schema import RelationType
+from tds.db import (
+    ProvenanceHandler,
+    entry_exists,
+    request_provenance_handler,
+    request_rdb,
+)
+from tds.operation import create, retrieve, update
+from tds.schema.model import Model
 
 logger = Logger(__name__)
 router = APIRouter()
+
+
+@router.get("")
+def list_models(rdb: Engine = Depends(request_rdb)) -> List[Model]:
+    """
+    Retrieve all models
+
+    This will return the full list of models, even the previous ones from
+    edit history.
+    """
+    results = []
+    with Session(rdb) as session:
+        for entry in session.query(orm.Model).all():
+            parameters: Query[orm.ModelParameter] = session.query(
+                orm.ModelParameter
+            ).filter(orm.ModelParameter.model_id == entry.id)
+            results.append(Model.from_orm(entry, list(parameters)))
+    return results
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
@@ -22,10 +47,15 @@ def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
     """
     Retrieve model
     """
-    with Session(rdb) as session:
-        model = session.query(orm.Model).get(id)
-        operation = session.query(orm.Operation).get(model.head_id)
-        return Model.from_orm(model, operation)
+    if entry_exists(rdb.connect(), orm.Model, id):
+        with Session(rdb) as session:
+            model = session.query(orm.Model).get(id)
+            parameters: Query[orm.ModelParameter] = session.query(
+                orm.ModelParameter
+            ).filter(orm.ModelParameter.model_id == id)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return Model.from_orm(model, list(parameters))
 
 
 @router.post("", **create.fastapi_endpoint_config)
@@ -35,48 +65,36 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
     """
     with Session(rdb) as session:
         model_payload = payload.dict()
-        operation_payload = model_payload.pop("body")
-        operation = orm.Operation(**operation_payload)
         # pylint: disable-next=unused-variable
         concept_payload = model_payload.pop("concept")  # TODO: Save ontology term
-        session.add(operation)
-        session.commit()
-        model_payload["head_id"] = operation.id
+        parameters = model_payload.pop("parameters")
+        model_payload.pop("id")
         model = orm.Model(**model_payload)
         session.add(model)
         session.commit()
         id: int = model.id
+        for name, type in parameters.items():
+            session.add(orm.ModelParameter(model_id=id, name=name, type=type))
+        session.commit()
     logger.info("new model created: %i", id)
     return id
 
 
 @router.post("/{id}", **update.fastapi_endpoint_config)
 def update_model(
-    payload: ModelBody, id: int, rdb: Engine = Depends(request_rdb)
-) -> Model:
+    payload: Model,
+    id: int,
+    rdb: Engine = Depends(request_rdb),
+    provenance_handler: ProvenanceHandler = Depends(request_provenance_handler),
+) -> int:
     """
     Update model content
     """
-    with Session(rdb) as session:
-        model = session.query(orm.Model).get(id)
-        operation_payload = payload.dict()
-        operation_payload["prev"] = model.head_id
-        operation = orm.Operation(**operation_payload)
-        session.add(operation)
-        session.commit()
-        model.head_id = operation.id
-        session.commit()
-    return get_model(id)
-
-
-@router.delete("/{id}", **delete.fastapi_endpoint_config)
-def delete_model(id: int, rdb: Engine = Depends(request_rdb)) -> str:
-    """
-    Delete model head
-
-    WARNING: The operation history is left dangling.
-    """
-    with Session(rdb) as session:
-        session.query(orm.Model).get(id).delete()
-        session.commit()
-    return "Deleted model"
+    if entry_exists(rdb.connect(), orm.Model, id):
+        new_id = create_model(payload, rdb)
+        old_model = get_model(id, rdb)
+        new_model = get_model(new_id, rdb)
+        provenance_handler.create(new_model, old_model, RelationType.editedFrom)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return new_model.id
