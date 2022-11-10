@@ -10,7 +10,7 @@ docker compose up
 
 Run the following command instead to start the data service api and a postgresql docker container
 ```
-docker compose --profile dev up
+docker compose up
 ```
 (Please note that any changes in the `tds/autogen` directory
 will forbid the API from starting.)
@@ -29,7 +29,7 @@ poetry run pre-commit install
 
 To start the server in a docker container, run:
 ```
-docker compose --profile dev up
+docker compose up
 ```
 which will also start a development instance of Postgres.
 
