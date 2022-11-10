@@ -68,6 +68,7 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
         # pylint: disable-next=unused-variable
         concept_payload = model_payload.pop("concept")  # TODO: Save ontology term
         parameters = model_payload.pop("parameters")
+        model_payload.pop("id")
         model = orm.Model(**model_payload)
         session.add(model)
         session.commit()

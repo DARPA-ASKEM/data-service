@@ -16,19 +16,17 @@ logger = Logger(__file__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def get_concepts(count: int, rdb: Engine = Depends(request_rdb)):
     """
     Get a specific number of concepts
     """
     with Session(rdb) as session:
-        result = (
+        return list(
             session.query(orm.OntologyConcept)
             .order_by(orm.OntologyConcept.id.asc())
             .limit(count)
         )
-        result = result[::]
-        return result
 
 
 @router.get("/{id}")
@@ -41,7 +39,7 @@ def get_concept(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("/")
+@router.post("")
 def create_concept(payload: schema.OntologyConcept, rdb: Engine = Depends(request_rdb)):
     """
     Create a concept

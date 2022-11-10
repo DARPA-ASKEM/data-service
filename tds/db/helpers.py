@@ -18,9 +18,8 @@ def init_dev_content(connection: Connection):
         need_framework = session.query(orm.ModelFramework).first() is None
         if need_framework:
             framework = orm.ModelFramework(
-                id=0,
-                version="dummy",
                 name="dummy",
+                version="dummy",
                 semantics={},
             )
             session.add(framework)

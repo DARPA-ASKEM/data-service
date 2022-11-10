@@ -17,22 +17,20 @@ logger.setLevel(DEBUG)
 router = APIRouter()
 
 
-@router.get("/datasets")
+@router.get("")
 def get_datasets(count: int, rdb: Engine = Depends(request_rdb)):
     """
     Get a specific number of datasets
     """
     with Session(rdb) as session:
-        result = (
+        return list(
             session.query(orm.Dataset)
             .order_by(orm.Dataset.timestamp.asc())
             .limit(count)
         )
-        result = result[::]
-        return result
 
 
-@router.get("/datasets/{id}")
+@router.get("/{id}")
 def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific dataset by ID
@@ -42,7 +40,7 @@ def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("/datasets")
+@router.post("")
 def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
     """
     Create a dataset
@@ -66,10 +64,10 @@ def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
         )
 
 
-@router.patch("/datasets/{id}")
+@router.patch("/{id}")
 def update_dataset(
     payload: schema.Dataset, id: int, rdb: Engine = Depends(request_rdb)
-) -> str:
+) -> Response:
     """
     Update a dataset by ID
     """
@@ -93,7 +91,7 @@ def update_dataset(
     )
 
 
-@router.post("/datasets/deprecate/{id}")
+@router.post("/deprecate/{id}")
 def deprecate_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Toggle a dataset's deprecated status by ID
@@ -108,8 +106,8 @@ def deprecate_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 # Not working because of lack of cascade settings in ORM?
 # Features foreign key blocks the delete.
-@router.delete("/datasets/{id}")
-def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+@router.delete("/{id}")
+def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Delete a dataset by ID
     """

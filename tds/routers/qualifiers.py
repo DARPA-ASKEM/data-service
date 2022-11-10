@@ -18,17 +18,15 @@ logger = Logger(__file__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def get_qualifiers(count: int, rdb: Engine = Depends(request_rdb)):
     """
     Get a specific number of qualifiers
     """
     with Session(rdb) as session:
-        result = (
+        return list(
             session.query(orm.Qualifier).order_by(orm.Qualifier.id.asc()).limit(count)
         )
-        result = result[::]
-        return result
 
 
 @router.get("/{id}")
@@ -41,7 +39,7 @@ def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("/")
+@router.post("")
 def create_qualifier(
     payload: schema.Qualifier,
     qualifies_array: List[str],

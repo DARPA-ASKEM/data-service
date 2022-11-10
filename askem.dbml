@@ -83,7 +83,6 @@ Table dataset {
   quality text
   temporal_resolution varchar
   geospatial_resolution varchar
-  annotations json
   maintainer int [not null, ref: > public.person.id]
 }
 
@@ -111,9 +110,8 @@ Table qualifier_xref {
 }
 
 Table model_framework {
-  id int [pk]
+  name varchar [pk]
   version varchar [not null]
-  name varchar [not null]
   semantics json [not null]
 }
 
@@ -121,7 +119,7 @@ Table model {
   id int [pk]
   name varchar [not null]
   description text
-  framework_id int [ref: > model_framework.id, not null]
+  framework varchar [ref: > model_framework.name, not null]
   timestamp datetime [default: `now()`, not null]
   content json
 }
@@ -131,7 +129,7 @@ Table intermediate {
   timestamp datetime [default: `now()`, not null]
   source intermediate_source [not null]
   type intermediate_format [not null]
-  representation blob [not null]
+  content blob [not null]
 }
 
 Table software {
@@ -145,21 +143,16 @@ Table model_runtime {
   id int [pk]
   timestamp datetime [default: `now()`, not null]
   name varchar [not null]
-  left int [ref: > model_framework.id, not null]
-  right int [ref: > model_framework.id, not null]
+  left varchar [ref: > model_framework.name, not null]
+  right varchar [ref: > model_framework.name, not null]
 }
 
 Table simulation_plan {
   id int [pk]
+  model_id int [ref: > model.id, not null]
   simulator varchar [not null]
   query varchar [not null]
   body json [not null]
-}
-
-Table applied_model {
-  id int [pk]
-  model_id int [ref: > model.id, not null]
-  plan_id int [ref: > simulation_plan.id, not null]
 }
 
 Table simulation_run {
@@ -171,17 +164,19 @@ Table simulation_run {
   response blob [note: 'The answer to the query whether its natural language or just a number.']
 }
 
-Table simulation_material {
-  id int [pk]
-  run_id int [ref: > simulation_run.id, not null]
-  dataset_id int [ref: > dataset.id, not null]
-  type direction
-}
-
 Table model_parameter {
   id int [pk]
   model_id int [ref: > model.id, not null]
   name varchar [not null]
+  type value_type [not null]
+}
+
+
+Table simulaton_parameter {
+  id int [pk]
+  plan_id int [ref: > simulation_plan.id, not null]
+  name varchar [not null]
+  value varchar [not null]
   type value_type [not null]
 }
 

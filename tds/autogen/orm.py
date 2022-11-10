@@ -103,27 +103,8 @@ class ModelRuntime(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     name = sa.Column(sa.String(), nullable=False)
-    left = sa.Column(sa.Integer(), sa.ForeignKey('model_framework.id'), nullable=False)
-    right = sa.Column(sa.Integer(), sa.ForeignKey('model_framework.id'), nullable=False)
-
-
-class AppliedModel(Base):
-
-    __tablename__ = 'applied_model'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
-    plan_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_plan.id'), nullable=False)
-
-
-class SimulationMaterial(Base):
-
-    __tablename__ = 'simulation_material'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    run_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_run.id'), nullable=False)
-    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey('dataset.id'), nullable=False)
-    type = sa.Column(sa.Enum(Direction))
+    left = sa.Column(sa.String(), sa.ForeignKey('model_framework.name'), nullable=False)
+    right = sa.Column(sa.String(), sa.ForeignKey('model_framework.name'), nullable=False)
 
 
 class Dataset(Base):
@@ -140,7 +121,6 @@ class Dataset(Base):
     quality = sa.Column(sa.Text())
     temporal_resolution = sa.Column(sa.String())
     geospatial_resolution = sa.Column(sa.String())
-    annotations = sa.Column(JSON())
     maintainer = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
 
 
@@ -174,9 +154,20 @@ class Model(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     name = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.Text())
-    framework_id = sa.Column(sa.Integer(), sa.ForeignKey('model_framework.id'), nullable=False)
+    framework = sa.Column(sa.String(), sa.ForeignKey('model_framework.name'), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     content = sa.Column(JSON())
+
+
+class SimulationPlan(Base):
+
+    __tablename__ = 'simulation_plan'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
+    simulator = sa.Column(sa.String(), nullable=False)
+    query = sa.Column(sa.String(), nullable=False)
+    body = sa.Column(JSON(), nullable=False)
 
 
 class SimulationRun(Base):
@@ -198,6 +189,17 @@ class ModelParameter(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
     name = sa.Column(sa.String(), nullable=False)
+    type = sa.Column(sa.Enum(ValueType), nullable=False)
+
+
+class SimulatonParameter(Base):
+
+    __tablename__ = 'simulaton_parameter'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    plan_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_plan.id'), nullable=False)
+    name = sa.Column(sa.String(), nullable=False)
+    value = sa.Column(sa.String(), nullable=False)
     type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
@@ -252,9 +254,8 @@ class ModelFramework(Base):
 
     __tablename__ = 'model_framework'
 
-    id = sa.Column(sa.Integer(), primary_key=True)
+    name = sa.Column(sa.String(), primary_key=True)
     version = sa.Column(sa.String(), nullable=False)
-    name = sa.Column(sa.String(), nullable=False)
     semantics = sa.Column(JSON(), nullable=False)
 
 
@@ -266,7 +267,7 @@ class Intermediate(Base):
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     source = sa.Column(sa.Enum(IntermediateSource), nullable=False)
     type = sa.Column(sa.Enum(IntermediateFormat), nullable=False)
-    representation = sa.Column(sa.LargeBinary(), nullable=False)
+    content = sa.Column(sa.LargeBinary(), nullable=False)
 
 
 class Software(Base):
@@ -277,16 +278,6 @@ class Software(Base):
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     source = sa.Column(sa.String(), nullable=False)
     storage_uri = sa.Column(sa.String(), nullable=False)
-
-
-class SimulationPlan(Base):
-
-    __tablename__ = 'simulation_plan'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    simulator = sa.Column(sa.String(), nullable=False)
-    query = sa.Column(sa.String(), nullable=False)
-    body = sa.Column(JSON(), nullable=False)
 
 
 class Publication(Base):

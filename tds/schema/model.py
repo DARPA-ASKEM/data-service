@@ -10,8 +10,8 @@ from tds.schema.concept import Concept
 
 
 class Model(schema.Model):
-    concept: Optional[Concept]
-    framework_id = 0  # TODO: Implement framework endpoints
+    concept: Optional[Concept] = None
+    framework = "dummy"  # TODO: Implement framework endpoints
     parameters: Dict[str, schema.ValueType] = {}
 
     @classmethod

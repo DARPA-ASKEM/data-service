@@ -95,23 +95,8 @@ class ModelRuntime(BaseModel):
     id: Optional[int] = None
     timestamp: datetime.datetime = datetime.datetime.now()
     name: str
-    left: int
-    right: int
-
-
-class AppliedModel(BaseModel):
-
-    id: Optional[int] = None
-    model_id: Optional[int] = None
-    plan_id: Optional[int] = None
-
-
-class SimulationMaterial(BaseModel):
-
-    id: Optional[int] = None
-    run_id: Optional[int] = None
-    dataset_id: Optional[int] = None
-    type: Optional[Direction]
+    left: str
+    right: str
 
 
 class Dataset(BaseModel):
@@ -126,7 +111,6 @@ class Dataset(BaseModel):
     quality: Optional[str]
     temporal_resolution: Optional[str]
     geospatial_resolution: Optional[str]
-    annotations: Optional[Json]
     maintainer: int
 
 
@@ -154,9 +138,18 @@ class Model(BaseModel):
     id: Optional[int] = None
     name: str
     description: Optional[str]
-    framework_id: Optional[int] = None
+    framework: str
     timestamp: datetime.datetime = datetime.datetime.now()
     content: Optional[Json]
+
+
+class SimulationPlan(BaseModel):
+
+    id: Optional[int] = None
+    model_id: Optional[int] = None
+    simulator: str
+    query: str
+    body: Json
 
 
 class SimulationRun(BaseModel):
@@ -174,6 +167,15 @@ class ModelParameter(BaseModel):
     id: Optional[int] = None
     model_id: Optional[int] = None
     name: str
+    type: ValueType
+
+
+class SimulatonParameter(BaseModel):
+
+    id: Optional[int] = None
+    plan_id: Optional[int] = None
+    name: str
+    value: str
     type: ValueType
 
 
@@ -218,9 +220,8 @@ class Association(BaseModel):
 
 class ModelFramework(BaseModel):
 
-    id: Optional[int] = None
-    version: str
     name: str
+    version: str
     semantics: Json
 
 
@@ -230,7 +231,7 @@ class Intermediate(BaseModel):
     timestamp: datetime.datetime = datetime.datetime.now()
     source: IntermediateSource
     type: IntermediateFormat
-    representation: bytes
+    content: bytes
 
 
 class Software(BaseModel):
@@ -239,14 +240,6 @@ class Software(BaseModel):
     timestamp: datetime.datetime = datetime.datetime.now()
     source: str
     storage_uri: str
-
-
-class SimulationPlan(BaseModel):
-
-    id: Optional[int] = None
-    simulator: str
-    query: str
-    body: Json
 
 
 class Publication(BaseModel):

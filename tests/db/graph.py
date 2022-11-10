@@ -19,7 +19,7 @@ def test_relation_handler_rdb_only():
             id=0,
             source=IntermediateSource.skema,
             type=IntermediateFormat.other,
-            representation=b"",
+            content=b"",
         )
         publication = Publication(id=0, xdd_uri="https://")
 

@@ -16,15 +16,13 @@ logger = Logger(__file__)
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def get_persons(count: int, rdb: Engine = Depends(request_rdb)):
     """
     Get a count of persons
     """
     with Session(rdb) as session:
-        result = session.query(orm.Person).order_by(orm.Person.id.asc()).limit(count)
-        result = result[::]
-        return result
+        return session.query(orm.Person).order_by(orm.Person.id.asc()).limit(count)
 
 
 @router.get("/{id}")
@@ -33,11 +31,10 @@ def get_person(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     Get a specific person by ID
     """
     with Session(rdb) as session:
-        result = session.query(orm.Person).get(id)
-        return result
+        return session.query(orm.Person).get(id)
 
 
-@router.post("/")
+@router.post("")
 def create_person(payload: schema.Person, rdb: Engine = Depends(request_rdb)):
     """
     Create a person
@@ -79,7 +76,7 @@ def update_person(
 
 
 @router.delete("/{id}")
-def delete_person(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+def delete_person(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Delete a person by ID
     """
