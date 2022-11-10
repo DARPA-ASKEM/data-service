@@ -1,0 +1,25 @@
+name: Correctness
+on: [push]
+
+jobs:
+  correctness:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.2.2
+      - name: Create environment
+        run:  poetry install
+      - name: Pylint source
+        run:  poetry run pylint ./tds
+      - name: Pylint tests
+        run:  poetry run pylint ./tests
+      - name: Pytest
+        run:  poetry run pytest
