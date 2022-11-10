@@ -2,10 +2,11 @@
 tds.router.models - crud operations for models
 """
 
+import json
 from logging import Logger
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
@@ -77,7 +78,14 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
             session.add(orm.ModelParameter(model_id=id, name=name, type=type))
         session.commit()
     logger.info("new model created: %i", id)
-    return id
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "location": f"/api/model/{id}",
+            "content-type": "application/json",
+        },
+        content=json.dumps({"model_id": id}),
+    )
 
 
 @router.post("/{id}", **update.fastapi_endpoint_config)

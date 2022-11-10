@@ -2,10 +2,11 @@
 tds.router.projects - crud operations for projects
 """
 
+import json
 from logging import Logger
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
@@ -80,7 +81,14 @@ def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> int:
         save_project_assets(id, assets, session)
         session.commit()
     logger.info("new project created: %i", id)
-    return id
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "location": f"/api/projects/{id}",
+            "content-type": "application/json",
+        },
+        content=json.dumps({"project_id": id}),
+    )
 
 
 @router.post("/{id}", **update.fastapi_endpoint_config)

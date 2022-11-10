@@ -37,6 +37,7 @@ class Plan(SimulationPlan):
                 "name": "string",
                 "description": "string",
                 "simulator": "string",
+                "model_id": "1",
                 "query": "string",
                 "content": "json-in-string",
                 "parameters": {"str": ("str", "value-type")},

@@ -49,7 +49,7 @@ def create_person(payload: schema.Person, rdb: Engine = Depends(request_rdb)):
         session.add(person)
         session.commit()
         data_id = person.id
-        personp["id"] = data_id
+        personp["person_id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={

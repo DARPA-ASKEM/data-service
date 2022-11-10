@@ -17,52 +17,53 @@ logger = Logger(__name__)
 router = APIRouter()
 
 
-@router.get("/{id}", **retrieve.fastapi_endpoint_config)
-def get_framework(id: int, rdb: Engine = Depends(request_rdb)) -> ModelFramework:
+@router.get("/{name}", **retrieve.fastapi_endpoint_config)
+def get_framework(name: str, rdb: Engine = Depends(request_rdb)) -> ModelFramework:
     """
     Retrieve framework metadata
     """
     with Session(rdb) as session:
         if (
             session.query(orm.ModelFramework)
-            .filter(orm.ModelFramework.id == id)
+            .filter(orm.ModelFramework.name == name)
             .count()
             == 1
         ):
-            return ModelFramework.from_orm(session.query(orm.ModelFramework).get(id))
+            return ModelFramework.from_orm(session.query(orm.ModelFramework).get(name))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @router.post("", **create.fastapi_endpoint_config)
 def create_framework(
     payload: ModelFramework, rdb: Engine = Depends(request_rdb)
-) -> int:
+) -> str:
     """
     Create framework metadata
     """
+
     with Session(rdb) as session:
         framework_payload = payload.dict()
         print(framework_payload)
         framework = orm.ModelFramework(**framework_payload)
         session.add(framework)
         session.commit()
-    logger.info("new framework with %i", framework.name)
-    return framework.name
+    logger.info("new framework with %i", framework_payload.get("name"))
+    return framework_payload.get("name")
 
 
-@router.delete("/{id}", **delete.fastapi_endpoint_config)
-def delete_framework(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
+@router.delete("/{name}", **delete.fastapi_endpoint_config)
+def delete_framework(name: str, rdb: Engine = Depends(request_rdb)) -> Response:
     """
     Delete framework metadata
     """
     with Session(rdb) as session:
         if (
             session.query(orm.ModelFramework)
-            .filter(orm.ModelFramework.id == id)
+            .filter(orm.ModelFramework.name == name)
             .count()
             == 1
         ):
-            framework = session.query(orm.ModelFramework).get(id)
+            framework = session.query(orm.ModelFramework).get(name)
             session.delete(framework)
             session.commit()
         else:
