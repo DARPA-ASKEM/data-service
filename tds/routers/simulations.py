@@ -22,9 +22,6 @@ router = APIRouter()
 def list_plans(rdb: Engine = Depends(request_rdb)) -> List[Plan]:
     """
     Retrieve all plans
-
-    This will return the full list of plans, even the previous ones from
-    edit history.
     """
     results = []
     with Session(rdb) as session:
@@ -76,8 +73,17 @@ def create_plan(payload: Plan, rdb: Engine = Depends(request_rdb)) -> int:
     return id
 
 
+@router.get("/results", **retrieve.fastapi_endpoint_config)
+def list_results(rdb: Engine = Depends(request_rdb)) -> List[Plan]:
+    """
+    Retrieve all simulation results for all plans
+    """
+    with Session(rdb) as session:
+        return list(session.query(orm.SimulationRun).all())
+
+
 @router.get("/results/{id}", **retrieve.fastapi_endpoint_config)
-def get_software(id: int, rdb: Engine = Depends(request_rdb)) -> Results:
+def get_results(id: int, rdb: Engine = Depends(request_rdb)) -> Results:
     """
     Retrieve software metadata
     """
@@ -91,7 +97,7 @@ def get_software(id: int, rdb: Engine = Depends(request_rdb)) -> Results:
 
 
 @router.post("/results", **create.fastapi_endpoint_config)
-def create_software(payload: Results, rdb: Engine = Depends(request_rdb)) -> int:
+def create_results(payload: Results, rdb: Engine = Depends(request_rdb)) -> int:
     """
     Create software metadata
     """
@@ -106,7 +112,7 @@ def create_software(payload: Results, rdb: Engine = Depends(request_rdb)) -> int
 
 
 @router.delete("/results/{id}", **delete.fastapi_endpoint_config)
-def delete_software(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
+def delete_results(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
     """
     Delete software metadata
     """

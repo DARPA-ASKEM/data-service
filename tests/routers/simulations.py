@@ -1,14 +1,14 @@
 """
-tests.routers.projects - tests basic model crud
+tests.routers.simulations - tests basic sim functionality
 """
 
 from tds.autogen.schema import ValueType
 from tests.helpers import demo_api
 
 
-def atest_project_cru():
+def test_simulation_cr():
     """
-    Test creation, retrieval and delete operations for modify.
+    Test creation, retrieval operations for results and plans.
 
     Note: Deletion is not implemented because we wouldn't want to mess up the Provenance graph.
     """
@@ -27,15 +27,14 @@ def atest_project_cru():
         ).json()
         # Create
         payload = {
-            "name": "string",
-            "description": "string",
+            "model_id": model1_id,
             "simulator": "string",
             "query": "string",
-            "content": "json-in-string",
-            "parameters": {"str": ["str", "value-type"]},
+            "content": "{}",
+            "parameters": {"x": ["1", ValueType.int]},
         }
         response_create = client.post(
-            "/projects",
+            "/simulations/plans",
             json=payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
@@ -43,36 +42,27 @@ def atest_project_cru():
         id = response_create.json()
         # Retrieval
         response_get = client.get(
-            f"/projects/{id}", headers={"Accept": "application/json"}
+            f"/simulations/plans/{id}", headers={"Accept": "application/json"}
         )
         assert 200 == response_create.status_code
-        project = response_get.json()
-        assert payload["name"] == project["name"]
-        assert (
-            ResourceType.model in project["assets"]
-            and model1_id in project["assets"][ResourceType.model]
-        )
-        # Update
-        payload_updated = {
-            "name": "string",
-            "description": "string",
-            "assets": {ResourceType.model: [model2_id]},
-            "status": "inactive",
+        plan = response_get.json()
+        assert payload["model_id"] == plan["model_id"]
+        assert "x" in plan["parameters"] and plan["parameters"]["x"][1] == ValueType.int
+        run_payload = {
+            "simulator_id": id,
+            "success": None,
+            "completed_at": None,
+            "response": "",
         }
-        response_update = client.post(
-            f"/projects/{id}",
-            json=payload_updated,
+        response_create = client.post(
+            "/simulations/results",
+            json=run_payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        assert 200 == response_update.status_code
-        response_get_again = client.get(
-            f"/projects/{id}", headers={"Accept": "application/json"}
+        assert 200 == response_create.status_code
+        run_id = response_create.json()
+        response_get = client.get(
+            f"/simulations/results/{run_id}", headers={"Accept": "application/json"}
         )
-        assert 200 == response_get_again.status_code
-        project = response_get_again.json()
-        assert response_get.json()["status"] != response_get_again.json()["status"]
-        assert (
-            ResourceType.model in project["assets"]
-            and model2_id in project["assets"][ResourceType.model]
-            and model1_id not in project["assets"][ResourceType.model]
-        )
+        assert 200 == response_get.status_code
+        assert run_payload["simulator_id"] == response_get.json()["simulator_id"]
