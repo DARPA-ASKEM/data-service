@@ -121,6 +121,7 @@ class Dataset(Base):
     quality = sa.Column(sa.Text())
     temporal_resolution = sa.Column(sa.String())
     geospatial_resolution = sa.Column(sa.String())
+    annotations = sa.Column(JSON())
     maintainer = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
 
 

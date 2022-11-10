@@ -111,6 +111,7 @@ class Dataset(BaseModel):
     quality: Optional[str]
     temporal_resolution: Optional[str]
     geospatial_resolution: Optional[str]
+    annotations: Optional[Json]
     maintainer: int
 
 

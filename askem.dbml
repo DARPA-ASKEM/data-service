@@ -83,6 +83,7 @@ Table dataset {
   quality text
   temporal_resolution varchar
   geospatial_resolution varchar
+  annotations json
   maintainer int [not null, ref: > public.person.id]
 }
 
