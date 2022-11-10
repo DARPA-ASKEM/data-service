@@ -34,10 +34,12 @@ class Plan(SimulationPlan):
         orm_mode = True
         schema_extra = {
             "example": {
-                "name": "Foo",
-                "description": "Lorem ipsum dolor sit amet.",
-                "content": "[]",
-                "parameters": {"epsilon": ("1", "int")},
+                "name": "string",
+                "description": "string",
+                "simulator": "string",
+                "query": "string",
+                "content": "json-in-string",
+                "parameters": {"str": ("str", "value-type")},
             }
         }
 

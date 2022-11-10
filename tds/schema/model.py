@@ -27,9 +27,9 @@ class Model(schema.Model):
         orm_mode = True
         schema_extra = {
             "example": {
-                "name": "Foo",
-                "description": "Lorem ipsum dolor sit amet.",
-                "content": "[]",
-                "parameters": {"epsilon": "int"},
+                "name": "string",
+                "description": "string",
+                "content": "json-as-string",
+                "parameters": {"string": "value-type"},
             }
         }

@@ -31,9 +31,9 @@ class Project(schema.Project):
         orm_mode = True
         schema_extra = {
             "example": {
-                "name": "Foo",
-                "description": "Lorem ipsum dolor sit amet.",
-                "assets": {},
-                "status": "Active",
+                "name": "string",
+                "description": "string",
+                "assets": {"resource-type": "list-of-ordered-ints"},
+                "status": "string",
             }
         }
