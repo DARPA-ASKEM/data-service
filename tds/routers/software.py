@@ -34,11 +34,11 @@ def create_software(payload: Software, rdb: Engine = Depends(request_rdb)) -> in
     Create software metadata
     """
     with Session(rdb) as session:
-        model_payload = payload.dict()
-        model = orm.Software(**model_payload)
-        session.add(model)
+        software_payload = payload.dict()
+        software = orm.Software(**software_payload)
+        session.add(software)
         session.commit()
-        id: int = model.id
+        id: int = software.id
     logger.info("new software with %i", id)
     return id
 

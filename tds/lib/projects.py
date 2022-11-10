@@ -61,4 +61,4 @@ def adjust_project_assets(
     for resource_type, resource_ids in active.items():
         inactive_ids = set(resource_ids) - set(assets.get(resource_type, []))
         for id in inactive_ids:
-            orm.ProjectAsset.from_orm(session.query(orm.ProjectAsset).get(id)).delete()
+            session.delete(session.query(orm.ProjectAsset).get(id))

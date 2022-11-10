@@ -35,15 +35,15 @@ def demo_rdb() -> Generator[Engine, None, None]:
 
 
 @contextmanager
-def demo_api(router_name: str) -> Generator[TestClient, None, None]:
+def demo_api(*router_name: str) -> Generator[TestClient, None, None]:
     """
     Environment for testing a router
     """
-    api = build_api(router_name)
+    api = build_api(*router_name)
     with demo_rdb() as rdb:
 
-        async def request_test_rdb() -> Engine:
-            return rdb
+        async def request_test_rdb():
+            yield rdb
 
         api.dependency_overrides[request_rdb] = request_test_rdb
         yield TestClient(api)
