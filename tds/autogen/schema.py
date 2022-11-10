@@ -149,7 +149,7 @@ class SimulationPlan(BaseModel):
     model_id: Optional[int] = None
     simulator: str
     query: str
-    body: Json
+    content: Json
 
 
 class SimulationRun(BaseModel):
@@ -170,7 +170,7 @@ class ModelParameter(BaseModel):
     type: ValueType
 
 
-class SimulatonParameter(BaseModel):
+class SimulationParameter(BaseModel):
 
     id: Optional[int] = None
     plan_id: Optional[int] = None

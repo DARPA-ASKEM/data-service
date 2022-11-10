@@ -3,6 +3,7 @@ tds.schema.simulations - API schema for simulation objects
 """
 # pylint: disable=missing-class-docstring
 
+from json import dumps
 from typing import Dict, List, Optional, Tuple
 
 from tds.autogen import orm, schema
@@ -21,6 +22,7 @@ class Plan(SimulationPlan):
         """
         Handle ORM conversion while coercing `dict` to JSON
         """
+        setattr(body, "content", dumps(body.content))
         setattr(
             body,
             "parameters",
@@ -35,7 +37,7 @@ class Plan(SimulationPlan):
                 "name": "Foo",
                 "description": "Lorem ipsum dolor sit amet.",
                 "content": "[]",
-                "parameters": {"epsilon": "int"},
+                "parameters": {"epsilon": ("1", "int")},
             }
         }
 

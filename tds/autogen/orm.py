@@ -167,7 +167,7 @@ class SimulationPlan(Base):
     model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
     simulator = sa.Column(sa.String(), nullable=False)
     query = sa.Column(sa.String(), nullable=False)
-    body = sa.Column(JSON(), nullable=False)
+    content = sa.Column(JSON(), nullable=False)
 
 
 class SimulationRun(Base):
@@ -192,9 +192,9 @@ class ModelParameter(Base):
     type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class SimulatonParameter(Base):
+class SimulationParameter(Base):
 
-    __tablename__ = 'simulaton_parameter'
+    __tablename__ = 'simulation_parameter'
 
     id = sa.Column(sa.Integer(), primary_key=True)
     plan_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_plan.id'), nullable=False)

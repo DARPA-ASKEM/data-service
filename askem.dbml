@@ -152,7 +152,7 @@ Table simulation_plan {
   model_id int [ref: > model.id, not null]
   simulator varchar [not null]
   query varchar [not null]
-  body json [not null]
+  content json [not null]
 }
 
 Table simulation_run {
@@ -172,7 +172,7 @@ Table model_parameter {
 }
 
 
-Table simulaton_parameter {
+Table simulation_parameter {
   id int [pk]
   plan_id int [ref: > simulation_plan.id, not null]
   name varchar [not null]
