@@ -113,7 +113,7 @@ Table qualifier_xref {
 Table model_framework {
   name varchar [pk]
   version varchar [not null]
-  semantics json [not null]
+  semantics varchar [not null]
 }
 
 Table model {

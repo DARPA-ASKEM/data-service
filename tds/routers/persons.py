@@ -21,8 +21,11 @@ def get_persons(count: int, rdb: Engine = Depends(request_rdb)):
     """
     Get a count of persons
     """
+    print(count)
     with Session(rdb) as session:
-        return session.query(orm.Person).order_by(orm.Person.id.asc()).limit(count)
+        return (
+            session.query(orm.Person).order_by(orm.Person.id.asc()).limit(count).all()
+        )
 
 
 @router.get("/{id}")
