@@ -1,6 +1,7 @@
 """
 tests.utils - The reusable Test DB connection
 """
+import os
 from contextlib import contextmanager
 from sqlite3 import connect
 from typing import Generator
@@ -9,7 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
-from tds.db import drop_content, init_dev_content, request_rdb
+from tds.db import init_dev_content, request_rdb
 from tds.server.build import build_api
 
 
@@ -20,9 +21,12 @@ def demo_rdb() -> Generator[Engine, None, None]:
     """
 
     engine = create_engine(
-        "sqlite://",
+        "sqlite:///.sqlite",
         creator=lambda: connect(
-            "file:test:?mode=memory&cache=shared", uri=True, check_same_thread=False
+            # "file:test:?mode=memory&cache=shared", uri=True, check_same_thread=False
+            "file:.sqlite",
+            uri=True,
+            check_same_thread=False,
         ),
     )
     connection = engine.connect()
@@ -30,8 +34,8 @@ def demo_rdb() -> Generator[Engine, None, None]:
     try:
         yield engine
     finally:
-        drop_content(connection)
         connection.close()
+        os.remove(".sqlite")
 
 
 @contextmanager

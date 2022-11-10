@@ -10,15 +10,15 @@ jobs:
       - uses: actions/checkout@v1
 
       # Use updated version of SQLite
-      - run: |
-          wget https://sqlite.org/2022/sqlite-autoconf-3390400.tar.gz
-          tar -xvf sqlite-autoconf-3390400.tar.gz
-      - run: |
-          ./configure
-          make
-          sudo make install
-          export PATH="/usr/local/lib:$PATH"
-        working-directory: sqlite-autoconf-3390400
+      #- run: |
+      #    wget https://sqlite.org/2022/sqlite-autoconf-3390400.tar.gz
+      #    tar -xvf sqlite-autoconf-3390400.tar.gz
+      #- run: |
+      #    ./configure
+      #    make
+      #    sudo make install
+      #    export PATH="/usr/local/lib:$PATH"
+      #  working-directory: sqlite-autoconf-3390400
 
       - uses: actions/setup-python@v4
         with:
