@@ -25,8 +25,8 @@ def test_model_cru():
             json=payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        assert 200 == response_create.status_code
-        id = response_create.json()
+        assert 201 == response_create.status_code
+        id = response_create.json()["id"]
         # Retrieval
         response_get = client.get(
             f"/models/{id}", headers={"Accept": "application/json"}
@@ -48,9 +48,9 @@ def test_model_cru():
             json=new_payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        new_id = response_update.json()
+        new_id = response_update.json()["id"]
         assert id != new_id
-        assert 200 == response_update.status_code
+        assert 201 == response_update.status_code
         response_get_again = client.get(
             f"/models/{new_id}", headers={"Accept": "application/json"}
         )

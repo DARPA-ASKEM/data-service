@@ -2,10 +2,11 @@
 tds.router.models - crud operations for models
 """
 
+import json
 from logging import Logger
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
@@ -59,14 +60,13 @@ def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
 
 
 @router.post("", **create.fastapi_endpoint_config)
-def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
+def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response:
     """
     Create model and return its ID
     """
     with Session(rdb) as session:
         model_payload = payload.dict()
-        # pylint: disable-next=unused-variable
-        concept_payload = model_payload.pop("concept")  # TODO: Save ontology term
+        model_payload.pop("concept")  # TODO: Save ontology term
         parameters = model_payload.pop("parameters")
         model_payload.pop("id")
         model = orm.Model(**model_payload)
@@ -77,7 +77,14 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
             session.add(orm.ModelParameter(model_id=id, name=name, type=type))
         session.commit()
     logger.info("new model created: %i", id)
-    return id
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "location": f"/api/model/{id}",
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id}),
+    )
 
 
 @router.post("/{id}", **update.fastapi_endpoint_config)
@@ -86,15 +93,22 @@ def update_model(
     id: int,
     rdb: Engine = Depends(request_rdb),
     provenance_handler: ProvenanceHandler = Depends(request_provenance_handler),
-) -> int:
+) -> Response:
     """
     Update model content
     """
     if entry_exists(rdb.connect(), orm.Model, id):
-        new_id = create_model(payload, rdb)
+        new_id = json.loads(create_model(payload, rdb).body)["id"]
         old_model = get_model(id, rdb)
         new_model = get_model(new_id, rdb)
         provenance_handler.create(new_model, old_model, RelationType.editedFrom)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return new_model.id
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "location": f"/api/model/{id}",
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": new_id}),
+    )

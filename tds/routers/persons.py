@@ -22,7 +22,9 @@ def get_persons(count: int, rdb: Engine = Depends(request_rdb)):
     Get a count of persons
     """
     with Session(rdb) as session:
-        return session.query(orm.Person).order_by(orm.Person.id.asc()).limit(count)
+        return (
+            session.query(orm.Person).order_by(orm.Person.id.asc()).limit(count).all()
+        )
 
 
 @router.get("/{id}")
@@ -46,7 +48,7 @@ def create_person(payload: schema.Person, rdb: Engine = Depends(request_rdb)):
         session.add(person)
         session.commit()
         data_id = person.id
-        personp["id"] = data_id
+        personp["person_id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={

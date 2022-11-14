@@ -5,8 +5,11 @@
 The API can be started by simply calling
 
 ```
-docker compose up
+make up
+make populate
 ```
+
+`make populate` only has to be called if you want to initialize the demo data.
 
 Navigate to [http://localhost:8001/](http://localhost:8001/) to view the documentation for the endpoints
 
@@ -19,13 +22,12 @@ Initialize the project using the following commands:
 ```
 git clone git@github.com:DARPA-ASKEM/data-service.git
 cd data-service
-poetry install
-poetry run pre-commit install
+make init
 ```
 
 To start the server in a docker container, run:
 ```
-docker compose up --build
+make up
 ```
 which will also start a development instance of Postgres.
 
