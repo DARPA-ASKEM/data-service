@@ -38,7 +38,7 @@ def test_simulation_cr():
             json=payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        assert 200 == response_create.status_code
+        assert 201 == response_create.status_code
         id = response_create.json()
         # Retrieval
         response_get = client.get(
