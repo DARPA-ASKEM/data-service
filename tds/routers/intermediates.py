@@ -4,21 +4,17 @@ tds.router.models - crud operations for models
 
 import json
 from logging import Logger
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.autogen.schema import RelationType
 from tds.db import (
-    ProvenanceHandler,
     entry_exists,
-    request_provenance_handler,
     request_rdb,
 )
-from tds.operation import create, retrieve, update
+from tds.operation import create, retrieve
 from tds.schema.intermediate import Intermediate
 
 logger = Logger(__name__)
@@ -47,11 +43,11 @@ def get_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Intermediat
     """
     if entry_exists(rdb.connect(), orm.Intermediate, id):
         with Session(rdb) as session:
-            Intermediate_ = session.query(orm.Intermediate).get(id)
+            intermediate = session.query(orm.Intermediate).get(id)
 
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Intermediate.from_orm(Intermediate_)
+    return Intermediate.from_orm(intermediate)
 
 
 @router.post("", **create.fastapi_endpoint_config)
@@ -64,10 +60,10 @@ def create_intermediate(
     with Session(rdb) as session:
         intermediate_payload = payload.dict()
         # pylint: disable-next=unused-variable
-        intermediate_ = orm.Intermediate(**intermediate_payload)
-        session.add(intermediate_)
+        intermediate = orm.Intermediate(**intermediate_payload)
+        session.add(intermediate)
         session.commit()
-        id: int = intermediate_.id
+        id: int = intermediate.id
 
     logger.info("new model created: %i", id)
     return Response(
@@ -76,5 +72,5 @@ def create_intermediate(
             "location": f"/api/intermediate/{id}",
             "content-type": "application/json",
         },
-        content=json.dumps({"intermediate_id": id}),
+        content=json.dumps({"id": id}),
     )

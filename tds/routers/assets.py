@@ -4,21 +4,18 @@ tds.router.models - crud operations for models
 
 import json
 from logging import Logger
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.autogen.schema import ProjectAsset, RelationType
+from tds.autogen.schema import ProjectAsset
 from tds.db import (
-    ProvenanceHandler,
     entry_exists,
-    request_provenance_handler,
     request_rdb,
 )
-from tds.operation import create, retrieve, update
+from tds.operation import create, retrieve
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -46,11 +43,11 @@ def get_project_asset(id: int, rdb: Engine = Depends(request_rdb)) -> ProjectAss
     """
     if entry_exists(rdb.connect(), orm.ProjectAsset, id):
         with Session(rdb) as session:
-            ProjectAsset_ = session.query(orm.ProjectAsset).get(id)
+            project_asset = session.query(orm.ProjectAsset).get(id)
 
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return ProjectAsset.from_orm(ProjectAsset)
+    return ProjectAsset.from_orm(project_asset)
 
 
 @router.post("", **create.fastapi_endpoint_config)
@@ -62,12 +59,12 @@ def create_asset(payload: ProjectAsset, rdb: Engine = Depends(request_rdb)) -> d
         asset_payload = payload.dict()
         print(asset_payload)
         # pylint: disable-next=unused-variable
-        asset_ = orm.ProjectAsset(**asset_payload)
+        project_asset = orm.ProjectAsset(**asset_payload)
         print("here")
-        print(asset_)
-        session.add(asset_)
+        print(project_asset)
+        session.add(project_asset)
         session.commit()
-        id: int = asset_.id
+        id: int = project_asset.id
 
     logger.info("new asset created: %i", id)
     return Response(
@@ -76,5 +73,5 @@ def create_asset(payload: ProjectAsset, rdb: Engine = Depends(request_rdb)) -> d
             "location": f"/api/assets/{id}",
             "content-type": "application/json",
         },
-        content=json.dumps({"asset_id": id}),
+        content=json.dumps({"id": id}),
     )
