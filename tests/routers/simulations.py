@@ -14,24 +14,24 @@ def test_simulation_cr():
     """
     with demo_api("simulations", "models") as client:
         # Create initial models
-        model1 = {
+        model = {
             "name": "Foo",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "{}",
             "parameters": {"x": ValueType.int},
         }
-        model1_id = client.post(
+        model_id = client.post(
             "/models",
-            json=model1,
+            json=model,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
-        ).json()
+        ).json()["id"]
         # Create
         payload = {
-            "model_id": model1_id,
+            "model_id": model_id,
             "simulator": "string",
             "query": "string",
             "content": "{}",
-            "parameters": {"x": ["1", ValueType.int]},
+            "parameters": {"x": ("1", ValueType.int)},
         }
         response_create = client.post(
             "/simulations/plans",

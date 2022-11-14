@@ -257,7 +257,7 @@ class ModelFramework(Base):
 
     name = sa.Column(sa.String(), primary_key=True)
     version = sa.Column(sa.String(), nullable=False)
-    semantics = sa.Column(JSON(), nullable=False)
+    semantics = sa.Column(sa.String(), nullable=False)
 
 
 class Intermediate(Base):

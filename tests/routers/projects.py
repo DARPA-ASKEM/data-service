@@ -30,12 +30,12 @@ def test_project_cru():
             "/models",
             json=model1,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
-        ).json()
+        ).json()["id"]
         model2_id = client.post(
             "/models",
             json=model2,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
-        ).json()
+        ).json()["id"]
 
         # Create
         payload = {
@@ -49,13 +49,13 @@ def test_project_cru():
             json=payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        assert 200 == response_create.status_code
-        id = response_create.json()
+        assert 201 == response_create.status_code
+        id = response_create.json()["id"]
         # Retrieval
         response_get = client.get(
             f"/projects/{id}", headers={"Accept": "application/json"}
         )
-        assert 200 == response_create.status_code
+        assert 200 == response_get.status_code
         project = response_get.json()
         assert payload["name"] == project["name"]
         assert (

@@ -2,4 +2,18 @@
 tds.operation.creation - standard objects to use for creation operations
 """
 
-fastapi_endpoint_config = {}
+fastapi_endpoint_config = {
+    "responses": {
+        201: {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"id": {"type": "integer"}},
+                    }
+                }
+            },
+            "description": "Item was created",
+        },
+    }
+}

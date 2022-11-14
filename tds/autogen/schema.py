@@ -223,7 +223,7 @@ class ModelFramework(BaseModel):
 
     name: str
     version: str
-    semantics: Json
+    semantics: str
 
 
 class Intermediate(BaseModel):

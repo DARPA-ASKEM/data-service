@@ -20,7 +20,7 @@ def init_dev_content(connection: Connection):
             framework = orm.ModelFramework(
                 name="dummy",
                 version="dummy",
-                semantics={},
+                semantics="dummy",
             )
             session.add(framework)
         session.commit()
