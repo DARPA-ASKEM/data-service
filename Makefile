@@ -18,6 +18,8 @@ up:
 .PHONY:
 populate:
 	python3  scripts/upload_demo_data.py 
+
+	
 .PHONY:
 down:
 	docker compose down;
