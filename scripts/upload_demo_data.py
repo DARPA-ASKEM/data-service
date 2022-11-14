@@ -1,6 +1,5 @@
 import glob
 import json
-import re
 import shutil
 import time
 from io import BytesIO
@@ -175,9 +174,7 @@ for folder in folders:
             # print(model_description)
         except Exception as e:
             model_name = folder.split("/")[3]
-            print(model_name)
             model_description = f"Description for {model_name}"
-            print(model_description)
             print(e)
 
         payload = json.dumps(
