@@ -118,18 +118,32 @@ if args.hydrate_postgres:
         )
 
     for folder in folders:
-        ## publications ##  todo
-        # try:
-        #     print("Upload publication")
-        #     with open(folder+"document_doi.txt", "r") as f:
-        #         doi_=f.read()
-        #         print(doi_)
 
-        #     with open(folder+"document_xdd_gddid.txt", "r") as f:
-        #         gddid_=f.read()
-        #         print(gddid_)
-        # except Exception as e:
-        #     print(f"error opening {folder}document_doi.txt . - {e}")
+        # publications ##
+        try:
+            print("Upload publication")
+            with open(folder + "document_doi.txt", "r") as f:
+                doi = f.read()
+                print(doi)
+
+            with open(folder + "document_xdd_gddid.txt", "r") as f:
+                gddid = f.read()
+                print(gddid)
+
+            payload = json.dumps({"xdd_uri": f"{gddid}"})
+            headers = {"Content-Type": "application/json"}
+
+            # return resource_id (a1)
+            response = requests.request(
+                "POST", url + "publications", headers=headers, data=payload
+            )
+            publication_json = response.json()
+            publication_id = publication_json.get("id")
+            asset_to_project(
+                project_id=1, asset_id=int(publication_id), asset_type="publication"
+            )
+        except Exception as e:
+            print(f"error opening {folder}document_doi.txt . - {e}")
 
         ## model ##
         try:
