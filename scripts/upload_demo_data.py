@@ -110,7 +110,12 @@ def asset_to_project(project_id, asset_id, asset_type):
     )
     headers = {"Content-Type": "application/json"}
 
-    response = requests.request("POST", url + "assets", headers=headers, data=payload)
+    response = requests.request(
+        "POST",
+        url + f"projects/{project_id}/assets/{asset_type}/{asset_id}",
+        headers=headers,
+        data=payload,
+    )
 
 
 for folder in folders:
