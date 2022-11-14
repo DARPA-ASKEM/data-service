@@ -14,8 +14,8 @@ from tds.autogen import orm
 from tds.db import entry_exists, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, retrieve, update
-from tds.schema.project import Project
-from tds.schema.resource import get_resource_orm
+from tds.schema.project import Asset, Project
+from tds.schema.resource import ResourceType, get_resource_orm
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -112,3 +112,83 @@ def update_project(
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return id
+
+
+@router.get("/assets")
+def get_assets(
+    results_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
+):
+    """
+    Scroll through all assets
+    """
+    with Session(rdb) as session:
+        return (
+            session.query(orm.ProjectAsset)
+            .order_by(orm.ProjectAsset.id.asc())
+            .limit(results_size)
+            .offset(page * results_size)
+            .all()
+        )
+
+
+@router.get(
+    "/{project_id}/assets/{resource_type}/{resource_id}",
+    **retrieve.fastapi_endpoint_config,
+)
+def get_asset(id: int, rdb: Engine = Depends(request_rdb)) -> Asset:
+    """
+    Retrieve asset
+    """
+    if entry_exists(rdb.connect(), orm.ProjectAsset, id):
+        with Session(rdb) as session:
+            project_asset = session.query(orm.ProjectAsset).get(id)
+
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return Asset.from_orm(project_asset)
+
+
+@router.post(
+    "/{project_id}/assets/{resource_type}/{resource_id}",
+    **create.fastapi_endpoint_config,
+)
+def create_asset(
+    project_id: int,
+    resource_type: ResourceType,
+    resource_id: int,
+    rdb: Engine = Depends(request_rdb),
+) -> Response:
+    """
+    Create asset and return its ID
+    """
+    with Session(rdb) as session:
+        identical_count = (
+            session.query(orm.ProjectAsset)
+            .filter(
+                orm.ProjectAsset.project_id == project_id,
+                orm.ProjectAsset.resource_id == resource_id,
+                orm.ProjectAsset.resource_type == resource_type,
+            )
+            .count()
+        )
+
+        if identical_count == 0:
+            project_asset = orm.ProjectAsset(
+                project_id=project_id,
+                resource_id=resource_id,
+                resource_type=resource_type,
+            )
+            session.add(project_asset)
+            session.commit()
+            id: int = project_asset.id
+
+            logger.info("new asset created: %i", id)
+            return Response(
+                status_code=status.HTTP_201_CREATED,
+                headers={
+                    "location": f"/api/assets/{id}",
+                    "content-type": "application/json",
+                },
+                content=json.dumps({"id": id}),
+            )
+        return Response(status.HTTP_409_CONFLICT)

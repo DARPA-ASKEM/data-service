@@ -1,9 +1,10 @@
 """
 tds.schema.resource - Redirects general types to restricted resource typing
 """
-# pylint: disable=missing-class-docstring
+# pylint: disable=missing-class-docstring, unhashable-member
 
-from typing import Optional
+from collections import defaultdict
+from typing import Dict, Optional, Type
 
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
@@ -38,47 +39,44 @@ ORMResource = (
 )
 
 
+obj_to_enum: Dict[Type[Resource], ResourceType] = {
+    Dataset: ResourceType.dataset,
+    ExtractedData: ResourceType.extracted_data,
+    Model: ResourceType.model,
+    Plan: ResourceType.plan,
+    Publication: ResourceType.publication,
+    Intermediate: ResourceType.intermediate,
+}
+
+
 def get_resource_type(resource: Resource) -> Optional[ResourceType]:
     """
     Maps class to resource enum
     """
-    resource_type = None
-    match resource:
-        case Dataset():
-            resource_type = ResourceType.dataset
-        case ExtractedData():
-            resource_type = ResourceType.extracted_data
-        case Model():
-            resource_type = ResourceType.model
-        case Plan():
-            resource_type = ResourceType.plan
-        case Publication():
-            resource_type = ResourceType.publication
-        case Intermediate():
-            resource_type = ResourceType.intermediate
-        case _:
-            resource_type = None
-    return resource_type
+    return defaultdict(lambda: None, obj_to_enum)[type(resource)]
+
+
+def get_schema(resource_type: ResourceType) -> Type[Resource]:
+    """
+    Maps class to resource enum
+    """
+    enum_to_obj = {type: resource for resource, type in obj_to_enum.items()}
+    return enum_to_obj[resource_type]
 
 
 def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
     """
     Maps resource type to ORM
     """
-    result_orm = None
-    match resource_type:
-        case ResourceType.dataset:
-            result_orm = orm.Dataset
-        case ResourceType.extracted_data:
-            result_orm = orm.ExtractedData
-        case ResourceType.model:
-            result_orm = orm.Model
-        case ResourceType.plan:
-            result_orm = orm.SimulationPlan
-        case ResourceType.publication:
-            result_orm = orm.Publication
-        case Intermediate():
-            result_orm = orm.Intermediate
-        case _:
-            result_orm = None
-    return result_orm
+    enum_to_orm = defaultdict(
+        lambda: None,
+        {
+            ResourceType.dataset: orm.Dataset,
+            ResourceType.extracted_data: orm.ExtractedData,
+            ResourceType.model: orm.Model,
+            ResourceType.plan: orm.SimulationPlan,
+            ResourceType.publication: orm.Publication,
+            ResourceType.intermediate: orm.Intermediate,
+        },
+    )
+    return enum_to_orm[resource_type]
