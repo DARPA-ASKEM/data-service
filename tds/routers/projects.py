@@ -114,23 +114,6 @@ def update_project(
     return id
 
 
-@router.get("/assets")
-def get_assets(
-    results_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
-):
-    """
-    Scroll through all assets
-    """
-    with Session(rdb) as session:
-        return (
-            session.query(orm.ProjectAsset)
-            .order_by(orm.ProjectAsset.id.asc())
-            .limit(results_size)
-            .offset(page * results_size)
-            .all()
-        )
-
-
 @router.get(
     "/{project_id}/assets/{resource_type}/{resource_id}",
     **retrieve.fastapi_endpoint_config,
