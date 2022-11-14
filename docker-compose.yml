@@ -3,9 +3,9 @@ networks:
   data-api:
     driver: bridge
     name: data-api
-  dojo-stack:
+  data-annotation-stack:
     driver: bridge
-    name: dojo-stack
+    name: data-annotation-stack
 services:
   rdb:
     image: "postgres:15.0"
@@ -19,14 +19,12 @@ services:
       - data-api
   api:
     build: ./
-    depends_on:
-      - "db"
     ports:
       - "8001:8000"
     env_file:
       - api.env
     networks:
-      - dojo-stack
+      - data-annotation-stack
       - data-api
     depends_on:
       - rdb
