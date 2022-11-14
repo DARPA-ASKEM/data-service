@@ -43,7 +43,6 @@ def create_framework(
 
     with Session(rdb) as session:
         framework_payload = payload.dict()
-        print(framework_payload)
         framework = orm.ModelFramework(**framework_payload)
         session.add(framework)
         session.commit()

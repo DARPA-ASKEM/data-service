@@ -10,9 +10,9 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.autogen.schema import ProjectAsset
 from tds.db import entry_exists, request_rdb
 from tds.operation import create, retrieve
+from tds.schema.project import Asset
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -23,7 +23,6 @@ def get_assets(count: int, rdb: Engine = Depends(request_rdb)):
     """
     Get a count of persons
     """
-    print(count)
     with Session(rdb) as session:
         return (
             session.query(orm.ProjectAsset)
@@ -34,7 +33,7 @@ def get_assets(count: int, rdb: Engine = Depends(request_rdb)):
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
-def get_project_asset(id: int, rdb: Engine = Depends(request_rdb)) -> ProjectAsset:
+def get_project_asset(id: int, rdb: Engine = Depends(request_rdb)) -> Asset:
     """
     Retrieve model
     """
@@ -44,21 +43,18 @@ def get_project_asset(id: int, rdb: Engine = Depends(request_rdb)) -> ProjectAss
 
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return ProjectAsset.from_orm(project_asset)
+    return Asset.from_orm(project_asset)
 
 
 @router.post("", **create.fastapi_endpoint_config)
-def create_asset(payload: ProjectAsset, rdb: Engine = Depends(request_rdb)) -> dict:
+def create_asset(payload: Asset, rdb: Engine = Depends(request_rdb)) -> Response:
     """
     Create asset and return its ID
     """
     with Session(rdb) as session:
         asset_payload = payload.dict()
-        print(asset_payload)
         # pylint: disable-next=unused-variable
         project_asset = orm.ProjectAsset(**asset_payload)
-        print("here")
-        print(project_asset)
         session.add(project_asset)
         session.commit()
         id: int = project_asset.id
