@@ -12,8 +12,11 @@ init:
 .PHONY:
 up:
 	docker compose up --build -d;
-	python3  upload_bio_models.py ${PARAMS} 
+	
 
+.PHONY:
+populate:
+	python3  scripts/upload_demo_data.py 
 .PHONY:
 down:
 	docker compose down;
