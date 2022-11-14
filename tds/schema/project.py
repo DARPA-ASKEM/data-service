@@ -9,6 +9,11 @@ from tds.autogen import orm, schema
 from tds.schema.concept import Concept
 
 
+class Asset(schema.ProjectAsset):
+    class Config:
+        orm_mode = True
+
+
 class Project(schema.Project):
     concept: Optional[Concept] = None
     assets: Dict[schema.ResourceType, Set[int]] = {}
