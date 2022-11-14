@@ -84,7 +84,7 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> int:
             "location": f"/api/model/{id}",
             "content-type": "application/json",
         },
-        content=json.dumps({"model_id": id}),
+        content=json.dumps({"id": id}),
     )
 
 
