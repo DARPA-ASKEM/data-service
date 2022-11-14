@@ -11,10 +11,7 @@ from sqlalchemy.orm import Session
 
 from tds.autogen import orm
 from tds.autogen.schema import ProjectAsset
-from tds.db import (
-    entry_exists,
-    request_rdb,
-)
+from tds.db import entry_exists, request_rdb
 from tds.operation import create, retrieve
 
 logger = Logger(__name__)

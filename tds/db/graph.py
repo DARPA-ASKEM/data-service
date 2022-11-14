@@ -12,7 +12,7 @@ from tds.autogen import orm
 from tds.autogen.schema import RelationType
 from tds.db.relational import request_engine as request_rdb
 from tds.schema.provenance import Provenance
-from tds.schema.resources import Resource, get_resource_type
+from tds.schema.resource import Resource, get_resource_type
 
 
 class ProvenanceHandler:

@@ -15,7 +15,7 @@ from tds.db import entry_exists, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, retrieve, update
 from tds.schema.project import Project
-from tds.schema.resources import get_resource_orm
+from tds.schema.resource import get_resource_orm
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -53,7 +53,7 @@ def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
 
 
 @router.post("", **create.fastapi_endpoint_config)
-def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> int:
+def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> Response:
     """
     Create project and return its ID
     """
@@ -87,7 +87,7 @@ def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> int:
             "location": f"/api/projects/{id}",
             "content-type": "application/json",
         },
-        content=json.dumps({"project_id": id}),
+        content=json.dumps({"id": id}),
     )
 
 
