@@ -1,5 +1,6 @@
 import glob
 import json
+import re
 import shutil
 import time
 from io import BytesIO
@@ -156,10 +157,33 @@ for folder in folders:
         with open(f"{folder}model_petri.json", "r") as f:
             model_content = json.load(f)
 
+        with open(folder + "model_sbml.xml", "r") as f:
+            mmt_template = f.read()
+
+        try:
+            model_name = mmt_template.split('name="')[1].split('"')[0]
+            print(f"mmm  {model_name}")
+
+            if "<p>" in mmt_template:
+                model_description = (
+                    mmt_template.split("<body")[1].split("</body>")[0].split("<p>")[1]
+                )
+            if "<pre>" in mmt_template:
+                model_description = (
+                    mmt_template.split("<body")[1].split("</body>")[0].split("<pre>")[1]
+                )
+            # print(model_description)
+        except Exception as e:
+            model_name = folder.split("/")[3]
+            print(model_name)
+            model_description = f"Description for {model_name}"
+            print(model_description)
+            print(e)
+
         payload = json.dumps(
             {
-                "name": "Covid SIDARHTE",
-                "description": "Petri net model to predict covid movement patters in a community",
+                "name": model_name,
+                "description": model_description,
                 "content": json.dumps(model_content),
                 "framework": "Petri Net",
                 "parameters": parameter_types,
