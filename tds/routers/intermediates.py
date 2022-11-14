@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from tds.autogen import orm
 from tds.db import entry_exists, request_rdb
 from tds.operation import create, retrieve
-from tds.schema.intermediate import Intermediate
+from tds.schema.resource import Intermediate
 
 logger = Logger(__name__)
 router = APIRouter()
