@@ -1,5 +1,5 @@
 """
-tds.schema.resources - Redirects general types to restricted resource typing
+tds.schema.resource - Redirects general types to restricted resource typing
 """
 # pylint: disable=missing-class-docstring
 

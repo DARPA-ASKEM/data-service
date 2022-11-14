@@ -35,9 +35,8 @@ class Plan(SimulationPlan):
         schema_extra = {
             "example": {
                 "name": "string",
-                "description": "string",
                 "simulator": "string",
-                "model_id": "1",
+                "model_id": "int",
                 "query": "string",
                 "content": "json-in-string",
                 "parameters": {"str": ("str", "value-type")},

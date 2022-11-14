@@ -8,7 +8,7 @@ The API can be started by simply calling
 docker compose up
 ```
 
-Navigate to [http://localhost:8001/](http://localhost:8001/) to view the documentation for the endpoints
+Navigate to [http://localhost:8000/](http://localhost:8000/) to view the documentation for the endpoints
 
 
 ## Development

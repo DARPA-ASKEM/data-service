@@ -48,8 +48,8 @@ def test_project_cru():
             json=payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        assert 200 == response_create.status_code
-        id = response_create.json()
+        assert 201 == response_create.status_code
+        id = response_create.json()["id"]
         # Retrieval
         response_get = client.get(
             f"/projects/{id}", headers={"Accept": "application/json"}
@@ -73,7 +73,9 @@ def test_project_cru():
             json=payload_updated,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        assert 200 == response_update.status_code
+        new_id = response_update.json()["id"]
+        assert id != new_id
+        assert 201 == response_update.status_code
         response_get_again = client.get(
             f"/projects/{id}", headers={"Accept": "application/json"}
         )

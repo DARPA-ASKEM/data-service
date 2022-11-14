@@ -10,10 +10,7 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.db import (
-    entry_exists,
-    request_rdb,
-)
+from tds.db import entry_exists, request_rdb
 from tds.operation import create, retrieve
 from tds.schema.intermediate import Intermediate
 

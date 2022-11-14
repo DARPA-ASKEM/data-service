@@ -8,7 +8,7 @@ from tds.autogen.schema import (
     ResourceType,
 )
 from tds.db import ProvenanceHandler
-from tds.schema.resources import Intermediate, Publication, get_resource_type
+from tds.schema.resource import Intermediate, Publication, get_resource_type
 from tests.helpers import demo_rdb
 
 
