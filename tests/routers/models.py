@@ -1,62 +1,87 @@
 """
-tests.routers.models - tests basic model crud
+tests.routers.projects - tests basic model crud
 """
 
-from tds.autogen.schema import ValueType
+from tds.autogen.schema import ResourceType, ValueType
 from tests.helpers import demo_api
 
 
-def test_model_cru():
+def test_project_cru():
     """
     Test creation, retrieval and delete operations for modify.
-
     Note: Deletion is not implemented because we wouldn't want to mess up the Provenance graph.
     """
-    with demo_api("models") as client:
-        # Creation
-        payload = {
+    with demo_api("projects", "models") as client:
+        # Create initial models
+        model1 = {
             "name": "Foo",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "{}",
             "parameters": {"x": ValueType.int},
         }
-        response_create = client.post(
+        model2 = {
+            "name": "Foo2",
+            "description": "Lorem ipsum dolor sit amet.",
+            "content": "[]",
+            "parameters": {"y": ValueType.int},
+        }
+        model1_id = client.post(
             "/models",
+            json=model1,
+            headers={"Content-type": "application/json", "Accept": "text/plain"},
+        ).json()
+        model2_id = client.post(
+            "/models",
+            json=model2,
+            headers={"Content-type": "application/json", "Accept": "text/plain"},
+        ).json()
+
+        # Create
+        payload = {
+            "name": "string",
+            "description": "string",
+            "assets": {ResourceType.model: [model1_id]},
+            "status": "active",
+        }
+        response_create = client.post(
+            "/projects",
             json=payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        assert 201 == response_create.status_code
+        assert 200 == response_create.status_code
         id = response_create.json()
         # Retrieval
         response_get = client.get(
-            f"/models/{id}", headers={"Accept": "application/json"}
+            f"/projects/{id}", headers={"Accept": "application/json"}
         )
-        assert 200 == response_get.status_code
-        assert payload["name"] == response_get.json()["name"]
+        assert 200 == response_create.status_code
+        project = response_get.json()
+        assert payload["name"] == project["name"]
         assert (
-            "x" in payload["parameters"] and payload["parameters"]["x"] == ValueType.int
+            ResourceType.model in project["assets"]
+            and model1_id in project["assets"][ResourceType.model]
         )
         # Update
-        new_payload = {
-            "name": "Bar",
-            "description": "No desc",
-            "content": "[]",
-            "parameters": {"y": ValueType.bool},
+        payload_updated = {
+            "name": "string",
+            "description": "string",
+            "assets": {ResourceType.model: [model2_id]},
+            "status": "inactive",
         }
         response_update = client.post(
-            f"/models/{id}",
-            json=new_payload,
+            f"/projects/{id}",
+            json=payload_updated,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        new_id = response_update.json()
-        assert id != new_id
         assert 200 == response_update.status_code
         response_get_again = client.get(
-            f"/models/{new_id}", headers={"Accept": "application/json"}
+            f"/projects/{id}", headers={"Accept": "application/json"}
         )
         assert 200 == response_get_again.status_code
-        assert response_get.json()["name"] != response_get_again.json()["name"]
+        project = response_get_again.json()
+        assert response_get.json()["status"] != response_get_again.json()["status"]
         assert (
-            "y" in new_payload["parameters"]
-            and new_payload["parameters"]["y"] == ValueType.bool
+            ResourceType.model in project["assets"]
+            and model2_id in project["assets"][ResourceType.model]
+            and model1_id not in project["assets"][ResourceType.model]
         )
