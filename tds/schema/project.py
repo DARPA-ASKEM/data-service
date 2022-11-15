@@ -21,7 +21,7 @@ class Project(schema.Project):
     @classmethod
     def from_orm(
         cls, body: orm.Project, project_assets: List[orm.ProjectAsset]
-    ) -> "FullProject":
+    ) -> "Project":
         """
         Handle the creation of asset dict
         """
