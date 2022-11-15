@@ -168,7 +168,7 @@ def add_concept(concept, object_id, type):
 
 concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
 
-for folder in folders:
+for folder in folders[1:2]:
     index = random.randrange(2)
     concept = concepts[index]
     # publications ##
@@ -187,6 +187,7 @@ for folder in folders:
         )
         publication_json = response.json()
         publication_id = publication_json.get("id")
+
         asset_to_project(
             project_id=1, asset_id=int(publication_id), asset_type="publications"
         )
