@@ -2,6 +2,7 @@ import glob
 import json
 import shutil
 import time
+import xml.etree.ElementTree as ET
 from io import BytesIO
 from urllib.request import urlopen
 from zipfile import ZipFile
@@ -123,13 +124,9 @@ for folder in folders:
     # publications ##
     try:
         print("Upload publication")
-        with open(folder + "document_doi.txt", "r") as f:
-            doi = f.read()
-            print(doi)
 
         with open(folder + "document_xdd_gddid.txt", "r") as f:
             gddid = f.read()
-            print(gddid)
 
         payload = json.dumps({"xdd_uri": f"{gddid}"})
         headers = {"Content-Type": "application/json"}
@@ -155,7 +152,6 @@ for folder in folders:
             parameters = json.load(f)
             for parameter_name, parameter_value in parameters.get("parameters").items():
                 parameter_types[parameter_name] = str(type(parameter_value).__name__)
-        print(parameter_types)
 
         # model content
         with open(f"{folder}model_petri.json", "r") as f:
@@ -164,23 +160,10 @@ for folder in folders:
         with open(folder + "model_sbml.xml", "r") as f:
             mmt_template = f.read()
 
-        try:
-            model_name = mmt_template.split('name="')[1].split('"')[0]
-            print(f"mmm  {model_name}")
-
-            if "<p>" in mmt_template:
-                model_description = (
-                    mmt_template.split("<body")[1].split("</body>")[0].split("<p>")[1]
-                )
-            if "<pre>" in mmt_template:
-                model_description = (
-                    mmt_template.split("<body")[1].split("</body>")[0].split("<pre>")[1]
-                )
-            # print(model_description)
-        except Exception as e:
-            model_name = folder.split("/")[3]
-            model_description = f"Description for {model_name}"
-            print(e)
+        tree = ET.parse(folder + "model_sbml.xml")
+        root = tree.getroot()
+        model_description = root[0][0][0][0].text
+        model_name = root[0].attrib["name"]
 
         payload = json.dumps(
             {
@@ -198,7 +181,6 @@ for folder in folders:
         )
         model_json = response.json()
         model_id = model_json.get("id")
-        print(f"model_id {model_id}")
         asset_to_project(project_id=1, asset_id=int(model_id), asset_type="model")
 
     except Exception as e:
@@ -224,7 +206,6 @@ for folder in folders:
         )
         intermediate_json = response.json()
         intermediate_id = intermediate_json.get("id")
-        print(f"model_id {intermediate_id}")
 
         asset_to_project(
             project_id=1, asset_id=int(intermediate_id), asset_type="intermediate"
