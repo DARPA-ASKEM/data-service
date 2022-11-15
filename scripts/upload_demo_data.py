@@ -5,6 +5,7 @@ import time
 from io import BytesIO
 from urllib.request import urlopen
 from zipfile import ZipFile
+import xml.etree.ElementTree as ET
 
 import requests
 
@@ -165,21 +166,13 @@ for folder in folders:
             mmt_template = f.read()
 
         try:
-            model_name = mmt_template.split('name="')[1].split('"')[0]
-            print(f"mmm  {model_name}")
-
-            if "<p>" in mmt_template:
-                model_description = (
-                    mmt_template.split("<body")[1].split("</body>")[0].split("<p>")[1]
-                )
-            if "<pre>" in mmt_template:
-                model_description = (
-                    mmt_template.split("<body")[1].split("</body>")[0].split("<pre>")[1]
-                )
-            # print(model_description)
+            tree = ET.parse(folder + "model_sbml.xml")
+            root = tree.getroot()
+            model_description=root[0][0][0][0].text
+            model_name=root[0].attrib['name']
+            
         except Exception as e:
-            model_name = folder.split("/")[3]
-            model_description = f"Description for {model_name}"
+           
             print(e)
 
         payload = json.dumps(
