@@ -170,16 +170,18 @@ def delete_framework(name: str, rdb: Engine = Depends(request_rdb)) -> Response:
 
 
 @router.get("/intermediates")
-def get_intermediates(count: int, rdb: Engine = Depends(request_rdb)):
+def get_intermediates(
+    page_size: int = 50, page: int = 0, rdb: Engine = Depends(request_rdb)
+):
     """
     Get a count of persons
     """
-    print(count)
     with Session(rdb) as session:
         return (
             session.query(orm.Intermediate)
             .order_by(orm.Intermediate.id.asc())
-            .limit(count)
+            .limit(page_size)
+            .offset(page)
             .all()
         )
 
