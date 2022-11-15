@@ -1,5 +1,5 @@
 """
-tds.schema.dataset - Provides the API interface for datasets.
+Provides the API interface for datasets.
 """
 # pylint: disable=missing-class-docstring, too-few-public-methods
 from typing import List, Optional

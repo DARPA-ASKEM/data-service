@@ -1,5 +1,5 @@
 """
-tests.routers.models - tests basic model crud
+Tests basic model crud
 """
 
 from tds.autogen.schema import ValueType

@@ -1,5 +1,5 @@
 """
-router.concepts - crud operations for concepts and related tables in the DB
+CRUD operations for concepts and related tables in the DB
 """
 
 import json

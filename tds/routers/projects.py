@@ -1,5 +1,5 @@
 """
-tds.router.projects - crud operations for projects
+CRUD operations for projects
 """
 
 import json

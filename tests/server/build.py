@@ -1,5 +1,5 @@
 """
-tests.server.build - Test the API bundler
+Test the API bundler
 """
 
 from fastapi.testclient import TestClient

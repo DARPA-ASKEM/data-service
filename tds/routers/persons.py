@@ -1,5 +1,5 @@
 """
-tds.router.persons - crud operations for persons and related tables in the DB
+CRUD operations for persons and related tables in the DB
 """
 
 import json

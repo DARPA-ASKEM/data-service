@@ -1,5 +1,5 @@
 """
-tests.routers.software - tests basic software crud
+Tests basic software crud
 """
 
 from tds.schema.resource import Software
