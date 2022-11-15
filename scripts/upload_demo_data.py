@@ -2,10 +2,10 @@ import glob
 import json
 import shutil
 import time
+import xml.etree.ElementTree as ET
 from io import BytesIO
 from urllib.request import urlopen
 from zipfile import ZipFile
-import xml.etree.ElementTree as ET
 
 import requests
 
@@ -160,13 +160,10 @@ for folder in folders:
         with open(folder + "model_sbml.xml", "r") as f:
             mmt_template = f.read()
 
-        
         tree = ET.parse(folder + "model_sbml.xml")
         root = tree.getroot()
-        model_description=root[0][0][0][0].text
-        model_name=root[0].attrib['name']
-            
-        
+        model_description = root[0][0][0][0].text
+        model_name = root[0].attrib["name"]
 
         payload = json.dumps(
             {
