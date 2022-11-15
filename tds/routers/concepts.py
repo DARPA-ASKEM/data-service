@@ -25,8 +25,8 @@ def search_concept(term: str, limit: int = 100, offset: int = 0):
     Wraps search functionality from the DKG.
     """
     headers = {"accept": "application/json", "Content-Type": "application/json"}
-    base_url = settings.DKG_URL
-    params = f"search?q={term}&limit={limit}&offset={offset}"
+    base_url = settings.DKG_URL + ":" + str(settings.DKG_API_PORT)
+    params = f"api/search?q={term}&limit={limit}&offset={offset}"
     url = f"{base_url}/{params}"
     logger.info("Sending data to %s", url)
 
@@ -40,14 +40,14 @@ def search_concept(term: str, limit: int = 100, offset: int = 0):
     raise Exception(f"DKG server returned the status {response.status_code}")
 
 
-@router.get("/definition/{ontology_id}")
-def get_concept_definition(ontology_id: str):
+@router.get("/definition/{curie}")
+def get_concept_definition(curie: str):
     """
     Wraps fetch functionality from the DKG.
     """
     headers = {"accept": "application/json", "Content-Type": "application/json"}
-    base_url = settings.DKG_URL
-    params = f"entity/{quote_plus(ontology_id)}"
+    base_url = settings.DKG_URL + ":" + str(settings.DKG_API_PORT)
+    params = f"api/entity/{quote_plus(curie)}"
     url = f"{base_url}/{params}"
     logger.info("Sending data to %s", url)
 
