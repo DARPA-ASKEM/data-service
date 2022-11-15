@@ -10,7 +10,8 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.db import request_rdb
+from tds.db import request_graph_engine, request_rdb
+from tds.db.graph import ProvenanceHandler
 from tds.operation import create, delete, retrieve
 from tds.schema.provenance import Provenance
 
@@ -28,21 +29,29 @@ def get_provenance() -> str:
 
 
 @router.post("", **create.fastapi_endpoint_config)
-def create_provenance(payload: Provenance, rdb: Engine = Depends(request_rdb)) -> dict:
+def create_provenance(
+    payload: Provenance,
+    rdb: Engine = Depends(request_rdb),
+    neo_engine=Depends(request_graph_engine),
+) -> dict:
     """
     Create provenance relationship
     """
-    with Session(rdb) as session:
-        provenance_payload = payload.dict()
-        provenance = orm.Provenance(**provenance_payload)
-        session.add(provenance)
-        session.commit()
-        id: int = provenance.id
+    provenance_handler = ProvenanceHandler(rdb=rdb, neo_engine=neo_engine)
+    provenance_payload = payload.dict()
+    id: int = provenance_handler.create(
+        left=provenance_payload.get("left"),
+        left_type=provenance_payload.get("left_type"),
+        right=provenance_payload.get("right"),
+        right_type=provenance_payload.get("right_type"),
+        relation_type=provenance_payload.get("relation_type"),
+        user_id=provenance_payload.get("user_id"),
+    )
+
     logger.info("new provenance with %i", id)
     return Response(
         status_code=status.HTTP_201_CREATED,
         headers={
-            "location": f"/api/provenance/{id}",
             "content-type": "application/json",
         },
         content=json.dumps({"id": id}),
