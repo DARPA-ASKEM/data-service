@@ -38,3 +38,8 @@ class Model(schema.Model):
 class ModelFramework(schema.ModelFramework):
     class Config:
         orm_mode = True
+
+
+class Intermediate(schema.Intermediate):
+    class Config:
+        orm_mode = True

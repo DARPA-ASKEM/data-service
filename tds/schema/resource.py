@@ -9,7 +9,7 @@ from typing import Dict, Optional, Type
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
 from tds.schema.dataset import Dataset
-from tds.schema.model import Model
+from tds.schema.model import Intermediate, Model
 from tds.schema.simulation import Plan
 
 
@@ -23,7 +23,7 @@ class Publication(schema.Publication):
         orm_mode = True
 
 
-class Intermediate(schema.Intermediate):
+class Software(schema.Software):
     class Config:
         orm_mode = True
 
