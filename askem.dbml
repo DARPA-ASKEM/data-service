@@ -1,15 +1,15 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v1'
+  Note: 'v2'
 }
 
 Enum public.resource_type {
-   dataset
-   model
-   extracted_data
-   plan
-   intermediate
-   publication
+   datasets
+   models
+   extractions
+   plans
+   intermediates
+   publications
 }
 
 Enum relation_type {
@@ -22,11 +22,11 @@ Enum relation_type {
 }
 
 Enum taggable_type {
-   feature
-   dataset
-   simulation_plan
-   model 
-   project
+   features
+   datasets
+   simulation_plans
+   models
+   projects
 }
 
 Enum value_type {
@@ -186,7 +186,7 @@ Table publication {
   xdd_uri varchar [not null]
 }
 
-Table extracted_data {
+Table extraction {
   id int [pk]
   publication_id int [ref: > publication.id, not null]
   type extracted_type [not null]
@@ -245,3 +245,4 @@ Table association {
   resource_type public.resource_type
   role public.role
 }
+

@@ -41,7 +41,7 @@ def test_project_cru():
         payload = {
             "name": "string",
             "description": "string",
-            "assets": {ResourceType.model: [model1_id]},
+            "assets": {ResourceType.models: [model1_id]},
             "status": "active",
         }
         response_create = client.post(
@@ -59,14 +59,14 @@ def test_project_cru():
         project = response_get.json()
         assert payload["name"] == project["name"]
         assert (
-            ResourceType.model in project["assets"]
-            and model1_id in project["assets"][ResourceType.model]
+            ResourceType.models in project["assets"]
+            and model1_id in project["assets"][ResourceType.models]
         )
         # Update
         payload_updated = {
             "name": "string",
             "description": "string",
-            "assets": {ResourceType.model: [model2_id]},
+            "assets": {ResourceType.models: [model2_id]},
             "status": "inactive",
         }
         response_update = client.post(
@@ -82,7 +82,7 @@ def test_project_cru():
         project = response_get_again.json()
         assert response_get.json()["status"] != response_get_again.json()["status"]
         assert (
-            ResourceType.model in project["assets"]
-            and model2_id in project["assets"][ResourceType.model]
-            and model1_id not in project["assets"][ResourceType.model]
+            ResourceType.models in project["assets"]
+            and model2_id in project["assets"][ResourceType.models]
+            and model1_id not in project["assets"][ResourceType.models]
         )

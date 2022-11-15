@@ -13,7 +13,7 @@ from tds.schema.model import Model
 from tds.schema.simulation import Plan
 
 
-class ExtractedData(schema.ExtractedData):
+class Extraction(schema.Extraction):
     class Config:
         orm_mode = True
 
@@ -28,10 +28,10 @@ class Intermediate(schema.Intermediate):
         orm_mode = True
 
 
-Resource = Dataset | ExtractedData | Model | Plan | Publication | Intermediate
+Resource = Dataset | Extraction | Model | Plan | Publication | Intermediate
 ORMResource = (
     orm.Dataset
-    | orm.ExtractedData
+    | orm.Extraction
     | orm.Model
     | orm.SimulationPlan
     | orm.Publication
@@ -40,12 +40,12 @@ ORMResource = (
 
 
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
-    Dataset: ResourceType.dataset,
-    ExtractedData: ResourceType.extracted_data,
-    Model: ResourceType.model,
-    Plan: ResourceType.plan,
-    Publication: ResourceType.publication,
-    Intermediate: ResourceType.intermediate,
+    Dataset: ResourceType.datasets,
+    Extraction: ResourceType.extractions,
+    Model: ResourceType.models,
+    Plan: ResourceType.plans,
+    Publication: ResourceType.publications,
+    Intermediate: ResourceType.intermediates,
 }
 
 
@@ -71,12 +71,12 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
     enum_to_orm = defaultdict(
         lambda: None,
         {
-            ResourceType.dataset: orm.Dataset,
-            ResourceType.extracted_data: orm.ExtractedData,
-            ResourceType.model: orm.Model,
-            ResourceType.plan: orm.SimulationPlan,
-            ResourceType.publication: orm.Publication,
-            ResourceType.intermediate: orm.Intermediate,
+            ResourceType.datasets: orm.Dataset,
+            ResourceType.extractions: orm.Extraction,
+            ResourceType.models: orm.Model,
+            ResourceType.plans: orm.SimulationPlan,
+            ResourceType.publications: orm.Publication,
+            ResourceType.intermediates: orm.Intermediate,
         },
     )
     return enum_to_orm[resource_type]

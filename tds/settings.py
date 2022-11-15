@@ -9,7 +9,7 @@ class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
     Data store configuration
     """
 
-    DBML_VERSION: str = "v1"
+    DBML_VERSION: str = "v2"
     GENERATED_PATH: str = "./tds/autogen"
     DBML_PATH: str = "./askem.dbml"
     SQL_URL: str = "rdb"
