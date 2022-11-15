@@ -124,13 +124,9 @@ for folder in folders:
     # publications ##
     try:
         print("Upload publication")
-        with open(folder + "document_doi.txt", "r") as f:
-            doi = f.read()
-            print(doi)
 
         with open(folder + "document_xdd_gddid.txt", "r") as f:
             gddid = f.read()
-            print(gddid)
 
         payload = json.dumps({"xdd_uri": f"{gddid}"})
         headers = {"Content-Type": "application/json"}
@@ -156,7 +152,6 @@ for folder in folders:
             parameters = json.load(f)
             for parameter_name, parameter_value in parameters.get("parameters").items():
                 parameter_types[parameter_name] = str(type(parameter_value).__name__)
-        print(parameter_types)
 
         # model content
         with open(f"{folder}model_petri.json", "r") as f:
@@ -191,7 +186,6 @@ for folder in folders:
         )
         model_json = response.json()
         model_id = model_json.get("id")
-        print(f"model_id {model_id}")
         asset_to_project(project_id=1, asset_id=int(model_id), asset_type="model")
 
     except Exception as e:
@@ -217,7 +211,6 @@ for folder in folders:
         )
         intermediate_json = response.json()
         intermediate_id = intermediate_json.get("id")
-        print(f"model_id {intermediate_id}")
 
         asset_to_project(
             project_id=1, asset_id=int(intermediate_id), asset_type="intermediate"
