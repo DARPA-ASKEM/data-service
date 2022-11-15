@@ -5,6 +5,7 @@ router.datasets - crud operations for datasets and related tables in the DB
 import json
 from logging import DEBUG, Logger
 
+import requests
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.engine.base import Engine
@@ -12,7 +13,6 @@ from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
 from tds.db import request_rdb
-from tds.utils.download import compress_stream, stream_csv_from_data_paths
 
 logger = Logger(__file__)
 logger.setLevel(DEBUG)
@@ -127,13 +127,10 @@ def get_csv(id: int, request: Request, rdb: Engine = Depends(request_rdb)):
     dataset = get_dataset(id=id, rdb=rdb)
     data_paths = dataset.annotations["data_paths"]
 
-    if "deflate" in request.headers.get("accept-encoding", ""):
-        return StreamingResponse(
-            compress_stream(stream_csv_from_data_paths(data_paths)),
-            media_type="text/csv",
-            headers={"Content-Encoding": "deflate"},
-        )
-    return StreamingResponse(
-        stream_csv_from_data_paths(data_paths),
-        media_type="text/csv",
+    response = requests.post(
+        "http://data-annotation-api:80/datasets/download/csv",
+        params={"data_path_list": data_paths},
+        stream=True,
     )
+
+    return StreamingResponse(response.raw, headers=response.headers)

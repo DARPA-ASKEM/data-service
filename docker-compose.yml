@@ -29,5 +29,4 @@ services:
     depends_on:
       - rdb
     volumes:
-      - ../datasets:/datasets:ro
       - $PWD/tds:/api/tds
