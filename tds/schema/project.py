@@ -1,5 +1,5 @@
 """
-tds.schema.project - Provides the API interface for models.
+Provides the API interface for models.
 """
 # pylint: disable=missing-class-docstring
 from collections import defaultdict

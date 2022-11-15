@@ -1,5 +1,5 @@
 """
-tds.db.relational - The configured DB engine
+The configured DB engine
 """
 
 from sqlalchemy import create_engine

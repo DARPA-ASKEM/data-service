@@ -1,5 +1,5 @@
 """
-router.software - very basic crud operations for software
+Very basic crud operations for software
 """
 
 from logging import Logger

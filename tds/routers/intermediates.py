@@ -1,5 +1,5 @@
 """
-tds.router.intermediates - crud operations for intermediates
+CRUD operations for intermediates
 """
 
 import json

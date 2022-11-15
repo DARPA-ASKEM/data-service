@@ -1,5 +1,5 @@
 """
-tds.router.publications - crud operations for publications
+CRUD operations for publications
 """
 
 import json

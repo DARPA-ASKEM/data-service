@@ -1,5 +1,5 @@
 """
-tds.lib.project - project-specific logic
+Project-specific logic
 """
 
 from collections import defaultdict

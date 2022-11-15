@@ -1,5 +1,5 @@
 """
-tests.relation.provenance - Test provenance wrapper
+Test provenance wrapper
 """
 from tds.autogen.schema import (
     IntermediateFormat,

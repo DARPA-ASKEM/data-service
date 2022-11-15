@@ -1,5 +1,5 @@
 """
-config.settings - Configures data store using environment variables
+Configures data store using environment variables
 """
 from pydantic import BaseSettings
 

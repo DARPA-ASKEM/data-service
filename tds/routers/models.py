@@ -1,5 +1,5 @@
 """
-tds.router.models - crud operations for models
+CRUD operations for models
 """
 
 import json

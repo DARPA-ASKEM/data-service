@@ -1,5 +1,5 @@
 """
-router.framework - very basic crud operations for frameworks
+Very basic crud operations for frameworks
 """
 
 from logging import Logger

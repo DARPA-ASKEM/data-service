@@ -1,5 +1,5 @@
 """
-tds.db.helpers - Easy initialization and deletion of db content
+Easy initialization and deletion of db content
 """
 from typing import Any
 
