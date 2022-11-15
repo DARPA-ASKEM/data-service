@@ -119,10 +119,10 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
         session.commit()
 
 
-@router.get("/{obj_id}/download/csv")
-def get_csv(obj_id: str, request: Request, rdb: Engine = Depends(request_rdb)):
+@router.get("/{id}/download/csv")
+def get_csv(id: int, request: Request, rdb: Engine = Depends(request_rdb)):
 
-    dataset = get_dataset(id=int(obj_id), rdb=rdb)
+    dataset = get_dataset(id=id, rdb=rdb)
     data_paths = dataset.annotations["data_paths"]
 
     if "deflate" in request.headers.get("accept-encoding", ""):
