@@ -14,7 +14,7 @@ from tds.autogen import orm
 from tds.db import entry_exists, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, retrieve, update
-from tds.schema.project import Asset, Project
+from tds.schema.project import Asset, FullProject, Project
 from tds.schema.resource import ResourceType, get_resource_orm
 
 logger = Logger(__name__)
@@ -26,18 +26,12 @@ def list_projects(rdb: Engine = Depends(request_rdb)) -> List[Project]:
     """
     Retrieve all projects
     """
-    results = []
     with Session(rdb) as session:
-        for entry in session.query(orm.Project).all():
-            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
-                orm.ProjectAsset.resource_id == entry.id
-            )
-            results.append(Project.from_orm(entry, list(assets)))
-    return results
+        return session.query(orm.Project).order_by(orm.Project.id.asc()).all()
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
-def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
+def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> FullProject:
     """
     Retrieve project
     """
@@ -49,11 +43,13 @@ def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
             ).filter(orm.ProjectAsset.project_id == id)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Project.from_orm(project, list(parameters))
+    return FullProject.from_orm(project, list(parameters))
 
 
 @router.post("", **create.fastapi_endpoint_config)
-def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> Response:
+def create_project(
+    payload: FullProject, rdb: Engine = Depends(request_rdb)
+) -> Response:
     """
     Create project and return its ID
     """
@@ -93,8 +89,8 @@ def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> Resp
 
 @router.post("/{id}", **update.fastapi_endpoint_config)
 def update_project(
-    id: int, payload: Project, rdb: Engine = Depends(request_rdb)
-) -> int:
+    id: int, payload: FullProject, rdb: Engine = Depends(request_rdb)
+) -> dict:
     """
     Update project
     """
@@ -111,7 +107,13 @@ def update_project(
             session.commit()
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return id
+    return Response(
+        headers={
+            "location": f"/api/projects/{id}",
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id}),
+    )
 
 
 @router.get(

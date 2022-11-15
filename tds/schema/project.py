@@ -14,14 +14,14 @@ class Asset(schema.ProjectAsset):
         orm_mode = True
 
 
-class Project(schema.Project):
+class FullProject(schema.Project):
     concept: Optional[Concept] = None
     assets: Dict[schema.ResourceType, Set[int]] = {}
 
     @classmethod
     def from_orm(
         cls, body: orm.Project, project_assets: List[orm.ProjectAsset]
-    ) -> "Project":
+    ) -> "FullProject":
         """
         Handle the creation of asset dict
         """
@@ -39,6 +39,20 @@ class Project(schema.Project):
                 "name": "string",
                 "description": "string",
                 "assets": {"resource-type": "list-of-ordered-ints"},
+                "status": "string",
+            }
+        }
+
+
+class Project(schema.Project):
+    concept: Optional[Concept] = None
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "name": "string",
+                "description": "string",
                 "status": "string",
             }
         }
