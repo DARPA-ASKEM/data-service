@@ -5,12 +5,15 @@ router.datasets - crud operations for datasets and related tables in the DB
 import json
 from logging import DEBUG, Logger
 
-from fastapi import APIRouter, Depends, Response, status
+import requests
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
 from tds.db import request_rdb
+from tds.utils.download import compress_stream, stream_csv_from_data_paths
 
 logger = Logger(__file__)
 logger.setLevel(DEBUG)
@@ -82,7 +85,7 @@ def update_dataset(
         data_to_update.update(data_payload)
         session.commit()
     return Response(
-        status_code=status.HTTP_201_CREATED,
+        status_code=status.HTTP_200_OK,
         headers={
             "location": f"/api/datasets/{id}",
             "content-type": "application/json",
@@ -114,3 +117,33 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
     with Session(rdb) as session:
         session.query(orm.Dataset).filter(orm.Dataset.id == id).delete()
         session.commit()
+
+
+@router.get("/{obj_id}/download/csv")
+def get_csv(obj_id: str, request: Request, rdb: Engine = Depends(request_rdb)):
+
+    dataset = get_dataset(id=int(obj_id), rdb=rdb)
+    data_paths = dataset.annotations["data_paths"]
+
+    logger.debug(data_paths)
+
+    # test_rep = requests.get("http://data-annotation-api:8000/datasets/5")
+
+    # response = requests.post(
+    #     "http://data-annotation-api:8000/datasets/download/csv",
+    #     params={"data_path_list": data_paths},
+    # )
+
+    if "deflate" in request.headers.get("accept-encoding", ""):
+        return StreamingResponse(
+            compress_stream(stream_csv_from_data_paths(data_paths)),
+            media_type="text/csv",
+            headers={"Content-Encoding": "deflate"},
+        )
+    else:
+        return StreamingResponse(
+            stream_csv_from_data_paths(data_paths),
+            media_type="text/csv",
+        )
+
+    return response
