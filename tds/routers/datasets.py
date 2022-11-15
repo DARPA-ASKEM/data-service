@@ -125,15 +125,6 @@ def get_csv(obj_id: str, request: Request, rdb: Engine = Depends(request_rdb)):
     dataset = get_dataset(id=int(obj_id), rdb=rdb)
     data_paths = dataset.annotations["data_paths"]
 
-    logger.debug(data_paths)
-
-    # test_rep = requests.get("http://data-annotation-api:8000/datasets/5")
-
-    # response = requests.post(
-    #     "http://data-annotation-api:8000/datasets/download/csv",
-    #     params={"data_path_list": data_paths},
-    # )
-
     if "deflate" in request.headers.get("accept-encoding", ""):
         return StreamingResponse(
             compress_stream(stream_csv_from_data_paths(data_paths)),
@@ -145,5 +136,3 @@ def get_csv(obj_id: str, request: Request, rdb: Engine = Depends(request_rdb)):
             stream_csv_from_data_paths(data_paths),
             media_type="text/csv",
         )
-
-    return response
