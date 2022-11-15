@@ -160,15 +160,13 @@ for folder in folders:
         with open(folder + "model_sbml.xml", "r") as f:
             mmt_template = f.read()
 
-        try:
-            tree = ET.parse(folder + "model_sbml.xml")
-            root = tree.getroot()
-            model_description=root[0][0][0][0].text
-            model_name=root[0].attrib['name']
+        
+        tree = ET.parse(folder + "model_sbml.xml")
+        root = tree.getroot()
+        model_description=root[0][0][0][0].text
+        model_name=root[0].attrib['name']
             
-        except Exception as e:
-           
-            print(e)
+        
 
         payload = json.dumps(
             {
