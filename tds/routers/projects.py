@@ -29,10 +29,10 @@ def list_projects(rdb: Engine = Depends(request_rdb)) -> List[Project]:
     results = []
     with Session(rdb) as session:
         for entry in session.query(orm.Project).all():
-            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
-                orm.ProjectAsset.resource_id == entry.id
-            )
-            results.append(Project.from_orm(entry, list(assets)))
+            # assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
+            #     orm.ProjectAsset.resource_id == entry.id
+            # )
+            results.append(entry)
     return results
 
 
