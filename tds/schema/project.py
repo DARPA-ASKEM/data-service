@@ -14,7 +14,7 @@ class Asset(schema.ProjectAsset):
         orm_mode = True
 
 
-class FullProject(schema.Project):
+class Project(schema.Project):
     concept: Optional[Concept] = None
     assets: Dict[schema.ResourceType, Set[int]] = {}
 
@@ -44,7 +44,7 @@ class FullProject(schema.Project):
         }
 
 
-class Project(schema.Project):
+class ProjectMetadata(schema.Project):
     concept: Optional[Concept] = None
 
     class Config:

@@ -14,7 +14,7 @@ from tds.autogen import orm
 from tds.db import entry_exists, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, retrieve, update
-from tds.schema.project import Asset, FullProject, Project
+from tds.schema.project import Asset, Project, ProjectMetadata
 from tds.schema.resource import ResourceType, get_resource_orm
 
 logger = Logger(__name__)
@@ -22,7 +22,7 @@ router = APIRouter()
 
 
 @router.get("")
-def list_projects(rdb: Engine = Depends(request_rdb)) -> List[Project]:
+def list_projects(rdb: Engine = Depends(request_rdb)) -> List[ProjectMetadata]:
     """
     Retrieve all projects
     """
@@ -31,7 +31,7 @@ def list_projects(rdb: Engine = Depends(request_rdb)) -> List[Project]:
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
-def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> FullProject:
+def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
     """
     Retrieve project
     """
@@ -43,13 +43,11 @@ def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> FullProject:
             ).filter(orm.ProjectAsset.project_id == id)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return FullProject.from_orm(project, list(parameters))
+    return Project.from_orm(project, list(parameters))
 
 
 @router.post("", **create.fastapi_endpoint_config)
-def create_project(
-    payload: FullProject, rdb: Engine = Depends(request_rdb)
-) -> Response:
+def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> Response:
     """
     Create project and return its ID
     """
@@ -89,8 +87,8 @@ def create_project(
 
 @router.post("/{id}", **update.fastapi_endpoint_config)
 def update_project(
-    id: int, payload: FullProject, rdb: Engine = Depends(request_rdb)
-) -> dict:
+    id: int, payload: Project, rdb: Engine = Depends(request_rdb)
+) -> Response:
     """
     Update project
     """

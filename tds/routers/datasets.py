@@ -232,7 +232,7 @@ def get_qualifiers(count: int, rdb: Engine = Depends(request_rdb)):
         )
 
 
-@router.get("/{id}")
+@router.get("/qualfiers/{id}")
 def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific qualifier by ID
@@ -242,7 +242,7 @@ def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("")
+@router.post("/qualfiers")
 def create_qualifier(
     payload: schema.Qualifier,
     qualifies_array: List[str],
@@ -294,7 +294,7 @@ def create_qualifier(
         )
 
 
-@router.patch("/{id}")
+@router.patch("/qualfiers/{id}")
 def update_qualifier(
     payload: schema.Qualifier, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
@@ -312,7 +312,7 @@ def update_qualifier(
     return "Updated Qualifier"
 
 
-@router.delete("/{id}")
+@router.delete("/qualfiers/{id}")
 def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Delete a qualifier by ID

@@ -33,3 +33,8 @@ class Model(schema.Model):
                 "parameters": {"string": "value-type"},
             }
         }
+
+
+class ModelFramework(schema.ModelFramework):
+    class Config:
+        orm_mode = True
