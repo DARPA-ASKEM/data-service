@@ -47,12 +47,6 @@ class FullProject(schema.Project):
 class Project(schema.Project):
     concept: Optional[Concept] = None
 
-    @classmethod
-    def from_orm(cls, body: orm.Project) -> "Project":
-        """
-        Handle the creation of asset dict
-        """
-
     class Config:
         orm_mode = True
         schema_extra = {
