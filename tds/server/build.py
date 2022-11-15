@@ -2,11 +2,13 @@
 Constructs API given specified router
 """
 
-from importlib import import_module
+from importlib import import_module, metadata
 from pkgutil import iter_modules
 from typing import List
 
 from fastapi import FastAPI
+
+API_DESCRIPTION = "TDS handles data between TERArium and other ASKEM components."
 
 
 def find_valid_routers() -> List[str]:
@@ -29,12 +31,23 @@ def attach_router(api: FastAPI, router_name: str) -> None:
         router_package.router, tags=[router_name], prefix="/" + router_name
     )
 
+    if api.openapi_tags is None:
+        api.openapi_tags = []
+    api.openapi_tags.append(
+        {"name": router_name, "description": router_package.__doc__}
+    )
+
 
 def build_api(*args: str) -> FastAPI:
     """
     Build an API using a group of specified router modules
     """
-    app = FastAPI(docs_url="/")
+    api = FastAPI(
+        title="TERArium Data Service",
+        version=metadata.version("tds"),
+        description=API_DESCRIPTION,
+        docs_url="/",
+    )
     for router_name in args if len(args) != 0 else find_valid_routers():
-        attach_router(app, router_name)
-    return app
+        attach_router(api, router_name)
+    return api

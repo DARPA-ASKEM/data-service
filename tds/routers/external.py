@@ -1,5 +1,5 @@
 """
-router.software - very basic crud operations for software
+Basic crud operations for external resources
 """
 
 import json
