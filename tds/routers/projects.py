@@ -108,7 +108,6 @@ def update_project(
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Response(
-        status_code=status.HTTP_200,
         headers={
             "location": f"/api/projects/{id}",
             "content-type": "application/json",
