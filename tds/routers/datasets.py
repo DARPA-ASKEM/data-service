@@ -1,5 +1,5 @@
 """
-router.datasets - crud operations for datasets and related tables in the DB
+CRUD operations for datasets and related tables in the DB
 """
 
 import json

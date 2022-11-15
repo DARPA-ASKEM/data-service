@@ -1,5 +1,5 @@
 """
-tests.routers.simulations - tests basic sim functionality
+Tests basic sim functionality
 """
 
 from tds.autogen.schema import ValueType

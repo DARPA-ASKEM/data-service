@@ -1,5 +1,5 @@
 """
-tds.relation.provenance - Handler for object relations
+Handler for object relations
 """
 
 from typing import Optional

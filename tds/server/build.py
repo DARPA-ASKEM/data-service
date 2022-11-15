@@ -1,5 +1,5 @@
 """
-tds.server.build - Constructs API given specified router
+Constructs API given specified router
 """
 
 from importlib import import_module
