@@ -6,7 +6,7 @@ import json
 from logging import DEBUG, Logger
 
 import requests
-from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi import APIRouter, Depends, Response, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
@@ -119,7 +119,7 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
 
 
 @router.get("/{id}/download/csv")
-def get_csv(id: int, request: Request, rdb: Engine = Depends(request_rdb)):
+def get_csv(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Gets the csv of an annotated dataset that is registered
     via the data-annotation tool.
@@ -131,6 +131,7 @@ def get_csv(id: int, request: Request, rdb: Engine = Depends(request_rdb)):
         "http://data-annotation-api:80/datasets/download/csv",
         params={"data_path_list": data_paths},
         stream=True,
+        timeout=15,
     )
 
     return StreamingResponse(response.raw, headers=response.headers)
