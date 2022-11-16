@@ -25,22 +25,6 @@ logger = Logger(__name__)
 router = APIRouter()
 
 
-@router.get("/frameworks/{name}", **retrieve.fastapi_endpoint_config)
-def get_framework(name: str, rdb: Engine = Depends(request_rdb)) -> ModelFramework:
-    """
-    Retrieve framework metadata
-    """
-    with Session(rdb) as session:
-        if (
-            session.query(orm.ModelFramework)
-            .filter(orm.ModelFramework.name == name)
-            .count()
-            == 1
-        ):
-            return ModelFramework.from_orm(session.query(orm.ModelFramework).get(name))
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-
 @router.post("/frameworks", **create.fastapi_endpoint_config)
 def create_framework(
     payload: ModelFramework, rdb: Engine = Depends(request_rdb)
@@ -56,6 +40,48 @@ def create_framework(
         session.commit()
     logger.info("new framework with %i", framework_payload.get("name"))
     return framework_payload.get("name")
+
+
+@router.post("/intermediates", **create.fastapi_endpoint_config)
+def create_intermediate(
+    payload: Intermediate, rdb: Engine = Depends(request_rdb)
+) -> Response:
+    """
+    Create intermediate and return its ID
+    """
+    with Session(rdb) as session:
+        intermediate_payload = payload.dict()
+        # pylint: disable-next=unused-variable
+        intermediate = orm.Intermediate(**intermediate_payload)
+        session.add(intermediate)
+        session.commit()
+        id: int = intermediate.id
+
+    logger.info("new model created: %i", id)
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "location": f"/api/intermediate/{id}",
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id}),
+    )
+
+
+@router.get("/frameworks/{name}", **retrieve.fastapi_endpoint_config)
+def get_framework(name: str, rdb: Engine = Depends(request_rdb)) -> ModelFramework:
+    """
+    Retrieve framework metadata
+    """
+    with Session(rdb) as session:
+        if (
+            session.query(orm.ModelFramework)
+            .filter(orm.ModelFramework.name == name)
+            .count()
+            == 1
+        ):
+            return ModelFramework.from_orm(session.query(orm.ModelFramework).get(name))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @router.delete("/frameworks/{name}", **delete.fastapi_endpoint_config)
@@ -109,32 +135,6 @@ def get_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Intermediat
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Intermediate.from_orm(intermediate)
-
-
-@router.post("/intermediates", **create.fastapi_endpoint_config)
-def create_intermediate(
-    payload: Intermediate, rdb: Engine = Depends(request_rdb)
-) -> Response:
-    """
-    Create intermediate and return its ID
-    """
-    with Session(rdb) as session:
-        intermediate_payload = payload.dict()
-        # pylint: disable-next=unused-variable
-        intermediate = orm.Intermediate(**intermediate_payload)
-        session.add(intermediate)
-        session.commit()
-        id: int = intermediate.id
-
-    logger.info("new model created: %i", id)
-    return Response(
-        status_code=status.HTTP_201_CREATED,
-        headers={
-            "location": f"/api/intermediate/{id}",
-            "content-type": "application/json",
-        },
-        content=json.dumps({"id": id}),
-    )
 
 
 @router.get("")
