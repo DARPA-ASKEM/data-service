@@ -21,6 +21,183 @@ logger.setLevel(DEBUG)
 router = APIRouter()
 
 
+@router.get("/features")
+def get_features(
+    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
+):
+    """
+    Get a specified number of features
+    """
+    return list_by_id(rdb.connect(), orm.Feature, page_size, page)
+
+
+@router.get("/features/{id}")
+def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Get a specific feature by ID
+    """
+    with Session(rdb) as session:
+        result = session.query(orm.Feature).get(id)
+        return result
+
+
+@router.post("/features")
+def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
+    """
+    Create a feature
+    """
+    with Session(rdb) as session:
+        featurep = payload.dict()
+        del featurep["id"]
+        feature = orm.Feature(**featurep)
+        exists = session.query(orm.Feature).filter_by(**featurep).first() is not None
+        if exists:
+            return Response(
+                status_code=status.HTTP_200_OK,
+                headers={
+                    "content-type": "application/json",
+                },
+                content=json.dumps(featurep),
+            )
+        session.add(feature)
+        session.commit()
+        data_id = feature.id
+        featurep["id"] = data_id
+        return Response(
+            status_code=status.HTTP_201_CREATED,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps(featurep),
+        )
+
+
+@router.patch("/features/{id}")
+def update_feature(
+    payload: schema.Feature, id: int, rdb: Engine = Depends(request_rdb)
+) -> str:
+    """
+    Update a feature by ID
+    """
+    with Session(rdb) as session:
+        data_payload = payload.dict(exclude_unset=True)
+        data_payload["id"] = id
+        logger.info(data_payload)
+
+        data_to_update = session.query(orm.Feature).filter(orm.Feature.id == id)
+        data_to_update.update(data_payload)
+        session.commit()
+    return "Updated Feature"
+
+
+@router.delete("/features/{id}")
+def delete_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Delete a feature by ID
+    """
+    with Session(rdb) as session:
+        session.query(orm.Feature).filter(orm.Feature.id == id).delete()
+        session.commit()
+
+
+@router.get("/qualifiers")
+def get_qualifiers(
+    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
+):
+    """
+    Get a specific number of qualifiers
+    """
+    return list_by_id(rdb.connect(), orm.Qualifier, page_size, page)
+
+
+@router.get("/qualifiers/{id}")
+def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Get a specific qualifier by ID
+    """
+    with Session(rdb) as session:
+        result = session.query(orm.Qualifier).get(id)
+        return result
+
+
+@router.post("/qualifiers")
+def create_qualifier(
+    payload: schema.Qualifier,
+    qualifies_array: List[str],
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Create a qualifier
+    """
+    with Session(rdb) as session:
+        qualifierp = payload.dict()
+        del qualifierp["id"]
+        qualifier = orm.Qualifier(**qualifierp)
+        exists = (
+            session.query(orm.Qualifier).filter_by(**qualifierp).first() is not None
+        )
+        if exists:
+            return Response(
+                status_code=status.HTTP_200_OK,
+                headers={
+                    "content-type": "application/json",
+                },
+                content=json.dumps(qualifierp),
+            )
+
+        session.add(qualifier)
+        session.commit()
+        data_id = qualifier.id
+        for qual in qualifies_array:
+            feature = (
+                session.query(orm.Feature)
+                .filter_by(name=qual, dataset_id=qualifierp["dataset_id"])
+                .first()
+            )
+            qualifier_xrefp = {
+                "id": 0,
+                "qualifier_id": data_id,
+                "feature_id": feature.id,
+            }
+            create_qualifier_xref(qualifier_xrefp, rdb)
+        qualifierp["id"] = data_id
+        return Response(
+            status_code=status.HTTP_201_CREATED,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps(qualifierp),
+        )
+
+
+@router.patch("/qualifiers/{id}")
+def update_qualifier(
+    payload: schema.Qualifier, id: int, rdb: Engine = Depends(request_rdb)
+) -> str:
+    """
+    Update a qualifier by ID
+    """
+    with Session(rdb) as session:
+        data_payload = payload.dict(exclude_unset=True)
+        data_payload["id"] = id
+        logger.info(data_payload)
+
+        data_to_update = session.query(orm.Qualifier).filter(orm.Qualifier.id == id)
+        data_to_update.update(data_payload)
+        session.commit()
+    return "Updated Qualifier"
+
+
+@router.delete("/qualifiers/{id}")
+def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+    """
+    Delete a qualifier by ID
+    """
+    with Session(rdb) as session:
+        session.query(orm.Qualifier).filter(orm.Qualifier.id == id).delete()
+        session.commit()
+
+
 @router.get("")
 def get_datasets(
     page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
@@ -28,7 +205,7 @@ def get_datasets(
     """
     Get a specific number of datasets
     """
-    return list_by_id(rdb.connect(), orm.Feature, page_size, page)
+    return list_by_id(rdb.connect(), orm.Dataset, page_size, page)
 
 
 @router.get("/{id}")
@@ -84,7 +261,6 @@ def update_dataset(
     return Response(
         status_code=status.HTTP_200_OK,
         headers={
-            "location": f"/api/datasets/{id}",
             "content-type": "application/json",
         },
         content=json.dumps(data_to_update, default=str),
@@ -133,184 +309,3 @@ def get_csv(id: int, rdb: Engine = Depends(request_rdb)):
     )
 
     return StreamingResponse(response.raw, headers=response.headers)
-
-
-@router.get("/features")
-def get_features(
-    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
-):
-    """
-    Get a specified number of features
-    """
-    return list_by_id(rdb.connect(), orm.Feature, page_size, page)
-
-
-@router.get("/features/{id}")
-def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
-    """
-    Get a specific feature by ID
-    """
-    with Session(rdb) as session:
-        result = session.query(orm.Feature).get(id)
-        return result
-
-
-@router.post("/features")
-def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
-    """
-    Create a feature
-    """
-    with Session(rdb) as session:
-        featurep = payload.dict()
-        del featurep["id"]
-        feature = orm.Feature(**featurep)
-        exists = session.query(orm.Feature).filter_by(**featurep).first() is not None
-        if exists:
-            return Response(
-                status_code=status.HTTP_200_OK,
-                headers={
-                    "location": "/api/features/",
-                    "content-type": "application/json",
-                },
-                content=json.dumps(featurep),
-            )
-        session.add(feature)
-        session.commit()
-        data_id = feature.id
-        featurep["id"] = data_id
-        return Response(
-            status_code=status.HTTP_201_CREATED,
-            headers={
-                "location": f"/api/features/{data_id}",
-                "content-type": "application/json",
-            },
-            content=json.dumps(featurep),
-        )
-
-
-@router.patch("/features/{id}")
-def update_feature(
-    payload: schema.Feature, id: int, rdb: Engine = Depends(request_rdb)
-) -> str:
-    """
-    Update a feature by ID
-    """
-    with Session(rdb) as session:
-        data_payload = payload.dict(exclude_unset=True)
-        data_payload["id"] = id
-        logger.info(data_payload)
-
-        data_to_update = session.query(orm.Feature).filter(orm.Feature.id == id)
-        data_to_update.update(data_payload)
-        session.commit()
-    return "Updated Feature"
-
-
-@router.delete("/features/{id}")
-def delete_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
-    """
-    Delete a feature by ID
-    """
-    with Session(rdb) as session:
-        session.query(orm.Feature).filter(orm.Feature.id == id).delete()
-        session.commit()
-
-
-@router.get("/qualifiers")
-def get_qualifiers(
-    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
-):
-    """
-    Get a specific number of qualifiers
-    """
-    return list_by_id(rdb.connect(), orm.Qualifier, page_size, page)
-
-
-@router.get("/qualfiers/{id}")
-def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
-    """
-    Get a specific qualifier by ID
-    """
-    with Session(rdb) as session:
-        result = session.query(orm.Qualifier).get(id)
-        return result
-
-
-@router.post("/qualfiers")
-def create_qualifier(
-    payload: schema.Qualifier,
-    qualifies_array: List[str],
-    rdb: Engine = Depends(request_rdb),
-):
-    """
-    Create a qualifier
-    """
-    with Session(rdb) as session:
-        qualifierp = payload.dict()
-        del qualifierp["id"]
-        qualifier = orm.Qualifier(**qualifierp)
-        exists = (
-            session.query(orm.Qualifier).filter_by(**qualifierp).first() is not None
-        )
-        if exists:
-            return Response(
-                status_code=status.HTTP_200_OK,
-                headers={
-                    "location": "/api/qualfiers/",
-                    "content-type": "application/json",
-                },
-                content=json.dumps(qualifierp),
-            )
-
-        session.add(qualifier)
-        session.commit()
-        data_id = qualifier.id
-        for qual in qualifies_array:
-            feature = (
-                session.query(orm.Feature)
-                .filter_by(name=qual, dataset_id=qualifierp["dataset_id"])
-                .first()
-            )
-            qualifier_xrefp = {
-                "id": 0,
-                "qualifier_id": data_id,
-                "feature_id": feature.id,
-            }
-            create_qualifier_xref(qualifier_xrefp, rdb)
-        qualifierp["id"] = data_id
-        return Response(
-            status_code=status.HTTP_201_CREATED,
-            headers={
-                "location": f"/api/qualifiers/{data_id}",
-                "content-type": "application/json",
-            },
-            content=json.dumps(qualifierp),
-        )
-
-
-@router.patch("/qualfiers/{id}")
-def update_qualifier(
-    payload: schema.Qualifier, id: int, rdb: Engine = Depends(request_rdb)
-) -> str:
-    """
-    Update a qualifier by ID
-    """
-    with Session(rdb) as session:
-        data_payload = payload.dict(exclude_unset=True)
-        data_payload["id"] = id
-        logger.info(data_payload)
-
-        data_to_update = session.query(orm.Qualifier).filter(orm.Qualifier.id == id)
-        data_to_update.update(data_payload)
-        session.commit()
-    return "Updated Qualifier"
-
-
-@router.delete("/qualfiers/{id}")
-def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
-    """
-    Delete a qualifier by ID
-    """
-    with Session(rdb) as session:
-        session.query(orm.Qualifier).filter(orm.Qualifier.id == id).delete()
-        session.commit()

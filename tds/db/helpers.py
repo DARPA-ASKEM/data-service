@@ -37,7 +37,7 @@ def list_by_id(connection: Connection, orm_type: Any, page_size: int, page: int 
     """
     with Session(connection) as session:
         return (
-            session.query(orm.Intermediate)
+            session.query(orm_type)
             .order_by(orm_type.id.asc())
             .limit(page_size)
             .offset(page)
