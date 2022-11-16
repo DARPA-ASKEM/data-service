@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-tds.main - The script hosts the API using a command line interface.
+The module hosts the API using a command line interface.
 """
 
 from sys import exit as sys_exit

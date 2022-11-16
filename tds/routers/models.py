@@ -1,5 +1,5 @@
 """
-tds.router.models - crud operations for models
+CRUD operations for models
 """
 
 import json
@@ -18,11 +18,123 @@ from tds.db import (
     request_provenance_handler,
     request_rdb,
 )
-from tds.operation import create, retrieve, update
-from tds.schema.model import Model
+from tds.operation import create, delete, retrieve, update
+from tds.schema.model import Intermediate, Model, ModelFramework
 
 logger = Logger(__name__)
 router = APIRouter()
+
+
+@router.post("/frameworks", **create.fastapi_endpoint_config)
+def create_framework(
+    payload: ModelFramework, rdb: Engine = Depends(request_rdb)
+) -> str:
+    """
+    Create framework metadata
+    """
+
+    with Session(rdb) as session:
+        framework_payload = payload.dict()
+        framework = orm.ModelFramework(**framework_payload)
+        session.add(framework)
+        session.commit()
+    logger.info("new framework with %i", framework_payload.get("name"))
+    return framework_payload.get("name")
+
+
+@router.get("/frameworks/{name}", **retrieve.fastapi_endpoint_config)
+def get_framework(name: str, rdb: Engine = Depends(request_rdb)) -> ModelFramework:
+    """
+    Retrieve framework metadata
+    """
+    with Session(rdb) as session:
+        if (
+            session.query(orm.ModelFramework)
+            .filter(orm.ModelFramework.name == name)
+            .count()
+            == 1
+        ):
+            return ModelFramework.from_orm(session.query(orm.ModelFramework).get(name))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@router.delete("/frameworks/{name}", **delete.fastapi_endpoint_config)
+def delete_framework(name: str, rdb: Engine = Depends(request_rdb)) -> Response:
+    """
+    Delete framework metadata
+    """
+    with Session(rdb) as session:
+        if (
+            session.query(orm.ModelFramework)
+            .filter(orm.ModelFramework.name == name)
+            .count()
+            == 1
+        ):
+            framework = session.query(orm.ModelFramework).get(name)
+            session.delete(framework)
+            session.commit()
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT,
+    )
+
+
+@router.get("/intermediates/{id}", **retrieve.fastapi_endpoint_config)
+def get_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Intermediate:
+    """
+    Retrieve model
+    """
+    if entry_exists(rdb.connect(), orm.Intermediate, id):
+        with Session(rdb) as session:
+            intermediate = session.query(orm.Intermediate).get(id)
+
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return Intermediate.from_orm(intermediate)
+
+
+@router.post("/intermediates", **create.fastapi_endpoint_config)
+def create_intermediate(
+    payload: Intermediate, rdb: Engine = Depends(request_rdb)
+) -> Response:
+    """
+    Create intermediate and return its ID
+    """
+    with Session(rdb) as session:
+        intermediate_payload = payload.dict()
+        # pylint: disable-next=unused-variable
+        intermediate = orm.Intermediate(**intermediate_payload)
+        session.add(intermediate)
+        session.commit()
+        id: int = intermediate.id
+
+    logger.info("new model created: %i", id)
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id}),
+    )
+
+
+@router.delete("/intermediates/{id}", **delete.fastapi_endpoint_config)
+def delete_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
+    """
+    Delete framework metadata
+    """
+    with Session(rdb) as session:
+        if entry_exists(rdb.connect(), orm.Intermediate, id):
+            intermediate = session.query(orm.Intermediate).get(id)
+            print(intermediate)
+            session.delete(intermediate)
+            session.commit()
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT,
+    )
 
 
 @router.get("")
@@ -80,7 +192,6 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
     return Response(
         status_code=status.HTTP_201_CREATED,
         headers={
-            "location": f"/api/model/{id}",
             "content-type": "application/json",
         },
         content=json.dumps({"id": id}),
@@ -107,7 +218,6 @@ def update_model(
     return Response(
         status_code=status.HTTP_201_CREATED,
         headers={
-            "location": f"/api/model/{id}",
             "content-type": "application/json",
         },
         content=json.dumps({"id": new_id}),

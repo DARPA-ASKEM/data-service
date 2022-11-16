@@ -9,6 +9,12 @@ init:
 	poetry install;
 	poetry run pre-commit install
 	
+.PHONY:
+tidy: 
+	poetry run pre-commit run;
+	poetry run pylint ./tds
+	poetry run pylint ./tests
+	poetry run pytest
 
 .PHONY:
 up:

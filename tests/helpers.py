@@ -1,5 +1,5 @@
 """
-tests.utils - The reusable Test DB connection
+The reusable Test DB connection
 """
 import os
 from contextlib import contextmanager
