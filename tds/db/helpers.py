@@ -29,3 +29,17 @@ def entry_exists(connection: Connection, orm_type: Any, id: int) -> bool:
     """
     with Session(connection) as session:
         return session.query(orm_type).filter(orm_type.id == id).count() == 1
+
+
+def list_by_id(connection: Connection, orm_type: Any, page_size: int, page: int = 0):
+    """
+    Page through table using given ORM
+    """
+    with Session(connection) as session:
+        return (
+            session.query(orm.Intermediate)
+            .order_by(orm_type.id.asc())
+            .limit(page_size)
+            .offset(page)
+            .all()
+        )

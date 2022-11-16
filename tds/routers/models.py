@@ -80,23 +80,6 @@ def delete_framework(name: str, rdb: Engine = Depends(request_rdb)) -> Response:
     )
 
 
-@router.get("/intermediates")
-def get_intermediates(
-    page_size: int = 50, page: int = 0, rdb: Engine = Depends(request_rdb)
-):
-    """
-    Get list of intermediates
-    """
-    with Session(rdb) as session:
-        return (
-            session.query(orm.Intermediate)
-            .order_by(orm.Intermediate.id.asc())
-            .limit(page_size)
-            .offset(page)
-            .all()
-        )
-
-
 @router.get("/intermediates/{id}", **retrieve.fastapi_endpoint_config)
 def get_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Intermediate:
     """

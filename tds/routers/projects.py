@@ -11,7 +11,7 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
-from tds.db import entry_exists, request_rdb
+from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, retrieve, update
 from tds.schema.project import Asset, Project, ProjectMetadata
@@ -22,12 +22,13 @@ router = APIRouter()
 
 
 @router.get("")
-def list_projects(rdb: Engine = Depends(request_rdb)) -> List[ProjectMetadata]:
+def list_projects(
+    page_size: int = 50, page: int = 0, rdb: Engine = Depends(request_rdb)
+) -> List[ProjectMetadata]:
     """
     Retrieve all projects
     """
-    with Session(rdb) as session:
-        return session.query(orm.Project).order_by(orm.Project.id.asc()).all()
+    return list_by_id(rdb.connect(), orm.Project, page_size, page)
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)

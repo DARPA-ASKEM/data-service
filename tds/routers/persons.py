@@ -10,26 +10,13 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
-from tds.db import request_rdb
+from tds.db import list_by_id, request_rdb
 
 logger = Logger(__file__)
 router = APIRouter()
 
 
-@router.get("associations")
-def get_associations(count: int = 100, rdb: Engine = Depends(request_rdb)):
-    """
-    Get a specific number of associations
-    """
-    with Session(rdb) as session:
-        return list(
-            session.query(orm.Association)
-            .order_by(orm.Association.id.asc())
-            .limit(count)
-        )
-
-
-@router.get("associations/{id}")
+@router.get("/associations/{id}")
 def get_association(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific association by ID
@@ -39,7 +26,7 @@ def get_association(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("associations")
+@router.post("/associations")
 def create_association(payload: schema.Association, rdb: Engine = Depends(request_rdb)):
     """
     Create a association
@@ -61,7 +48,7 @@ def create_association(payload: schema.Association, rdb: Engine = Depends(reques
         )
 
 
-@router.patch("associations/{id}")
+@router.patch("/associations/{id}")
 def update_association(
     payload: schema.Association, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
@@ -79,7 +66,7 @@ def update_association(
     return "Updated association"
 
 
-@router.delete("associations/{id}")
+@router.delete("/associations/{id}")
 def delete_association(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Delete a association by ID
@@ -90,14 +77,13 @@ def delete_association(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 
 @router.get("")
-def get_persons(count: int, rdb: Engine = Depends(request_rdb)):
+def get_persons(
+    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
+):
     """
-    Get a count of persons
+    Page over persons
     """
-    with Session(rdb) as session:
-        return (
-            session.query(orm.Person).order_by(orm.Person.id.asc()).limit(count).all()
-        )
+    return list_by_id(rdb.connect(), orm.Person, page_size, page)
 
 
 @router.get("/{id}")
