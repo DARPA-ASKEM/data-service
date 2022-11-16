@@ -4,7 +4,7 @@ PYTHON = $(shell which python3 || which python)
 export LANG
 
 
-.PHONY:
+.PHONY:init
 init:
 	poetry install;
 	poetry run pre-commit install
