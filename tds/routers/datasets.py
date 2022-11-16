@@ -55,7 +55,6 @@ def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
             return Response(
                 status_code=status.HTTP_200_OK,
                 headers={
-                    "location": "/api/features/",
                     "content-type": "application/json",
                 },
                 content=json.dumps(featurep),
@@ -67,7 +66,6 @@ def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/features/{data_id}",
                 "content-type": "application/json",
             },
             content=json.dumps(featurep),
@@ -112,7 +110,7 @@ def get_qualifiers(
     return list_by_id(rdb.connect(), orm.Qualifier, page_size, page)
 
 
-@router.get("/qualfiers/{id}")
+@router.get("/qualifiers/{id}")
 def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific qualifier by ID
@@ -122,7 +120,7 @@ def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("/qualfiers")
+@router.post("/qualifiers")
 def create_qualifier(
     payload: schema.Qualifier,
     qualifies_array: List[str],
@@ -142,7 +140,6 @@ def create_qualifier(
             return Response(
                 status_code=status.HTTP_200_OK,
                 headers={
-                    "location": "/api/qualfiers/",
                     "content-type": "application/json",
                 },
                 content=json.dumps(qualifierp),
@@ -167,14 +164,13 @@ def create_qualifier(
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/qualifiers/{data_id}",
                 "content-type": "application/json",
             },
             content=json.dumps(qualifierp),
         )
 
 
-@router.patch("/qualfiers/{id}")
+@router.patch("/qualifiers/{id}")
 def update_qualifier(
     payload: schema.Qualifier, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
@@ -192,7 +188,7 @@ def update_qualifier(
     return "Updated Qualifier"
 
 
-@router.delete("/qualfiers/{id}")
+@router.delete("/qualifiers/{id}")
 def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Delete a qualifier by ID
@@ -209,7 +205,7 @@ def get_datasets(
     """
     Get a specific number of datasets
     """
-    return list_by_id(rdb.connect(), orm.Feature, page_size, page)
+    return list_by_id(rdb.connect(), orm.Dataset, page_size, page)
 
 
 @router.get("/{id}")
@@ -265,7 +261,6 @@ def update_dataset(
     return Response(
         status_code=status.HTTP_200_OK,
         headers={
-            "location": f"/api/datasets/{id}",
             "content-type": "application/json",
         },
         content=json.dumps(data_to_update, default=str),
