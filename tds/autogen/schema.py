@@ -13,6 +13,7 @@ class ResourceType(str, Enum):
     plans = 'plans'
     publications = 'publications'
     simulation_runs = 'simulation_runs'
+
     
 
 class RelationType(str, Enum):
@@ -38,6 +39,7 @@ class TaggableType(str, Enum):
     simulation_parameters = 'simulation_parameters'
     simulation_plans = 'simulation_plans'
     simulation_runs = 'simulation_runs'
+
     
 
 class ValueType(str, Enum):

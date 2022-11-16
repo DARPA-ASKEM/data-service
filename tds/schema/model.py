@@ -29,6 +29,7 @@ class Model(schema.Model):
     concept: Optional[Concept] = None
     parameters: ModelParameters = {}
 
+
     @classmethod
     def from_orm(cls, body: orm.Model, parameters: List[orm.ModelParameter]) -> "Model":
         """

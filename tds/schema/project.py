@@ -57,3 +57,17 @@ class ProjectMetadata(schema.Project):
                 "active": True,
             }
         }
+
+
+class ProjectMetadata(schema.Project):
+    concept: Optional[Concept] = None
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "name": "string",
+                "description": "string",
+                "status": "string",
+            }
+        }
