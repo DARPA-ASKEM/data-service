@@ -202,7 +202,7 @@ for folder in folders:
         headers = {"Content-Type": "application/json"}
 
         response = requests.request(
-            "POST", url + "intermediates", headers=headers, data=payload
+            "POST", url + "models/intermediates", headers=headers, data=payload
         )
         intermediate_json = response.json()
         intermediate_id = intermediate_json.get("id")
