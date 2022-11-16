@@ -13,7 +13,7 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
-from tds.db import request_rdb
+from tds.db import list_by_id, request_rdb
 from tds.lib.datasets import create_qualifier_xref
 
 logger = Logger(__file__)
@@ -22,16 +22,13 @@ router = APIRouter()
 
 
 @router.get("")
-def get_datasets(count: int, rdb: Engine = Depends(request_rdb)):
+def get_datasets(
+    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
+):
     """
     Get a specific number of datasets
     """
-    with Session(rdb) as session:
-        return list(
-            session.query(orm.Dataset)
-            .order_by(orm.Dataset.timestamp.asc())
-            .limit(count)
-        )
+    return list_by_id(rdb.connect(), orm.Feature, page_size, page)
 
 
 @router.get("/{id}")
@@ -139,14 +136,13 @@ def get_csv(id: int, rdb: Engine = Depends(request_rdb)):
 
 
 @router.get("/features")
-def get_features(count: int, rdb: Engine = Depends(request_rdb)):
+def get_features(
+    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
+):
     """
     Get a specified number of features
     """
-    with Session(rdb) as session:
-        result = session.query(orm.Feature).order_by(orm.Feature.id.asc()).limit(count)
-        result = result[::]
-        return result
+    return list_by_id(rdb.connect(), orm.Feature, page_size, page)
 
 
 @router.get("/features/{id}")
@@ -220,15 +216,14 @@ def delete_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         session.commit()
 
 
-@router.get("")
-def get_qualifiers(count: int, rdb: Engine = Depends(request_rdb)):
+@router.get("/qualifiers")
+def get_qualifiers(
+    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
+):
     """
     Get a specific number of qualifiers
     """
-    with Session(rdb) as session:
-        return list(
-            session.query(orm.Qualifier).order_by(orm.Qualifier.id.asc()).limit(count)
-        )
+    return list_by_id(rdb.connect(), orm.Qualifier, page_size, page)
 
 
 @router.get("/qualfiers/{id}")
