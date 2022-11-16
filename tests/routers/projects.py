@@ -13,18 +13,28 @@ def test_project_cru():
     Note: Deletion is not implemented because we wouldn't want to mess up the Provenance graph.
     """
     with demo_api("projects", "models") as client:
-        # Create initial models
+        # Preamble
+        payload = {"name": "dummy", "version": "v0", "semantics": ""}
+        framework = client.post(
+            "/models/frameworks",
+            json=payload,
+            headers={"Content-type": "application/json", "Accept": "text/plain"},
+        ).json()
+
+        ## Create initial models
         model1 = {
             "name": "Foo",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "{}",
             "parameters": {"x": ValueType.int},
+            "framework": framework,
         }
         model2 = {
             "name": "Foo2",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "[]",
             "parameters": {"y": ValueType.int},
+            "framework": framework,
         }
         model1_id = client.post(
             "/models",

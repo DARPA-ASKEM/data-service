@@ -42,32 +42,6 @@ def create_framework(
     return framework_payload.get("name")
 
 
-@router.post("/intermediates", **create.fastapi_endpoint_config)
-def create_intermediate(
-    payload: Intermediate, rdb: Engine = Depends(request_rdb)
-) -> Response:
-    """
-    Create intermediate and return its ID
-    """
-    with Session(rdb) as session:
-        intermediate_payload = payload.dict()
-        # pylint: disable-next=unused-variable
-        intermediate = orm.Intermediate(**intermediate_payload)
-        session.add(intermediate)
-        session.commit()
-        id: int = intermediate.id
-
-    logger.info("new model created: %i", id)
-    return Response(
-        status_code=status.HTTP_201_CREATED,
-        headers={
-            "location": f"/api/intermediate/{id}",
-            "content-type": "application/json",
-        },
-        content=json.dumps({"id": id}),
-    )
-
-
 @router.get("/frameworks/{name}", **retrieve.fastapi_endpoint_config)
 def get_framework(name: str, rdb: Engine = Depends(request_rdb)) -> ModelFramework:
     """
@@ -111,7 +85,7 @@ def get_intermediates(
     page_size: int = 50, page: int = 0, rdb: Engine = Depends(request_rdb)
 ):
     """
-    Get a count of persons
+    Get list of intermediates
     """
     with Session(rdb) as session:
         return (
@@ -135,6 +109,50 @@ def get_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Intermediat
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Intermediate.from_orm(intermediate)
+
+
+@router.post("/intermediates", **create.fastapi_endpoint_config)
+def create_intermediate(
+    payload: Intermediate, rdb: Engine = Depends(request_rdb)
+) -> Response:
+    """
+    Create intermediate and return its ID
+    """
+    with Session(rdb) as session:
+        intermediate_payload = payload.dict()
+        # pylint: disable-next=unused-variable
+        intermediate = orm.Intermediate(**intermediate_payload)
+        session.add(intermediate)
+        session.commit()
+        id: int = intermediate.id
+
+    logger.info("new model created: %i", id)
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "location": f"/api/intermediate/{id}",
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id}),
+    )
+
+
+@router.delete("/intermediates/{id}", **delete.fastapi_endpoint_config)
+def delete_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
+    """
+    Delete framework metadata
+    """
+    with Session(rdb) as session:
+        if entry_exists(rdb.connect(), orm.Intermediate, id):
+            intermediate = session.query(orm.Intermediate).get(id)
+            print(intermediate)
+            session.delete(intermediate)
+            session.commit()
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT,
+    )
 
 
 @router.get("")

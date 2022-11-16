@@ -14,16 +14,6 @@ def init_dev_content(connection: Connection):
     Initialize tables in the connected DB
     """
     orm.Base.metadata.create_all(connection)
-    with Session(connection) as session:
-        need_framework = session.query(orm.ModelFramework).first() is None
-        if need_framework:
-            framework = orm.ModelFramework(
-                name="dummy",
-                version="dummy",
-                semantics="dummy",
-            )
-            session.add(framework)
-        session.commit()
 
 
 def drop_content(connection: Connection):

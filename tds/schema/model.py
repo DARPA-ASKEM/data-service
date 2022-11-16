@@ -11,7 +11,6 @@ from tds.schema.concept import Concept
 
 class Model(schema.Model):
     concept: Optional[Concept] = None
-    framework = "dummy"  # TODO: Implement framework endpoints
     parameters: Dict[str, schema.ValueType] = {}
 
     @classmethod
@@ -31,6 +30,7 @@ class Model(schema.Model):
                 "description": "string",
                 "content": "json-as-string",
                 "parameters": {"string": "value-type"},
+                "framework": "string",
             }
         }
 
