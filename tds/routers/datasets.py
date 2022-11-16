@@ -5,7 +5,9 @@ router.datasets - crud operations for datasets and related tables in the DB
 import json
 from logging import DEBUG, Logger
 
+import requests
 from fastapi import APIRouter, Depends, Response, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -82,7 +84,7 @@ def update_dataset(
         data_to_update.update(data_payload)
         session.commit()
     return Response(
-        status_code=status.HTTP_201_CREATED,
+        status_code=status.HTTP_200_OK,
         headers={
             "location": f"/api/datasets/{id}",
             "content-type": "application/json",
@@ -114,3 +116,22 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
     with Session(rdb) as session:
         session.query(orm.Dataset).filter(orm.Dataset.id == id).delete()
         session.commit()
+
+
+@router.get("/{id}/download/csv")
+def get_csv(id: int, rdb: Engine = Depends(request_rdb)):
+    """
+    Gets the csv of an annotated dataset that is registered
+    via the data-annotation tool.
+    """
+    dataset = get_dataset(id=id, rdb=rdb)
+    data_paths = dataset.annotations["data_paths"]
+
+    response = requests.post(
+        "http://data-annotation-api:80/datasets/download/csv",
+        params={"data_path_list": data_paths},
+        stream=True,
+        timeout=15,
+    )
+
+    return StreamingResponse(response.raw, headers=response.headers)
