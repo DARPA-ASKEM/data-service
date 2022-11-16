@@ -1,5 +1,5 @@
 """
-tds.router.simulations - crud operations for plans and runs
+CRUD operations for plans and runs
 """
 
 from logging import Logger

@@ -74,7 +74,7 @@ def create_project(url=url):
 
 
 def create_framework(url=url):
-    path = "frameworks"
+    path = "models/frameworks"
 
     payload = json.dumps(
         {
@@ -133,7 +133,7 @@ for folder in folders:
 
         # return resource_id (a1)
         response = requests.request(
-            "POST", url + "publications", headers=headers, data=payload
+            "POST", url + "external/publications", headers=headers, data=payload
         )
         publication_json = response.json()
         publication_id = publication_json.get("id")
@@ -202,7 +202,7 @@ for folder in folders:
         headers = {"Content-Type": "application/json"}
 
         response = requests.request(
-            "POST", url + "intermediates", headers=headers, data=payload
+            "POST", url + "models/intermediates", headers=headers, data=payload
         )
         intermediate_json = response.json()
         intermediate_id = intermediate_json.get("id")
@@ -228,7 +228,7 @@ for folder in folders:
         headers = {"Content-Type": "application/json"}
 
         response = requests.request(
-            "POST", url + "intermediates", headers=headers, data=payload
+            "POST", url + "models/intermediates", headers=headers, data=payload
         )
         intermediate_json = response.json()
         intermediate_id = intermediate_json.get("id")

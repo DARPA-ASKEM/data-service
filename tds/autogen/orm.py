@@ -10,12 +10,12 @@ Base = declarative_base()
 
 class ResourceType(str, Enum):
 
-    dataset = 'dataset'
-    extracted_data = 'extracted_data'
-    intermediate = 'intermediate'
-    model = 'model'
-    plan = 'plan'
-    publication = 'publication'
+    datasets = 'datasets'
+    extractions = 'extractions'
+    intermediates = 'intermediates'
+    models = 'models'
+    plans = 'plans'
+    publications = 'publications'
     
 
 class RelationType(str, Enum):
@@ -30,11 +30,11 @@ class RelationType(str, Enum):
 
 class TaggableType(str, Enum):
 
-    dataset = 'dataset'
-    feature = 'feature'
-    model = 'model'
-    project = 'project'
-    simulation_plan = 'simulation_plan'
+    datasets = 'datasets'
+    features = 'features'
+    models = 'models'
+    projects = 'projects'
+    simulation_plans = 'simulation_plans'
     
 
 class ValueType(str, Enum):
@@ -204,9 +204,9 @@ class SimulationParameter(Base):
     type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class ExtractedData(Base):
+class Extraction(Base):
 
-    __tablename__ = 'extracted_data'
+    __tablename__ = 'extraction'
 
     id = sa.Column(sa.Integer(), primary_key=True)
     publication_id = sa.Column(sa.Integer(), sa.ForeignKey('publication.id'), nullable=False)

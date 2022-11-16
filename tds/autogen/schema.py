@@ -6,12 +6,12 @@ from pydantic import BaseModel, Json
 
 class ResourceType(str, Enum):
 
-    dataset = 'dataset'
-    extracted_data = 'extracted_data'
-    intermediate = 'intermediate'
-    model = 'model'
-    plan = 'plan'
-    publication = 'publication'
+    datasets = 'datasets'
+    extractions = 'extractions'
+    intermediates = 'intermediates'
+    models = 'models'
+    plans = 'plans'
+    publications = 'publications'
     
 
 class RelationType(str, Enum):
@@ -26,11 +26,11 @@ class RelationType(str, Enum):
 
 class TaggableType(str, Enum):
 
-    dataset = 'dataset'
-    feature = 'feature'
-    model = 'model'
-    project = 'project'
-    simulation_plan = 'simulation_plan'
+    datasets = 'datasets'
+    features = 'features'
+    models = 'models'
+    projects = 'projects'
+    simulation_plans = 'simulation_plans'
     
 
 class ValueType(str, Enum):
@@ -180,7 +180,7 @@ class SimulationParameter(BaseModel):
     type: ValueType
 
 
-class ExtractedData(BaseModel):
+class Extraction(BaseModel):
 
     id: Optional[int] = None
     publication_id: Optional[int] = None

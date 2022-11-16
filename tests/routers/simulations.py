@@ -1,5 +1,5 @@
 """
-tests.routers.simulations - tests basic sim functionality
+Tests basic sim functionality
 """
 
 from tds.autogen.schema import ValueType
@@ -13,12 +13,21 @@ def test_simulation_cr():
     Note: Deletion is not implemented because we wouldn't want to mess up the Provenance graph.
     """
     with demo_api("simulations", "models") as client:
-        # Create initial models
+        # Preamble
+        payload = {"name": "dummy", "version": "v0", "semantics": ""}
+        framework = client.post(
+            "/models/frameworks",
+            json=payload,
+            headers={"Content-type": "application/json", "Accept": "text/plain"},
+        ).json()
+
+        ## Create initial models
         model = {
             "name": "Foo",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "{}",
             "parameters": {"x": ValueType.int},
+            "framework": framework,
         }
         model_id = client.post(
             "/models",
@@ -32,6 +41,7 @@ def test_simulation_cr():
             "query": "string",
             "content": "{}",
             "parameters": {"x": ("1", ValueType.int)},
+            "framework": framework,
         }
         response_create = client.post(
             "/simulations/plans",
