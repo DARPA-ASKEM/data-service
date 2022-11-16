@@ -55,7 +55,6 @@ def create_concept(payload: schema.OntologyConcept, rdb: Engine = Depends(reques
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/concepts/{data_id}",
                 "content-type": "application/json",
             },
             content=json.dumps(conceptp),

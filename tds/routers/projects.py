@@ -107,7 +107,6 @@ def update_project(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Response(
         headers={
-            "location": f"/api/projects/{id}",
             "content-type": "application/json",
         },
         content=json.dumps({"id": id}),
@@ -169,7 +168,6 @@ def create_asset(
             return Response(
                 status_code=status.HTTP_201_CREATED,
                 headers={
-                    "location": f"/api/assets/{id}",
                     "content-type": "application/json",
                 },
                 content=json.dumps({"id": id}),

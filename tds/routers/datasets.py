@@ -61,7 +61,6 @@ def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/datasets/{data_id}",
                 "content-type": "application/json",
             },
             content=json.dumps(datasetp, default=str),

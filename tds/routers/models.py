@@ -130,7 +130,6 @@ def create_intermediate(
     return Response(
         status_code=status.HTTP_201_CREATED,
         headers={
-            "location": f"/api/intermediate/{id}",
             "content-type": "application/json",
         },
         content=json.dumps({"id": id}),
@@ -210,7 +209,6 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
     return Response(
         status_code=status.HTTP_201_CREATED,
         headers={
-            "location": f"/api/model/{id}",
             "content-type": "application/json",
         },
         content=json.dumps({"id": id}),
@@ -237,7 +235,6 @@ def update_model(
     return Response(
         status_code=status.HTTP_201_CREATED,
         headers={
-            "location": f"/api/model/{id}",
             "content-type": "application/json",
         },
         content=json.dumps({"id": new_id}),

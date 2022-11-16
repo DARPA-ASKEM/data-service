@@ -55,7 +55,6 @@ def create_association(payload: schema.Association, rdb: Engine = Depends(reques
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/associations/{data_id}",
                 "content-type": "application/json",
             },
             content=json.dumps(associationp),
@@ -126,7 +125,6 @@ def create_person(payload: schema.Person, rdb: Engine = Depends(request_rdb)):
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/persons/{data_id}",
                 "content-type": "application/json",
             },
             content=json.dumps(personp),
