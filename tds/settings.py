@@ -4,7 +4,7 @@ Configures data store using environment variables
 from pydantic import BaseSettings
 
 
-class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
+class Settings(BaseSettings):
     """
     Data store configuration
     """
@@ -16,6 +16,9 @@ class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
     SQL_PORT: int = 8032
     SQL_USER: str = "dev"
     SQL_PASSWORD: str = "dev"
+    DKG_URL = "http://34.230.33.149"
+    DKG_API_PORT = 8771
+    DKG_DESC_PORT = 8772
 
 
 settings = Settings()
