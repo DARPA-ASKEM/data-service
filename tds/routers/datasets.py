@@ -48,7 +48,6 @@ def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
     """
     Create a feature
     """
-
     with Session(rdb) as session:
         featurep = payload.dict()
         del featurep["id"]
