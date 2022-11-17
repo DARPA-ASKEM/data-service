@@ -1,32 +1,64 @@
 """
-router.concepts - crud operations for concepts and related tables in the DB
+CRUD operations for concepts and related tables in the DB
 """
 
 import json
 from logging import Logger
+from urllib.parse import quote_plus
 
+import requests
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
 from tds.db import request_rdb
+from tds.settings import settings
 
 logger = Logger(__file__)
 router = APIRouter()
 
 
 @router.get("")
-def get_concepts(count: int, rdb: Engine = Depends(request_rdb)):
+def search_concept(term: str, limit: int = 100, offset: int = 0):
     """
-    Get a specific number of concepts
+    Wraps search functionality from the DKG.
     """
-    with Session(rdb) as session:
-        return list(
-            session.query(orm.OntologyConcept)
-            .order_by(orm.OntologyConcept.id.asc())
-            .limit(count)
-        )
+    headers = {"accept": "application/json", "Content-Type": "application/json"}
+    base_url = settings.DKG_URL + ":" + str(settings.DKG_API_PORT)
+    params = f"api/search?q={term}&limit={limit}&offset={offset}"
+    url = f"{base_url}/{params}"
+    logger.info("Sending data to %s", url)
+
+    response = requests.get(url, headers=headers, timeout=5)
+    logger.debug("response: %s", response)
+    logger.debug("response reason: %s", response.raw.reason)
+
+    if response.status_code == 200:
+        return json.loads(response.content.decode("utf8"))
+    logger.debug("Failed to fetch ontologies: %s", response)
+    raise Exception(f"DKG server returned the status {response.status_code}")
+
+
+@router.get("/definition/{curie}")
+def get_concept_definition(curie: str):
+    """
+    Wraps fetch functionality from the DKG.
+    """
+    headers = {"accept": "application/json", "Content-Type": "application/json"}
+    base_url = settings.DKG_URL + ":" + str(settings.DKG_API_PORT)
+    params = f"api/entity/{quote_plus(curie)}"
+    url = f"{base_url}/{params}"
+    logger.info("Sending data to %s", url)
+
+    response = requests.get(url, headers=headers, timeout=5)
+    logger.debug("response: %s", response)
+    logger.debug("response reason: %s", response.raw.reason)
+
+    if response.status_code == 200:
+        return json.loads(response.content.decode("utf8"))
+    logger.debug("Failed to fetch ontologies: %s", response)
+    raise Exception("DKG server returned the status {response.status_code}")
 
 
 @router.get("/{id}")
@@ -55,7 +87,6 @@ def create_concept(payload: schema.OntologyConcept, rdb: Engine = Depends(reques
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
-                "location": f"/api/concepts/{data_id}",
                 "content-type": "application/json",
             },
             content=json.dumps(conceptp),

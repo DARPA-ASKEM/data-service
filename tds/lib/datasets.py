@@ -1,5 +1,5 @@
 """
-tds.lib.qualifers - qualifer specific logic
+Qualifer specific logic
 """
 
 import json

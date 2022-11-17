@@ -1,5 +1,5 @@
 """
-tds.operation.deletion - standard objects to use for deletion operations
+Standard objects to use for deletion operations
 """
 
 fastapi_endpoint_config = {

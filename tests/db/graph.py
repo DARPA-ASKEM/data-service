@@ -1,5 +1,5 @@
 """
-tests.relation.provenance - Test provenance wrapper
+Test provenance wrapper
 """
 from tds.autogen.schema import (
     IntermediateFormat,
@@ -24,8 +24,8 @@ def test_relation_handler_rdb_only():
         publication = Publication(id=0, xdd_uri="https://")
 
         # NOTE: Should these two asserts be their own test?
-        assert get_resource_type(intermediate) == ResourceType.intermediate
-        assert get_resource_type(publication) == ResourceType.publication
+        assert get_resource_type(intermediate) == ResourceType.intermediates
+        assert get_resource_type(publication) == ResourceType.publications
 
         id = relation_handler.create(
             intermediate, publication, RelationType.derivedfrom

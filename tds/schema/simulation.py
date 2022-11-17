@@ -1,5 +1,5 @@
 """
-tds.schema.simulations - API schema for simulation objects
+API schema for simulation objects
 """
 # pylint: disable=missing-class-docstring
 

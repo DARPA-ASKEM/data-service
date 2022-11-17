@@ -1,5 +1,5 @@
 """
-tds.schema.model - Provides the API interface for models.
+Provides the API interface for models.
 """
 # pylint: disable=missing-class-docstring
 from json import dumps
@@ -11,7 +11,6 @@ from tds.schema.concept import Concept
 
 class Model(schema.Model):
     concept: Optional[Concept] = None
-    framework = "dummy"  # TODO: Implement framework endpoints
     parameters: Dict[str, schema.ValueType] = {}
 
     @classmethod
@@ -31,5 +30,16 @@ class Model(schema.Model):
                 "description": "string",
                 "content": "json-as-string",
                 "parameters": {"string": "value-type"},
+                "framework": "string",
             }
         }
+
+
+class ModelFramework(schema.ModelFramework):
+    class Config:
+        orm_mode = True
+
+
+class Intermediate(schema.Intermediate):
+    class Config:
+        orm_mode = True

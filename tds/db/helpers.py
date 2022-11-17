@@ -1,5 +1,5 @@
 """
-tds.db.helpers - Easy initialization and deletion of db content
+Easy initialization and deletion of db content
 """
 from typing import Any
 
@@ -14,16 +14,6 @@ def init_dev_content(connection: Connection):
     Initialize tables in the connected DB
     """
     orm.Base.metadata.create_all(connection)
-    with Session(connection) as session:
-        need_framework = session.query(orm.ModelFramework).first() is None
-        if need_framework:
-            framework = orm.ModelFramework(
-                name="dummy",
-                version="dummy",
-                semantics="dummy",
-            )
-            session.add(framework)
-        session.commit()
 
 
 def drop_content(connection: Connection):
@@ -39,3 +29,17 @@ def entry_exists(connection: Connection, orm_type: Any, id: int) -> bool:
     """
     with Session(connection) as session:
         return session.query(orm_type).filter(orm_type.id == id).count() == 1
+
+
+def list_by_id(connection: Connection, orm_type: Any, page_size: int, page: int = 0):
+    """
+    Page through table using given ORM
+    """
+    with Session(connection) as session:
+        return (
+            session.query(orm_type)
+            .order_by(orm_type.id.asc())
+            .limit(page_size)
+            .offset(page)
+            .all()
+        )

@@ -1,5 +1,5 @@
 """
-tests.main - A basic healthcheck
+A basic healthcheck
 """
 
 from dbml_builder import get_dbml_version

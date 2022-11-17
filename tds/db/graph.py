@@ -1,5 +1,5 @@
 """
-tds.relation.provenance - Handler for object relations
+Handler for object relations
 """
 
 from typing import Optional
@@ -13,7 +13,7 @@ from tds.autogen.schema import RelationType
 from tds.db.relational import request_engine as request_rdb
 from tds.db.relational import request_graph_engine
 from tds.schema.provenance import Provenance
-from tds.schema.resource import ResourceType, get_resource_type
+from tds.schema.resource import ResourceType
 
 
 class ProvenanceHandler:
@@ -54,6 +54,7 @@ class ProvenanceHandler:
                 session.add(provenance)
                 session.commit()
                 id: int = provenance.id
+
             if self.graph_cache_enabled:
                 self.create_node_relationship(provenance_payload=provenance_payload)
 
@@ -109,8 +110,6 @@ class ProvenanceHandler:
             print(results)
 
     def create_node_relationship(self, provenance_payload):
-        print("hereere")
-        print(provenance_payload)
         with self.neo_engine.session() as session:
 
             # if node 1 is not created yet create node

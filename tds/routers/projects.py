@@ -1,5 +1,5 @@
 """
-tds.router.projects - crud operations for projects
+CRUD operations for projects
 """
 
 import json
@@ -11,10 +11,10 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
-from tds.db import entry_exists, request_rdb
+from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, retrieve, update
-from tds.schema.project import Asset, Project
+from tds.schema.project import Asset, Project, ProjectMetadata
 from tds.schema.resource import ResourceType, get_resource_orm
 
 logger = Logger(__name__)
@@ -22,18 +22,13 @@ router = APIRouter()
 
 
 @router.get("")
-def list_projects(rdb: Engine = Depends(request_rdb)) -> List[Project]:
+def list_projects(
+    page_size: int = 50, page: int = 0, rdb: Engine = Depends(request_rdb)
+) -> List[ProjectMetadata]:
     """
     Retrieve all projects
     """
-    results = []
-    with Session(rdb) as session:
-        for entry in session.query(orm.Project).all():
-            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
-                orm.ProjectAsset.resource_id == entry.id
-            )
-            results.append(Project.from_orm(entry, list(assets)))
-    return results
+    return list_by_id(rdb.connect(), orm.Project, page_size, page)
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
@@ -94,7 +89,7 @@ def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> Resp
 @router.post("/{id}", **update.fastapi_endpoint_config)
 def update_project(
     id: int, payload: Project, rdb: Engine = Depends(request_rdb)
-) -> int:
+) -> Response:
     """
     Update project
     """
@@ -111,7 +106,12 @@ def update_project(
             session.commit()
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return id
+    return Response(
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id}),
+    )
 
 
 @router.get(
@@ -169,7 +169,6 @@ def create_asset(
             return Response(
                 status_code=status.HTTP_201_CREATED,
                 headers={
-                    "location": f"/api/assets/{id}",
                     "content-type": "application/json",
                 },
                 content=json.dumps({"id": id}),
