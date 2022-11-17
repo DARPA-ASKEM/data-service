@@ -28,8 +28,10 @@ class TaggableType(str, Enum):
 
     datasets = 'datasets'
     features = 'features'
+    model_parameters = 'model_parameters'
     models = 'models'
     projects = 'projects'
+    qualifiers = 'qualifiers'
     simulation_plans = 'simulation_plans'
     
 
@@ -81,6 +83,12 @@ class Direction(str, Enum):
 
     input = 'input'
     output = 'output'
+    
+
+class Status(str, Enum):
+
+    active = 'active'
+    inactive = 'inactive'
     
 
 class QualifierXref(BaseModel):
@@ -169,12 +177,13 @@ class ModelParameter(BaseModel):
     model_id: Optional[int] = None
     name: str
     type: ValueType
+    default_value: Optional[str]
 
 
 class SimulationParameter(BaseModel):
 
     id: Optional[int] = None
-    plan_id: Optional[int] = None
+    run_id: Optional[int] = None
     name: str
     value: str
     type: ValueType
@@ -255,7 +264,7 @@ class Project(BaseModel):
     name: str
     description: str
     timestamp: Optional[datetime.datetime] = datetime.datetime.now()
-    status: str
+    status: Status
 
 
 class OntologyConcept(BaseModel):

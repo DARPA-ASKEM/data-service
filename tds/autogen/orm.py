@@ -32,8 +32,10 @@ class TaggableType(str, Enum):
 
     datasets = 'datasets'
     features = 'features'
+    model_parameters = 'model_parameters'
     models = 'models'
     projects = 'projects'
+    qualifiers = 'qualifiers'
     simulation_plans = 'simulation_plans'
     
 
@@ -85,6 +87,12 @@ class Direction(str, Enum):
 
     input = 'input'
     output = 'output'
+    
+
+class Status(str, Enum):
+
+    active = 'active'
+    inactive = 'inactive'
     
 
 class QualifierXref(Base):
@@ -191,6 +199,7 @@ class ModelParameter(Base):
     model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
     name = sa.Column(sa.String(), nullable=False)
     type = sa.Column(sa.Enum(ValueType), nullable=False)
+    default_value = sa.Column(sa.String())
 
 
 class SimulationParameter(Base):
@@ -198,7 +207,7 @@ class SimulationParameter(Base):
     __tablename__ = 'simulation_parameter'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    plan_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_plan.id'), nullable=False)
+    run_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_run.id'), nullable=False)
     name = sa.Column(sa.String(), nullable=False)
     value = sa.Column(sa.String(), nullable=False)
     type = sa.Column(sa.Enum(ValueType), nullable=False)
@@ -297,7 +306,7 @@ class Project(Base):
     name = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.String(), nullable=False)
     timestamp = sa.Column(sa.DateTime(), server_default=func.now())
-    status = sa.Column(sa.String(), nullable=False)
+    status = sa.Column(sa.Enum(Status), nullable=False)
 
 
 class OntologyConcept(Base):

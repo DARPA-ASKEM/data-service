@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v2'
+  Note: 'v3'
 }
 
 Enum public.resource_type {
@@ -23,9 +23,11 @@ Enum relation_type {
 
 Enum taggable_type {
    features
+   qualifiers
    datasets
    simulation_plans
    models
+   model_parameters
    projects
 }
 
@@ -70,6 +72,11 @@ Enum extracted_type {
 Enum direction {
   input
   output
+}
+
+Enum status {
+  active
+  inactive
 }
 
 Table dataset {
@@ -170,12 +177,13 @@ Table model_parameter {
   model_id int [ref: > model.id, not null]
   name varchar [not null]
   type value_type [not null]
+  default_value varchar
 }
 
 
 Table simulation_parameter {
   id int [pk]
-  plan_id int [ref: > simulation_plan.id, not null]
+  run_id int [ref: > simulation_run.id, not null]
   name varchar [not null]
   value varchar [not null]
   type value_type [not null]
@@ -199,7 +207,7 @@ Table project {
   name varchar [not null]
   description varchar [not null]
   timestamp datetime [default: `now()`]
-  status varchar [not null]
+  status status [not null]
 }
 
 Table project_asset {
@@ -245,4 +253,3 @@ Table association {
   resource_type public.resource_type
   role public.role
 }
-
