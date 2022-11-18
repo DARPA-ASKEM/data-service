@@ -16,6 +16,7 @@ class Asset(schema.ProjectAsset):
 
 class Project(schema.Project):
     concept: Optional[Concept] = None
+    active = True
     assets: Dict[schema.ResourceType, Set[int]] = {}
 
     @classmethod
@@ -39,7 +40,7 @@ class Project(schema.Project):
                 "name": "string",
                 "description": "string",
                 "assets": {"resource-type": "list-of-ordered-ints"},
-                "status": "string",
+                "active": "bool",
             }
         }
 

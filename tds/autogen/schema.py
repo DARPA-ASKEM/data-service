@@ -85,12 +85,6 @@ class Direction(str, Enum):
     output = 'output'
     
 
-class Status(str, Enum):
-
-    active = 'active'
-    inactive = 'inactive'
-    
-
 class QualifierXref(BaseModel):
 
     id: Optional[int] = None
@@ -167,7 +161,7 @@ class SimulationRun(BaseModel):
     simulator_id: Optional[int] = None
     timestamp: datetime.datetime = datetime.datetime.now()
     completed_at: Optional[datetime.datetime]
-    success: Optional[bool] = True
+    success: Optional[bool]
     response: Optional[bytes]
 
 
@@ -264,13 +258,13 @@ class Project(BaseModel):
     name: str
     description: str
     timestamp: Optional[datetime.datetime] = datetime.datetime.now()
-    status: Status
+    active: bool
 
 
 class OntologyConcept(BaseModel):
 
     id: Optional[int] = None
-    term_id: str
+    curie: str
     type: TaggableType
     obj_id: Optional[int] = None
     status: OntologicalField

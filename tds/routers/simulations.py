@@ -12,7 +12,7 @@ from sqlalchemy.orm import Query, Session
 from tds.autogen import orm
 from tds.db import entry_exists, request_rdb
 from tds.operation import create, delete, retrieve
-from tds.schema.simulation import Plan, Results
+from tds.schema.simulation import Plan, Run
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -23,14 +23,14 @@ def list_plans(rdb: Engine = Depends(request_rdb)) -> List[Plan]:
     """
     Retrieve all plans
     """
-    results = []
+    run = []
     with Session(rdb) as session:
         for entry in session.query(orm.SimulationPlan).all():
             parameters: Query[orm.SimulationParameter] = session.query(
                 orm.SimulationParameter
             ).filter(orm.SimulationParameter.plan_id == entry.id)
-            results.append(Plan.from_orm(entry, list(parameters)))
-    return results
+            run.append(Plan.from_orm(entry, list(parameters)))
+    return run
 
 
 @router.get("/plans/{id}", **retrieve.fastapi_endpoint_config)
@@ -73,17 +73,17 @@ def create_plan(payload: Plan, rdb: Engine = Depends(request_rdb)) -> int:
     return id
 
 
-@router.get("/results", **retrieve.fastapi_endpoint_config)
-def list_results(rdb: Engine = Depends(request_rdb)) -> List[Plan]:
+@router.get("/run", **retrieve.fastapi_endpoint_config)
+def list_runs(rdb: Engine = Depends(request_rdb)) -> List[Plan]:
     """
-    Retrieve all simulation results for all plans
+    Retrieve all simulation run for all plans
     """
     with Session(rdb) as session:
         return list(session.query(orm.SimulationRun).all())
 
 
-@router.get("/results/{id}", **retrieve.fastapi_endpoint_config)
-def get_results(id: int, rdb: Engine = Depends(request_rdb)) -> Results:
+@router.get("/run/description/{id}", **retrieve.fastapi_endpoint_config)
+def get_run_descriptoin(id: int, rdb: Engine = Depends(request_rdb)) -> Run:
     """
     Retrieve software metadata
     """
@@ -92,27 +92,27 @@ def get_results(id: int, rdb: Engine = Depends(request_rdb)) -> Results:
             session.query(orm.SimulationRun).filter(orm.SimulationRun.id == id).count()
             == 1
         ):
-            return Results.from_orm(session.query(orm.SimulationRun).get(id))
+            return Run.from_orm(session.query(orm.SimulationRun).get(id))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.post("/results", **create.fastapi_endpoint_config)
-def create_results(payload: Results, rdb: Engine = Depends(request_rdb)) -> int:
+@router.post("/run/verbose", **create.fastapi_endpoint_config)
+def create_verbose_run(payload: Run, rdb: Engine = Depends(request_rdb)) -> int:
     """
     Create software metadata
     """
     with Session(rdb) as session:
-        results_payload = payload.dict()
-        results = orm.SimulationRun(**results_payload)
-        session.add(results)
+        run_payload = payload.dict()
+        run = orm.SimulationRun(**run_payload)
+        session.add(run)
         session.commit()
-        id: int = results.id
+        id: int = run.id
     logger.info("new software with %i", id)
     return id
 
 
-@router.delete("/results/{id}", **delete.fastapi_endpoint_config)
-def delete_results(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
+@router.delete("/run/verbose/{id}", **delete.fastapi_endpoint_config)
+def delete_verbose_run(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
     """
     Delete software metadata
     """
@@ -121,8 +121,57 @@ def delete_results(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
             session.query(orm.SimulationRun).filter(orm.SimulationRun.id == id).count()
             == 1
         ):
-            results = session.query(orm.SimulationRun).get(id)
-            session.delete(results)
+            run = session.query(orm.SimulationRun).get(id)
+            session.delete(run)
+            session.commit()
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT,
+    )
+
+
+@router.get("/run/{id}", **retrieve.fastapi_endpoint_config)
+def get_run(id: int, rdb: Engine = Depends(request_rdb)) -> Run:
+    """
+    Retrieve software metadata
+    """
+    with Session(rdb) as session:
+        if (
+            session.query(orm.SimulationRun).filter(orm.SimulationRun.id == id).count()
+            == 1
+        ):
+            return Run.from_orm(session.query(orm.SimulationRun).get(id))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@router.post("/run", **create.fastapi_endpoint_config)
+def create_run(payload: Run, rdb: Engine = Depends(request_rdb)) -> int:
+    """
+    Create software metadata
+    """
+    with Session(rdb) as session:
+        run_payload = payload.dict()
+        run = orm.SimulationRun(**run_payload)
+        session.add(run)
+        session.commit()
+        id: int = run.id
+    logger.info("new software with %i", id)
+    return id
+
+
+@router.delete("/run/{id}", **delete.fastapi_endpoint_config)
+def delete_run(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
+    """
+    Delete software metadata
+    """
+    with Session(rdb) as session:
+        if (
+            session.query(orm.SimulationRun).filter(orm.SimulationRun.id == id).count()
+            == 1
+        ):
+            run = session.query(orm.SimulationRun).get(id)
+            session.delete(run)
             session.commit()
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
