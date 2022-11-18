@@ -9,7 +9,7 @@ from urllib.parse import quote_plus
 import requests
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Session, noload
+from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
 from tds.db import request_rdb
@@ -97,7 +97,6 @@ def create_concept(payload: schema.OntologyConcept, rdb: Engine = Depends(reques
     """
     with Session(rdb) as session:
         concept = payload.dict()
-        # del conceptp["id"]
         concept_ = orm.OntologyConcept(**concept)
         session.add(concept_)
         session.commit()
