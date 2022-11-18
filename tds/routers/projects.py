@@ -50,7 +50,7 @@ def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
 @router.delete("/{id}", **retrieve.fastapi_endpoint_config)
 def deactivate_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
     """
-    Retrieve project
+    Deactivate project
     """
     if entry_exists(rdb.connect(), orm.Project, id):
         with Session(rdb) as session:
