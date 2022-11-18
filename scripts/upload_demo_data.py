@@ -1,5 +1,6 @@
 import glob
 import json
+import random
 import shutil
 import time
 import xml.etree.ElementTree as ET
@@ -101,6 +102,31 @@ create_framework()
 folders = glob.glob("experiments-main/thin-thread-examples/biomodels/BIOMD*/")
 
 
+def add_concept(object_id, type):
+    concepts = ["covid", "research", "sir"]
+    index = random.randrange(2)
+    term = concepts[index]
+    print(term)
+    payload = json.dumps(
+        {
+            "curie": str(term),
+            "type": str(type),
+            "object_id": int(object_id),
+            "status": "obj",
+        }
+    )
+    print(payload)
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.request(
+        "POST",
+        url + f"concepts",
+        headers=headers,
+        data=payload,
+    )
+    print(response.text)
+
+
 def asset_to_project(project_id, asset_id, asset_type):
     payload = json.dumps(
         {
@@ -142,12 +168,33 @@ def add_provenance(left, right, relation_type, user_id):
     print(response)
 
 
-def add_concept():
-    print("add concept")
+def add_concept(concept, object_id, type):
 
+    payload = json.dumps(
+        {
+            "curie": str(concept),
+            "type": str(type),
+            "object_id": int(object_id),
+            "status": "obj",
+        }
+    )
+    print(payload)
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.request(
+        "POST",
+        url + f"concepts",
+        headers=headers,
+        data=payload,
+    )
+    print(response.text)
+
+
+concepts = ["covid", "research", "sir"]
 
 for folder in folders:
-
+    index = random.randrange(2)
+    concept = concepts[index]
     # publications ##
     try:
         print("Upload publication")
@@ -167,6 +214,8 @@ for folder in folders:
         asset_to_project(
             project_id=1, asset_id=int(publication_id), asset_type="publications"
         )
+
+        add_concept(concept=concept, object_id=publication_id, type="publications")
     except Exception as e:
         print(f"error opening {folder}document_doi.txt . - {e}")
 
@@ -202,6 +251,10 @@ for folder in folders:
             user_id=person_id,
         )
 
+        add_concept(
+            concept=concept, object_id=intermediate_mmt_id, type="intermediates"
+        )
+
     except Exception as e:
         print(e)
 
@@ -231,6 +284,10 @@ for folder in folders:
             right={"id": intermediate_mmt_id, "resource_type": "intermediates"},
             relation_type="derivedfrom",
             user_id=person_id,
+        )
+
+        add_concept(
+            concept=concept, object_id=intermediate_sbml_id, type="intermediates"
         )
 
     except Exception as e:
@@ -283,6 +340,8 @@ for folder in folders:
             user_id=person_id,
         )
 
+        add_concept(concept=concept, object_id=model_id, type="models")
+
     except Exception as e:
         print(f" {e}")
 
@@ -311,6 +370,7 @@ for folder in folders:
         response = requests.request("POST", url + path, headers=headers, data=payload)
         sim_plan_json = response.json()
         simulation_plan_id = sim_plan_json.get("id")
+
         asset_to_project(
             project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
         )
@@ -321,6 +381,8 @@ for folder in folders:
             right={"id": model_id, "resource_type": "models"},
             user_id=person_id,
         )
+
+        add_concept(concept=concept, object_id=intermediate_sbml_id, type="plans")
 
     except Exception as e:
         print(f" {e}")
@@ -351,6 +413,7 @@ for folder in folders:
         response = requests.request("POST", url + path, headers=headers, data=payload)
         sim_plan_json = response.json()
         simulation_plan_id = sim_plan_json.get("id")
+
         asset_to_project(
             project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
         )

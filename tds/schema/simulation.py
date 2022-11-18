@@ -13,21 +13,13 @@ from tds.schema.concept import Concept
 
 class Plan(SimulationPlan):
     concept: Optional[Concept] = None
-    parameters: Dict[str, Tuple[str, schema.ValueType]] = {}
 
     @classmethod
-    def from_orm(
-        cls, body: orm.SimulationPlan, parameters: List[orm.ModelParameter]
-    ) -> "Plan":
+    def from_orm(cls, body: orm.SimulationRun) -> "Plan":
         """
         Handle ORM conversion while coercing `dict` to JSON
         """
         setattr(body, "content", dumps(body.content))
-        setattr(
-            body,
-            "parameters",
-            {param.name: (param.value, param.type) for param in parameters},
-        )
         return super().from_orm(body)
 
     class Config:
@@ -39,11 +31,36 @@ class Plan(SimulationPlan):
                 "model_id": "int",
                 "query": "string",
                 "content": "json-in-string",
-                "parameters": {"str": ("str", "value-type")},
             }
         }
 
 
-class Results(SimulationRun):
+class Run(SimulationRun):
+    success = True
+    parameters: Dict[str, Tuple[str, schema.ValueType]] = {}
+
+    @classmethod
+    def from_orm(
+        cls, body: orm.SimulationRun, parameters: List[orm.SimulationParameter]
+    ) -> "Run":
+        """
+        Handle ORM conversion while including parameters
+        """
+        setattr(
+            body,
+            "parameters",
+            {param.name: (param.value, param.type) for param in parameters},
+        )
+        return super().from_orm(body)
+
     class Config:
         orm_mode = True
+        schema_extra = {
+            "example": {
+                "simulator_id": 0,
+                "timestamp": "datetime",
+                "completed_at": "optional-datetime",
+                "response": "blob",
+                "parameters": {"str": ("str", "value-type")},
+            }
+        }

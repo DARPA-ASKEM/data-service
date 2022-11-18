@@ -1,4 +1,5 @@
 """
+
 router.provenance - very basic crud operations for provenance
 
 """
@@ -62,7 +63,7 @@ def create_provenance(
 @router.delete("/{id}", **delete.fastapi_endpoint_config)
 def delete_provenance(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
     """
-    Delete software metadata
+    Delete provenance metadata
     """
     with Session(rdb) as session:
         if session.query(orm.Provenance).filter(orm.Provenance.id == id).count() == 1:

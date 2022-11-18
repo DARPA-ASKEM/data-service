@@ -16,6 +16,7 @@ class Asset(schema.ProjectAsset):
 
 class Project(schema.Project):
     concept: Optional[Concept] = None
+    active = True
     assets: Dict[schema.ResourceType, Set[int]] = {}
 
     @classmethod
@@ -39,6 +40,20 @@ class Project(schema.Project):
                 "name": "string",
                 "description": "string",
                 "assets": {"resource-type": "list-of-ordered-ints"},
+                "active": "bool",
+            }
+        }
+
+
+class ProjectMetadata(schema.Project):
+    concept: Optional[Concept] = None
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "name": "string",
+                "description": "string",
                 "status": "string",
             }
         }
