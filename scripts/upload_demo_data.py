@@ -1,5 +1,6 @@
 import glob
 import json
+import random
 import shutil
 import time
 import xml.etree.ElementTree as ET
@@ -100,6 +101,31 @@ create_framework()
 folders = glob.glob("experiments-main/thin-thread-examples/biomodels/BIOMD*/")
 
 
+def add_concept(object_id, type):
+    concepts = ["covid", "research", "sir"]
+    index = random.randrange(2)
+    term = concepts[index]
+    print(term)
+    payload = json.dumps(
+        {
+            "term_id": str(term),
+            "type": str(type),
+            "obj_id": int(object_id),
+            "status": "obj",
+        }
+    )
+    print(payload)
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.request(
+        "POST",
+        url + f"concepts",
+        headers=headers,
+        data=payload,
+    )
+    print(response.text)
+
+
 def asset_to_project(project_id, asset_id, asset_type):
     payload = json.dumps(
         {
@@ -140,6 +166,8 @@ for folder in folders:
         asset_to_project(
             project_id=1, asset_id=int(publication_id), asset_type="publication"
         )
+
+        add_concept(object_id=publication_id, type="publications")
     except Exception as e:
         print(f"error opening {folder}document_doi.txt . - {e}")
 

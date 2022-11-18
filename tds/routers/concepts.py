@@ -9,7 +9,7 @@ from urllib.parse import quote_plus
 import requests
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, noload
 
 from tds.autogen import orm, schema
 from tds.db import request_rdb
@@ -20,6 +20,26 @@ router = APIRouter()
 
 
 @router.get("")
+def search_concept(term: str, rdb: Engine = Depends(request_rdb)):
+    """
+    Searches within TDS for artifacts with this concept term associated with them
+    """
+    results = []
+    with Session(rdb) as session:
+        result_list = (
+            session.query(orm.OntologyConcept)
+            .filter(orm.OntologyConcept.term_id == term)
+            .all()
+        )
+
+    for result in result_list:
+        print(result)
+        result.__dict__.pop("id")
+        results.append(result)
+    return results
+
+
+@router.get("/definition")
 def search_concept(term: str, limit: int = 100, offset: int = 0):
     """
     Wraps search functionality from the DKG.
@@ -77,19 +97,17 @@ def create_concept(payload: schema.OntologyConcept, rdb: Engine = Depends(reques
     Create a concept
     """
     with Session(rdb) as session:
-        conceptp = payload.dict()
-        del conceptp["id"]
-        concept = orm.OntologyConcept(**conceptp)
-        session.add(concept)
+        concept = payload.dict()
+        # del conceptp["id"]
+        concept_ = orm.OntologyConcept(**concept)
+        session.add(concept_)
         session.commit()
-        data_id = concept.id
-        conceptp["id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
                 "content-type": "application/json",
             },
-            content=json.dumps(conceptp),
+            content=json.dumps({"id": concept_.id}),
         )
 
 

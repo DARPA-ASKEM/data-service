@@ -29,6 +29,7 @@ Enum taggable_type {
    models
    model_parameters
    projects
+   publications
 }
 
 Enum value_type {

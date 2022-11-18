@@ -35,6 +35,7 @@ class TaggableType(str, Enum):
     model_parameters = 'model_parameters'
     models = 'models'
     projects = 'projects'
+    publications = 'publications'
     qualifiers = 'qualifiers'
     simulation_plans = 'simulation_plans'
     
