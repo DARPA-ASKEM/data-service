@@ -20,7 +20,7 @@ router = APIRouter()
 
 
 @router.get("")
-def search_concept(term: str, rdb: Engine = Depends(request_rdb)):
+def search_concept(curie: str, rdb: Engine = Depends(request_rdb)):
     """
     Searches within TDS for artifacts with this concept term associated with them
     """
@@ -28,12 +28,11 @@ def search_concept(term: str, rdb: Engine = Depends(request_rdb)):
     with Session(rdb) as session:
         result_list = (
             session.query(orm.OntologyConcept)
-            .filter(orm.OntologyConcept.term_id == term)
+            .filter(orm.OntologyConcept.curie == curie)
             .all()
         )
 
     for result in result_list:
-        print(result)
         result.__dict__.pop("id")
         results.append(result)
     return results
