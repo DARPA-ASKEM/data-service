@@ -108,9 +108,9 @@ def add_concept(object_id, type):
     print(term)
     payload = json.dumps(
         {
-            "term_id": str(term),
+            "curie": str(term),
             "type": str(type),
-            "obj_id": int(object_id),
+            "object_id": int(object_id),
             "status": "obj",
         }
     )

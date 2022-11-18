@@ -36,7 +36,7 @@ class Plan(SimulationPlan):
 
 
 class Run(SimulationRun):
-    success = None
+    success = True
     parameters: Dict[str, Tuple[str, schema.ValueType]] = {}
 
     @classmethod
