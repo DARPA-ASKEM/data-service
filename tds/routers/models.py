@@ -19,8 +19,16 @@ from tds.db import (
     request_provenance_handler,
     request_rdb,
 )
+from tds.lib.models import adjust_model_params
 from tds.operation import create, delete, retrieve, update
-from tds.schema.model import Intermediate, Model, ModelDescription, ModelFramework
+from tds.schema.model import (
+    Intermediate,
+    Model,
+    ModelDescription,
+    ModelFramework,
+    ModelParameters,
+    orm_to_params,
+)
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -152,7 +160,9 @@ def list_model_descriptions(
 
 
 @router.get("/descriptions/{id}", **retrieve.fastapi_endpoint_config)
-def get_model_description(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
+def get_model_description(
+    id: int, rdb: Engine = Depends(request_rdb)
+) -> ModelDescription:
     """
     Retrieve model
     """
@@ -162,6 +172,41 @@ def get_model_description(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return ModelDescription.from_orm(model)
+
+
+@router.get("/parameters/{id}", **retrieve.fastapi_endpoint_config)
+def get_model_parameters(
+    id: int, rdb: Engine = Depends(request_rdb)
+) -> ModelParameters:
+    """
+    Retrieve model
+    """
+    if entry_exists(rdb.connect(), orm.Model, id):
+        with Session(rdb) as session:
+            parameters: Query[orm.ModelParameter] = session.query(
+                orm.ModelParameter
+            ).filter(orm.ModelParameter.model_id == id)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return orm_to_params(list(parameters))
+
+
+@router.put("/parameters/{id}", **update.fastapi_endpoint_config)
+def update_run_parameters(
+    payload: ModelParameters, id: int, rdb: Engine = Depends(request_rdb)
+) -> Response:
+    """
+    Update the parameters for a run
+    """
+    with Session(rdb) as session:
+        adjust_model_params(id, payload, session)
+        session.commit()
+    return Response(
+        status_code=status.HTTP_200_OK,
+        headers={
+            "content-type": "application/json",
+        },
+    )
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
