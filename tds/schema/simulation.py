@@ -10,6 +10,15 @@ from tds.autogen import orm, schema
 from tds.autogen.schema import SimulationPlan, SimulationRun
 from tds.schema.concept import Concept
 
+SimulationParameters = Dict[str, Tuple[str, schema.ValueType]]
+
+
+def orm_to_params(parameters: List[orm.SimulationParameter]) -> SimulationParameters:
+    """
+    Convert SQL parameter search to dict
+    """
+    return {param.name: (param.value, param.type) for param in parameters}
+
 
 class Plan(SimulationPlan):
     concept: Optional[Concept] = None
@@ -35,9 +44,13 @@ class Plan(SimulationPlan):
         }
 
 
+class RunDescription(SimulationRun):
+    class Config:
+        orm_mode = True
+
+
 class Run(SimulationRun):
-    success = True
-    parameters: Dict[str, Tuple[str, schema.ValueType]] = {}
+    parameters: SimulationParameters = {}
 
     @classmethod
     def from_orm(
@@ -49,7 +62,7 @@ class Run(SimulationRun):
         setattr(
             body,
             "parameters",
-            {param.name: (param.value, param.type) for param in parameters},
+            orm_to_params(parameters),
         )
         return super().from_orm(body)
 

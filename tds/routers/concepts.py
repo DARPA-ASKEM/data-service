@@ -38,8 +38,8 @@ def search_concept(curie: str, rdb: Engine = Depends(request_rdb)):
     return results
 
 
-@router.get("/definition")
-def search_concept(term: str, limit: int = 100, offset: int = 0):
+@router.get("/definitions")
+def search_concept_definitions(term: str, limit: int = 100, offset: int = 0):
     """
     Wraps search functionality from the DKG.
     """
@@ -59,7 +59,7 @@ def search_concept(term: str, limit: int = 100, offset: int = 0):
     raise Exception(f"DKG server returned the status {response.status_code}")
 
 
-@router.get("/definition/{curie}")
+@router.get("/definitions/{curie}")
 def get_concept_definition(curie: str):
     """
     Wraps fetch functionality from the DKG.

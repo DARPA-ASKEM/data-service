@@ -40,7 +40,6 @@ def test_simulation_cr():
             "simulator": "string",
             "query": "string",
             "content": "{}",
-            "parameters": {"x": ("1", ValueType.int)},
             "framework": framework,
         }
         response_create = client.post(
@@ -48,31 +47,31 @@ def test_simulation_cr():
             json=payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        assert 200 == response_create.status_code
-        id = response_create.json()
+        assert 201 == response_create.status_code
+        id = response_create.json()["id"]
         # Retrieval
         response_get = client.get(
             f"/simulations/plans/{id}", headers={"Accept": "application/json"}
         )
-        assert 200 == response_create.status_code
+        assert 200 == response_get.status_code
         plan = response_get.json()
         assert payload["model_id"] == plan["model_id"]
-        assert "x" in plan["parameters"] and plan["parameters"]["x"][1] == ValueType.int
         run_payload = {
             "simulator_id": id,
             "success": None,
             "completed_at": None,
+            "parameters": {"x": ("1", ValueType.int)},
             "response": "",
         }
         response_create = client.post(
-            "/simulations/results",
+            "/simulations/runs",
             json=run_payload,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
-        assert 200 == response_create.status_code
-        run_id = response_create.json()
+        assert 201 == response_create.status_code
+        run_id = response_create.json()["id"]
         response_get = client.get(
-            f"/simulations/results/{run_id}", headers={"Accept": "application/json"}
+            f"/simulations/runs/{run_id}", headers={"Accept": "application/json"}
         )
         assert 200 == response_get.status_code
         assert run_payload["simulator_id"] == response_get.json()["simulator_id"]
