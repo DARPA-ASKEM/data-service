@@ -1,7 +1,7 @@
 """
 CRUD operations for plans and runs
 """
-
+import json
 from logging import Logger
 from typing import List
 
@@ -70,7 +70,12 @@ def create_plan(payload: Plan, rdb: Engine = Depends(request_rdb)) -> int:
             )
         session.commit()
     logger.info("new plan created: %i", id)
-    return id
+    return Response(
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id}),
+    )
 
 
 @router.get("/results", **retrieve.fastapi_endpoint_config)
@@ -85,7 +90,7 @@ def list_results(rdb: Engine = Depends(request_rdb)) -> List[Plan]:
 @router.get("/results/{id}", **retrieve.fastapi_endpoint_config)
 def get_results(id: int, rdb: Engine = Depends(request_rdb)) -> Results:
     """
-    Retrieve software metadata
+    Retrieve results metadata
     """
     with Session(rdb) as session:
         if (
@@ -99,7 +104,7 @@ def get_results(id: int, rdb: Engine = Depends(request_rdb)) -> Results:
 @router.post("/results", **create.fastapi_endpoint_config)
 def create_results(payload: Results, rdb: Engine = Depends(request_rdb)) -> int:
     """
-    Create software metadata
+    Create results metadata
     """
     with Session(rdb) as session:
         results_payload = payload.dict()
@@ -107,8 +112,13 @@ def create_results(payload: Results, rdb: Engine = Depends(request_rdb)) -> int:
         session.add(results)
         session.commit()
         id: int = results.id
-    logger.info("new software with %i", id)
-    return id
+    logger.info("new results with %i", id)
+    return Response(
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id}),
+    )
 
 
 @router.delete("/results/{id}", **delete.fastapi_endpoint_config)

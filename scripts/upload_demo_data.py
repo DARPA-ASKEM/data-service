@@ -91,9 +91,10 @@ def create_framework(url=url):
 
 
 person = create_person()
-person_id = person.get("person_id")
+print(person)
+person_id = person.get("id")
 project = create_project()
-project_id = project.get("project_id")
+project_id = project.get("id")
 create_framework()
 
 # loop over models
@@ -119,6 +120,32 @@ def asset_to_project(project_id, asset_id, asset_type):
     )
 
 
+def add_provenance(left, right, relation_type, user_id):
+    payload = json.dumps(
+        {
+            "left": left.get("id"),
+            "left_type": left.get("resource_type"),
+            "right": right.get("id"),
+            "right_type": right.get("resource_type"),
+            "relation_type": relation_type,
+            "user_id": user_id,
+        }
+    )
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.request(
+        "POST",
+        url + f"provenance",
+        headers=headers,
+        data=payload,
+    )
+    print(response)
+
+
+def add_concept():
+    print("add concept")
+
+
 for folder in folders:
 
     # publications ##
@@ -138,10 +165,76 @@ for folder in folders:
         publication_json = response.json()
         publication_id = publication_json.get("id")
         asset_to_project(
-            project_id=1, asset_id=int(publication_id), asset_type="publication"
+            project_id=1, asset_id=int(publication_id), asset_type="publications"
         )
     except Exception as e:
         print(f"error opening {folder}document_doi.txt . - {e}")
+
+    ## intermediates ##
+    try:
+        print("Upload intermediate mmt")
+        with open(folder + "model_mmt_templates.json", "r") as f:
+            mmt_template = json.load(f)
+
+            payload = json.dumps(
+                {
+                    "source": "mrepresentationa",
+                    "type": "bilayer",
+                    "content": json.dumps(mmt_template),
+                }
+            )
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.request(
+            "POST", url + "models/intermediates", headers=headers, data=payload
+        )
+        intermediate_json = response.json()
+        intermediate_mmt_id = intermediate_json.get("id")
+
+        asset_to_project(
+            project_id=1, asset_id=int(intermediate_mmt_id), asset_type="intermediates"
+        )
+
+        add_provenance(
+            left={"id": intermediate_mmt_id, "resource_type": "intermediates"},
+            right={"id": publication_id, "resource_type": "publications"},
+            relation_type="derivedfrom",
+            user_id=person_id,
+        )
+
+    except Exception as e:
+        print(e)
+
+    try:
+        print("Upload intermediate sbml")
+        with open(folder + "model_sbml.xml", "r") as f:
+            mmt_template = f.read()
+            payload = json.dumps(
+                {
+                    "source": "mrepresentationa",
+                    "type": "sbml",
+                    "content": mmt_template,
+                }
+            )
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.request(
+            "POST", url + "models/intermediates", headers=headers, data=payload
+        )
+        intermediate_json = response.json()
+        intermediate_sbml_id = intermediate_json.get("id")
+        asset_to_project(
+            project_id=1, asset_id=int(intermediate_sbml_id), asset_type="intermediates"
+        )
+        add_provenance(
+            left={"id": intermediate_sbml_id, "resource_type": "intermediates"},
+            right={"id": intermediate_mmt_id, "resource_type": "intermediates"},
+            relation_type="derivedfrom",
+            user_id=person_id,
+        )
+
+    except Exception as e:
+        print(e)
 
     ## model ##
     try:
@@ -181,63 +274,97 @@ for folder in folders:
         )
         model_json = response.json()
         model_id = model_json.get("id")
-        asset_to_project(project_id=1, asset_id=int(model_id), asset_type="model")
+        asset_to_project(project_id=1, asset_id=int(model_id), asset_type="models")
+
+        add_provenance(
+            left={"id": model_id, "resource_type": "models"},
+            right={"id": intermediate_sbml_id, "resource_type": "intermediates"},
+            relation_type="derivedfrom",
+            user_id=person_id,
+        )
 
     except Exception as e:
-        print(f"error opening {folder}document_doi.txt . - {e}")
+        print(f" {e}")
 
-    ## intermediates ##
+    ### upload simulation plan ###
     try:
-        print("Upload intermediate mmt")
-        with open(folder + "model_mmt_templates.json", "r") as f:
-            mmt_template = json.load(f)
+        print("Upload Simulation Plan")
 
-            payload = json.dumps(
-                {
-                    "source": "mrepresentationa",
-                    "type": "bilayer",
-                    "content": json.dumps(mmt_template),
-                }
-            )
+        path = "simulations/plans"
+
+        # load simulation plan contents as json
+        with open("scripts/simulation-plan_ATE.json", "r") as f:
+            simulation_body = json.load(f)
+
+        payload = json.dumps(
+            {
+                "name": f"{model_id}_simulation_plan",
+                "model_id": model_id,
+                "description": f"Simulation plan for model {model_id}",
+                "simulator": "default",
+                "query": "My query",
+                "content": json.dumps(simulation_body),
+            }
+        )
         headers = {"Content-Type": "application/json"}
 
-        response = requests.request(
-            "POST", url + "models/intermediates", headers=headers, data=payload
-        )
-        intermediate_json = response.json()
-        intermediate_id = intermediate_json.get("id")
-
+        response = requests.request("POST", url + path, headers=headers, data=payload)
+        sim_plan_json = response.json()
+        simulation_plan_id = sim_plan_json.get("id")
         asset_to_project(
-            project_id=1, asset_id=int(intermediate_id), asset_type="intermediate"
+            project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
+        )
+
+        add_provenance(
+            left={"id": simulation_plan_id, "resource_type": "plans"},
+            relation_type="derivedfrom",
+            right={"id": model_id, "resource_type": "models"},
+            user_id=person_id,
         )
 
     except Exception as e:
-        print(e)
+        print(f" {e}")
+
+    ### simulation run ###
 
     try:
-        print("Upload intermediate sbml")
-        with open(folder + "model_sbml.xml", "r") as f:
-            mmt_template = f.read()
-            payload = json.dumps(
-                {
-                    "source": "mrepresentationa",
-                    "type": "sbml",
-                    "content": mmt_template,
-                }
-            )
+        print("Upload Simulation Run")
+
+        path = "simulations/plans"
+
+        # load simulation plan contents as json
+        with open("scripts/simulation-plan_ATE.json", "r") as f:
+            simulation_body = json.load(f)
+
+        payload = json.dumps(
+            {
+                "name": f"{model_id}_simulation_plan",
+                "model_id": model_id,
+                "description": f"Simulation plan for model {model_id}",
+                "simulator": "default",
+                "query": "My query",
+                "content": json.dumps(simulation_body),
+            }
+        )
         headers = {"Content-Type": "application/json"}
 
-        response = requests.request(
-            "POST", url + "models/intermediates", headers=headers, data=payload
-        )
-        intermediate_json = response.json()
-        intermediate_id = intermediate_json.get("id")
+        response = requests.request("POST", url + path, headers=headers, data=payload)
+        sim_plan_json = response.json()
+        simulation_plan_id = sim_plan_json.get("id")
         asset_to_project(
-            project_id=1, asset_id=int(intermediate_id), asset_type="intermediate"
+            project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
+        )
+
+        add_provenance(
+            left={"id": simulation_plan_id, "resource_type": "plans"},
+            relation_type="derivedfrom",
+            right={"id": model_id, "resource_type": "models"},
+            user_id=person_id,
         )
 
     except Exception as e:
-        print(e)
+        print(f" {e}")
+
 
 ## now delete repo
 shutil.rmtree("experiments-main")
