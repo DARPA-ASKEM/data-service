@@ -267,7 +267,7 @@ class OntologyConcept(BaseModel):
     id: Optional[int] = None
     curie: str
     type: TaggableType
-    obj_id: Optional[int] = None
+    object_id: Optional[int] = None
     status: OntologicalField
 
 

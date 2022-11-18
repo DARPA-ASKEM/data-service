@@ -311,7 +311,7 @@ class OntologyConcept(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     curie = sa.Column(sa.String(), nullable=False)
     type = sa.Column(sa.Enum(TaggableType), nullable=False)
-    obj_id = sa.Column(sa.Integer(), nullable=False)
+    object_id = sa.Column(sa.Integer(), nullable=False)
     status = sa.Column(sa.Enum(OntologicalField), nullable=False)
 
 
