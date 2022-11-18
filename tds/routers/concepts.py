@@ -96,16 +96,16 @@ def create_concept(payload: schema.OntologyConcept, rdb: Engine = Depends(reques
     Create a concept
     """
     with Session(rdb) as session:
-        concept = payload.dict()
-        concept_ = orm.OntologyConcept(**concept)
-        session.add(concept_)
+        concept_dict = payload.dict()
+        concept = orm.OntologyConcept(**concept_dict)
+        session.add(concept)
         session.commit()
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
                 "content-type": "application/json",
             },
-            content=json.dumps({"id": concept_.id}),
+            content=json.dumps({"id": concept.id}),
         )
 
 
