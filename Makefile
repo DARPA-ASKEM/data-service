@@ -18,14 +18,14 @@ tidy:
 
 .PHONY:
 up:
-	docker compose up --build -d;
+	docker-compose up --build -d;
 	
 
 .PHONY:
 populate:
-	python3  scripts/upload_demo_data.py 
+	python3 scripts/upload_demo_data.py;
 
 	
 .PHONY:
 down:
-	docker compose down;
+	docker-compose down;

@@ -8,6 +8,7 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 import requests
+from demo_dataset_generator import programatically_populate_datasets
 
 url = "http://localhost:8001/"
 
@@ -238,6 +239,8 @@ for folder in folders:
 
     except Exception as e:
         print(e)
+
+programatically_populate_datasets()
 
 ## now delete repo
 shutil.rmtree("experiments-main")
