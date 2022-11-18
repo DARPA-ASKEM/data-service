@@ -449,5 +449,7 @@ for folder in folders:
 
 programatically_populate_datasets()
 
+programatically_populate_datasets()
+
 ## now delete repo
 shutil.rmtree("experiments-main")
