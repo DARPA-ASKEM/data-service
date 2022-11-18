@@ -31,6 +31,7 @@ class TaggableType(str, Enum):
     model_parameters = 'model_parameters'
     models = 'models'
     projects = 'projects'
+    publications = 'publications'
     qualifiers = 'qualifiers'
     simulation_plans = 'simulation_plans'
     
@@ -266,7 +267,7 @@ class OntologyConcept(BaseModel):
     id: Optional[int] = None
     curie: str
     type: TaggableType
-    obj_id: Optional[int] = None
+    object_id: Optional[int] = None
     status: OntologicalField
 
 
