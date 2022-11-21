@@ -128,7 +128,7 @@ def get_run_parameters(
         if entry_exists(rdb.connect(), orm.SimulationRun, id):
             parameters: Query[orm.SimulationParameter] = session.query(
                 orm.SimulationParameter
-            ).filter(orm.SimulationParameter.model_id == id)
+            ).filter(orm.SimulationParameter.run_id == id)
             return orm_to_params(list(parameters))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
