@@ -30,6 +30,7 @@ Enum taggable_type {
    model_parameters
    projects
    publications
+   simulation_runs
 }
 
 Enum value_type {

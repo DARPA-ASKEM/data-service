@@ -363,6 +363,7 @@ for folder in folders:
                 "simulator": "default",
                 "query": "My query",
                 "content": json.dumps(simulation_body),
+                # "parameters":json.dumps({"simulations":{"count":5}})
             }
         )
         headers = {"Content-Type": "application/json"}
@@ -382,7 +383,9 @@ for folder in folders:
             user_id=person_id,
         )
 
-        add_concept(concept=concept, object_id=intermediate_sbml_id, type="plans")
+        add_concept(
+            concept=concept, object_id=intermediate_sbml_id, type="simulation_plans"
+        )
 
     except Exception as e:
         print(f" {e}")
@@ -392,37 +395,39 @@ for folder in folders:
     try:
         print("Upload Simulation Run")
 
-        path = "simulations/plans"
+        path = "simulations/runs"
 
-        # load simulation plan contents as json
-        with open("scripts/simulation-plan_ATE.json", "r") as f:
-            simulation_body = json.load(f)
+        # load simulation run contents as json
+        with open(folder + "sim_output.json", "r") as f:
+            sim_output = f.read()
 
         payload = json.dumps(
             {
-                "name": f"{model_id}_simulation_plan",
-                "model_id": model_id,
-                "description": f"Simulation plan for model {model_id}",
-                "simulator": "default",
-                "query": "My query",
-                "content": json.dumps(simulation_body),
+                "simulator_id": simulation_plan_id,
+                "success": True,
+                "response": json.dumps(sim_output),
+                "parameters": {"test": ("int", "1")},
             }
         )
         headers = {"Content-Type": "application/json"}
 
         response = requests.request("POST", url + path, headers=headers, data=payload)
-        sim_plan_json = response.json()
-        simulation_plan_id = sim_plan_json.get("id")
+        sim_run_json = response.json()
+        simulation_run_id = sim_run_json.get("id")
 
         asset_to_project(
-            project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
+            project_id=1, asset_id=int(simulation_run_id), asset_type="plans"
         )
 
         add_provenance(
-            left={"id": simulation_plan_id, "resource_type": "plans"},
+            left={"id": simulation_run_id, "resource_type": "simulation_runs"},
             relation_type="derivedfrom",
-            right={"id": model_id, "resource_type": "models"},
+            right={"id": simulation_plan_id, "resource_type": "plans"},
             user_id=person_id,
+        )
+
+        add_concept(
+            concept=concept, object_id=simulation_run_id, type="simulation_runs"
         )
 
     except Exception as e:

@@ -22,12 +22,38 @@ router = APIRouter()
 
 
 @router.get("")
-def get_provenance() -> str:
+def get_provenance(id: int, rdb: Engine = Depends(request_rdb)):
     """
-    Mock provenance
+    Searches within TDS for artifacts with this concept term associated with them
     """
-    logger.info("PROVENANCE ENDPOINT NOT YET CREATED")
-    return "PROVENANCE NOT IMPLEMENTED!"
+    with Session(rdb) as session:
+        results = session.query(orm.Provenance).filter(orm.Provenance.id == id).all()
+
+    return results
+
+
+@router.get("/derived_from")
+def search_provenance(
+    artifact_id: int,
+    artifact_type: str,
+    rdb: Engine = Depends(request_rdb),
+    neo_engine=Depends(request_graph_engine),
+) -> list:
+    """
+    Search provenance of for all artifacts that helped derive this artifact.
+    """
+    logger.info("search provenance")
+    provenance_handler = ProvenanceHandler(rdb=rdb, neo_engine=neo_engine)
+    list_of_artifacts = provenance_handler.search_derivedfrom(
+        artifact_id=artifact_id, artifact_type=artifact_type
+    )
+    print(list_of_artifacts)
+    return Response(
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"provenance": list_of_artifacts}),
+    )
 
 
 @router.post("", **create.fastapi_endpoint_config)
@@ -60,18 +86,43 @@ def create_provenance(
     )
 
 
+@router.delete("/hanging_nodes")
+def delete_hanging_nodes(
+    rdb: Engine = Depends(request_rdb), neo_engine=Depends(request_graph_engine)
+) -> Response:
+    print("here")
+    provenance_handler = ProvenanceHandler(rdb=rdb, neo_engine=neo_engine)
+    success = provenance_handler.delete_nodes()
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT,
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"success": success}),
+    )
+
+
 @router.delete("/{id}", **delete.fastapi_endpoint_config)
-def delete_provenance(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
+def delete_provenance(
+    id: int,
+    rdb: Engine = Depends(request_rdb),
+    neo_engine=Depends(request_graph_engine),
+) -> Response:
     """
     Delete provenance metadata
     """
     with Session(rdb) as session:
         if session.query(orm.Provenance).filter(orm.Provenance.id == id).count() == 1:
-            provenance = session.query(orm.Provenance).get(id)
-            session.delete(provenance)
-            session.commit()
+
+            provenance_handler = ProvenanceHandler(rdb=rdb, neo_engine=neo_engine)
+            success = provenance_handler.delete(id=id)
+
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Response(
         status_code=status.HTTP_204_NO_CONTENT,
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id, "success": success}),
     )

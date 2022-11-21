@@ -38,6 +38,7 @@ class TaggableType(str, Enum):
     publications = 'publications'
     qualifiers = 'qualifiers'
     simulation_plans = 'simulation_plans'
+    simulation_runs = 'simulation_runs'
     
 
 class ValueType(str, Enum):

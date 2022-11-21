@@ -2,6 +2,7 @@
 Handler for object relations
 """
 
+import json
 from typing import Optional
 
 from fastapi import Depends
@@ -86,7 +87,15 @@ class ProvenanceHandler:
                 provenance = session.query(orm.Provenance).get(id)
                 session.delete(provenance)
                 session.commit()
+                print(provenance)
+                provenance_dict = provenance.__dict__
+                print(provenance_dict)
+
+                if self.graph_cache_enabled:
+                    self.delete_node_relationship(provenance_payload=provenance_dict)
+
                 return True
+
             return False
 
     ## neo4j functions
@@ -147,15 +156,15 @@ class ProvenanceHandler:
                 user_id=provenance_payload.get("user_id"),
             )
 
-    def delete_node_relationship(self, node_1, node_2, relationship, user_id):
+    def delete_node_relationship(self, provenance_payload):
         with self.neo_engine.session() as session:
             q = (
-                f"Match (n1: {node_1.get('label')} ) "
-                + "Where n1.id = $node_1_id_ "
-                + f"Match (n2: {node_2.get('label')} ) "
-                + "Where n2.id = $node_2_id_ "
+                f"Match (n1: {provenance_payload.get('left_type')} ) "
+                + "Where n1.id = $left "
+                + f"Match (n2: {provenance_payload.get('right_type')} ) "
+                + "Where n2.id = $right "
                 + "Match (n1)-[r:"
-                + relationship
+                + provenance_payload.get("relation_type")
                 + " {user_id : $user_id"
                 + "}]->(n2)"
                 + "Delete r"
@@ -164,11 +173,35 @@ class ProvenanceHandler:
             print(q)
             res = session.run(
                 q,
-                node_1_id_=node_1.get("id"),
-                node_2_id_=node_2.get("id"),
-                user_id=user_id,
+                left=provenance_payload.get("left"),
+                right=provenance_payload.get("right"),
+                user_id=provenance_payload.get("user_id"),
             )
             print(res)
+
+    def delete_nodes(self):
+        with self.neo_engine.session() as session:
+            q = "match (n) where not (n)--() delete (n)"
+            print(q)
+            res = session.run(q)
+            print(res)
+        return True
+
+    def search_derivedfrom(self, artifact_id, artifact_type):
+        with self.neo_engine.session() as session:
+
+            q = (
+                f"Match (n1: {artifact_type} ) -[:derivedfrom *1..]->(n2)"
+                + "Where n1.id = $artifact_id_ "
+                + "RETURN labels(n2) as label, n2.id as id"
+            )
+
+            response = session.run(q, artifact_id_=artifact_id)
+
+            return [
+                {"label": res.data().get("label")[0], "id": res.data().get("id")}
+                for res in response
+            ]
 
     def neo_close(self):
         self.neo_engine.close()
@@ -181,3 +214,7 @@ async def request_provenance_handler(
     Create a fastapi dependency relational handler
     """
     return ProvenanceHandler(rdb, neo_engine=neo_engine)
+
+
+def get_properties(self):
+    return self._properties

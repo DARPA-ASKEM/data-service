@@ -23,12 +23,17 @@ def list_plans(rdb: Engine = Depends(request_rdb)) -> List[Plan]:
     """
     Retrieve all plans
     """
+    print("her")
     run = []
     with Session(rdb) as session:
         for entry in session.query(orm.SimulationPlan).all():
             parameters: Query[orm.SimulationParameter] = session.query(
                 orm.SimulationParameter
-            ).filter(orm.SimulationParameter.plan_id == entry.id)
+            ).filter(orm.SimulationParameter.id == entry.id)
+            print(entry)
+            print("he")
+            print(parameters)
+            print(list(parameters))
             run.append(Plan.from_orm(entry, list(parameters)))
     return run
 
@@ -43,7 +48,7 @@ def get_plan(id: int, rdb: Engine = Depends(request_rdb)) -> Plan:
             plan = session.query(orm.SimulationPlan).get(id)
             parameters: Query[orm.SimulationParameter] = session.query(
                 orm.SimulationParameter
-            ).filter(orm.SimulationParameter.plan_id == id)
+            ).filter(orm.SimulationParameter.id == id)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Plan.from_orm(plan, list(parameters))
@@ -58,16 +63,16 @@ def create_plan(payload: Plan, rdb: Engine = Depends(request_rdb)) -> int:
         plan_payload = payload.dict()
         # pylint: disable-next=unused-variable
         concept_payload = plan_payload.pop("concept")  # TODO: Save ontology term
-        parameters = plan_payload.pop("parameters")
+        # parameters = plan_payload.pop("parameters")
         plan_payload.pop("id")
         plan = orm.SimulationPlan(**plan_payload)
         session.add(plan)
         session.commit()
         id: int = plan.id
-        for name, (value, type) in parameters.items():
-            session.add(
-                orm.SimulationParameter(plan_id=id, name=name, value=value, type=type)
-            )
+        # for name, (value, type) in parameters.items():
+        #     session.add(
+        #         orm.SimulationParameter(plan_id=id, name=name, value=value, type=type)
+        #     )
         session.commit()
     logger.info("new plan created: %i", id)
     return Response(
@@ -168,7 +173,12 @@ def create_run(payload: Run, rdb: Engine = Depends(request_rdb)) -> int:
         session.commit()
         id: int = run.id
     logger.info("new run with %i", id)
-    return id
+    return Response(
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id}),
+    )
 
 
 @router.delete("/run/{id}", **delete.fastapi_endpoint_config)
