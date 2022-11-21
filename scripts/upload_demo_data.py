@@ -102,31 +102,6 @@ create_framework()
 folders = glob.glob("experiments-main/thin-thread-examples/biomodels/BIOMD*/")
 
 
-def add_concept(object_id, type):
-    concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
-    index = random.randrange(2)
-    term = concepts[index]
-    print(term)
-    payload = json.dumps(
-        {
-            "curie": str(term),
-            "type": str(type),
-            "object_id": int(object_id),
-            "status": "obj",
-        }
-    )
-    print(payload)
-    headers = {"Content-Type": "application/json"}
-
-    response = requests.request(
-        "POST",
-        url + f"concepts",
-        headers=headers,
-        data=payload,
-    )
-    print(response.text)
-
-
 def asset_to_project(project_id, asset_id, asset_type):
     payload = json.dumps(
         {
@@ -190,7 +165,7 @@ def add_concept(concept, object_id, type):
     print(response.text)
 
 
-concepts = ["covid", "research", "sir"]
+concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
 
 for folder in folders[1:6]:
     index = random.randrange(2)
