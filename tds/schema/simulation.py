@@ -77,6 +77,6 @@ class Run(SimulationRun):
                 "timestamp": "datetime",
                 "completed_at": "optional-datetime",
                 "response": "blob",
-                "parameters": {"str": ("str", "value-type")},
+                "parameters": [],
             }
         }

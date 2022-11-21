@@ -31,7 +31,6 @@ def adjust_run_params(run_id: int, parameters: SimulationParameters, session: Se
                     name=parameter.get("name"),
                     type=parameter.get("type"),
                     value=parameter.get("value"),
-
                 )
             )
         else:
@@ -41,7 +40,6 @@ def adjust_run_params(run_id: int, parameters: SimulationParameters, session: Se
             ).update({"type": parameter.get("type"), "value": parameter.get("value")})
 
             existing.remove(parameter.name)
-
 
     for name in existing:
         for param in session.query(orm.SimulationParameter).filter(
