@@ -12,7 +12,6 @@ class ResourceType(str, Enum):
     models = 'models'
     plans = 'plans'
     publications = 'publications'
-    simulation_parameters = 'simulation_parameters'
     simulation_runs = 'simulation_runs'
     
 
