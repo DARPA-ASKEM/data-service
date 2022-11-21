@@ -1,7 +1,6 @@
 """
 CRUD operations for plans and runs
 """
-
 import json
 from logging import Logger
 from typing import List
@@ -33,6 +32,7 @@ def list_plans(
     """
     Retrieve all plans
     """
+
     return list_by_id(rdb.connect(), orm.SimulationPlan, page_size, page)
 
 
@@ -44,6 +44,7 @@ def get_plan(id: int, rdb: Engine = Depends(request_rdb)) -> Plan:
     if entry_exists(rdb.connect(), orm.SimulationPlan, id):
         with Session(rdb) as session:
             plan = session.query(orm.SimulationPlan).get(id)
+
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Plan.from_orm(plan)
@@ -63,6 +64,7 @@ def create_plan(payload: Plan, rdb: Engine = Depends(request_rdb)) -> Response:
         session.add(plan)
         session.commit()
         id: int = plan.id
+
     logger.info("new plan created: %i", id)
     return Response(
         status_code=status.HTTP_201_CREATED,
@@ -96,17 +98,19 @@ def get_run_description(id: int, rdb: Engine = Depends(request_rdb)) -> RunDescr
 
 @router.post("/runs/descriptions", **create.fastapi_endpoint_config)
 def create_run_from_description(
-    payload: Run, rdb: Engine = Depends(request_rdb)
+    payload: RunDescription, rdb: Engine = Depends(request_rdb)
 ) -> Response:
     """
     Create a run with no parameters initialized
     """
     with Session(rdb) as session:
         run_payload = payload.dict()
+        print(run_payload)
         run = orm.SimulationRun(**run_payload)
         session.add(run)
         session.commit()
         id: int = run.id
+
     logger.info("new run with %i", id)
     return Response(
         status_code=status.HTTP_201_CREATED,
@@ -140,6 +144,7 @@ def update_run_parameters(
     """
     Update the parameters for a run
     """
+    print("made 8it")
     with Session(rdb) as session:
         adjust_run_params(id, payload, session)
         session.commit()
@@ -179,6 +184,7 @@ def create_run(payload: Run, rdb: Engine = Depends(request_rdb)) -> Response:
         session.add(run)
         session.commit()
         id: int = run.id
+
         for name, (value, type) in parameters.items():
             session.add(
                 orm.SimulationParameter(run_id=id, name=name, value=value, type=type)
