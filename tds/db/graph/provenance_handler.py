@@ -34,8 +34,8 @@ def operate_on_graph(method):
     """
 
     def raise_missing_graph_failure(*args) -> Any:
-        # if not retrieve_obj(method).cache_enabled():
-        #    raise Exception("Graph database connection not enabled")
+        if not retrieve_obj(method).cache_enabled():
+            raise Exception("Graph database connection not enabled")
         return method(*args)
 
     return raise_missing_graph_failure
