@@ -79,7 +79,7 @@ def test_project_cru():
             "assets": {ResourceType.models: [model2_id]},
             "status": "inactive",
         }
-        response_update = client.post(
+        response_update = client.put(
             f"/projects/{id}",
             json=payload_updated,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
