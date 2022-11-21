@@ -21,23 +21,24 @@ def adjust_run_params(run_id: int, parameters: SimulationParameters, session: Se
     for param in session.query(orm.SimulationParameter).filter(
         orm.SimulationParameter.run_id == run_id
     ):
-        existing.append(param.name)
+        existing.append(param.get("name"))
 
     for parameter in parameters:
-        if parameter.name not in existing:
+        if parameter.get("name") not in existing:
             session.add(
-                orm.ProjectAsset(
+                orm.SimulationParameter(
                     run_id=run_id,
-                    name=parameter.name,
-                    type=parameter.type,
-                    value=parameter.value,
+                    name=parameter.get("name"),
+                    type=parameter.get("type"),
+                    value=parameter.get("value"),
+
                 )
             )
         else:
             session.query(orm.SimulationParameter).filter(
                 orm.SimulationParameter.run_id == run_id,
-                orm.SimulationParameter.id == parameter.id,
-            ).update({"type": parameter.type, "value": parameter.value})
+                orm.SimulationParameter.id == parameter.get("id"),
+            ).update({"type": parameter.get("type"), "value": parameter.get("value")})
 
             existing.remove(parameter.name)
 
