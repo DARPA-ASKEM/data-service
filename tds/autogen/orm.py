@@ -13,7 +13,6 @@ class ResourceType(str, Enum):
     datasets = 'datasets'
     extractions = 'extractions'
     intermediates = 'intermediates'
-    model_parameters = 'model_parameters'
     models = 'models'
     plans = 'plans'
     publications = 'publications'
@@ -28,7 +27,6 @@ class RelationType(str, Enum):
     derivedfrom = 'derivedfrom'
     editedFrom = 'editedFrom'
     gluedFrom = 'gluedFrom'
-    parameterOf = 'parameterOf'
     stratifiedFrom = 'stratifiedFrom'
     
 

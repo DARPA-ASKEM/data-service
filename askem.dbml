@@ -12,7 +12,6 @@ Enum public.resource_type {
    publications
    simulation_runs
    simulation_parameters
-   
 }
 
 Enum relation_type {
