@@ -126,7 +126,6 @@ class ProvenanceHandler:
                 f"Merge (n: {provenance_payload.get('left_type')}"
                 + "{ id: $left_id } )"
             )
-            print(q)
             session.run(q, left_id=provenance_payload.get("left"))
 
             # if node 2 is not created yet create node
@@ -134,7 +133,6 @@ class ProvenanceHandler:
                 f"Merge (n: {provenance_payload.get('right_type')}"
                 + "{ id: $right_id } )"
             )
-            print(q)
             session.run(q, right_id=provenance_payload.get("right"))
 
             # Match our two nodes and create new relationship. Set user_id as property of relationship
@@ -148,7 +146,6 @@ class ProvenanceHandler:
                 + " {user_id : $user_id"
                 + "}]->(n2)"
             )
-            print(q)
             session.run(
                 q,
                 left_id=provenance_payload.get("left"),
@@ -170,7 +167,6 @@ class ProvenanceHandler:
                 + "Delete r"
             )
 
-            print(q)
             res = session.run(
                 q,
                 left=provenance_payload.get("left"),
@@ -182,9 +178,7 @@ class ProvenanceHandler:
     def delete_nodes(self):
         with self.neo_engine.session() as session:
             q = "match (n) where not (n)--() delete (n)"
-            print(q)
             res = session.run(q)
-            print(res)
         return True
 
     def search_derivedfrom(self, artifact_id, artifact_type):

@@ -103,7 +103,7 @@ folders = glob.glob("experiments-main/thin-thread-examples/biomodels/BIOMD*/")
 
 
 def add_concept(object_id, type):
-    concepts = ["covid", "research", "sir"]
+    concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
     index = random.randrange(2)
     term = concepts[index]
     print(term)
