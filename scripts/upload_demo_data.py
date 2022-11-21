@@ -192,7 +192,7 @@ def add_concept(concept, object_id, type):
 
 concepts = ["covid", "research", "sir"]
 
-for folder in folders[1:3]:
+for folder in folders[1:6]:
     index = random.randrange(2)
     concept = concepts[index]
     # publications ##
@@ -455,8 +455,8 @@ for folder in folders[1:3]:
             headers=headers,
             data=payload,
         )
-        sim_plan_json = response.json()
-        simulation_plan_id = sim_plan_json.get("id")
+        print(response.text)
+
     except Exception as e:
         print(e)
 
