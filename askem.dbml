@@ -10,6 +10,7 @@ Enum public.resource_type {
    plans
    intermediates
    publications
+   simulation_runs
 }
 
 Enum relation_type {
@@ -31,6 +32,7 @@ Enum taggable_type {
    projects
    publications
    simulation_runs
+   intermediates
 }
 
 Enum value_type {

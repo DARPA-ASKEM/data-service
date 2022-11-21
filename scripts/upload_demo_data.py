@@ -192,7 +192,7 @@ def add_concept(concept, object_id, type):
 
 concepts = ["covid", "research", "sir"]
 
-for folder in folders:
+for folder in folders[1:3]:
     index = random.randrange(2)
     concept = concepts[index]
     # publications ##
@@ -395,7 +395,7 @@ for folder in folders:
     try:
         print("Upload Simulation Run")
 
-        path = "simulations/runs"
+        path = "simulations/runs/descriptions"
 
         # load simulation run contents as json
         with open(folder + "sim_output.json", "r") as f:
@@ -406,17 +406,18 @@ for folder in folders:
                 "simulator_id": simulation_plan_id,
                 "success": True,
                 "response": json.dumps(sim_output),
-                "parameters": {"test": ("int", "1")},
             }
         )
         headers = {"Content-Type": "application/json"}
 
+        print(payload)
         response = requests.request("POST", url + path, headers=headers, data=payload)
+        print(response.text)
         sim_run_json = response.json()
         simulation_run_id = sim_run_json.get("id")
 
         asset_to_project(
-            project_id=1, asset_id=int(simulation_run_id), asset_type="plans"
+            project_id=1, asset_id=int(simulation_run_id), asset_type="simulation_runs"
         )
 
         add_provenance(
@@ -433,6 +434,31 @@ for folder in folders:
     except Exception as e:
         print(f" {e}")
 
+    ### Simulation parameters ###
+    try:
+
+        # creating simulation parameters
+        parameter_types = {}
+        with open(f"{folder}model_mmt_parameters.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("parameters").items():
+                parameter_types[parameter_name] = (
+                    str(parameter_value),
+                    str(type(parameter_value).__name__),
+                )
+        payload = json.dumps(parameter_types)
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.request(
+            "PUT",
+            url + f"simulations/runs/parameters/{simulation_run_id}",
+            headers=headers,
+            data=payload,
+        )
+        sim_plan_json = response.json()
+        simulation_plan_id = sim_plan_json.get("id")
+    except Exception as e:
+        print(e)
 
 ## now delete repo
 shutil.rmtree("experiments-main")
