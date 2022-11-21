@@ -4,9 +4,10 @@ CRUD operations for models
 
 import json
 from logging import Logger
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from neo4j import Driver
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
@@ -16,7 +17,7 @@ from tds.db import (
     ProvenanceHandler,
     entry_exists,
     list_by_id,
-    request_provenance_handler,
+    request_graph_db,
     request_rdb,
 )
 from tds.lib.models import adjust_model_params
@@ -257,11 +258,12 @@ def update_model(
     payload: Model,
     id: int,
     rdb: Engine = Depends(request_rdb),
-    provenance_handler: ProvenanceHandler = Depends(request_provenance_handler),
+    graph_db: Optional[Driver] = Depends(request_graph_db),
 ) -> Response:
     """
     Update model content
     """
+    provenance_handler = ProvenanceHandler(rdb, graph_db)
     if entry_exists(rdb.connect(), orm.Model, id):
         new_id = json.loads(create_model(payload, rdb).body)["id"]
         old_model = get_model(id, rdb)
