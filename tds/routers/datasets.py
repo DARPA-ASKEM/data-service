@@ -268,7 +268,7 @@ def update_dataset(
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps(data_to_update, default=str),
+        content=json.dumps(data_payload, default=str),
     )
 
 
@@ -319,7 +319,7 @@ def get_csv_from_data_annotation(
     else:
         for path in data_paths:
             file = get_rawfile(path)
-            return file
+            return StreamingResponse(file, media_type="text/csv")
 
 
 @router.post("/{id}/upload/file")

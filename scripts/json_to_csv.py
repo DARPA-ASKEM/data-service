@@ -8,7 +8,7 @@ import json
 import sys
 
 
-def convert_biomd_json_to_csv(json_file_path, output_file_path, mock_geo_time=True):
+def convert_biomd_json_to_csv(json_file_path, output_file_path):
     """
     Converts ASKEM simulation output
 
@@ -26,31 +26,30 @@ def convert_biomd_json_to_csv(json_file_path, output_file_path, mock_geo_time=Tr
 
             csv_writer = csv.writer(data_file)
 
-            headers = []
-            state_length = len(states[0])  # Grabs len of first "row" of states
-
-            # Use state_length to construct header row
-            for state_suffix in range(state_length):
-                headers.append(f"state_{state_suffix}")
-            headers.append("time")
-            if mock_geo_time:
-                headers.append("mock_lat")
-                headers.append("mock_lon")
-                headers.append("mock_time")
+            headers = [
+                "timestamp, country, admin1, admin2, admin3, lat, lng, feature, value"
+            ]
 
             # Write header wrote
             csv_writer.writerow(headers)
 
-            # Write all other rows
-            # First add times to the state value matrix
+            # Write all states out as their own row.
             for list_index in range(len(states)):
-                states[list_index].append(times[list_index])
-                if mock_geo_time:
-                    # Append mock lat, lon, time values
-                    states[list_index].append("0.1")
-                    states[list_index].append("1.0")
-                    states[list_index].append("01/01/2020")
-            csv_writer.writerows(states)
+                timestamp = times[list_index]
+                for state in states[list_index]:
+                    value_index = states[list_index].index(state)
+                    row = [
+                        timestamp,
+                        None,
+                        None,
+                        None,
+                        None,
+                        "0.1",
+                        "1.0",
+                        f"state_{value_index}",
+                        state,
+                    ]
+                    csv_writer.writerow(row)
 
 
 if __name__ == "__main__":
