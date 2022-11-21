@@ -18,7 +18,7 @@ tidy:
 
 .PHONY:
 up:
-	docker compose up --build -d;
+	docker-compose up --build -d;
 	
 
 .PHONY:
@@ -28,4 +28,4 @@ populate:
 	
 .PHONY:
 down:
-	docker compose down;
+	docker-compose down;

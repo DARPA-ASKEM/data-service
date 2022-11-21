@@ -3,11 +3,12 @@ CRUD operations for datasets and related tables in the DB
 """
 
 import json
+import os
 from logging import DEBUG, Logger
-from typing import List
+from typing import List, Optional
 
 import requests
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, File, Response, UploadFile, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
@@ -15,6 +16,7 @@ from sqlalchemy.orm import Session
 from tds.autogen import orm, schema
 from tds.db import list_by_id, request_rdb
 from tds.lib.datasets import create_qualifier_xref
+from tds.lib.storage import get_rawfile, put_rawfile
 
 logger = Logger(__file__)
 logger.setLevel(DEBUG)
@@ -296,7 +298,9 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
 
 
 @router.get("/{id}/download/csv")
-def get_csv(id: int, rdb: Engine = Depends(request_rdb)):
+def get_csv_from_data_annotation(
+    id: int, data_annotation_flag: bool = False, rdb: Engine = Depends(request_rdb)
+):
     """
     Gets the csv of an annotated dataset that is registered
     via the data-annotation tool.
@@ -304,11 +308,51 @@ def get_csv(id: int, rdb: Engine = Depends(request_rdb)):
     dataset = get_dataset(id=id, rdb=rdb)
     data_paths = dataset.annotations["data_paths"]
 
-    response = requests.post(
-        "http://data-annotation-api:80/datasets/download/csv",
-        params={"data_path_list": data_paths},
-        stream=True,
-        timeout=15,
-    )
+    if data_annotation_flag:
+        response = requests.post(
+            "http://data-annotation-api:80/datasets/download/csv",
+            params={"data_path_list": data_paths},
+            stream=True,
+            timeout=15,
+        )
+        return StreamingResponse(response.raw, headers=response.headers)
+    else:
+        for path in data_paths:
+            file = get_rawfile(path)
+            return file
 
-    return StreamingResponse(response.raw, headers=response.headers)
+
+@router.post("/{id}/upload/file")
+def upload_file(
+    id: int,
+    file: UploadFile = File(...),
+    filename: Optional[str] = None,
+):
+    """Upload a file to the DATASET_BASE_STORAGE_URL
+
+    Args:
+        id (int): Dataset ID.
+        file (UploadFile, optional): Upload of file-like object.
+        filename (Optional[str], optional): Allows the specification of
+        a particular filename at upload. Defaults to None.
+
+    Returns:
+        Reponse: FastAPI Response object containing
+        information about the uploaded file.
+    """
+    base_uri = os.getenv("DATASET_STORAGE_BASE_URL")
+
+    if filename is None:
+        filename = file.filename
+
+    # Upload file
+    dest_path = os.path.join(base_uri, str(id), filename)
+    put_rawfile(path=dest_path, fileobj=file.file)
+
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id, "filename": filename}),
+    )
