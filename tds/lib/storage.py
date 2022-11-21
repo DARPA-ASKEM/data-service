@@ -1,3 +1,6 @@
+"""File storage library for functions related to getting and putting files.
+"""
+
 import os
 import tempfile
 from urllib.parse import urlparse
@@ -10,10 +13,25 @@ s3 = boto3.client("s3")
 
 
 def get_rawfile(path):
+    """Gets a file from a filepath
+
+    Args:
+        path (str): URI to file
+
+    Raises:
+        FileNotFoundError: If the file cannnot be found on S3.
+        RuntimeError: If the path URI does not begin with 'file' or 's3'
+        there is no handler for it yet.
+
+    Returns:
+        file: a file-like object
+    """
     location_info = urlparse(path)
 
     if location_info.scheme.lower() == "file":
-        raw_file = open(location_info.path, "rb")
+        with open(location_info.path, "rb") as file:
+            raw_file = file
+            return raw_file
     elif location_info.scheme.lower() == "s3":
         try:
             file_path = location_info.path.lstrip("/")
@@ -22,8 +40,8 @@ def get_rawfile(path):
                 Bucket=location_info.netloc, Key=file_path, Fileobj=raw_file
             )
             raw_file.seek(0)
-        except botocore.exceptions.ClientError as e:
-            raise FileNotFoundError()
+        except botocore.exceptions.ClientError as error:
+            raise FileNotFoundError() from error
     else:
         raise RuntimeError("File storage format is unknown")
 
@@ -31,6 +49,16 @@ def get_rawfile(path):
 
 
 def put_rawfile(path, fileobj):
+    """Puts/uploads a file at URI specified
+
+    Args:
+        path (str): URI to put/upload the file to.
+        fileobj (file): The file-like object to upload.
+
+    Raises:
+        RuntimeError: If the path URI does not begin with 'file' or 's3'
+        there is no handler for it yet.
+    """
     location_info = urlparse(path)
 
     if location_info.scheme.lower() == "file":
@@ -46,19 +74,31 @@ def put_rawfile(path, fileobj):
 
 
 def list_files(path):
+    """Lists all files at a specific URI
+
+    Args:
+        path (str): Directory or bucket URI containing the files to list.
+
+    Raises:
+        RuntimeError: If the path URI does not begin with 'file' or 's3'
+        there is no handler for it yet.
+
+    Returns:
+        list: a list of strings that represent the full URI paths of each file
+        in the directory/bucket.
+    """
     location_info = urlparse(path)
     if location_info.scheme.lower() == "file":
         return os.listdir(location_info.path)
-    elif location_info.scheme.lower() == "s3":
+    if location_info.scheme.lower() == "s3":
         s3_list = s3.list_objects(
             Bucket=location_info.netloc, Marker=location_info.path
         )
         s3_contents = s3_list["Contents"]
         final_file_list = []
-        for x in s3_contents:
-            filename = x["Key"]
+        for content in s3_contents:
+            filename = content["Key"]
             final_file_list.append(f"{location_info.path}/{filename}")
 
         return final_file_list
-    else:
-        raise RuntimeError("File storage format is unknown")
+    raise RuntimeError("File storage format is unknown")

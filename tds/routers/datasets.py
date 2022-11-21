@@ -297,7 +297,7 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
         session.commit()
 
 
-@router.get("/{id}/download/csv")
+@router.get("/{id}/download/rawfile")
 def get_csv_from_data_annotation(
     id: int, data_annotation_flag: bool = False, rdb: Engine = Depends(request_rdb)
 ):
@@ -316,10 +316,9 @@ def get_csv_from_data_annotation(
             timeout=15,
         )
         return StreamingResponse(response.raw, headers=response.headers)
-    else:
-        for path in data_paths:
-            file = get_rawfile(path)
-            return StreamingResponse(file, media_type="text/csv")
+    for path in data_paths:
+        file = get_rawfile(path)
+        return StreamingResponse(file, media_type="text/csv")
 
 
 @router.post("/{id}/upload/file")
