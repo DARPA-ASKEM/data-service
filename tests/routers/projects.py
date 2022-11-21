@@ -52,6 +52,7 @@ def test_project_cru():
             "name": "string",
             "description": "string",
             "assets": {ResourceType.models: [model1_id]},
+            "status": "active",
         }
         response_create = client.post(
             "/projects",
@@ -76,6 +77,7 @@ def test_project_cru():
             "name": "new_string",
             "description": "string",
             "assets": {ResourceType.models: [model2_id]},
+            "status": "inactive",
         }
         response_update = client.put(
             f"/projects/{id}",

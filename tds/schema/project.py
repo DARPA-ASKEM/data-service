@@ -54,6 +54,6 @@ class ProjectMetadata(schema.Project):
             "example": {
                 "name": "string",
                 "description": "string",
-                "status": "string",
+                "active": True,
             }
         }

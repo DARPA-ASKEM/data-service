@@ -10,6 +10,7 @@ Enum public.resource_type {
    plans
    intermediates
    publications
+   simulation_runs
 }
 
 Enum relation_type {
@@ -30,6 +31,9 @@ Enum taggable_type {
    model_parameters
    projects
    publications
+   simulation_runs
+   intermediates
+   simulation_parameters
 }
 
 Enum value_type {
@@ -249,3 +253,4 @@ Table association {
   resource_type public.resource_type
   role public.role
 }
+
