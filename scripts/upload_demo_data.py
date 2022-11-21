@@ -444,15 +444,15 @@ for folder in folders[1:5]:
         for parameter in parameters_json:
             print(parameter)
 
-            add_provenance(
-                left={
-                    "id": parameter.get("id"),
-                    "resource_type": "simulation_parameters",
-                },
-                relation_type="parameterOf",
-                right={"id": simulation_run_id, "resource_type": "simulation_runs"},
-                user_id=person_id,
-            )
+            # add_provenance(
+            #     left={
+            #         "id": parameter.get("id"),
+            #         "resource_type": "simulation_parameters",
+            #     },
+            #     relation_type="parameterOf",
+            #     right={"id": simulation_run_id, "resource_type": "simulation_runs"},
+            #     user_id=person_id,
+            # )
 
             add_concept(
                 concept=concept,

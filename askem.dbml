@@ -12,7 +12,7 @@ Enum public.resource_type {
    publications
    simulation_runs
    simulation_parameters
-   model_parameters
+   
 }
 
 Enum relation_type {
@@ -22,7 +22,6 @@ Enum relation_type {
   gluedFrom
   stratifiedFrom
   editedFrom
-  parameterOf
 }
 
 Enum taggable_type {
