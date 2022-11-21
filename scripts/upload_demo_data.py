@@ -167,7 +167,7 @@ def add_concept(concept, object_id, type):
 
 concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
 
-for folder in folders[1:6]:
+for folder in folders[1:5]:
     index = random.randrange(2)
     concept = concepts[index]
     # publications ##
@@ -413,14 +413,18 @@ for folder in folders[1:6]:
     try:
 
         # creating simulation parameters
-        parameter_types = {}
+        parameter_types = []
         with open(f"{folder}model_mmt_parameters.json", "r") as f:
             parameters = json.load(f)
             for parameter_name, parameter_value in parameters.get("parameters").items():
-                parameter_types[parameter_name] = (
-                    str(parameter_value),
-                    str(type(parameter_value).__name__),
+                parameter_types.append(
+                    {
+                        "name": parameter_name,
+                        "value": str(parameter_value),
+                        "type": str(type(parameter_value).__name__),
+                    }
                 )
+
         payload = json.dumps(parameter_types)
         headers = {"Content-Type": "application/json"}
 
@@ -430,7 +434,31 @@ for folder in folders[1:6]:
             headers=headers,
             data=payload,
         )
-        print(response.text)
+
+        # get parameters
+        response = requests.request(
+            "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
+        )
+        parameters_json = response.json()
+
+        for parameter in parameters_json:
+            print(parameter)
+
+            add_provenance(
+                left={
+                    "id": parameter.get("id"),
+                    "resource_type": "simulation_parameters",
+                },
+                relation_type="parameterOf",
+                right={"id": simulation_run_id, "resource_type": "simulation_runs"},
+                user_id=person_id,
+            )
+
+            add_concept(
+                concept=concept,
+                object_id=parameter.get("id"),
+                type="simulation_parameters",
+            )
 
     except Exception as e:
         print(e)

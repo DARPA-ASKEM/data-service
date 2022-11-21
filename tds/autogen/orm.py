@@ -13,9 +13,11 @@ class ResourceType(str, Enum):
     datasets = 'datasets'
     extractions = 'extractions'
     intermediates = 'intermediates'
+    model_parameters = 'model_parameters'
     models = 'models'
     plans = 'plans'
     publications = 'publications'
+    simulation_parameters = 'simulation_parameters'
     simulation_runs = 'simulation_runs'
     
 
@@ -26,6 +28,7 @@ class RelationType(str, Enum):
     derivedfrom = 'derivedfrom'
     editedFrom = 'editedFrom'
     gluedFrom = 'gluedFrom'
+    parameterOf = 'parameterOf'
     stratifiedFrom = 'stratifiedFrom'
     
 
@@ -39,6 +42,7 @@ class TaggableType(str, Enum):
     projects = 'projects'
     publications = 'publications'
     qualifiers = 'qualifiers'
+    simulation_parameters = 'simulation_parameters'
     simulation_plans = 'simulation_plans'
     simulation_runs = 'simulation_runs'
     
