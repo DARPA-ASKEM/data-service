@@ -18,7 +18,7 @@ def adjust_model_params(model_id: int, parameters: ModelParameters, session: Ses
     """
 
     existing = []
-    for param in session.query(orm.SimulationParameter).filter(
+    for param in session.query(orm.ModelParameter).filter(
         orm.ModelParameter.model_id == model_id
     ):
         existing.append(param.name)

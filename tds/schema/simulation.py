@@ -4,20 +4,23 @@ API schema for simulation objects
 # pylint: disable=missing-class-docstring
 
 from json import dumps
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional
 
-from tds.autogen import orm, schema
+from tds.autogen import orm
 from tds.autogen.schema import SimulationPlan, SimulationRun
 from tds.schema.concept import Concept
 
-SimulationParameters = Dict[str, Tuple[str, schema.ValueType]]
+SimulationParameters = List[dict]
 
 
 def orm_to_params(parameters: List[orm.SimulationParameter]) -> SimulationParameters:
     """
     Convert SQL parameter search to dict
     """
-    return {param.name: (param.value, param.type) for param in parameters}
+    return [
+        {"name": param.name, "value": param.value, "type": param.type, "id": param.id}
+        for param in parameters
+    ]
 
 
 class Plan(SimulationPlan):
@@ -74,6 +77,6 @@ class Run(SimulationRun):
                 "timestamp": "datetime",
                 "completed_at": "optional-datetime",
                 "response": "blob",
-                "parameters": {"str": ("str", "value-type")},
+                "parameters": [],
             }
         }

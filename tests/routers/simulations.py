@@ -60,7 +60,7 @@ def test_simulation_cr():
             "simulator_id": id,
             "success": None,
             "completed_at": None,
-            "parameters": {"x": ("1", ValueType.int)},
+            "parameters": [{"name": "x", "value": "1", "type": ValueType.int}],
             "response": "",
         }
         response_create = client.post(

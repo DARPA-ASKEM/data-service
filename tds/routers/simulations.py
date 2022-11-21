@@ -185,9 +185,14 @@ def create_run(payload: Run, rdb: Engine = Depends(request_rdb)) -> Response:
         session.commit()
         id: int = run.id
 
-        for name, (value, type) in parameters.items():
+        for param in parameters:
             session.add(
-                orm.SimulationParameter(run_id=id, name=name, value=value, type=type)
+                orm.SimulationParameter(
+                    run_id=id,
+                    name=param["name"],
+                    value=param["value"],
+                    type=param["type"],
+                )
             )
         session.commit()
     logger.info("new run with %i", id)

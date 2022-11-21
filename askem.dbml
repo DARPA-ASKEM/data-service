@@ -33,6 +33,7 @@ Enum taggable_type {
    publications
    simulation_runs
    intermediates
+   simulation_parameters
 }
 
 Enum value_type {
