@@ -168,7 +168,7 @@ def add_concept(concept, object_id, type):
 
 concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
 
-for folder in folders[1:2]:
+for folder in folders:
     index = random.randrange(2)
     concept = concepts[index]
     # publications ##
@@ -187,7 +187,6 @@ for folder in folders[1:2]:
         )
         publication_json = response.json()
         publication_id = publication_json.get("id")
-
         asset_to_project(
             project_id=1, asset_id=int(publication_id), asset_type="publications"
         )
@@ -435,7 +434,6 @@ for folder in folders[1:2]:
             url + f"simulations/runs/parameters/{simulation_run_id}",
             headers=headers,
             data=payload,
-
         )
 
         # get parameters
@@ -465,9 +463,6 @@ for folder in folders[1:2]:
 
     except Exception as e:
         print(e)
-
-programatically_populate_datasets()
-
 
 programatically_populate_datasets()
 
