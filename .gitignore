@@ -9,3 +9,5 @@ dist
 .cache
 .sqlite
 experiments-main
+api.env
+
