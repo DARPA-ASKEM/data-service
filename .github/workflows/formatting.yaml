@@ -1,5 +1,11 @@
+---
 name: Formatting
-on: [push]
+on:
+  workflow_call:
+  push:
+    branches: [ 'main' ]
+  pull_request:
+    branches: [ 'main' ]
 
 jobs:
   formatting:

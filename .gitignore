@@ -1,3 +1,22 @@
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# IntelliJ
+.idea/*
+*.ipr
+*.iml
+*.iws
+
+# Visual Studio Code
+.vscode/*
+.factorypath
+
+# OSX
+.DS_Store
+
 # Python
 __pycache__
 .mypy_cache
