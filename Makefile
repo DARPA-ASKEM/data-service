@@ -6,6 +6,7 @@ export LANG
 
 .PHONY:init
 init:
+	cp api.env.sample api.env
 	poetry install;
 	poetry run pre-commit install
 	
