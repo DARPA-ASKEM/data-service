@@ -41,20 +41,6 @@ class Project(schema.Project):
                 "description": "string",
                 "assets": {"resource-type": "list-of-ordered-ints"},
                 "active": "bool",
-
-
-
-class ProjectMetadata(schema.Project):
-    concept: Optional[Concept] = None
-
-    class Config:
-        orm_mode = True
-        schema_extra = {
-            "example": {
-                "name": "string",
-                "description": "string",
-                "active": True,
-
             }
         }
 
