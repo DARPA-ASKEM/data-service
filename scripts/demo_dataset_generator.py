@@ -31,6 +31,26 @@ URL = "http://localhost:8001/"
 #     p_response_obj = persons_response.json()
 
 #     return p_response_obj
+url = "http://localhost:8001/"
+
+
+def asset_to_project(project_id, asset_id, asset_type):
+    payload = json.dumps(
+        {
+            "project_id": project_id,
+            "resource_id": asset_id,
+            "resource_type": asset_type,
+            "external_ref": "string",
+        }
+    )
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.request(
+        "POST",
+        url + f"projects/{project_id}/assets/{asset_type}/{asset_id}",
+        headers=headers,
+        data=payload,
+    )
 
 
 def create_dataset(maintainer_id, num_of_states, dataset_index):
@@ -239,6 +259,8 @@ def programatically_populate_datasets():
                 for state in range(num_of_states):
                     create_feature(dataset_id, state)
                 create_qualifier(dataset_id, num_of_states)
+                asset_to_project(1, dataset_id, "datasets")
+
         except FileNotFoundError:
             print("sim_output.json not found in " + folder)
         folder_index += 1
