@@ -32,3 +32,13 @@ services:
       - rdb
     volumes:
       - $PWD/tds:/api/tds
+  graphdb:
+    image: neo4j:latest
+    ports:
+      - 7474:7474
+      - 7687:7687
+    environment:
+      - NEO4J_AUTH=neo4j/password
+      - NEO4J_dbms_memory_pagecache_size=512M
+    networks:
+      - data-api

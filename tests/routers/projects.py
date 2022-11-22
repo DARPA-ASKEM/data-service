@@ -74,12 +74,12 @@ def test_project_cru():
         )
         # Update
         payload_updated = {
-            "name": "string",
+            "name": "new_string",
             "description": "string",
             "assets": {ResourceType.models: [model2_id]},
             "status": "inactive",
         }
-        response_update = client.post(
+        response_update = client.put(
             f"/projects/{id}",
             json=payload_updated,
             headers={"Content-type": "application/json", "Accept": "text/plain"},
@@ -90,7 +90,7 @@ def test_project_cru():
         )
         assert 200 == response_get_again.status_code
         project = response_get_again.json()
-        assert response_get.json()["status"] != response_get_again.json()["status"]
+        assert response_get.json()["name"] != response_get_again.json()["name"]
         assert (
             ResourceType.models in project["assets"]
             and model2_id in project["assets"][ResourceType.models]
