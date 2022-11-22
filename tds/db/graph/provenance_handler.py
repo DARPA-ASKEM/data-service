@@ -2,9 +2,9 @@
 Handler for object relations
 """
 
-from typing import Any, Optional
-import inspect
 import functools
+import inspect
+from typing import Any, Optional
 
 from neo4j import Driver
 from sqlalchemy.engine.base import Engine
@@ -16,8 +16,6 @@ from tds.schema.provenance import Provenance
 from tds.schema.resource import Resource, get_resource_type
 
 
-
-
 class ProvenanceHandler:
     """
     The handler wraps crud operations and writes to both the relational and graph DBs
@@ -26,8 +24,7 @@ class ProvenanceHandler:
     def __init__(self, rdb: Engine, graph_db: Optional[Driver] = None):
         self.__connection__ = rdb.connect()
         self.graph_db = graph_db
-        
-        
+
     def cache_enabled(self):
         """
         Check if graph cache should be written to
