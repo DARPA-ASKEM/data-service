@@ -1,5 +1,6 @@
 """
 Provides the API interface for models.
+
 """
 # pylint: disable=missing-class-docstring
 from json import dumps
@@ -28,7 +29,6 @@ class ModelDescription(schema.Model):
 class Model(schema.Model):
     concept: Optional[Concept] = None
     parameters: ModelParameters = {}
-
 
     @classmethod
     def from_orm(cls, body: orm.Model, parameters: List[orm.ModelParameter]) -> "Model":

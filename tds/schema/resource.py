@@ -13,7 +13,6 @@ from tds.schema.model import Intermediate, Model
 from tds.schema.simulation import Plan, Run
 
 
-
 class Extraction(schema.Extraction):
     class Config:
         orm_mode = True
@@ -41,7 +40,6 @@ ORMResource = (
     | orm.SimulationRun
 )
 
-
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
     Extraction: ResourceType.extractions,
@@ -50,7 +48,6 @@ obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Publication: ResourceType.publications,
     Intermediate: ResourceType.intermediates,
     Run: ResourceType.simulation_runs,
-
 }
 
 
@@ -83,7 +80,6 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
             ResourceType.publications: orm.Publication,
             ResourceType.intermediates: orm.Intermediate,
             ResourceType.simulation_runs: orm.SimulationRun,
-
         },
     )
     return enum_to_orm[resource_type]
