@@ -24,6 +24,9 @@ psycopg2-binary = "^2.9.4"
 neo4j = "^5.2.0"
 pyarrow = "^10.0.0"
 fsspec = "^2022.11.0"
+boto3 = "^1.26.13"
+botocore = "^1.29.13"
+python-multipart = "^0.0.5"
 
 [tool.poetry.scripts]
 tds = "tds.main:cli"
