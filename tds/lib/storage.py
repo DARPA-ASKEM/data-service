@@ -29,10 +29,8 @@ def get_rawfile(path):
     location_info = urlparse(path)
 
     if location_info.scheme.lower() == "file":
-        with open(location_info.path, "rb") as file:
-            raw_file = file
-            return raw_file
-    elif location_info.scheme.lower() == "s3":
+        return open(location_info.path, "rb")
+    if location_info.scheme.lower() == "s3":
         try:
             file_path = location_info.path.lstrip("/")
             raw_file = tempfile.TemporaryFile()
