@@ -3,6 +3,8 @@ Handler for object relations
 """
 
 from typing import Any, Optional
+import inspect
+import functools
 
 from neo4j import Driver
 from sqlalchemy.engine.base import Engine
@@ -14,31 +16,6 @@ from tds.schema.provenance import Provenance
 from tds.schema.resource import Resource, get_resource_type
 
 
-def retrieve_obj(method):
-    """
-    Retrieve the parent caller
-    """
-    if "__self__" in dir(method):
-        return method.__self__
-    if "__call__" in dir(method):
-        return retrieve_obj(method.__call__)
-    return None
-
-
-def operate_on_graph(method):
-    """
-    Wraps functions that directly interact with the graph database
-
-    Currently, it checks to see if a connection exists and throws and
-    error if false.
-    """
-
-    def raise_missing_graph_failure(*args) -> Any:
-        if not retrieve_obj(method).cache_enabled():
-            raise Exception("Graph database connection not enabled")
-        return method(*args)
-
-    return raise_missing_graph_failure
 
 
 class ProvenanceHandler:
@@ -49,7 +26,8 @@ class ProvenanceHandler:
     def __init__(self, rdb: Engine, graph_db: Optional[Driver] = None):
         self.__connection__ = rdb.connect()
         self.graph_db = graph_db
-
+        
+        
     def cache_enabled(self):
         """
         Check if graph cache should be written to
@@ -126,7 +104,6 @@ class ProvenanceHandler:
 
             return False
 
-    @operate_on_graph
     def create_node(self, id, label):
         """
         Create node
@@ -135,7 +112,6 @@ class ProvenanceHandler:
             query_label = f"{label.capitalize()}"
             session.run("Create (n:" + query_label + ")" + "SET n.id = $id_", id_=id)
 
-    @operate_on_graph
     def delete_node(self, id):
         """
         Delete individual node
@@ -149,7 +125,6 @@ class ProvenanceHandler:
                 id_=id,
             )
 
-    @operate_on_graph
     def create_node_relationship(self, provenance_payload):
         """
         Create edge between two nodes
@@ -189,7 +164,6 @@ class ProvenanceHandler:
                 user_id=provenance_payload.get("user_id"),
             )
 
-    @operate_on_graph
     def delete_node_relationship(self, provenance_payload):
         """
         Delete edge between two nodes
@@ -214,7 +188,6 @@ class ProvenanceHandler:
                 user_id=provenance_payload.get("user_id"),
             )
 
-    @operate_on_graph
     def delete_nodes(self):
         """
         Prune nodes without edges
@@ -224,7 +197,6 @@ class ProvenanceHandler:
             session.run(query)
         return True
 
-    @operate_on_graph
     def search_derivedfrom(self, artifact_id, artifact_type):
         """
         Search for ancestors
