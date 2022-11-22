@@ -1,5 +1,11 @@
+---
 name: Correctness
-on: [push]
+on:
+  workflow_call:
+  push:
+    branches: [ 'main' ]
+  pull_request:
+    branches: [ 'main' ]
 
 jobs:
   correctness:
