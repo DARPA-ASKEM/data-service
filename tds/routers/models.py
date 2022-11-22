@@ -31,7 +31,6 @@ from tds.schema.model import (
     orm_to_params,
 )
 
-
 logger = Logger(__name__)
 router = APIRouter()
 
