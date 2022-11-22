@@ -2,9 +2,7 @@
 Handler for object relations
 """
 
-import functools
-import inspect
-from typing import Any, Optional
+from typing import Optional
 
 from neo4j import Driver
 from sqlalchemy.engine.base import Engine
