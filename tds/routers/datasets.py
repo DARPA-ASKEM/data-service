@@ -46,6 +46,7 @@ def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
     """
     Create a feature
     """
+
     with Session(rdb) as session:
         featurep = payload.dict()
         del featurep["id"]
@@ -223,7 +224,9 @@ def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
     """
     Create a dataset
     """
+
     with Session(rdb) as session:
+
         datasetp = payload.dict()
         del datasetp["id"]
         dataset = orm.Dataset(**datasetp)

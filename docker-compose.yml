@@ -8,6 +8,7 @@ networks:
     name: data-annotation-stack
 services:
   rdb:
+    container_name: data-service-rdb
     image: "postgres:15.0"
     ports:
       - "8032:5432"
@@ -18,6 +19,7 @@ services:
     networks:
       - data-api
   api:
+    container_name: data-service-api
     build: ./
     ports:
       - "8001:8000"

@@ -23,7 +23,7 @@ up:
 
 .PHONY:
 populate:
-	python3  scripts/upload_demo_data.py 
+	python3 scripts/upload_demo_data.py;
 
 	
 .PHONY:

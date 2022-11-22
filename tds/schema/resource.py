@@ -29,6 +29,7 @@ class Software(schema.Software):
 
 
 Resource = Dataset | Extraction | Model | Plan | Publication | Intermediate | Run
+
 ORMResource = (
     orm.Dataset
     | orm.Extraction
@@ -38,7 +39,6 @@ ORMResource = (
     | orm.Intermediate
     | orm.SimulationRun
 )
-
 
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,

@@ -151,6 +151,7 @@ def delete_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Response
 def list_model_descriptions(
     page: int = 100, page_size: int = 0, rdb: Engine = Depends(request_rdb)
 ) -> List[Model]:
+
     """
     Retrieve all models
 

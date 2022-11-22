@@ -1,5 +1,6 @@
 """
 Provides the API interface for models.
+
 """
 # pylint: disable=missing-class-docstring
 from json import dumps

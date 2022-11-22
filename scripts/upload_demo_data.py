@@ -9,6 +9,7 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 import requests
+from demo_dataset_generator import programatically_populate_datasets
 
 url = "http://localhost:8001/"
 
@@ -92,7 +93,6 @@ def create_framework(url=url):
 
 
 person = create_person()
-print(person)
 person_id = person.get("id")
 project = create_project()
 project_id = project.get("id")
@@ -140,7 +140,6 @@ def add_provenance(left, right, relation_type, user_id):
         headers=headers,
         data=payload,
     )
-    print(response)
 
 
 def add_concept(concept, object_id, type):
@@ -153,7 +152,6 @@ def add_concept(concept, object_id, type):
             "status": "obj",
         }
     )
-    print(payload)
     headers = {"Content-Type": "application/json"}
 
     response = requests.request(
@@ -162,7 +160,6 @@ def add_concept(concept, object_id, type):
         headers=headers,
         data=payload,
     )
-    print(response.text)
 
 
 concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
@@ -385,9 +382,7 @@ for folder in folders:
         )
         headers = {"Content-Type": "application/json"}
 
-        print(payload)
         response = requests.request("POST", url + path, headers=headers, data=payload)
-        print(response.text)
         sim_run_json = response.json()
         simulation_run_id = sim_run_json.get("id")
 
@@ -442,17 +437,6 @@ for folder in folders:
         parameters_json = response.json()
 
         for parameter in parameters_json:
-            print(parameter)
-
-            # add_provenance(
-            #     left={
-            #         "id": parameter.get("id"),
-            #         "resource_type": "simulation_parameters",
-            #     },
-            #     relation_type="parameterOf",
-            #     right={"id": simulation_run_id, "resource_type": "simulation_runs"},
-            #     user_id=person_id,
-            # )
 
             add_concept(
                 concept=concept,
@@ -462,6 +446,8 @@ for folder in folders:
 
     except Exception as e:
         print(e)
+
+programatically_populate_datasets()
 
 ## now delete repo
 shutil.rmtree("experiments-main")
