@@ -12,25 +12,25 @@ URL = "http://localhost:8001/"
 # Function definitions
 
 
-def create_person():
-    """Creates a demo person in postgres
+# def create_person():
+#     """Creates a demo person in postgres
 
-    Returns:
-        json: requests response in json format
-    """
-    person_payload = {
-        "name": "Adam Smith",
-        "email": "Adam@test.io",
-        "org": "Uncharted",
-        "website": "",
-        "is_registered": True,
-    }
+#     Returns:
+#         json: requests response in json format
+#     """
+#     person_payload = {
+#         "name": "Adam Smith",
+#         "email": "Adam@test.io",
+#         "org": "Uncharted",
+#         "website": "",
+#         "is_registered": True,
+#     }
 
-    persons_response = requests.post(URL + "persons", json=person_payload, timeout=100)
+#     persons_response = requests.post(URL + "persons", json=person_payload, timeout=100)
 
-    p_response_obj = persons_response.json()
+#     p_response_obj = persons_response.json()
 
-    return p_response_obj
+#     return p_response_obj
 
 
 def create_dataset(maintainer_id, num_of_states, dataset_index):
