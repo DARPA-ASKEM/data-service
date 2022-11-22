@@ -13,6 +13,6 @@ engine = create_engine(url, connect_args={"connect_timeout": 8})
 
 async def request_engine():
     """
-    Provides engine that can be used by FastAPI Dependencies
+    Provides postgres engine that can be used by FastAPI Dependencies
     """
     return engine

@@ -16,6 +16,7 @@ class ResourceType(str, Enum):
     models = 'models'
     plans = 'plans'
     publications = 'publications'
+    simulation_runs = 'simulation_runs'
     
 
 class RelationType(str, Enum):
@@ -32,9 +33,15 @@ class TaggableType(str, Enum):
 
     datasets = 'datasets'
     features = 'features'
+    intermediates = 'intermediates'
+    model_parameters = 'model_parameters'
     models = 'models'
     projects = 'projects'
+    publications = 'publications'
+    qualifiers = 'qualifiers'
+    simulation_parameters = 'simulation_parameters'
     simulation_plans = 'simulation_plans'
+    simulation_runs = 'simulation_runs'
     
 
 class ValueType(str, Enum):
@@ -179,7 +186,7 @@ class SimulationRun(Base):
     simulator_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_plan.id'), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     completed_at = sa.Column(sa.DateTime())
-    success = sa.Column(sa.Boolean(), server_default='True')
+    success = sa.Column(sa.Boolean())
     response = sa.Column(sa.LargeBinary())
 
 
@@ -191,6 +198,7 @@ class ModelParameter(Base):
     model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
     name = sa.Column(sa.String(), nullable=False)
     type = sa.Column(sa.Enum(ValueType), nullable=False)
+    default_value = sa.Column(sa.String())
 
 
 class SimulationParameter(Base):
@@ -198,7 +206,7 @@ class SimulationParameter(Base):
     __tablename__ = 'simulation_parameter'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    plan_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_plan.id'), nullable=False)
+    run_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_run.id'), nullable=False)
     name = sa.Column(sa.String(), nullable=False)
     value = sa.Column(sa.String(), nullable=False)
     type = sa.Column(sa.Enum(ValueType), nullable=False)
@@ -297,7 +305,7 @@ class Project(Base):
     name = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.String(), nullable=False)
     timestamp = sa.Column(sa.DateTime(), server_default=func.now())
-    status = sa.Column(sa.String(), nullable=False)
+    active = sa.Column(sa.Boolean(), nullable=False)
 
 
 class OntologyConcept(Base):
@@ -305,9 +313,9 @@ class OntologyConcept(Base):
     __tablename__ = 'ontology_concept'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    term_id = sa.Column(sa.String(), nullable=False)
+    curie = sa.Column(sa.String(), nullable=False)
     type = sa.Column(sa.Enum(TaggableType), nullable=False)
-    obj_id = sa.Column(sa.Integer(), nullable=False)
+    object_id = sa.Column(sa.Integer(), nullable=False)
     status = sa.Column(sa.Enum(OntologicalField), nullable=False)
 
 

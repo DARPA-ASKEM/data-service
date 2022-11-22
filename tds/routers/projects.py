@@ -47,6 +47,34 @@ def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
     return Project.from_orm(project, list(parameters))
 
 
+@router.delete("/{id}", **retrieve.fastapi_endpoint_config)
+def deactivate_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
+    """
+    Deactivate project
+    """
+    if entry_exists(rdb.connect(), orm.Project, id):
+        with Session(rdb) as session:
+            project = session.query(orm.Project).get(id)
+
+        # set to dict and active to false
+        project_ = project.__dict__
+        project_.pop("_sa_instance_state")
+        project_["active"] = False
+
+        with Session(rdb) as session:
+            session.query(orm.Project).filter(orm.Project.id == id).update(project_)
+            session.commit()
+
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return Response(
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id, "status": project_["active"]}),
+    )
+
+
 @router.post("", **create.fastapi_endpoint_config)
 def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> Response:
     """
@@ -86,7 +114,7 @@ def create_project(payload: Project, rdb: Engine = Depends(request_rdb)) -> Resp
     )
 
 
-@router.post("/{id}", **update.fastapi_endpoint_config)
+@router.put("/{id}", **update.fastapi_endpoint_config)
 def update_project(
     id: int, payload: Project, rdb: Engine = Depends(request_rdb)
 ) -> Response:

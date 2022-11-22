@@ -8,10 +8,26 @@ from typing import Dict, List, Optional
 from tds.autogen import orm, schema
 from tds.schema.concept import Concept
 
+ModelParameters = Dict[str, schema.ValueType]
+
+
+def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
+    """
+    Convert SQL parameter search to dict
+    """
+    return {param.name: param.type for param in parameters}
+
+
+class ModelDescription(schema.Model):
+    concept: Optional[Concept] = None
+
+    class Config:
+        orm_mode = True
+
 
 class Model(schema.Model):
     concept: Optional[Concept] = None
-    parameters: Dict[str, schema.ValueType] = {}
+    parameters: ModelParameters = {}
 
     @classmethod
     def from_orm(cls, body: orm.Model, parameters: List[orm.ModelParameter]) -> "Model":
