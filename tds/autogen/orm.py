@@ -103,6 +103,18 @@ class QualifierXref(Base):
     feature_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
 
 
+class Model(Base):
+
+    __tablename__ = 'model'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    name = sa.Column(sa.String(), nullable=False)
+    description = sa.Column(sa.Text())
+    framework = sa.Column(sa.String(), sa.ForeignKey('model_framework.name'), nullable=False)
+    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
+    state_id = sa.Column(sa.Integer(), sa.ForeignKey('model_state.id'), nullable=False)
+
+
 class ModelRuntime(Base):
 
     __tablename__ = 'model_runtime'
@@ -155,16 +167,14 @@ class Qualifier(Base):
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class Model(Base):
+class ModelState(Base):
 
-    __tablename__ = 'model'
+    __tablename__ = 'model_state'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.Text())
-    framework = sa.Column(sa.String(), sa.ForeignKey('model_framework.name'), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     content = sa.Column(JSON())
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
 
 
 class SimulationPlan(Base):

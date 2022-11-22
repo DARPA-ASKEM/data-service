@@ -129,7 +129,14 @@ Table model {
   description text
   framework varchar [ref: > model_framework.name, not null]
   timestamp datetime [default: `now()`, not null]
+  state_id int [ref: > model_state.id, not null]
+}
+
+Table model_state {
+  id int [pk]
+  timestamp datetime [default: `now()`, not null]
   content json
+  model_id int [ref: > model.id, not null]
 }
 
 Table intermediate {
@@ -253,4 +260,3 @@ Table association {
   resource_type public.resource_type
   role public.role
 }
-

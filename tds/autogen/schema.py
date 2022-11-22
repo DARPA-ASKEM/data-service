@@ -97,6 +97,16 @@ class QualifierXref(BaseModel):
     feature_id: Optional[int] = None
 
 
+class Model(BaseModel):
+
+    id: Optional[int] = None
+    name: str
+    description: Optional[str]
+    framework: str
+    timestamp: datetime.datetime = datetime.datetime.now()
+    state_id: Optional[int] = None
+
+
 class ModelRuntime(BaseModel):
 
     id: Optional[int] = None
@@ -141,14 +151,12 @@ class Qualifier(BaseModel):
     value_type: ValueType
 
 
-class Model(BaseModel):
+class ModelState(BaseModel):
 
     id: Optional[int] = None
-    name: str
-    description: Optional[str]
-    framework: str
     timestamp: datetime.datetime = datetime.datetime.now()
     content: Optional[Json]
+    model_id: Optional[int] = None
 
 
 class SimulationPlan(BaseModel):
