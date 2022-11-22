@@ -20,7 +20,26 @@ router = APIRouter()
 
 
 @router.get("")
-def search_concept(term: str, limit: int = 100, offset: int = 0):
+def search_concept(curie: str, rdb: Engine = Depends(request_rdb)):
+    """
+    Searches within TDS for artifacts with this concept term associated with them
+    """
+    results = []
+    with Session(rdb) as session:
+        result_list = (
+            session.query(orm.OntologyConcept)
+            .filter(orm.OntologyConcept.curie == curie)
+            .all()
+        )
+
+    for result in result_list:
+        result.__dict__.pop("id")
+        results.append(result)
+    return results
+
+
+@router.get("/definitions")
+def search_concept_definitions(term: str, limit: int = 100, offset: int = 0):
     """
     Wraps search functionality from the DKG.
     """
@@ -40,7 +59,7 @@ def search_concept(term: str, limit: int = 100, offset: int = 0):
     raise Exception(f"DKG server returned the status {response.status_code}")
 
 
-@router.get("/definition/{curie}")
+@router.get("/definitions/{curie}")
 def get_concept_definition(curie: str):
     """
     Wraps fetch functionality from the DKG.
@@ -77,19 +96,16 @@ def create_concept(payload: schema.OntologyConcept, rdb: Engine = Depends(reques
     Create a concept
     """
     with Session(rdb) as session:
-        conceptp = payload.dict()
-        del conceptp["id"]
-        concept = orm.OntologyConcept(**conceptp)
+        concept_dict = payload.dict()
+        concept = orm.OntologyConcept(**concept_dict)
         session.add(concept)
         session.commit()
-        data_id = concept.id
-        conceptp["id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
             headers={
                 "content-type": "application/json",
             },
-            content=json.dumps(conceptp),
+            content=json.dumps({"id": concept.id}),
         )
 
 

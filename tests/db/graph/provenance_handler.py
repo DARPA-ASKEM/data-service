@@ -14,7 +14,7 @@ from tests.helpers import demo_rdb
 
 def test_relation_handler_rdb_only():
     with demo_rdb() as rdb:
-        relation_handler = ProvenanceHandler(rdb, False)
+        relation_handler = ProvenanceHandler(rdb, None)
         intermediate = Intermediate(
             id=0,
             source=IntermediateSource.skema,

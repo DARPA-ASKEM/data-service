@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
-from tds.db import init_dev_content, request_rdb
+from tds.db import init_dev_content, request_graph_db, request_rdb
 from tds.server.build import build_api
 
 
@@ -49,5 +49,9 @@ def demo_api(*router_name: str) -> Generator[TestClient, None, None]:
         async def request_test_rdb():
             yield rdb
 
+        async def request_test_graph():
+            yield None
+
         api.dependency_overrides[request_rdb] = request_test_rdb
+        api.dependency_overrides[request_graph_db] = request_test_graph
         yield TestClient(api)

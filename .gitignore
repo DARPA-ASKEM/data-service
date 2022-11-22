@@ -27,3 +27,6 @@ dist
 .vscode
 .cache
 .sqlite
+experiments-main
+api.env
+

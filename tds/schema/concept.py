@@ -8,7 +8,7 @@ from tds.autogen import schema
 
 
 class Concept(BaseModel):
-    term_id: str
+    curie: str
     status: schema.OntologicalField
 
     class Config:

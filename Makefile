@@ -6,6 +6,7 @@ export LANG
 
 .PHONY:init
 init:
+	cp api.env.sample api.env
 	poetry install;
 	poetry run pre-commit install
 	
@@ -23,7 +24,7 @@ up:
 
 .PHONY:
 populate:
-	python3  scripts/upload_demo_data.py 
+	poetry run python3 scripts/upload_demo_data.py;
 
 	
 .PHONY:

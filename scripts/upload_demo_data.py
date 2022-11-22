@@ -1,5 +1,6 @@
 import glob
 import json
+import random
 import shutil
 import time
 import xml.etree.ElementTree as ET
@@ -8,6 +9,7 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 import requests
+from demo_dataset_generator import programatically_populate_datasets
 
 url = "http://localhost:8001/"
 
@@ -91,9 +93,9 @@ def create_framework(url=url):
 
 
 person = create_person()
-person_id = person.get("person_id")
+person_id = person.get("id")
 project = create_project()
-project_id = project.get("project_id")
+project_id = project.get("id")
 create_framework()
 
 # loop over models
@@ -119,8 +121,52 @@ def asset_to_project(project_id, asset_id, asset_type):
     )
 
 
-for folder in folders:
+def add_provenance(left, right, relation_type, user_id):
+    payload = json.dumps(
+        {
+            "left": left.get("id"),
+            "left_type": left.get("resource_type"),
+            "right": right.get("id"),
+            "right_type": right.get("resource_type"),
+            "relation_type": relation_type,
+            "user_id": user_id,
+        }
+    )
+    headers = {"Content-Type": "application/json"}
 
+    response = requests.request(
+        "POST",
+        url + f"provenance",
+        headers=headers,
+        data=payload,
+    )
+
+
+def add_concept(concept, object_id, type):
+
+    payload = json.dumps(
+        {
+            "curie": str(concept),
+            "type": str(type),
+            "object_id": int(object_id),
+            "status": "obj",
+        }
+    )
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.request(
+        "POST",
+        url + f"concepts",
+        headers=headers,
+        data=payload,
+    )
+
+
+concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
+
+for folder in folders:
+    index = random.randrange(2)
+    concept = concepts[index]
     # publications ##
     try:
         print("Upload publication")
@@ -138,10 +184,86 @@ for folder in folders:
         publication_json = response.json()
         publication_id = publication_json.get("id")
         asset_to_project(
-            project_id=1, asset_id=int(publication_id), asset_type="publication"
+            project_id=1, asset_id=int(publication_id), asset_type="publications"
         )
+
+        add_concept(concept=concept, object_id=publication_id, type="publications")
     except Exception as e:
         print(f"error opening {folder}document_doi.txt . - {e}")
+
+    ## intermediates ##
+    try:
+        print("Upload intermediate mmt")
+        with open(folder + "model_mmt_templates.json", "r") as f:
+            mmt_template = json.load(f)
+
+            payload = json.dumps(
+                {
+                    "source": "mrepresentationa",
+                    "type": "bilayer",
+                    "content": json.dumps(mmt_template),
+                }
+            )
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.request(
+            "POST", url + "models/intermediates", headers=headers, data=payload
+        )
+        intermediate_json = response.json()
+        intermediate_mmt_id = intermediate_json.get("id")
+
+        asset_to_project(
+            project_id=1, asset_id=int(intermediate_mmt_id), asset_type="intermediates"
+        )
+
+        add_provenance(
+            left={"id": intermediate_mmt_id, "resource_type": "intermediates"},
+            right={"id": publication_id, "resource_type": "publications"},
+            relation_type="derivedfrom",
+            user_id=person_id,
+        )
+
+        add_concept(
+            concept=concept, object_id=intermediate_mmt_id, type="intermediates"
+        )
+
+    except Exception as e:
+        print(e)
+
+    try:
+        print("Upload intermediate sbml")
+        with open(folder + "model_sbml.xml", "r") as f:
+            mmt_template = f.read()
+            payload = json.dumps(
+                {
+                    "source": "mrepresentationa",
+                    "type": "sbml",
+                    "content": mmt_template,
+                }
+            )
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.request(
+            "POST", url + "models/intermediates", headers=headers, data=payload
+        )
+        intermediate_json = response.json()
+        intermediate_sbml_id = intermediate_json.get("id")
+        asset_to_project(
+            project_id=1, asset_id=int(intermediate_sbml_id), asset_type="intermediates"
+        )
+        add_provenance(
+            left={"id": intermediate_sbml_id, "resource_type": "intermediates"},
+            right={"id": intermediate_mmt_id, "resource_type": "intermediates"},
+            relation_type="derivedfrom",
+            user_id=person_id,
+        )
+
+        add_concept(
+            concept=concept, object_id=intermediate_sbml_id, type="intermediates"
+        )
+
+    except Exception as e:
+        print(e)
 
     ## model ##
     try:
@@ -181,63 +303,151 @@ for folder in folders:
         )
         model_json = response.json()
         model_id = model_json.get("id")
-        asset_to_project(project_id=1, asset_id=int(model_id), asset_type="model")
+        asset_to_project(project_id=1, asset_id=int(model_id), asset_type="models")
+
+        add_provenance(
+            left={"id": model_id, "resource_type": "models"},
+            right={"id": intermediate_sbml_id, "resource_type": "intermediates"},
+            relation_type="derivedfrom",
+            user_id=person_id,
+        )
+
+        add_concept(concept=concept, object_id=model_id, type="models")
 
     except Exception as e:
-        print(f"error opening {folder}document_doi.txt . - {e}")
+        print(f" {e}")
 
-    ## intermediates ##
+    ### upload simulation plan ###
     try:
-        print("Upload intermediate mmt")
-        with open(folder + "model_mmt_templates.json", "r") as f:
-            mmt_template = json.load(f)
+        print("Upload Simulation Plan")
 
-            payload = json.dumps(
-                {
-                    "source": "mrepresentationa",
-                    "type": "bilayer",
-                    "content": json.dumps(mmt_template),
-                }
-            )
+        path = "simulations/plans"
+
+        # load simulation plan contents as json
+        with open("scripts/simulation-plan_ATE.json", "r") as f:
+            simulation_body = json.load(f)
+
+        payload = json.dumps(
+            {
+                "name": f"{model_id}_simulation_plan",
+                "model_id": model_id,
+                "description": f"Simulation plan for model {model_id}",
+                "simulator": "default",
+                "query": "My query",
+                "content": json.dumps(simulation_body),
+                # "parameters":json.dumps({"simulations":{"count":5}})
+            }
+        )
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.request("POST", url + path, headers=headers, data=payload)
+        sim_plan_json = response.json()
+        simulation_plan_id = sim_plan_json.get("id")
+
+        asset_to_project(
+            project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
+        )
+
+        add_provenance(
+            left={"id": simulation_plan_id, "resource_type": "plans"},
+            relation_type="derivedfrom",
+            right={"id": model_id, "resource_type": "models"},
+            user_id=person_id,
+        )
+
+        add_concept(
+            concept=concept, object_id=intermediate_sbml_id, type="simulation_plans"
+        )
+
+    except Exception as e:
+        print(f" {e}")
+
+    ### simulation run ###
+
+    try:
+        print("Upload Simulation Run")
+
+        path = "simulations/runs/descriptions"
+
+        # load simulation run contents as json
+        with open(folder + "sim_output.json", "r") as f:
+            sim_output = f.read()
+
+        payload = json.dumps(
+            {
+                "simulator_id": simulation_plan_id,
+                "success": True,
+                "response": json.dumps(sim_output),
+            }
+        )
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.request("POST", url + path, headers=headers, data=payload)
+        sim_run_json = response.json()
+        simulation_run_id = sim_run_json.get("id")
+
+        asset_to_project(
+            project_id=1, asset_id=int(simulation_run_id), asset_type="simulation_runs"
+        )
+
+        add_provenance(
+            left={"id": simulation_run_id, "resource_type": "simulation_runs"},
+            relation_type="derivedfrom",
+            right={"id": simulation_plan_id, "resource_type": "plans"},
+            user_id=person_id,
+        )
+
+        add_concept(
+            concept=concept, object_id=simulation_run_id, type="simulation_runs"
+        )
+
+    except Exception as e:
+        print(f" {e}")
+
+    ### Simulation parameters ###
+    try:
+
+        # creating simulation parameters
+        parameter_types = []
+        with open(f"{folder}model_mmt_parameters.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("parameters").items():
+                parameter_types.append(
+                    {
+                        "name": parameter_name,
+                        "value": str(parameter_value),
+                        "type": str(type(parameter_value).__name__),
+                    }
+                )
+
+        payload = json.dumps(parameter_types)
         headers = {"Content-Type": "application/json"}
 
         response = requests.request(
-            "POST", url + "models/intermediates", headers=headers, data=payload
+            "PUT",
+            url + f"simulations/runs/parameters/{simulation_run_id}",
+            headers=headers,
+            data=payload,
         )
-        intermediate_json = response.json()
-        intermediate_id = intermediate_json.get("id")
 
-        asset_to_project(
-            project_id=1, asset_id=int(intermediate_id), asset_type="intermediate"
+        # get parameters
+        response = requests.request(
+            "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
         )
+        parameters_json = response.json()
+
+        for parameter in parameters_json:
+
+            add_concept(
+                concept=concept,
+                object_id=parameter.get("id"),
+                type="simulation_parameters",
+            )
 
     except Exception as e:
         print(e)
 
-    try:
-        print("Upload intermediate sbml")
-        with open(folder + "model_sbml.xml", "r") as f:
-            mmt_template = f.read()
-            payload = json.dumps(
-                {
-                    "source": "mrepresentationa",
-                    "type": "sbml",
-                    "content": mmt_template,
-                }
-            )
-        headers = {"Content-Type": "application/json"}
-
-        response = requests.request(
-            "POST", url + "models/intermediates", headers=headers, data=payload
-        )
-        intermediate_json = response.json()
-        intermediate_id = intermediate_json.get("id")
-        asset_to_project(
-            project_id=1, asset_id=int(intermediate_id), asset_type="intermediate"
-        )
-
-    except Exception as e:
-        print(e)
+programatically_populate_datasets()
 
 ## now delete repo
 shutil.rmtree("experiments-main")

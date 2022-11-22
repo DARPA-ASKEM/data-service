@@ -4,30 +4,34 @@ API schema for simulation objects
 # pylint: disable=missing-class-docstring
 
 from json import dumps
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional
 
-from tds.autogen import orm, schema
+from tds.autogen import orm
 from tds.autogen.schema import SimulationPlan, SimulationRun
 from tds.schema.concept import Concept
+
+SimulationParameters = List[dict]
+
+
+def orm_to_params(parameters: List[orm.SimulationParameter]) -> SimulationParameters:
+    """
+    Convert SQL parameter search to dict
+    """
+    return [
+        {"name": param.name, "value": param.value, "type": param.type, "id": param.id}
+        for param in parameters
+    ]
 
 
 class Plan(SimulationPlan):
     concept: Optional[Concept] = None
-    parameters: Dict[str, Tuple[str, schema.ValueType]] = {}
 
     @classmethod
-    def from_orm(
-        cls, body: orm.SimulationPlan, parameters: List[orm.ModelParameter]
-    ) -> "Plan":
+    def from_orm(cls, body: orm.SimulationRun) -> "Plan":
         """
         Handle ORM conversion while coercing `dict` to JSON
         """
         setattr(body, "content", dumps(body.content))
-        setattr(
-            body,
-            "parameters",
-            {param.name: (param.value, param.type) for param in parameters},
-        )
         return super().from_orm(body)
 
     class Config:
@@ -39,11 +43,40 @@ class Plan(SimulationPlan):
                 "model_id": "int",
                 "query": "string",
                 "content": "json-in-string",
-                "parameters": {"str": ("str", "value-type")},
             }
         }
 
 
-class Results(SimulationRun):
+class RunDescription(SimulationRun):
     class Config:
         orm_mode = True
+
+
+class Run(SimulationRun):
+    parameters: SimulationParameters = {}
+
+    @classmethod
+    def from_orm(
+        cls, body: orm.SimulationRun, parameters: List[orm.SimulationParameter]
+    ) -> "Run":
+        """
+        Handle ORM conversion while including parameters
+        """
+        setattr(
+            body,
+            "parameters",
+            orm_to_params(parameters),
+        )
+        return super().from_orm(body)
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "simulator_id": 0,
+                "timestamp": "datetime",
+                "completed_at": "optional-datetime",
+                "response": "blob",
+                "parameters": [],
+            }
+        }

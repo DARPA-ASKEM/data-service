@@ -12,6 +12,7 @@ class ResourceType(str, Enum):
     models = 'models'
     plans = 'plans'
     publications = 'publications'
+    simulation_runs = 'simulation_runs'
     
 
 class RelationType(str, Enum):
@@ -28,9 +29,15 @@ class TaggableType(str, Enum):
 
     datasets = 'datasets'
     features = 'features'
+    intermediates = 'intermediates'
+    model_parameters = 'model_parameters'
     models = 'models'
     projects = 'projects'
+    publications = 'publications'
+    qualifiers = 'qualifiers'
+    simulation_parameters = 'simulation_parameters'
     simulation_plans = 'simulation_plans'
+    simulation_runs = 'simulation_runs'
     
 
 class ValueType(str, Enum):
@@ -159,7 +166,7 @@ class SimulationRun(BaseModel):
     simulator_id: Optional[int] = None
     timestamp: datetime.datetime = datetime.datetime.now()
     completed_at: Optional[datetime.datetime]
-    success: Optional[bool] = True
+    success: Optional[bool]
     response: Optional[bytes]
 
 
@@ -169,12 +176,13 @@ class ModelParameter(BaseModel):
     model_id: Optional[int] = None
     name: str
     type: ValueType
+    default_value: Optional[str]
 
 
 class SimulationParameter(BaseModel):
 
     id: Optional[int] = None
-    plan_id: Optional[int] = None
+    run_id: Optional[int] = None
     name: str
     value: str
     type: ValueType
@@ -255,15 +263,15 @@ class Project(BaseModel):
     name: str
     description: str
     timestamp: Optional[datetime.datetime] = datetime.datetime.now()
-    status: str
+    active: bool
 
 
 class OntologyConcept(BaseModel):
 
     id: Optional[int] = None
-    term_id: str
+    curie: str
     type: TaggableType
-    obj_id: Optional[int] = None
+    object_id: Optional[int] = None
     status: OntologicalField
 
 
