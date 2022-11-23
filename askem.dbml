@@ -129,7 +129,7 @@ Table model {
   description text
   framework varchar [ref: > model_framework.name, not null]
   timestamp datetime [default: `now()`, not null]
-  state_id int [ref: > model_state.id, not null]
+  state_id int [ref: > model_state.id]
 }
 
 Table model_state {

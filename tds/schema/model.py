@@ -5,6 +5,8 @@ Provides the API interface for models.
 from json import dumps
 from typing import Dict, List, Optional
 
+from pydantic import Json
+
 from tds.autogen import orm, schema
 from tds.schema.concept import Concept
 
@@ -28,13 +30,19 @@ class ModelDescription(schema.Model):
 class Model(schema.Model):
     concept: Optional[Concept] = None
     parameters: ModelParameters = {}
+    content: Json
 
     @classmethod
-    def from_orm(cls, body: orm.Model, parameters: List[orm.ModelParameter]) -> "Model":
+    def from_orm(
+        cls,
+        body: orm.Model,
+        parameters: List[orm.ModelParameter],
+        state: orm.ModelState,
+    ) -> "Model":
         """
         Handle ORM conversion while coercing `dict` to JSON
         """
-        setattr(body, "content", dumps(body.content))
+        setattr(body, "content", dumps(state.content))
         setattr(body, "parameters", {param.name: param.type for param in parameters})
         return super().from_orm(body)
 

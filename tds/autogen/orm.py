@@ -112,7 +112,7 @@ class Model(Base):
     description = sa.Column(sa.Text())
     framework = sa.Column(sa.String(), sa.ForeignKey('model_framework.name'), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    state_id = sa.Column(sa.Integer(), sa.ForeignKey('model_state.id'), nullable=False)
+    state_id = sa.Column(sa.Integer(), sa.ForeignKey('model_state.id'))
 
 
 class ModelRuntime(Base):

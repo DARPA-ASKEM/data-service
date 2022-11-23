@@ -104,7 +104,7 @@ class Model(BaseModel):
     description: Optional[str]
     framework: str
     timestamp: datetime.datetime = datetime.datetime.now()
-    state_id: Optional[int] = None
+    state_id: Optional[int]
 
 
 class ModelRuntime(BaseModel):
