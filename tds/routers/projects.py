@@ -13,8 +13,8 @@ from sqlalchemy.orm import Query, Session
 from tds.autogen import orm
 from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
-from tds.operation import create, retrieve, update
-from tds.schema.project import Asset, Project, ProjectMetadata
+from tds.operation import create, delete, retrieve, update
+from tds.schema.project import Project, ProjectMetadata
 from tds.schema.resource import ResourceType, get_resource_orm
 
 logger = Logger(__name__)
@@ -142,21 +142,34 @@ def update_project(
     )
 
 
-@router.get(
+@router.delete(
     "/{project_id}/assets/{resource_type}/{resource_id}",
-    **retrieve.fastapi_endpoint_config,
+    **delete.fastapi_endpoint_config,
 )
-def get_asset(id: int, rdb: Engine = Depends(request_rdb)) -> Asset:
+def delete_asset(
+    project_id: int,
+    resource_type: ResourceType,
+    resource_id: int,
+    rdb: Engine = Depends(request_rdb),
+) -> Response:
     """
-    Retrieve asset
+    Remove asset
     """
-    if entry_exists(rdb.connect(), orm.ProjectAsset, id):
-        with Session(rdb) as session:
-            project_asset = session.query(orm.ProjectAsset).get(id)
-
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Asset.from_orm(project_asset)
+    with Session(rdb) as session:
+        project_assets = list(
+            session.query(orm.ProjectAsset).filter(
+                orm.ProjectAsset.project_id == project_id,
+                orm.ProjectAsset.resource_type == resource_type,
+                orm.ProjectAsset.resource_id == resource_id,
+            )
+        )
+        if len(project_assets) == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        session.delete(project_assets[0])
+        session.commit()
+        return Response(
+            status_code=status.HTTP_204_NO_CONTENT,
+        )
 
 
 @router.post(
