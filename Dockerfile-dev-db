@@ -1,0 +1,4 @@
+FROM postgres:15.1
+
+COPY scripts/data-service-dev-db.sql /var/lib/postgresql/backup/data-service-dev-db.sql
+COPY scripts/init-data-service-dev-db.sh /docker-entrypoint-initdb.d/
