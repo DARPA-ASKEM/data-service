@@ -32,7 +32,7 @@ group "prod" {
 }
 
 group "default" {
-  targets = ["data-service-base"]
+  targets = ["data-service-base", "data-service-dev-db"]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -45,6 +45,12 @@ target "data-service-base" {
 	context = "."
 	tags = tag("data-service", "", "")
 	dockerfile = "Dockerfile"
+}
+
+target "data-service-dev-db" {
+	context = "."
+	tags = tag("data-service-dev-db", "", "")
+	dockerfile = "Dockerfile-dev-db"
 }
 
 target "data-service" {
