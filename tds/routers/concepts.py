@@ -4,10 +4,12 @@ CRUD operations for concepts and related tables in the DB
 
 import json
 from logging import Logger
+from typing import List, Optional
 from urllib.parse import quote_plus
 
 import requests
 from fastapi import APIRouter, Depends, Response, status
+from sqlalchemy import func
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -39,11 +41,41 @@ def search_concept(curie: str, rdb: Engine = Depends(request_rdb)):
 
 
 @router.get("/facets")
-def search_concept_using_facets(term: str, limit: int = 100, offset: int = 0):
+def search_concept_using_facets(
+    types: Optional[List[schema.TaggableType]] = None,
+    curies: Optional[List[str]] = None,
+    rdb: Engine = Depends(request_rdb),
+):
     """
     Search along type and curie facets
     """
-    raise Exception(f"Not yet implemented")
+    with Session(rdb) as session:
+        search_body = {
+            "types": session.query(
+                func.count(orm.OntologyConcept.type), orm.OntologyConcept
+            ).group_by(orm.OntologyConcept.type),
+            "curies": session.query(
+                func.count(orm.OntologyConcept.curie), orm.OntologyConcept
+            ).group_by(orm.OntologyConcept.curie),
+            "results": session.query(orm.OntologyConcept),
+        }
+        for key in search_body:
+            if types is not None:
+                search_body[key] = search_body[key].filter(
+                    orm.OntologyConcept.type in types
+                )
+            if curies is not None:
+                search_body[key] = search_body[key].filter(
+                    orm.OntologyConcept.curie in curies
+                )
+            search_body[key] = search_body[key].all()
+        return Response(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps(search_body),
+        )
 
 
 @router.get("/definitions")
