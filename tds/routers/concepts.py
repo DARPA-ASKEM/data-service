@@ -38,6 +38,14 @@ def search_concept(curie: str, rdb: Engine = Depends(request_rdb)):
     return results
 
 
+@router.get("/facets")
+def search_concept_using_facets(term: str, limit: int = 100, offset: int = 0):
+    """
+    Search along type and curie facets
+    """
+    raise Exception(f"Not yet implemented")
+
+
 @router.get("/definitions")
 def search_concept_definitions(term: str, limit: int = 100, offset: int = 0):
     """
