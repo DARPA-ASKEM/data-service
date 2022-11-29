@@ -13,28 +13,6 @@ URL = "http://localhost:8001/"
 # Function definitions
 
 
-# def create_person():
-#     """Creates a demo person in postgres
-
-#     Returns:
-#         json: requests response in json format
-#     """
-#     person_payload = {
-#         "name": "Adam Smith",
-#         "email": "Adam@test.io",
-#         "org": "Uncharted",
-#         "website": "",
-#         "is_registered": True,
-#     }
-
-#     persons_response = requests.post(URL + "persons", json=person_payload, timeout=100)
-
-#     p_response_obj = persons_response.json()
-
-#     return p_response_obj
-url = "http://localhost:8001/"
-
-
 def asset_to_project(project_id, asset_id, asset_type):
     payload = json.dumps(
         {
@@ -48,13 +26,13 @@ def asset_to_project(project_id, asset_id, asset_type):
 
     response = requests.request(
         "POST",
-        url + f"projects/{project_id}/assets/{asset_type}/{asset_id}",
+        URL + f"projects/{project_id}/assets/{asset_type}/{asset_id}",
         headers=headers,
         data=payload,
     )
 
 
-def create_dataset(maintainer_id, num_of_states):
+def create_dataset(maintainer_id, num_of_states, biomodel_name=None):
     """Creates a demo dataset using a maintainer_id and number of states.
 
     Args:
@@ -68,7 +46,7 @@ def create_dataset(maintainer_id, num_of_states):
     # Post dataset first to get ID from postgres
     headers = {"Content-Type": "application/json"}
     initial_dataset_payload = {
-        "name": "Biomodel simulation output",
+        "name": f"Biomodel simulation output {biomodel_name}",
         "url": "",
         "description": "Biomodel simulation output registered as a dataset",
         "maintainer": maintainer_id,
@@ -172,7 +150,7 @@ def create_dataset(maintainer_id, num_of_states):
     }
 
     dataset_payload = {
-        "name": f"Biomodel simulation output {dataset_id}",
+        "name": f"Biomodel simulation output {biomodel_name}",
         "url": "",
         "description": "Biomodel simulation output registered as a dataset",
         "deprecated": False,
@@ -293,6 +271,7 @@ def programatically_populate_datasets():
         try:
             # Open json to get relevant information
             with open(folder + "sim_output.json", "r", encoding="utf-8") as sim_out:
+                model_name = folder.split("/")[-2]
                 simulation_output = json.load(sim_out)
                 states = simulation_output["states"]
                 first_state_obj = states[0]
@@ -303,6 +282,7 @@ def programatically_populate_datasets():
                 dataset_response = create_dataset(
                     maintainer_id=1,
                     num_of_states=num_of_states,
+                    biomodel_name=model_name,
                 )
                 dataset_id = dataset_response["id"]
                 # Convert the json to a CSV

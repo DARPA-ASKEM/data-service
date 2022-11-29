@@ -10,6 +10,7 @@ from zipfile import ZipFile
 
 import requests
 from demo_dataset_generator import programatically_populate_datasets
+from exemplar_dataset_generator import populate_exemplar_datasets
 
 url = "http://localhost:8001/"
 
@@ -489,6 +490,7 @@ for folder in folders:
         print(e)
 
 programatically_populate_datasets()
+populate_exemplar_datasets()
 
 ## now delete repo
 shutil.rmtree("experiments-main")

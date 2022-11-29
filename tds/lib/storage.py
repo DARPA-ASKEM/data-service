@@ -1,12 +1,15 @@
 """File storage library for functions related to getting and putting files.
 """
 
+import csv
 import os
 import tempfile
+from io import StringIO
 from urllib.parse import urlparse
 
 import boto3
 import botocore
+import pandas
 
 # S3 OBJECT
 s3 = boto3.client("s3")
@@ -100,3 +103,56 @@ def list_files(path):
 
         return final_file_list
     raise RuntimeError("File storage format is unknown")
+
+
+async def stream_csv_from_data_paths(data_paths, wide_format=False):
+    """Function to asynchronously stream parquet + csv files from
+    a datapaths list
+
+    Args:
+        data_paths (List): List of string URIs representing files to grab.
+        wide_format (boolean, optional): Boolean flag determing whether
+        the data is returned long or wide. Defaults to False.
+
+    Yields:
+        streamable: Streamable file object to be returned via
+        StreamingResponse
+    """
+    # Build single dataframe
+    dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
+
+    # Ensure pandas floats are used because vanilla python ones are problematic
+    dataframe = dataframe.fillna("").astype(
+        {
+            col: "str"
+            for col in dataframe.select_dtypes(include=["float32", "float64"]).columns
+        },
+        # Note: This links it to the previous `dataframe` so not a full copy
+        copy=False,
+    )
+    if wide_format:
+        dataframe_wide = pandas.pivot(
+            dataframe, index=None, columns="feature", values="value"
+        )  # Reshape from long to wide
+        dataframe = dataframe.drop(["feature", "value"], axis=1)
+        dataframe = pandas.merge(
+            dataframe, dataframe_wide, left_index=True, right_index=True
+        )
+
+    # Prepare for writing CSV to a temporary buffer
+    buffer = StringIO()
+    writer = csv.writer(buffer)
+
+    # Write out the header row
+    writer.writerow(dataframe.columns)
+
+    yield buffer.getvalue()
+    buffer.seek(0)  # To clear the buffer we need to seek back to the start and truncate
+    buffer.truncate()
+
+    # Iterate over dataframe tuples, writing each one out as a CSV line one at a time
+    for record in dataframe.itertuples(index=False, name=None):
+        writer.writerow(str(i) for i in record)
+        yield buffer.getvalue()
+        buffer.seek(0)
+        buffer.truncate()
