@@ -127,7 +127,6 @@ def create_dataset(maintainer_id, num_of_states, biomodel_name=None):
         timeout=100,
     )
     dataset_id = initial_dataset_response.json()["id"]
-    print(dataset_id)
 
     feature_array = []
     for state in range(num_of_states):
@@ -666,12 +665,11 @@ for folder in folders:
             with open(folder + "sim_output.csv", "rb") as sim_csv:
                 print(f"Uploading file to dataset_id {dataset_id}")
                 upload_file_to_tds(id=dataset_id, file_object=sim_csv)
-                print(dataset_id)
             # Finish populating dataset metadata: Features, Qualifiers
             for state in range(num_of_states):
                 create_feature(dataset_id, state)
             create_qualifier(dataset_id, num_of_states)
-            asset_to_project(1, dataset_id, "datasets")
+            asset_to_project(project_id, dataset_id, "datasets")
 
     except FileNotFoundError:
         print("sim_output.json not found in " + folder)
