@@ -5,17 +5,26 @@ Provides the API interface for models.
 from json import dumps
 from typing import Dict, List, Optional
 
+from fastapi.encoders import jsonable_encoder
+
 from tds.autogen import orm, schema
 from tds.schema.concept import Concept
 
-ModelParameters = Dict[str, schema.ValueType]
+ModelParameters = List[Dict]
 
 
 def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
     """
     Convert SQL parameter search to dict
     """
-    return {param.name: param.type for param in parameters}
+    return [
+        {
+            "name": param.name,
+            "type": jsonable_encoder(param.type),
+            "default_value": param.default_value,
+        }
+        for param in parameters
+    ]
 
 
 class ModelDescription(schema.Model):
@@ -27,7 +36,7 @@ class ModelDescription(schema.Model):
 
 class Model(schema.Model):
     concept: Optional[Concept] = None
-    parameters: ModelParameters = {}
+    parameters: ModelParameters = []
 
     @classmethod
     def from_orm(cls, body: orm.Model, parameters: List[orm.ModelParameter]) -> "Model":
@@ -35,17 +44,19 @@ class Model(schema.Model):
         Handle ORM conversion while coercing `dict` to JSON
         """
         setattr(body, "content", dumps(body.content))
-        setattr(body, "parameters", {param.name: param.type for param in parameters})
+        setattr(body, "parameters", orm_to_params(parameters))
+
         return super().from_orm(body)
 
     class Config:
         orm_mode = True
+        use_enum_values = True
         schema_extra = {
             "example": {
                 "name": "string",
                 "description": "string",
                 "content": "json-as-string",
-                "parameters": {"string": "value-type"},
+                "parameters": [{"string": "value-type"}],
                 "framework": "string",
             }
         }

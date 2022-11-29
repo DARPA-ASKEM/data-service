@@ -24,10 +24,13 @@ time.sleep(10)
 
 print("Starting process to upload artifacts to postgres.")
 # get experiments repo
+# download_and_unzip(
+#     "https://github.com/DARPA-ASKEM/experiments/archive/acb2d14b75898a8cceec7199dbabbcf281936a97.zip"
+# )
 
-download_and_unzip(
-    "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
-)
+# download_and_unzip(
+#     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+# )
 time.sleep(2)
 
 #### Person ####
@@ -99,7 +102,7 @@ project_id = project.get("id")
 create_framework()
 
 # loop over models
-folders = glob.glob("experiments-main/thin-thread-examples/biomodels/BIOMD*/")
+folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
 
 
 def asset_to_project(project_id, asset_id, asset_type):
@@ -164,7 +167,7 @@ def add_concept(concept, object_id, type):
 
 concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
 
-for folder in folders:
+for folder in folders[1:3]:
     index = random.randrange(2)
     concept = concepts[index]
     # publications ##
@@ -267,13 +270,7 @@ for folder in folders:
 
     ## model ##
     try:
-        print("Upload Model with parameters")
-        # load parameters of the model and set the type values
-        parameter_types = {}
-        with open(f"{folder}model_mmt_parameters.json", "r") as f:
-            parameters = json.load(f)
-            for parameter_name, parameter_value in parameters.get("parameters").items():
-                parameter_types[parameter_name] = str(type(parameter_value).__name__)
+        print("Upload Model")
 
         # model content
         with open(f"{folder}model_petri.json", "r") as f:
@@ -293,7 +290,6 @@ for folder in folders:
                 "description": model_description,
                 "content": json.dumps(model_content),
                 "framework": "Petri Net",
-                "parameters": parameter_types,
             }
         )
         headers = {"Content-Type": "application/json"}
@@ -317,6 +313,32 @@ for folder in folders:
     except Exception as e:
         print(f" {e}")
 
+    ### upload model parameters ###
+    try:
+        print("Model Parameters")
+        # load parameters of the model and set the type values
+        parameter_types = []
+        with open(f"{folder}model_mmt_parameters.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("parameters").items():
+                param = {
+                    "model_id": model_id,
+                    "name": parameter_name,
+                    "type": str(type(parameter_value).__name__),
+                    "default_value": str(parameter_value),
+                }
+                parameter_types.append(param)
+
+        payload = json.dumps(parameter_types)
+        headers = {"Content-Type": "application/json"}
+        print(parameter_types)
+        response = requests.request(
+            "PUT", url + f"models/parameters/{model_id}", headers=headers, data=payload
+        )
+        print(response.text)
+
+    except Exception as e:
+        print(e)
     ### upload simulation plan ###
     try:
         print("Upload Simulation Plan")
@@ -450,4 +472,4 @@ for folder in folders:
 programatically_populate_datasets()
 
 ## now delete repo
-shutil.rmtree("experiments-main")
+shutil.rmtree("experiments-*")

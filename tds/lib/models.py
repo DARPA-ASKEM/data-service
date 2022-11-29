@@ -21,25 +21,34 @@ def adjust_model_params(model_id: int, parameters: ModelParameters, session: Ses
     for param in session.query(orm.ModelParameter).filter(
         orm.ModelParameter.model_id == model_id
     ):
-        existing.append(param.name)
+        existing.append(param.get("name"))
 
-    for name, type in parameters.items():
-        if name not in existing:
-            session.add(orm.ModelParameter(run_id=model_id, name=name, type=type))
+    for parameter in parameters:
+        if parameter.get("name") not in existing:
+            session.add(
+                orm.ModelParameter(
+                    model_id=model_id,
+                    name=parameter.get("name"),
+                    type=parameter.get("type"),
+                    default_value=parameter.get("default_value"),
+                )
+            )
         else:
             session.query(orm.ModelParameter).filter(
                 orm.ModelParameter.model_id == model_id,
-                orm.ModelParameter.name == name,
+                orm.ModelParameter.id == parameter.get("id"),
             ).update(
                 {
-                    "type": type,
+                    "type": parameter.get("type"),
+                    "default_value": parameter.get("default_value"),
                 }
             )
-        existing.remove(name)
+
+            existing.remove(parameter.name)
 
     for name in existing:
         for param in session.query(orm.ModelParameter).filter(
-            orm.ModelParameter.run_id == model_id,
+            orm.ModelParameter.model_id == model_id,
             orm.ModelParameter.name == name,
         ):
             session.delete(param)
