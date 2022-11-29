@@ -171,7 +171,7 @@ def add_concept(concept, object_id, type):
     )
 
 
-for folder in folders[1:3]:
+for folder in folders:
     # get src/main files
     folders_src = glob.glob(folder + "src/main/*")
 
