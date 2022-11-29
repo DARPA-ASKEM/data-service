@@ -26,7 +26,14 @@ def test_simulation_cr():
             "name": "Foo",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "{}",
-            "parameters": {"x": ValueType.int},
+            "parameters": [
+                {
+                    "name": "x",
+                    "default_value": "1",
+                    "type": ValueType.int,
+                    "initial": False,
+                }
+            ],
             "framework": framework,
         }
         model_id = client.post(
