@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v3'
+  Note: 'v4'
 }
 
 Enum public.resource_type {
@@ -178,6 +178,7 @@ Table model_parameter {
   name varchar [not null]
   type value_type [not null]
   default_value varchar
+  initial bool [not null]
 }
 
 

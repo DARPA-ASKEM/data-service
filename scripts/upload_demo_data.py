@@ -23,7 +23,11 @@ def download_and_unzip(url, extract_to="."):
 time.sleep(10)
 
 print("Starting process to upload artifacts to postgres.")
-# get experiments repo
+
+# get experiments repo at specific commit for now
+# download_and_unzip(
+#     "https://github.com/DARPA-ASKEM/experiments/archive/acb2d14b75898a8cceec7199dbabbcf281936a97.zip"
+# )
 
 download_and_unzip(
     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
@@ -99,7 +103,7 @@ project_id = project.get("id")
 create_framework()
 
 # loop over models
-folders = glob.glob("experiments-main/thin-thread-examples/biomodels/BIOMD*/")
+folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
 
 
 def asset_to_project(project_id, asset_id, asset_type):
@@ -162,11 +166,28 @@ def add_concept(concept, object_id, type):
     )
 
 
-concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
-
 for folder in folders:
-    index = random.randrange(2)
-    concept = concepts[index]
+    # get src/main files
+    folders_src = glob.glob(folder + "src/main/*")
+
+    ## get concepts ##
+    model_concepts = []
+    with open(folder + "model_mmt_templates.json", "r") as f:
+        mmt_template = json.load(f)
+
+    for template in mmt_template.get("templates"):
+
+        for key in template.keys():
+            if key == "subject" or key == "outcome":
+                ncit = template[key].get("identifiers").get("ncit", None)
+                ido = template[key].get("identifiers").get("ido", None)
+                if ncit is not None:
+                    model_concepts.append(f"ncit:{ncit}")
+                if ido is not None:
+                    model_concepts.append(f"ido:{ido}")
+
+    model_concepts = [*set(model_concepts)]
+
     # publications ##
     try:
         print("Upload publication")
@@ -187,7 +208,8 @@ for folder in folders:
             project_id=1, asset_id=int(publication_id), asset_type="publications"
         )
 
-        add_concept(concept=concept, object_id=publication_id, type="publications")
+        for concept in model_concepts:
+            add_concept(concept=concept, object_id=publication_id, type="publications")
     except Exception as e:
         print(f"error opening {folder}document_doi.txt . - {e}")
 
@@ -222,17 +244,18 @@ for folder in folders:
             relation_type="derivedfrom",
             user_id=person_id,
         )
-
-        add_concept(
-            concept=concept, object_id=intermediate_mmt_id, type="intermediates"
-        )
+        for concept in model_concepts:
+            add_concept(
+                concept=concept, object_id=intermediate_mmt_id, type="intermediates"
+            )
 
     except Exception as e:
         print(e)
 
     try:
         print("Upload intermediate sbml")
-        with open(folder + "model_sbml.xml", "r") as f:
+
+        with open(folders_src[0], "r") as f:
             mmt_template = f.read()
             payload = json.dumps(
                 {
@@ -257,32 +280,23 @@ for folder in folders:
             relation_type="derivedfrom",
             user_id=person_id,
         )
-
-        add_concept(
-            concept=concept, object_id=intermediate_sbml_id, type="intermediates"
-        )
+        for concept in model_concepts:
+            add_concept(
+                concept=concept, object_id=intermediate_sbml_id, type="intermediates"
+            )
 
     except Exception as e:
         print(e)
 
     ## model ##
     try:
-        print("Upload Model with parameters")
-        # load parameters of the model and set the type values
-        parameter_types = {}
-        with open(f"{folder}model_mmt_parameters.json", "r") as f:
-            parameters = json.load(f)
-            for parameter_name, parameter_value in parameters.get("parameters").items():
-                parameter_types[parameter_name] = str(type(parameter_value).__name__)
+        print("Upload Model")
 
         # model content
         with open(f"{folder}model_petri.json", "r") as f:
             model_content = json.load(f)
 
-        with open(folder + "model_sbml.xml", "r") as f:
-            mmt_template = f.read()
-
-        tree = ET.parse(folder + "model_sbml.xml")
+        tree = ET.parse(folders_src[0])
         root = tree.getroot()
         model_description = root[0][0][0][0].text
         model_name = root[0].attrib["name"]
@@ -293,7 +307,6 @@ for folder in folders:
                 "description": model_description,
                 "content": json.dumps(model_content),
                 "framework": "Petri Net",
-                "parameters": parameter_types,
             }
         )
         headers = {"Content-Type": "application/json"}
@@ -311,12 +324,49 @@ for folder in folders:
             relation_type="derivedfrom",
             user_id=person_id,
         )
-
-        add_concept(concept=concept, object_id=model_id, type="models")
+        for concept in model_concepts:
+            add_concept(concept=concept, object_id=model_id, type="models")
 
     except Exception as e:
         print(f" {e}")
 
+    ### upload model parameters ###
+    try:
+        print("Model Parameters")
+        # load parameters of the model and set the type values
+        parameter_types = []
+        with open(f"{folder}model_mmt_parameters.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("parameters").items():
+                param = {
+                    "model_id": model_id,
+                    "name": parameter_name,
+                    "type": str(type(parameter_value.get("value")).__name__),
+                    "default_value": str(parameter_value.get("value")),
+                    "initial": False,
+                }
+                parameter_types.append(param)
+
+        with open(f"{folder}model_mmt_initials.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("initials").items():
+                param = {
+                    "model_id": model_id,
+                    "name": parameter_name,
+                    "type": str(type(parameter_value.get("value")).__name__),
+                    "default_value": str(parameter_value.get("value")),
+                    "initial": True,
+                }
+                parameter_types.append(param)
+
+        payload = json.dumps(parameter_types)
+        headers = {"Content-Type": "application/json"}
+        response = requests.request(
+            "PUT", url + f"models/parameters/{model_id}", headers=headers, data=payload
+        )
+
+    except Exception as e:
+        print(e)
     ### upload simulation plan ###
     try:
         print("Upload Simulation Plan")
@@ -353,10 +403,6 @@ for folder in folders:
             relation_type="derivedfrom",
             right={"id": model_id, "resource_type": "models"},
             user_id=person_id,
-        )
-
-        add_concept(
-            concept=concept, object_id=intermediate_sbml_id, type="simulation_plans"
         )
 
     except Exception as e:
@@ -397,10 +443,6 @@ for folder in folders:
             user_id=person_id,
         )
 
-        add_concept(
-            concept=concept, object_id=simulation_run_id, type="simulation_runs"
-        )
-
     except Exception as e:
         print(f" {e}")
 
@@ -408,21 +450,20 @@ for folder in folders:
     try:
 
         # creating simulation parameters
-        parameter_types = []
+        parameter_simulation = []
         with open(f"{folder}model_mmt_parameters.json", "r") as f:
             parameters = json.load(f)
             for parameter_name, parameter_value in parameters.get("parameters").items():
-                parameter_types.append(
+                parameter_simulation.append(
                     {
                         "name": parameter_name,
-                        "value": str(parameter_value),
-                        "type": str(type(parameter_value).__name__),
+                        "value": str(parameter_value.get("value")),
+                        "type": str(type(parameter_value.get("value")).__name__),
                     }
                 )
 
-        payload = json.dumps(parameter_types)
+        payload = json.dumps(parameter_simulation)
         headers = {"Content-Type": "application/json"}
-
         response = requests.request(
             "PUT",
             url + f"simulations/runs/parameters/{simulation_run_id}",
@@ -436,13 +477,13 @@ for folder in folders:
         )
         parameters_json = response.json()
 
-        for parameter in parameters_json:
+        # for parameter in parameters_json:
 
-            add_concept(
-                concept=concept,
-                object_id=parameter.get("id"),
-                type="simulation_parameters",
-            )
+        #     add_concept(
+        #         concept=concept,
+        #         object_id=parameter.get("id"),
+        #         type="simulation_parameters",
+        #     )
 
     except Exception as e:
         print(e)
