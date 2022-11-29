@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
 from tds.db import request_rdb
+from tds.lib.errors import DKGError
 from tds.settings import settings
 
 logger = Logger(__file__)
@@ -38,54 +39,6 @@ def search_concept(curie: str, rdb: Engine = Depends(request_rdb)):
         result.__dict__.pop("id")
         results.append(result)
     return results
-
-
-@router.get("/facets")
-def search_concept_using_facets(
-    types: List[schema.TaggableType] = Query(default=None),
-    curies: Optional[List[str]] = Query(default=None),
-    rdb: Engine = Depends(request_rdb),
-) -> Response:
-    """
-    Search along type and curie facets
-    """
-    with Session(rdb) as session:
-        search_body = {
-            "types": session.query(
-                func.count(orm.OntologyConcept.type), orm.OntologyConcept.type
-            ).group_by(orm.OntologyConcept.type),
-            "curies": session.query(
-                func.count(orm.OntologyConcept.curie), orm.OntologyConcept.curie
-            ).group_by(orm.OntologyConcept.curie),
-            "results": session.query(orm.OntologyConcept),
-        }
-        for key in search_body:
-            if types is not None:
-                search_body[key] = search_body[key].filter(
-                    orm.OntologyConcept.type.in_(types)
-                )
-            if curies is not None:
-                search_body[key] = search_body[key].filter(
-                    orm.OntologyConcept.curie.in_(curies)
-                )
-        return Response(
-            status_code=status.HTTP_200_OK,
-            headers={
-                "content-type": "application/json",
-            },
-            content=json.dumps(
-                {
-                    "facets": {
-                        "types": [tuple(hit) for hit in search_body["types"]],
-                        "curies": [tuple(hit) for hit in search_body["curies"]],
-                    },
-                    "results": [
-                        (entry.type, entry.object_id, entry.curie)
-                        for entry in search_body["results"]
-                    ],
-                }
-            ),
-        )
 
 
 @router.get("/definitions")
@@ -127,7 +80,69 @@ def get_concept_definition(curie: str):
     if response.status_code == 200:
         return json.loads(response.content.decode("utf8"))
     logger.debug("Failed to fetch ontologies: %s", response)
-    raise Exception("DKG server returned the status {response.status_code}")
+    raise DKGError("DKG server returned the status {response.status_code}")
+
+
+@router.get("/facets")
+def search_concept_using_facets(
+    types: List[schema.TaggableType] = Query(default=None),
+    curies: Optional[List[str]] = Query(default=None),
+    rdb: Engine = Depends(request_rdb),
+) -> Response:
+    """
+    Search along type and curie facets
+    """
+    with Session(rdb) as session:
+        search_body = {
+            "types": session.query(
+                func.count(orm.OntologyConcept.type), orm.OntologyConcept.type
+            ).group_by(orm.OntologyConcept.type),
+            "curies": session.query(
+                func.count(orm.OntologyConcept.curie), orm.OntologyConcept.curie
+            ).group_by(orm.OntologyConcept.curie),
+            "results": session.query(orm.OntologyConcept),
+        }
+        for key in search_body:
+            if types is not None:
+                search_body[key] = search_body[key].filter(
+                    orm.OntologyConcept.type.in_(types)
+                )
+            if curies is not None:
+                search_body[key] = search_body[key].filter(
+                    orm.OntologyConcept.curie.in_(curies)
+                )
+
+        def handle_dkg(curie):
+            try:
+                return get_concept_definition(curie)["name"]
+            except DKGError:
+                return None
+
+        term_map = {hit[1]: handle_dkg(hit[1]) for hit in search_body["curies"]}
+
+        return Response(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps(
+                {
+                    "facets": {
+                        "types": {hit[1]: hit[0] for hit in search_body["types"]},
+                        "curies": {hit[1]: hit[0] for hit in search_body["curies"]},
+                    },
+                    "results": [
+                        {
+                            "type": entry.type,
+                            "id": entry.object_id,
+                            "curie": entry.curie,
+                            "display_name": term_map[entry.curie],
+                        }
+                        for entry in search_body["results"]
+                    ],
+                }
+            ),
+        )
 
 
 @router.get("/{id}")
