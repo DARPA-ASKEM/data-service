@@ -186,7 +186,7 @@ def populate_exemplar_datasets():
     """Populates demonstration exemplar data into the datasets, features, and
     qualifiers tables.
     """
-    folders = glob.glob("exemplar_datasets/*/")
+    folders = glob.glob("experiments-main/thin-thread-examples/exemplar_datasets/*/")
 
     for folder in folders:
         print(folder)
@@ -204,7 +204,6 @@ def populate_exemplar_datasets():
                 )
                 dataset_id = dataset_response["id"]
                 file_to_upload = glob.glob(folder + "*.parquet.gzip")
-                print(file_to_upload)
                 # Upload the CSV to TDS for full mock data
                 for file in file_to_upload:
                     with open(file, "rb") as exemplar_parquet:
