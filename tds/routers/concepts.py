@@ -4,10 +4,12 @@ CRUD operations for concepts and related tables in the DB
 
 import json
 from logging import Logger
+from typing import List, Optional
 from urllib.parse import quote_plus
 
 import requests
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
+from sqlalchemy import func
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -36,6 +38,54 @@ def search_concept(curie: str, rdb: Engine = Depends(request_rdb)):
         result.__dict__.pop("id")
         results.append(result)
     return results
+
+
+@router.get("/facets")
+def search_concept_using_facets(
+    types: List[schema.TaggableType] = Query(default=None),
+    curies: Optional[List[str]] = Query(default=None),
+    rdb: Engine = Depends(request_rdb),
+) -> Response:
+    """
+    Search along type and curie facets
+    """
+    with Session(rdb) as session:
+        search_body = {
+            "types": session.query(
+                func.count(orm.OntologyConcept.type), orm.OntologyConcept.type
+            ).group_by(orm.OntologyConcept.type),
+            "curies": session.query(
+                func.count(orm.OntologyConcept.curie), orm.OntologyConcept.curie
+            ).group_by(orm.OntologyConcept.curie),
+            "results": session.query(orm.OntologyConcept),
+        }
+        for key in search_body:
+            if types is not None:
+                search_body[key] = search_body[key].filter(
+                    orm.OntologyConcept.type.in_(types)
+                )
+            if curies is not None:
+                search_body[key] = search_body[key].filter(
+                    orm.OntologyConcept.curie.in_(curies)
+                )
+        return Response(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps(
+                {
+                    "facets": {
+                        "types": [tuple(hit) for hit in search_body["types"]],
+                        "curies": [tuple(hit) for hit in search_body["curies"]],
+                    },
+                    "results": [
+                        (entry.type, entry.object_id, entry.curie)
+                        for entry in search_body["results"]
+                    ],
+                }
+            ),
+        )
 
 
 @router.get("/definitions")
