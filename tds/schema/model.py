@@ -50,7 +50,6 @@ class Model(schema.Model):
 
     class Config:
         orm_mode = True
-        use_enum_values = True
         schema_extra = {
             "example": {
                 "name": "string",
