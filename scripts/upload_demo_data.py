@@ -25,13 +25,13 @@ time.sleep(10)
 print("Starting process to upload artifacts to postgres.")
 
 # get experiments repo at specific commit for now
-download_and_unzip(
-    "https://github.com/DARPA-ASKEM/experiments/archive/acb2d14b75898a8cceec7199dbabbcf281936a97.zip"
-)
-
 # download_and_unzip(
-#     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+#     "https://github.com/DARPA-ASKEM/experiments/archive/acb2d14b75898a8cceec7199dbabbcf281936a97.zip"
 # )
+
+download_and_unzip(
+    "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+)
 time.sleep(2)
 
 #### Person ####
@@ -167,13 +167,14 @@ def add_concept(concept, object_id, type):
 
 
 for folder in folders:
+    # get src/main files
+    folders_src = glob.glob(folder + "src/main/*")
 
     ## get concepts ##
     model_concepts = []
     with open(folder + "model_mmt_templates.json", "r") as f:
         mmt_template = json.load(f)
 
-    print(len(mmt_template.get("templates")))
     for template in mmt_template.get("templates"):
 
         for key in template.keys():
@@ -253,7 +254,8 @@ for folder in folders:
 
     try:
         print("Upload intermediate sbml")
-        with open(folder + "model_sbml.xml", "r") as f:
+
+        with open(folders_src[0], "r") as f:
             mmt_template = f.read()
             payload = json.dumps(
                 {
@@ -294,10 +296,7 @@ for folder in folders:
         with open(f"{folder}model_petri.json", "r") as f:
             model_content = json.load(f)
 
-        with open(folder + "model_sbml.xml", "r") as f:
-            mmt_template = f.read()
-
-        tree = ET.parse(folder + "model_sbml.xml")
+        tree = ET.parse(folders_src[0])
         root = tree.getroot()
         model_description = root[0][0][0][0].text
         model_name = root[0].attrib["name"]
@@ -342,18 +341,29 @@ for folder in folders:
                 param = {
                     "model_id": model_id,
                     "name": parameter_name,
-                    "type": str(type(parameter_value).__name__),
-                    "default_value": str(parameter_value),
+                    "type": str(type(parameter_value.get("value")).__name__),
+                    "default_value": str(parameter_value.get("value")),
+                    "initial": False,
+                }
+                parameter_types.append(param)
+
+        with open(f"{folder}model_mmt_initials.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("initials").items():
+                param = {
+                    "model_id": model_id,
+                    "name": parameter_name,
+                    "type": str(type(parameter_value.get("value")).__name__),
+                    "default_value": str(parameter_value.get("value")),
+                    "initial": True,
                 }
                 parameter_types.append(param)
 
         payload = json.dumps(parameter_types)
         headers = {"Content-Type": "application/json"}
-        print(parameter_types)
         response = requests.request(
             "PUT", url + f"models/parameters/{model_id}", headers=headers, data=payload
         )
-        print(response.text)
 
     except Exception as e:
         print(e)
@@ -440,21 +450,20 @@ for folder in folders:
     try:
 
         # creating simulation parameters
-        parameter_types = []
+        parameter_simulation = []
         with open(f"{folder}model_mmt_parameters.json", "r") as f:
             parameters = json.load(f)
             for parameter_name, parameter_value in parameters.get("parameters").items():
-                parameter_types.append(
+                parameter_simulation.append(
                     {
                         "name": parameter_name,
-                        "value": str(parameter_value),
-                        "type": str(type(parameter_value).__name__),
+                        "value": str(parameter_value.get("value")),
+                        "type": str(type(parameter_value.get("value")).__name__),
                     }
                 )
 
-        payload = json.dumps(parameter_types)
+        payload = json.dumps(parameter_simulation)
         headers = {"Content-Type": "application/json"}
-
         response = requests.request(
             "PUT",
             url + f"simulations/runs/parameters/{simulation_run_id}",
@@ -482,4 +491,4 @@ for folder in folders:
 programatically_populate_datasets()
 
 ## now delete repo
-shutil.rmtree("experiments-acb2d14b75898a8cceec7199dbabbcf281936a97")
+shutil.rmtree("experiments-main")

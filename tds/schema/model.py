@@ -22,6 +22,7 @@ def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
             "name": param.name,
             "type": jsonable_encoder(param.type),
             "default_value": param.default_value,
+            "initial": param.initial,
         }
         for param in parameters
     ]
@@ -57,6 +58,7 @@ class Model(schema.Model):
                 "content": "json-as-string",
                 "parameters": [{"string": "value-type"}],
                 "framework": "string",
+                "initial": "bool",
             }
         }
 
