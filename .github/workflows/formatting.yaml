@@ -3,9 +3,9 @@ name: Formatting
 on:
   workflow_call:
   push:
-    branches: [ 'main' ]
+    branches: [ 'main', 'dev' ]
   pull_request:
-    branches: [ 'main' ]
+    branches: [ 'main', 'dev' ]
 
 jobs:
   formatting:
