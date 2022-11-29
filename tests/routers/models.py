@@ -97,7 +97,14 @@ def test_model_cru():
             "name": "Foo",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "{}",
-            "parameters": {"x": ValueType.int},
+            "parameters": [
+                {
+                    "name": "test",
+                    "default_value": "1",
+                    "type": ValueType.int,
+                    "initial": False,
+                }
+            ],
             "framework": framework,
         }
         response_create = client.post(
@@ -121,7 +128,14 @@ def test_model_cru():
             "name": "Bar",
             "description": "No desc",
             "content": "[]",
-            "parameters": {"y": ValueType.bool},
+            "parameters": [
+                {
+                    "name": "test",
+                    "default_value": "2",
+                    "type": ValueType.int,
+                    "initial": False,
+                }
+            ],
             "framework": framework,
         }
         response_update = client.post(

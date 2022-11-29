@@ -247,8 +247,9 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
                 orm.ModelParameter(
                     model_id=id,
                     name=param["name"],
-                    value=param["value"],
+                    default_value=param["default_value"],
                     type=param["type"],
+                    initial=param.get("initial", False),
                 )
             )
         session.commit()
