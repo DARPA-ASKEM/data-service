@@ -11,7 +11,11 @@ from json_to_csv import convert_biomd_json_to_csv
 
 ## Dataset code ###
 def create_dataset(
-    maintainer_id, num_of_states, url="http://localhost:8001", biomodel_name=None
+    maintainer_id,
+    num_of_states,
+    url="http://localhost:8001",
+    biomodel_name=None,
+    biomodel_description=None,
 ):
     """Creates a demo dataset using a maintainer_id and number of states.
 
@@ -28,7 +32,7 @@ def create_dataset(
     initial_dataset_payload = {
         "name": f"Biomodel simulation output {biomodel_name}",
         "url": "",
-        "description": "Biomodel simulation output registered as a dataset",
+        "description": biomodel_description,
         "maintainer": maintainer_id,
     }
 
@@ -131,7 +135,7 @@ def create_dataset(
     dataset_payload = {
         "name": f"Biomodel simulation output {biomodel_name}",
         "url": "",
-        "description": "Biomodel simulation output registered as a dataset",
+        "description": f"Dataset from simulation run output- Model description: {biomodel_description}",
         "deprecated": False,
         "sensitivity": "",
         "quality": "Measured",

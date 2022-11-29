@@ -426,10 +426,13 @@ for folder in folders:
 
             # Create the dataset with maintainer_id of 1
             # assuming the first maintainer is already created.
+            print(model_description)
+            print("here")
             dataset_response = create_dataset(
                 maintainer_id=1,
                 num_of_states=num_of_states,
                 biomodel_name=model_name,
+                biomodel_description=model_description,
                 url=url,
             )
             dataset_id = dataset_response["id"]
