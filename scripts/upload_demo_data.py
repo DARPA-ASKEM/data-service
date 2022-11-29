@@ -9,7 +9,16 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 import requests
-from demo_dataset_generator import programatically_populate_datasets
+from demo_dataset_generator import (
+    create_dataset,
+    create_feature,
+    create_qualifier,
+    upload_file_to_tds,
+)
+
+# from demo_dataset_generator import programatically_populate_datasets
+from exemplar_dataset_generator import populate_exemplar_datasets
+from json_to_csv import convert_biomd_json_to_csv
 
 url = "http://localhost:8001/"
 
@@ -20,14 +29,10 @@ def download_and_unzip(url, extract_to="."):
     zipfile.extractall(path=extract_to)
 
 
-time.sleep(10)
+time.sleep(5)
 
 print("Starting process to upload artifacts to postgres.")
 
-# get experiments repo at specific commit for now
-# download_and_unzip(
-#     "https://github.com/DARPA-ASKEM/experiments/archive/acb2d14b75898a8cceec7199dbabbcf281936a97.zip"
-# )
 
 download_and_unzip(
     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
@@ -408,6 +413,46 @@ for folder in folders:
     except Exception as e:
         print(f" {e}")
 
+    ## create dataset from simulation run * backwards from how this would normally happen but we want dataset id to add to request
+
+    try:
+        # Open json to get relevant information
+        with open(folder + "sim_output.json", "r", encoding="utf-8") as sim_out:
+            # model_name = folder.split("/")[-2]
+            simulation_output = json.load(sim_out)
+            states = simulation_output["states"]
+            first_state_obj = states[0]
+            num_of_states = len(first_state_obj)
+
+            # Create the dataset with maintainer_id of 1
+            # assuming the first maintainer is already created.
+
+            dataset_response = create_dataset(
+                maintainer_id=1,
+                num_of_states=num_of_states,
+                biomodel_name=model_name,
+                biomodel_description=model_description,
+                url=url,
+            )
+            dataset_id = dataset_response["id"]
+            # Convert the json to a CSV
+            convert_biomd_json_to_csv(
+                json_file_path=folder + "sim_output.json",
+                output_file_path=folder + "sim_output.csv",
+            )
+            # Upload the CSV to TDS for full mock data
+            with open(folder + "sim_output.csv", "rb") as sim_csv:
+                print(f"Uploading file to dataset_id {dataset_id}")
+                upload_file_to_tds(id=dataset_id, file_object=sim_csv, url=url)
+            # Finish populating dataset metadata: Features, Qualifiers
+            for state in range(num_of_states):
+                create_feature(dataset_id, state, url=url)
+            create_qualifier(dataset_id, num_of_states, url=url)
+            asset_to_project(project_id, dataset_id, "datasets")
+
+    except FileNotFoundError:
+        print("sim_output.json not found in " + folder)
+
     ### simulation run ###
 
     try:
@@ -424,6 +469,7 @@ for folder in folders:
                 "simulator_id": simulation_plan_id,
                 "success": True,
                 "response": json.dumps(sim_output),
+                "dataset_id": dataset_id,
             }
         )
         headers = {"Content-Type": "application/json"}
@@ -488,7 +534,7 @@ for folder in folders:
     except Exception as e:
         print(e)
 
-programatically_populate_datasets()
+populate_exemplar_datasets()
 
 ## now delete repo
 shutil.rmtree("experiments-main")

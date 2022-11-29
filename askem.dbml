@@ -169,6 +169,7 @@ Table simulation_run {
   timestamp datetime [default: `now()`, not null]
   completed_at datetime
   success bool
+  dataset_id int
   response blob [note: 'The answer to the query whether its natural language or just a number.']
 }
 
