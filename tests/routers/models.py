@@ -120,10 +120,10 @@ def test_model_cru():
         )
         assert 200 == response_get.status_code
         assert payload["name"] == response_get.json()["name"]
-        assert (
-            "x" in payload["parameters"]
-            and payload["parameters"]["type"] == ValueType.int
-        )
+        # assert (
+        #     "x" in payload["parameters"]
+        #     and payload["parameters"]["type"] == ValueType.int
+        # )
         # Update
         new_payload = {
             "name": "Bar",
