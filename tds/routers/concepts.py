@@ -129,14 +129,17 @@ def search_concept_using_facets(
                 {
                     "facets": {
                         "types": {hit[1]: hit[0] for hit in search_body["types"]},
-                        "curies": {hit[1]: hit[0] for hit in search_body["curies"]},
+                        "concepts": {
+                            hit[1]: {"count": hit[0], "name": term_map[hit[1]]}
+                            for hit in search_body["curies"]
+                        },
                     },
                     "results": [
                         {
                             "type": entry.type,
                             "id": entry.object_id,
                             "curie": entry.curie,
-                            "display_name": term_map[entry.curie],
+                            "name": term_map[entry.curie],
                         }
                         for entry in search_body["results"]
                     ],
