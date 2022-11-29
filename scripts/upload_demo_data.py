@@ -23,10 +23,11 @@ def download_and_unzip(url, extract_to="."):
 time.sleep(10)
 
 print("Starting process to upload artifacts to postgres.")
-# get experiments repo
-# download_and_unzip(
-#     "https://github.com/DARPA-ASKEM/experiments/archive/acb2d14b75898a8cceec7199dbabbcf281936a97.zip"
-# )
+
+# get experiments repo at specific commit for now
+download_and_unzip(
+    "https://github.com/DARPA-ASKEM/experiments/archive/acb2d14b75898a8cceec7199dbabbcf281936a97.zip"
+)
 
 # download_and_unzip(
 #     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
@@ -165,11 +166,27 @@ def add_concept(concept, object_id, type):
     )
 
 
-concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
+for folder in folders:
 
-for folder in folders[1:3]:
-    index = random.randrange(2)
-    concept = concepts[index]
+    ## get concepts ##
+    model_concepts = []
+    with open(folder + "model_mmt_templates.json", "r") as f:
+        mmt_template = json.load(f)
+
+    print(len(mmt_template.get("templates")))
+    for template in mmt_template.get("templates"):
+
+        for key in template.keys():
+            if key == "subject" or key == "outcome":
+                ncit = template[key].get("identifiers").get("ncit", None)
+                ido = template[key].get("identifiers").get("ido", None)
+                if ncit is not None:
+                    model_concepts.append(f"ncit:{ncit}")
+                if ido is not None:
+                    model_concepts.append(f"ido:{ido}")
+
+    model_concepts = [*set(model_concepts)]
+
     # publications ##
     try:
         print("Upload publication")
@@ -190,7 +207,8 @@ for folder in folders[1:3]:
             project_id=1, asset_id=int(publication_id), asset_type="publications"
         )
 
-        add_concept(concept=concept, object_id=publication_id, type="publications")
+        for concept in model_concepts:
+            add_concept(concept=concept, object_id=publication_id, type="publications")
     except Exception as e:
         print(f"error opening {folder}document_doi.txt . - {e}")
 
@@ -225,10 +243,10 @@ for folder in folders[1:3]:
             relation_type="derivedfrom",
             user_id=person_id,
         )
-
-        add_concept(
-            concept=concept, object_id=intermediate_mmt_id, type="intermediates"
-        )
+        for concept in model_concepts:
+            add_concept(
+                concept=concept, object_id=intermediate_mmt_id, type="intermediates"
+            )
 
     except Exception as e:
         print(e)
@@ -260,10 +278,10 @@ for folder in folders[1:3]:
             relation_type="derivedfrom",
             user_id=person_id,
         )
-
-        add_concept(
-            concept=concept, object_id=intermediate_sbml_id, type="intermediates"
-        )
+        for concept in model_concepts:
+            add_concept(
+                concept=concept, object_id=intermediate_sbml_id, type="intermediates"
+            )
 
     except Exception as e:
         print(e)
@@ -307,8 +325,8 @@ for folder in folders[1:3]:
             relation_type="derivedfrom",
             user_id=person_id,
         )
-
-        add_concept(concept=concept, object_id=model_id, type="models")
+        for concept in model_concepts:
+            add_concept(concept=concept, object_id=model_id, type="models")
 
     except Exception as e:
         print(f" {e}")
@@ -377,10 +395,6 @@ for folder in folders[1:3]:
             user_id=person_id,
         )
 
-        add_concept(
-            concept=concept, object_id=intermediate_sbml_id, type="simulation_plans"
-        )
-
     except Exception as e:
         print(f" {e}")
 
@@ -419,10 +433,6 @@ for folder in folders[1:3]:
             user_id=person_id,
         )
 
-        add_concept(
-            concept=concept, object_id=simulation_run_id, type="simulation_runs"
-        )
-
     except Exception as e:
         print(f" {e}")
 
@@ -458,13 +468,13 @@ for folder in folders[1:3]:
         )
         parameters_json = response.json()
 
-        for parameter in parameters_json:
+        # for parameter in parameters_json:
 
-            add_concept(
-                concept=concept,
-                object_id=parameter.get("id"),
-                type="simulation_parameters",
-            )
+        #     add_concept(
+        #         concept=concept,
+        #         object_id=parameter.get("id"),
+        #         type="simulation_parameters",
+        #     )
 
     except Exception as e:
         print(e)
@@ -472,4 +482,4 @@ for folder in folders[1:3]:
 programatically_populate_datasets()
 
 ## now delete repo
-shutil.rmtree("experiments-*")
+shutil.rmtree("experiments-acb2d14b75898a8cceec7199dbabbcf281936a97")
