@@ -29,7 +29,7 @@ def download_and_unzip(url, extract_to="."):
     zipfile.extractall(path=extract_to)
 
 
-time.sleep(10)
+time.sleep(5)
 
 print("Starting process to upload artifacts to postgres.")
 
