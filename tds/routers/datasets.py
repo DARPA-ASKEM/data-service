@@ -7,6 +7,7 @@ import os
 from logging import DEBUG, Logger
 from typing import List, Optional
 
+import pandas
 import requests
 from fastapi import APIRouter, Depends, File, Response, UploadFile, status
 from fastapi.responses import StreamingResponse
@@ -16,7 +17,7 @@ from sqlalchemy.orm import Session
 from tds.autogen import orm, schema
 from tds.db import list_by_id, request_rdb
 from tds.lib.datasets import create_qualifier_xref
-from tds.lib.storage import get_rawfile, put_rawfile
+from tds.lib.storage import get_rawfile, put_rawfile, stream_csv_from_data_paths
 
 logger = Logger(__file__)
 logger.setLevel(DEBUG)
@@ -40,6 +41,25 @@ def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     with Session(rdb) as session:
         result = session.query(orm.Feature).get(id)
+        return result
+
+
+@router.get("/search/features")
+def search_feature(
+    dataset_id: int = None,
+    feature_name: str = None,
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Search features by dataset id and/or name
+    """
+    with Session(rdb) as session:
+        query = session.query(orm.Feature)
+        if dataset_id:
+            query = query.filter(orm.Feature.dataset_id == int(dataset_id))
+        if feature_name:
+            query = query.filter(orm.Feature.name == feature_name)
+        result = query.all()
         return result
 
 
@@ -297,8 +317,11 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
 
 
 @router.get("/{id}/download/rawfile")
-def get_csv_from_data_annotation(
-    id: int, data_annotation_flag: bool = False, rdb: Engine = Depends(request_rdb)
+def get_csv_from_dataset(
+    id: int,
+    wide_format: bool = False,
+    data_annotation_flag: bool = False,
+    rdb: Engine = Depends(request_rdb),
 ):
     """
     Gets the csv of an annotated dataset that is registered
@@ -316,7 +339,19 @@ def get_csv_from_data_annotation(
         )
         return StreamingResponse(response.raw, headers=response.headers)
     for path in data_paths:
+        if path.endswith(".parquet.gzip"):
+            # Build single dataframe
+            dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
+            output = stream_csv_from_data_paths(dataframe, wide_format)
+            return StreamingResponse(
+                iter([output]),
+                media_type="text/csv",
+            )
         file = get_rawfile(path)
+        if wide_format:
+            dataframe = pandas.read_csv(file)
+            output = stream_csv_from_data_paths(dataframe, wide_format)
+            return StreamingResponse(iter([output]), media_type="text/csv")
         return StreamingResponse(file, media_type="text/csv")
 
 

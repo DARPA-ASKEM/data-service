@@ -27,7 +27,15 @@ def convert_biomd_json_to_csv(json_file_path, output_file_path):
             csv_writer = csv.writer(data_file)
 
             headers = [
-                "timestamp, country, admin1, admin2, admin3, lat, lng, feature, value"
+                "timestamp",
+                "country",
+                "admin1",
+                "admin2",
+                "admin3",
+                "lat",
+                "lng",
+                "feature",
+                "value",
             ]
 
             # Write header wrote
