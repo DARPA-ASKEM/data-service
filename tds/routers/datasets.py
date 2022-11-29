@@ -4,7 +4,6 @@ CRUD operations for datasets and related tables in the DB
 
 import json
 import os
-from io import StringIO
 from logging import DEBUG, Logger
 from typing import List, Optional
 
@@ -318,7 +317,7 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
 
 
 @router.get("/{id}/download/rawfile")
-def get_csv_from_data_annotation(
+def get_csv_from_dataset(
     id: int,
     wide_format: bool = False,
     data_annotation_flag: bool = False,
@@ -341,24 +340,18 @@ def get_csv_from_data_annotation(
         return StreamingResponse(response.raw, headers=response.headers)
     for path in data_paths:
         if path.endswith(".parquet.gzip"):
-            logger.info("Made it into parquet")
+            # Build single dataframe
+            dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
+            output = stream_csv_from_data_paths(dataframe, wide_format)
             return StreamingResponse(
-                stream_csv_from_data_paths(data_paths, wide_format),
+                iter([output]),
                 media_type="text/csv",
             )
         file = get_rawfile(path)
         if wide_format:
             dataframe = pandas.read_csv(file)
-            dataframe_wide = pandas.pivot(
-                dataframe, index=None, columns="feature", values="value"
-            )  # Reshape from long to wide
-            dataframe = dataframe.drop(["feature", "value"], axis=1)
-            dataframe = pandas.merge(
-                dataframe, dataframe_wide, left_index=True, right_index=True
-            )
-            buffer = StringIO()
-            dataframe.to_csv(buffer)
-            return StreamingResponse(buffer.seek(0), media_type="text/csv")
+            output = stream_csv_from_data_paths(dataframe, wide_format)
+            return StreamingResponse(iter([output]), media_type="text/csv")
         return StreamingResponse(file, media_type="text/csv")
 
 
