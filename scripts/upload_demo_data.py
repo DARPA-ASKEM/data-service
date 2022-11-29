@@ -9,8 +9,10 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 import requests
-from demo_dataset_generator import programatically_populate_datasets
+
+# from demo_dataset_generator import programatically_populate_datasets
 from exemplar_dataset_generator import populate_exemplar_datasets
+from json_to_csv import convert_biomd_json_to_csv
 
 url = "http://localhost:8001/"
 
@@ -95,6 +97,233 @@ def create_framework(url=url):
     response = requests.request("POST", url + path, headers=headers, data=payload)
 
     return response.text
+
+
+## Dataset code ###
+def create_dataset(maintainer_id, num_of_states, biomodel_name=None):
+    """Creates a demo dataset using a maintainer_id and number of states.
+
+    Args:
+        maintainer_id (int): id of the maintainer linked to dataset
+        num_of_states (int): state number from raw data
+
+    Returns:
+        json: requests response in json format
+    """
+
+    # Post dataset first to get ID from postgres
+    headers = {"Content-Type": "application/json"}
+    initial_dataset_payload = {
+        "name": f"Biomodel simulation output {biomodel_name}",
+        "url": "",
+        "description": "Biomodel simulation output registered as a dataset",
+        "maintainer": maintainer_id,
+    }
+
+    initial_dataset_response = requests.post(
+        url + "datasets",
+        headers=headers,
+        data=json.dumps(initial_dataset_payload),
+        timeout=100,
+    )
+    dataset_id = initial_dataset_response.json()["id"]
+    print(dataset_id)
+
+    feature_array = []
+    for state in range(num_of_states):
+        feature_dict = {
+            "name": f"state_{state}",
+            "display_name": "",
+            "description": f"state feature {state}",
+            "type": "feature",
+            "feature_type": "float",
+            "units": "na",
+            "units_description": "",
+            "qualifies": [],
+            "primary_ontology_id": "",
+            "qualifierrole": "breakdown",
+            "aliases": {},
+        }
+        feature_array.append(feature_dict)
+
+    qualifies_array = []
+    for state in range(num_of_states):
+        qualifies_array.append(f"state_{state}")
+
+    time_step_qual = {
+        "name": "time",
+        "display_name": "",
+        "description": "time step feature",
+        "type": "feature",
+        "feature_type": "float",
+        "units": "na",
+        "units_description": "",
+        "qualifies": qualifies_array,
+        "primary_ontology_id": "",
+        "qualifierrole": "breakdown",
+        "aliases": {},
+    }
+
+    feature_array.append(time_step_qual)
+
+    data_path_string = f"file:///datasets/{dataset_id}/sim_output.csv"
+
+    annotation = {
+        "annotations": {
+            "geo": [
+                {
+                    "name": "mock_lon",
+                    "display_name": "loc",
+                    "description": "location",
+                    "type": "geo",
+                    "geo_type": "longitude",
+                    "primary_geo": True,
+                    "resolve_to_gadm": False,
+                    "coord_format": "lonlat",
+                    "qualifies": [],
+                    "aliases": {},
+                    "gadm_level": "admin1",
+                },
+                {
+                    "name": "mock_lat",
+                    "display_name": "loc",
+                    "description": "location",
+                    "type": "geo",
+                    "geo_type": "latitude",
+                    "primary_geo": True,
+                    "resolve_to_gadm": False,
+                    "is_geo_pair": "mock_lon",
+                    "coord_format": "lonlat",
+                    "qualifies": [],
+                    "aliases": {},
+                    "gadm_level": "admin1",
+                },
+            ],
+            "date": [
+                {
+                    "name": "mock_time",
+                    "display_name": "",
+                    "description": "date",
+                    "type": "date",
+                    "date_type": "date",
+                    "primary_date": True,
+                    "time_format": "%m/%d/%Y",
+                    "qualifies": [],
+                    "aliases": {},
+                }
+            ],
+            "feature": feature_array,
+        },
+        "data_paths": [data_path_string],
+    }
+
+    dataset_payload = {
+        "name": f"Biomodel simulation output {biomodel_name}",
+        "url": "",
+        "description": "Biomodel simulation output registered as a dataset",
+        "deprecated": False,
+        "sensitivity": "",
+        "quality": "Measured",
+        "temporal_resolution": "",
+        "geospatial_resolution": "",
+        "annotations": json.dumps(annotation),
+        "maintainer": maintainer_id,
+    }
+
+    dataset_response = requests.patch(
+        url + f"datasets/{dataset_id}",
+        headers=headers,
+        data=json.dumps(dataset_payload),
+        timeout=100,
+    )
+    print(f"Dataset post response: {dataset_response}")
+
+    dataset_json = dataset_response.json()
+
+    return dataset_json
+
+
+def create_feature(dataset_id, index):
+    """Creates a demo feature using a dataset_id and a feature index.
+
+    Args:
+        dataset_id (int): related dataset's id in postgres
+        index (int): state number from dataset
+
+    Returns:
+        json: requests response in json format
+    """
+    feature_payload = {
+        "dataset_id": dataset_id,
+        "description": f"State Feature {index}",
+        "display_name": f"state_{index}",
+        "name": f"state_{index}",
+        "value_type": "float",
+    }
+    feature_response = requests.post(
+        url + "datasets/features",
+        json=feature_payload,
+        timeout=100,
+    )
+
+    return feature_response.json()
+
+
+def create_qualifier(dataset_id, num_of_states):
+    """Creates a demo qualifier using a dataset_id and number of states.
+
+    Args:
+        dataset_id (int): related dataset's id in postgres
+        num_of_states (int): number of states in sample data
+
+    Returns:
+        json: requests response in json format
+    """
+    qualifier_payload = {
+        "dataset_id": dataset_id,
+        "description": "Timestep feature qualifier",
+        "display_name": "timestep_qualifier",
+        "name": "timestep_qualifier",
+        "value_type": "float",
+    }
+    qualifies_array = []
+    for state in range(num_of_states):
+        qualifies_array.append(f"state_{state}")
+    qualifier_full_payload = {
+        "payload": qualifier_payload,
+        "qualifies_array": qualifies_array,
+    }
+
+    qualifier_response = requests.post(
+        url + "datasets/qualifiers",
+        json=qualifier_full_payload,
+        timeout=100,
+    )
+
+    return qualifier_response.json()
+
+
+def upload_file_to_tds(id, file_object):
+    """Uploads a file_object to TDS
+
+    Args:
+        id (int): dataset id the file is associated with
+        file_object (file): file to upload
+
+    Returns:
+        json: Requests response in json format
+    """
+
+    payload = {"id": id}
+    file_payload = {"file": file_object}
+    upload_response = requests.post(
+        url + f"datasets/{id}/upload/file",
+        files=file_payload,
+        json=payload,
+        timeout=100,
+    )
+
+    return upload_response.json()
 
 
 person = create_person()
@@ -409,6 +638,44 @@ for folder in folders:
     except Exception as e:
         print(f" {e}")
 
+    ## create dataset from simulation run * backwards from how this would normally happen but we want dataset id to add to request
+
+    try:
+        # Open json to get relevant information
+        with open(folder + "sim_output.json", "r", encoding="utf-8") as sim_out:
+            # model_name = folder.split("/")[-2]
+            simulation_output = json.load(sim_out)
+            states = simulation_output["states"]
+            first_state_obj = states[0]
+            num_of_states = len(first_state_obj)
+
+            # Create the dataset with maintainer_id of 1
+            # assuming the first maintainer is already created.
+            dataset_response = create_dataset(
+                maintainer_id=1,
+                num_of_states=num_of_states,
+                biomodel_name=model_name,
+            )
+            dataset_id = dataset_response["id"]
+            # Convert the json to a CSV
+            convert_biomd_json_to_csv(
+                json_file_path=folder + "sim_output.json",
+                output_file_path=folder + "sim_output.csv",
+            )
+            # Upload the CSV to TDS for full mock data
+            with open(folder + "sim_output.csv", "rb") as sim_csv:
+                print(f"Uploading file to dataset_id {dataset_id}")
+                upload_file_to_tds(id=dataset_id, file_object=sim_csv)
+                print(dataset_id)
+            # Finish populating dataset metadata: Features, Qualifiers
+            for state in range(num_of_states):
+                create_feature(dataset_id, state)
+            create_qualifier(dataset_id, num_of_states)
+            asset_to_project(1, dataset_id, "datasets")
+
+    except FileNotFoundError:
+        print("sim_output.json not found in " + folder)
+
     ### simulation run ###
 
     try:
@@ -425,6 +692,7 @@ for folder in folders:
                 "simulator_id": simulation_plan_id,
                 "success": True,
                 "response": json.dumps(sim_output),
+                "dataset_id": dataset_id,
             }
         )
         headers = {"Content-Type": "application/json"}
@@ -489,7 +757,6 @@ for folder in folders:
     except Exception as e:
         print(e)
 
-programatically_populate_datasets()
 populate_exemplar_datasets()
 
 ## now delete repo

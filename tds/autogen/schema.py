@@ -167,6 +167,7 @@ class SimulationRun(BaseModel):
     timestamp: datetime.datetime = datetime.datetime.now()
     completed_at: Optional[datetime.datetime]
     success: Optional[bool]
+    dataset_id: Optional[int]
     response: Optional[bytes]
 
 

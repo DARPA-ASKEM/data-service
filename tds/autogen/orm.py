@@ -187,6 +187,7 @@ class SimulationRun(Base):
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     completed_at = sa.Column(sa.DateTime())
     success = sa.Column(sa.Boolean())
+    dataset_id = sa.Column(sa.Integer())
     response = sa.Column(sa.LargeBinary())
 
 

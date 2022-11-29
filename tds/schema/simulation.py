@@ -41,6 +41,7 @@ class Plan(SimulationPlan):
                 "name": "string",
                 "simulator": "string",
                 "model_id": "int",
+                "dataset_id": "int",
                 "query": "string",
                 "content": "json-in-string",
             }
