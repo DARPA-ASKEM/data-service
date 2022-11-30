@@ -171,6 +171,8 @@ def get_model_description(
     if entry_exists(rdb.connect(), orm.Model, id):
         with Session(rdb) as session:
             model = session.query(orm.Model).get(id)
+            model.pop("content")  # TODO: Remove content
+
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return ModelDescription.from_orm(model)

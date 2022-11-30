@@ -32,6 +32,11 @@ def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
 class ModelDescription(schema.Model):
     concept: Optional[Concept] = None
 
+    # @classmethod
+    # def from_orm_(cls, body: orm.Model):
+    #     setattr(body, "content", dumps(body.content))
+    #     return body
+
     class Config:
         orm_mode = True
 
@@ -47,7 +52,6 @@ class Model(schema.Model):
         """
         setattr(body, "content", dumps(body.content))
         setattr(body, "parameters", orm_to_params(parameters))
-
         return super().from_orm(body)
 
     class Config:
