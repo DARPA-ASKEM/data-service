@@ -9,8 +9,8 @@ from typing import Dict, Optional, Type
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
 from tds.schema.dataset import Dataset
-from tds.schema.model import Intermediate, Model
-from tds.schema.simulation import Plan, Run
+from tds.schema.model import Intermediate, Model, ModelDescription
+from tds.schema.simulation import Plan, Run, RunDescription
 
 
 class Extraction(schema.Extraction):
@@ -43,11 +43,11 @@ ORMResource = (
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
     Extraction: ResourceType.extractions,
-    Model: ResourceType.models,
+    ModelDescription: ResourceType.models,
     Plan: ResourceType.plans,
     Publication: ResourceType.publications,
     Intermediate: ResourceType.intermediates,
-    Run: ResourceType.simulation_runs,
+    RunDescription: ResourceType.simulation_runs,
 }
 
 
