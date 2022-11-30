@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.0 (Debian 15.0-1.pgdg110+1)
--- Dumped by pg_dump version 15.0 (Debian 15.0-1.pgdg110+1)
+-- Dumped from database version 15.1 (Debian 15.1-1.pgdg110+1)
+-- Dumped by pg_dump version 15.1 (Debian 15.1-1.pgdg110+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -153,6 +153,18 @@ ALTER TYPE public.valuetype OWNER TO dev;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: active_concept; Type: TABLE; Schema: public; Owner: dev
+--
+
+CREATE TABLE public.active_concept (
+    curie character varying NOT NULL,
+    name character varying
+);
+
+
+ALTER TABLE public.active_concept OWNER TO dev;
 
 --
 -- Name: association; Type: TABLE; Schema: public; Owner: dev
@@ -408,7 +420,7 @@ CREATE TABLE public.model_parameter (
     name character varying NOT NULL,
     type public.valuetype NOT NULL,
     default_value character varying,
-    initial boolean NOT NULL
+    state_variable boolean NOT NULL
 );
 
 
@@ -1058,6 +1070,14 @@ ALTER TABLE ONLY public.software ALTER COLUMN id SET DEFAULT nextval('public.sof
 
 
 --
+-- Name: active_concept active_concept_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
+--
+
+ALTER TABLE ONLY public.active_concept
+    ADD CONSTRAINT active_concept_pkey PRIMARY KEY (curie);
+
+
+--
 -- Name: association association_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
 --
 
@@ -1287,6 +1307,14 @@ ALTER TABLE ONLY public.model_runtime
 
 ALTER TABLE ONLY public.model_runtime
     ADD CONSTRAINT model_runtime_right_fkey FOREIGN KEY ("right") REFERENCES public.model_framework(name);
+
+
+--
+-- Name: ontology_concept ontology_concept_curie_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
+--
+
+ALTER TABLE ONLY public.ontology_concept
+    ADD CONSTRAINT ontology_concept_curie_fkey FOREIGN KEY (curie) REFERENCES public.active_concept(curie);
 
 
 --
