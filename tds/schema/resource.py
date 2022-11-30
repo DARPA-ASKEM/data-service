@@ -65,7 +65,7 @@ def get_schema_description(resource_type: ResourceType) -> Type[Resource]:
     """
     Maps class to schema enum for descriptions
     """
-    enum_to_obj = {type: resource for resource, type in obj_to_enum.items()}
+    enum_to_obj = {type: resource for resource, type in obj_to_enum_desc.items()}
     return enum_to_obj[resource_type]
 
 
