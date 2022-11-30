@@ -176,12 +176,16 @@ def create_qualifier(
                 .filter_by(name=qual, dataset_id=qualifierp["dataset_id"])
                 .first()
             )
-            qualifier_xrefp = {
-                "id": 0,
-                "qualifier_id": data_id,
-                "feature_id": feature.id,
-            }
-            create_qualifier_xref(qualifier_xrefp, rdb)
+            try:
+                qualifier_xrefp = {
+                    "id": 0,
+                    "qualifier_id": data_id,
+                    "feature_id": feature.id,
+                }
+                create_qualifier_xref(qualifier_xrefp, rdb)
+            except AttributeError as error:
+                logger.warning("Skipped xref because of %s", error)
+
         qualifierp["id"] = data_id
         return Response(
             status_code=status.HTTP_201_CREATED,
