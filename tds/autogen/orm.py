@@ -236,6 +236,17 @@ class ProjectAsset(Base):
     external_ref = sa.Column(sa.String())
 
 
+class OntologyConcept(Base):
+
+    __tablename__ = 'ontology_concept'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    curie = sa.Column(sa.String(), sa.ForeignKey('active_concept.curie'), nullable=False)
+    type = sa.Column(sa.Enum(TaggableType), nullable=False)
+    object_id = sa.Column(sa.Integer(), nullable=False)
+    status = sa.Column(sa.Enum(OntologicalField), nullable=False)
+
+
 class Provenance(Base):
 
     __tablename__ = 'provenance'
@@ -310,17 +321,6 @@ class Project(Base):
     active = sa.Column(sa.Boolean(), nullable=False)
 
 
-class OntologyConcept(Base):
-
-    __tablename__ = 'ontology_concept'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    curie = sa.Column(sa.String(), nullable=False)
-    type = sa.Column(sa.Enum(TaggableType), nullable=False)
-    object_id = sa.Column(sa.Integer(), nullable=False)
-    status = sa.Column(sa.Enum(OntologicalField), nullable=False)
-
-
 class Person(Base):
 
     __tablename__ = 'person'
@@ -331,3 +331,11 @@ class Person(Base):
     org = sa.Column(sa.String())
     website = sa.Column(sa.String())
     is_registered = sa.Column(sa.Boolean(), nullable=False)
+
+
+class ActiveConcept(Base):
+
+    __tablename__ = 'active_concept'
+
+    curie = sa.Column(sa.String(), primary_key=True)
+    name = sa.Column(sa.String())
