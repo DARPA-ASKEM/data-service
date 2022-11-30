@@ -44,6 +44,25 @@ def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
+@router.get("/search/features")
+def search_feature(
+    dataset_id: int = None,
+    feature_name: str = None,
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Search features by dataset id and/or name
+    """
+    with Session(rdb) as session:
+        query = session.query(orm.Feature)
+        if dataset_id:
+            query = query.filter(orm.Feature.dataset_id == int(dataset_id))
+        if feature_name:
+            query = query.filter(orm.Feature.name == feature_name)
+        result = query.all()
+        return result
+
+
 @router.post("/features")
 def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
     """

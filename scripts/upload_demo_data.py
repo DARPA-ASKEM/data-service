@@ -415,7 +415,6 @@ for folder in folders:
 
     except Exception as e:
         print(e)
-
     ### upload simulation plan ###
     try:
         print("Upload Simulation Plan")
