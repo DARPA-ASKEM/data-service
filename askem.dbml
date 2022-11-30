@@ -179,7 +179,7 @@ Table model_parameter {
   name varchar [not null]
   type value_type [not null]
   default_value varchar
-  initial bool [not null]
+  state_variable bool [not null]
 }
 
 

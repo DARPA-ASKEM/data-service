@@ -178,7 +178,7 @@ class ModelParameter(BaseModel):
     name: str
     type: ValueType
     default_value: Optional[str]
-    initial: bool
+    state_variable: bool
 
 
 class SimulationParameter(BaseModel):
