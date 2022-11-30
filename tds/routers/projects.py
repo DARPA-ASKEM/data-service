@@ -3,10 +3,13 @@ CRUD operations for projects
 """
 
 import json
+from collections import defaultdict
 from logging import Logger
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi import Query as Query_Fastapi
+from fastapi import Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
@@ -15,7 +18,7 @@ from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, delete, retrieve, update
 from tds.schema.project import Project, ProjectMetadata
-from tds.schema.resource import ResourceType, get_resource_orm
+from tds.schema.resource import ResourceType, get_resource_orm, get_schema_description
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -29,6 +32,61 @@ def list_projects(
     Retrieve all projects
     """
     return list_by_id(rdb.connect(), orm.Project, page_size, page)
+
+
+@router.get("/{id}/assets", **retrieve.fastapi_endpoint_config)
+def get_project_assets(
+    id: int,
+    types: List[ResourceType] = Query_Fastapi(
+        default=[
+            "publications",
+            "models",
+            "intermediates",
+            "datasets",
+            "extractions",
+            "plans",
+            "simulation_runs",
+        ]
+    ),
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Retrieve project assets
+    """
+    if entry_exists(rdb.connect(), orm.Project, id):
+        with Session(rdb) as session:
+            # project = session.query(orm.Project).get(id)
+            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
+                orm.ProjectAsset.project_id == id
+            )
+            assets_key_ids = defaultdict(list)
+            for asset in list(assets):
+                if asset.resource_type in types:
+                    assets_key_ids[asset.resource_type].append(asset.resource_id)
+            assets_key_objects = defaultdict(list)
+            for key in assets_key_ids:
+                orm_type = get_resource_orm(key)
+                orm_schema = get_schema_description(key)
+                if key == ResourceType.datasets:
+                    assets_key_objects[key].append(
+                        list(
+                            session.query(orm_type).filter(
+                                orm_type.id.in_(assets_key_ids[key])
+                            )
+                        )
+                    )
+                else:
+                    assets_key_objects[key].append(
+                        [
+                            orm_schema.from_orm(asset)
+                            for asset in session.query(orm_type).filter(
+                                orm_type.id.in_(assets_key_ids[key])
+                            )
+                        ]
+                    )
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return assets_key_objects
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
