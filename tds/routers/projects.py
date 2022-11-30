@@ -18,7 +18,7 @@ from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, delete, retrieve, update
 from tds.schema.project import Project, ProjectMetadata
-from tds.schema.resource import ResourceType, get_resource_orm, get_schema
+from tds.schema.resource import ResourceType, get_resource_orm, get_schema_description
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -67,15 +67,14 @@ def get_project_assets(
             for key in assets_key_ids.keys():
 
                 orm_type = get_resource_orm(key)
-                orm_schema = get_schema(key)
+                orm_schema = get_schema_description(key)
                 if key == ResourceType.datasets:
                     assets_key_objects[key].append(
-                        [
-                            asset
-                            for asset in session.query(orm_type).filter(
+                        list(
+                            session.query(orm_type).filter(
                                 orm_type.id.in_(assets_key_ids[key])
                             )
-                        ]
+                        )
                     )
                 else:
                     assets_key_objects[key].append(
