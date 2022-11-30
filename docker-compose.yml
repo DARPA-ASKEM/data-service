@@ -16,6 +16,8 @@ services:
       - POSTGRES_PASSWORD=dev
       - POSTGRES_USER=dev
       - POSTGRES_DB=askem
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
     networks:
       - data-api
   api:
