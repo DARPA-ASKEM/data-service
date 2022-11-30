@@ -37,7 +37,7 @@ def create_dataset(maintainer_id, meta_object):
 
     Args:
         maintainer_id (int): id of the maintainer linked to dataset
-        num_of_states (int): state number from raw data
+        meta_object (Dict): dictionary of metadata about dataset.
 
     Returns:
         json: requests response in json format
@@ -103,7 +103,7 @@ def create_feature(dataset_id, feature_obj):
 
     Args:
         dataset_id (int): related dataset's id in postgres
-        index (int): state number from dataset
+        feature_obj (Dict): dictionary of feature data.
 
     Returns:
         json: requests response in json format
@@ -129,18 +129,27 @@ def create_qualifier(dataset_id, qualifier_obj):
 
     Args:
         dataset_id (int): related dataset's id in postgres
-        num_of_states (int): number of states in sample data
+        qualifier_obj (Dict): dictionary of qualifier data.
 
     Returns:
         json: requests response in json format
     """
+    # Check the value type to make sure it conforms.
+    value_type = "str"
+    qualifier_type = qualifier_obj["type"]
+    accepted_value_types = {"binary", "bool", "float", "int", "str"}
+    if qualifier_type in accepted_value_types:
+        value_type = qualifier_type
+
+    # Now construct payload
     qualifier_payload = {
         "dataset_id": dataset_id,
         "description": qualifier_obj["description"],
         "display_name": qualifier_obj["display_name"],
         "name": qualifier_obj["name"],
-        "value_type": qualifier_obj["type"],
+        "value_type": value_type,
     }
+    # Construct full payload with additional qualifies list.
     qualifies_array = qualifier_obj["related_features"]
     qualifier_full_payload = {
         "payload": qualifier_payload,
@@ -152,6 +161,8 @@ def create_qualifier(dataset_id, qualifier_obj):
         json=qualifier_full_payload,
         timeout=100,
     )
+
+    print(qualifier_response)
 
     return qualifier_response.json()
 
