@@ -348,7 +348,7 @@ for folder in folders:
                     "name": parameter_name,
                     "type": str(type(parameter_value.get("value")).__name__),
                     "default_value": str(parameter_value.get("value")),
-                    "initial": False,
+                    "state_variable": False,
                 }
                 parameter_types.append(param)
 
@@ -360,7 +360,7 @@ for folder in folders:
                     "name": parameter_name,
                     "type": str(type(parameter_value.get("value")).__name__),
                     "default_value": str(parameter_value.get("value")),
-                    "initial": True,
+                    "state_variable": True,
                 }
                 parameter_types.append(param)
 
