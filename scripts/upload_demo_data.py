@@ -372,6 +372,37 @@ for folder in folders:
 
     except Exception as e:
         print(e)
+
+    ## set concept to inital model parameters
+    try:
+        # get parameters
+        response = requests.request("GET", url + f"models/parameters/{model_id}")
+        parameters_model_json = response.json()
+
+        with open(f"{folder}model_mmt_initials.json", "r") as f:
+            init_params = json.load(f)
+            for init_parameter_name, init_parameter_value in init_params.get(
+                "initials"
+            ).items():
+                for parameter in parameters_model_json:
+                    if parameter.get("name") == init_parameter_name:
+                        ncit = init_parameter_value.get("identifiers").get("ncit", None)
+                        ido = init_parameter_value.get("identifiers").get("ido", None)
+                        if ncit is not None:
+                            add_concept(
+                                concept=f"ncit:{ncit}",
+                                object_id=parameter.get("id"),
+                                type="model_parameters",
+                            )
+                        if ido is not None:
+                            add_concept(
+                                concept=f"ido:{ido}",
+                                object_id=parameter.get("id"),
+                                type="model_parameters",
+                            )
+
+    except Exception as e:
+        print(e)
     ### upload simulation plan ###
     try:
         print("Upload Simulation Plan")
@@ -507,6 +538,15 @@ for folder in folders:
                         "type": str(type(parameter_value.get("value")).__name__),
                     }
                 )
+        with open(f"{folder}model_mmt_initials.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("initials").items():
+                param = {
+                    "name": parameter_name,
+                    "type": str(type(parameter_value.get("value")).__name__),
+                    "value": str(parameter_value.get("value")),
+                }
+                parameter_simulation.append(param)
 
         payload = json.dumps(parameter_simulation)
         headers = {"Content-Type": "application/json"}
@@ -517,20 +557,34 @@ for folder in folders:
             data=payload,
         )
 
+        time.sleep(1)
         # get parameters
         response = requests.request(
             "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
         )
         parameters_json = response.json()
 
-        # for parameter in parameters_json:
-
-        #     add_concept(
-        #         concept=concept,
-        #         object_id=parameter.get("id"),
-        #         type="simulation_parameters",
-        #     )
-
+        with open(f"{folder}model_mmt_initials.json", "r") as f:
+            init_parameters = json.load(f)
+            for init_parameter_name, init_parameter_value in init_parameters.get(
+                "initials"
+            ).items():
+                for parameter in parameters_json:
+                    if parameter.get("name") == init_parameter_name:
+                        ncit = init_parameter_value.get("identifiers").get("ncit", None)
+                        ido = init_parameter_value.get("identifiers").get("ido", None)
+                        if ncit is not None:
+                            add_concept(
+                                concept=f"ncit:{ncit}",
+                                object_id=parameter.get("id"),
+                                type="simulation_parameters",
+                            )
+                        if ido is not None:
+                            add_concept(
+                                concept=f"ido:{ido}",
+                                object_id=parameter.get("id"),
+                                type="simulation_parameters",
+                            )
     except Exception as e:
         print(e)
 

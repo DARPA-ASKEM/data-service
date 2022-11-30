@@ -19,6 +19,7 @@ def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
     """
     return [
         {
+            "id": param.id,
             "name": param.name,
             "type": jsonable_encoder(param.type),
             "default_value": param.default_value,
