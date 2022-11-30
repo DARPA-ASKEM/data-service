@@ -19,10 +19,11 @@ def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
     """
     return [
         {
+            "id": param.id,
             "name": param.name,
             "type": jsonable_encoder(param.type),
             "default_value": param.default_value,
-            "initial": param.initial,
+            "state_variable": param.state_variable,
         }
         for param in parameters
     ]
@@ -55,7 +56,6 @@ class Model(schema.Model):
         """
         setattr(body, "content", dumps(body.content))
         setattr(body, "parameters", orm_to_params(parameters))
-
         return super().from_orm(body)
 
     class Config:
@@ -67,7 +67,7 @@ class Model(schema.Model):
                 "content": "json-as-string",
                 "parameters": [{"string": "value-type"}],
                 "framework": "string",
-                "initial": "bool",
+                "state_variable": "bool",
             }
         }
 

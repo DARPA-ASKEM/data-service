@@ -200,7 +200,7 @@ class ModelParameter(Base):
     name = sa.Column(sa.String(), nullable=False)
     type = sa.Column(sa.Enum(ValueType), nullable=False)
     default_value = sa.Column(sa.String())
-    initial = sa.Column(sa.Boolean(), nullable=False)
+    state_variable = sa.Column(sa.Boolean(), nullable=False)
 
 
 class SimulationParameter(Base):

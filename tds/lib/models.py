@@ -31,7 +31,7 @@ def adjust_model_params(model_id: int, parameters: ModelParameters, session: Ses
                     name=parameter.get("name"),
                     type=parameter.get("type"),
                     default_value=parameter.get("default_value"),
-                    initial=parameter.get("initial", False),
+                    state_variable=parameter.get("state_variable", False),
                 )
             )
         else:
@@ -42,7 +42,7 @@ def adjust_model_params(model_id: int, parameters: ModelParameters, session: Ses
                 {
                     "type": parameter.get("type"),
                     "default_value": parameter.get("default_value"),
-                    "initial": parameter.get("initial", False),
+                    "state_variable": parameter.get("state_variable", False),
                 }
             )
 
