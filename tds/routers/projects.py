@@ -47,16 +47,11 @@ def get_project_assets(id: int, rdb: Engine = Depends(request_rdb)):
             for asset in list(assets):
                 assets_key_ids[asset.resource_type].append(asset.resource_id)
             assets_key_objects = defaultdict(list)
-            for key, value in assets_key_ids.items():
+            for key in assets_key_ids.keys():
 
                 orm_type = get_resource_orm(key)
                 orm_schema = get_schema(key)
-
-                print(orm_schema)
-                print(orm_type)
-                print(key)
                 if key == ResourceType.datasets:
-                    print("here")
                     assets_key_objects[key].append(
                         [
                             asset
@@ -74,9 +69,6 @@ def get_project_assets(id: int, rdb: Engine = Depends(request_rdb)):
                             )
                         ]
                     )
-
-            print(assets_key_objects)
-            print("done")
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return assets_key_objects
