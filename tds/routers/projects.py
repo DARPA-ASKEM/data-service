@@ -64,9 +64,7 @@ def get_project_assets(
                 if asset.resource_type in types:
                     assets_key_ids[asset.resource_type].append(asset.resource_id)
             assets_key_objects = defaultdict(list)
-            for key, value in assets_key_ids.items():
-                print(value)
-
+            for key in assets_key_ids:
                 orm_type = get_resource_orm(key)
                 orm_schema = get_schema_description(key)
                 if key == ResourceType.datasets:
