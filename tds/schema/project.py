@@ -12,20 +12,18 @@ from tds.schema.concept import Concept
 class Project(schema.Project):
     concept: Optional[Concept] = None
     active = True
-    assets: Dict[schema.ResourceType, Set[int]] = {}
+    assets: Dict[schema.ResourceType, dict] = {}
 
     @classmethod
-    def from_orm(
-        cls, body: orm.Project, project_assets: List[orm.ProjectAsset]
-    ) -> "Project":
+    def from_orm(cls, body: orm.Project, project_assets) -> "Project":
         """
         Handle the creation of asset dict
         """
-        assets = defaultdict(list)
-        for asset in project_assets:
-            assets[asset.resource_type].append(asset.resource_id)
+        # assets = defaultdict(list)
+        # for asset in project_assets:
+        #     assets[asset.resource_type].append(asset)
 
-        setattr(body, "assets", assets)
+        setattr(body, "assets", project_assets)
         return super().from_orm(body)
 
     class Config:

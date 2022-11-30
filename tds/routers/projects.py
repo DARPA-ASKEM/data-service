@@ -64,7 +64,7 @@ def return_asset(asset, session):
     elif asset.resource_type == "simulation_runs":
         return RunDescription.from_orm(session.query(orm).get(asset.resource_id))
     else:
-        return orm.from_orm(session.query(orm).get(asset.resource_id))
+        return session.query(orm).get(asset.resource_id)
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
@@ -90,7 +90,7 @@ def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
             print(assets_)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Project.from_orm(project, list(assets))
+    return Project.from_orm(project, assets_)
 
 
 @router.delete("/{id}", **retrieve.fastapi_endpoint_config)
