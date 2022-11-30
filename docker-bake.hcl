@@ -28,11 +28,11 @@ function "check_suffix" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 group "prod" {
-  targets = ["data-service"]
+  targets = ["data-service", "data-service-dev-db"]
 }
 
 group "default" {
-  targets = ["data-service-base", "data-service-dev-db"]
+  targets = ["data-service-base", "data-service-dev-db-base"]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ target "data-service-base" {
 	dockerfile = "Dockerfile"
 }
 
-target "data-service-dev-db" {
+target "data-service-dev-db-base" {
 	context = "."
 	tags = tag("data-service-dev-db", "", "")
 	dockerfile = "Dockerfile-dev-db"
@@ -55,4 +55,8 @@ target "data-service-dev-db" {
 
 target "data-service" {
   inherits = ["_platforms", "data-service-base"]
+}
+
+target "data-service-dev-db" {
+  inherits = ["_platforms", "data-service-dev-db-base"]
 }
