@@ -7,7 +7,9 @@ from collections import defaultdict
 from logging import Logger
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi import Query as Query_Fastapi
+from fastapi import Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
@@ -33,19 +35,34 @@ def list_projects(
 
 
 @router.get("/{id}/assets", **retrieve.fastapi_endpoint_config)
-def get_project_assets(id: int, rdb: Engine = Depends(request_rdb)):
+def get_project_assets(
+    id: int,
+    types: List[ResourceType] = Query_Fastapi(
+        default=[
+            "publications",
+            "models",
+            "intermediates",
+            "datasets",
+            "extractions",
+            "plans",
+            "simulation_runs",
+        ]
+    ),
+    rdb: Engine = Depends(request_rdb),
+):
     """
-    Retrieve project
+    Retrieve project assets
     """
     if entry_exists(rdb.connect(), orm.Project, id):
         with Session(rdb) as session:
-            project = session.query(orm.Project).get(id)
+            # project = session.query(orm.Project).get(id)
             assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
                 orm.ProjectAsset.project_id == id
             )
             assets_key_ids = defaultdict(list)
             for asset in list(assets):
-                assets_key_ids[asset.resource_type].append(asset.resource_id)
+                if asset.resource_type in types:
+                    assets_key_ids[asset.resource_type].append(asset.resource_id)
             assets_key_objects = defaultdict(list)
             for key in assets_key_ids.keys():
 
