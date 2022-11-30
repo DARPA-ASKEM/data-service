@@ -3,7 +3,7 @@ Provides the API interface for models.
 """
 # pylint: disable=missing-class-docstring
 from collections import defaultdict
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
 from tds.autogen import orm, schema
 from tds.schema.concept import Concept
@@ -12,7 +12,7 @@ from tds.schema.concept import Concept
 class Project(schema.Project):
     concept: Optional[Concept] = None
     active = True
-    assets: Dict[schema.ResourceType, dict] = {}
+    assets: Dict[schema.ResourceType, Any] = {}
 
     @classmethod
     def from_orm(cls, body: orm.Project, project_assets) -> "Project":

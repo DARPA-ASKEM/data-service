@@ -78,16 +78,16 @@ def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
             assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
                 orm.ProjectAsset.project_id == id
             )
-            print(assets)
             assets_ = defaultdict(list)
             for asset in list(assets):
-                print(asset)
 
                 assets_[asset.resource_type].append(
                     return_asset(asset, session=session)
                 )
             print("here")
-            print(assets_)
+            print(assets_.keys())
+            # print(assets_['intermediates'])
+            print(type(assets_))
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Project.from_orm(project, assets_)
