@@ -83,3 +83,22 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
         },
     )
     return enum_to_orm[resource_type]
+
+
+def map_resource_str_orm(resource_type: str) -> Optional[ORMResource]:
+    """
+    Maps resource type to ORM
+    """
+    enum_to_orm = defaultdict(
+        lambda: None,
+        {
+            "datasets": orm.Dataset,
+            "extractions": orm.Extraction,
+            "models": orm.Model,
+            "plans": orm.SimulationPlan,
+            "publications": orm.Publication,
+            "intermediates": orm.Intermediate,
+            "simulation_runs": orm.SimulationRun,
+        },
+    )
+    return enum_to_orm[resource_type]

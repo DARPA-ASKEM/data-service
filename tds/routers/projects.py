@@ -3,6 +3,7 @@ CRUD operations for projects
 """
 
 import json
+from collections import defaultdict
 from logging import Logger
 from typing import List
 
@@ -10,12 +11,26 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
-from tds.autogen import orm
+from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.operation import create, delete, retrieve, update
+from tds.schema.model import Intermediate, Model, ModelDescription
 from tds.schema.project import Project, ProjectMetadata
-from tds.schema.resource import ResourceType, get_resource_orm
+from tds.schema.resource import (
+    Publication,
+    ResourceType,
+    Software,
+    get_resource_orm,
+    map_resource_str_orm,
+)
+from tds.schema.simulation import (
+    Plan,
+    Run,
+    RunDescription,
+    SimulationParameters,
+    orm_to_params,
+)
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -31,6 +46,27 @@ def list_projects(
     return list_by_id(rdb.connect(), orm.Project, page_size, page)
 
 
+def return_asset(asset, session):
+
+    orm = get_resource_orm(asset.resource_type)
+    print(orm)
+    print(asset.resource_type)
+    if asset.resource_type == "publications":
+        return Publication.from_orm(session.query(orm).get(asset.resource_id))
+    elif asset.resource_type == "models":
+        print("here")
+        print(asset)
+        return ModelDescription.from_orm(session.query(orm).get(asset.resource_id))
+    elif asset.resource_type == "intermediates":
+        return Intermediate.from_orm(session.query(orm).get(asset.resource_id))
+    elif asset.resource_type == "plans":
+        return Plan.from_orm(session.query(orm).get(asset.resource_id))
+    elif asset.resource_type == "simulation_runs":
+        return RunDescription.from_orm(session.query(orm).get(asset.resource_id))
+    else:
+        return orm.from_orm(session.query(orm).get(asset.resource_id))
+
+
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
 def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
     """
@@ -39,12 +75,22 @@ def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
     if entry_exists(rdb.connect(), orm.Project, id):
         with Session(rdb) as session:
             project = session.query(orm.Project).get(id)
-            parameters: Query[orm.ProjectAsset] = session.query(
-                orm.ProjectAsset
-            ).filter(orm.ProjectAsset.project_id == id)
+            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
+                orm.ProjectAsset.project_id == id
+            )
+            print(assets)
+            assets_ = defaultdict(list)
+            for asset in list(assets):
+                print(asset)
+
+                assets_[asset.resource_type].append(
+                    return_asset(asset, session=session)
+                )
+            print("here")
+            print(assets_)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Project.from_orm(project, list(parameters))
+    return Project.from_orm(project, list(assets))
 
 
 @router.delete("/{id}", **retrieve.fastapi_endpoint_config)
