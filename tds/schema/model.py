@@ -31,6 +31,15 @@ def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
 class ModelDescription(schema.Model):
     concept: Optional[Concept] = None
 
+    @classmethod
+    def from_orm(cls, body: orm.Model) -> "ModelDescription":
+        """
+        Handle ORM conversion while coercing `dict` to JSON
+        """
+        setattr(body, "content", dumps(body.content))
+
+        return super().from_orm(body)
+
     class Config:
         orm_mode = True
 
