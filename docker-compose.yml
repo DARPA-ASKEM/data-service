@@ -9,13 +9,15 @@ networks:
 services:
   rdb:
     container_name: data-service-rdb
-    image: "postgres:15.0"
+    image: "postgres:15.1"
     ports:
       - "8032:5432"
     environment:
       - POSTGRES_PASSWORD=dev
       - POSTGRES_USER=dev
       - POSTGRES_DB=askem
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
     networks:
       - data-api
   api:
