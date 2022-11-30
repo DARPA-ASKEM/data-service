@@ -9,7 +9,16 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 import requests
-from demo_dataset_generator import programatically_populate_datasets
+from demo_dataset_generator import (
+    create_dataset,
+    create_feature,
+    create_qualifier,
+    upload_file_to_tds,
+)
+
+# from demo_dataset_generator import programatically_populate_datasets
+from exemplar_dataset_generator import populate_exemplar_datasets
+from json_to_csv import convert_biomd_json_to_csv
 
 url = "http://localhost:8001/"
 
@@ -20,10 +29,10 @@ def download_and_unzip(url, extract_to="."):
     zipfile.extractall(path=extract_to)
 
 
-time.sleep(10)
+time.sleep(5)
 
 print("Starting process to upload artifacts to postgres.")
-# get experiments repo
+
 
 download_and_unzip(
     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
@@ -99,7 +108,7 @@ project_id = project.get("id")
 create_framework()
 
 # loop over models
-folders = glob.glob("experiments-main/thin-thread-examples/biomodels/BIOMD*/")
+folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
 
 
 def asset_to_project(project_id, asset_id, asset_type):
@@ -162,11 +171,28 @@ def add_concept(concept, object_id, type):
     )
 
 
-concepts = ["doid:0080600", "vo:0004281", "miro:40000058"]
-
 for folder in folders:
-    index = random.randrange(2)
-    concept = concepts[index]
+    # get src/main files
+    folders_src = glob.glob(folder + "src/main/*")
+
+    ## get concepts ##
+    model_concepts = []
+    with open(folder + "model_mmt_templates.json", "r") as f:
+        mmt_template = json.load(f)
+
+    for template in mmt_template.get("templates"):
+
+        for key in template.keys():
+            if key == "subject" or key == "outcome":
+                ncit = template[key].get("identifiers").get("ncit", None)
+                ido = template[key].get("identifiers").get("ido", None)
+                if ncit is not None:
+                    model_concepts.append(f"ncit:{ncit}")
+                if ido is not None:
+                    model_concepts.append(f"ido:{ido}")
+
+    model_concepts = [*set(model_concepts)]
+
     # publications ##
     try:
         print("Upload publication")
@@ -187,7 +213,8 @@ for folder in folders:
             project_id=1, asset_id=int(publication_id), asset_type="publications"
         )
 
-        add_concept(concept=concept, object_id=publication_id, type="publications")
+        for concept in model_concepts:
+            add_concept(concept=concept, object_id=publication_id, type="publications")
     except Exception as e:
         print(f"error opening {folder}document_doi.txt . - {e}")
 
@@ -222,17 +249,18 @@ for folder in folders:
             relation_type="derivedfrom",
             user_id=person_id,
         )
-
-        add_concept(
-            concept=concept, object_id=intermediate_mmt_id, type="intermediates"
-        )
+        for concept in model_concepts:
+            add_concept(
+                concept=concept, object_id=intermediate_mmt_id, type="intermediates"
+            )
 
     except Exception as e:
         print(e)
 
     try:
         print("Upload intermediate sbml")
-        with open(folder + "model_sbml.xml", "r") as f:
+
+        with open(folders_src[0], "r") as f:
             mmt_template = f.read()
             payload = json.dumps(
                 {
@@ -257,32 +285,23 @@ for folder in folders:
             relation_type="derivedfrom",
             user_id=person_id,
         )
-
-        add_concept(
-            concept=concept, object_id=intermediate_sbml_id, type="intermediates"
-        )
+        for concept in model_concepts:
+            add_concept(
+                concept=concept, object_id=intermediate_sbml_id, type="intermediates"
+            )
 
     except Exception as e:
         print(e)
 
     ## model ##
     try:
-        print("Upload Model with parameters")
-        # load parameters of the model and set the type values
-        parameter_types = {}
-        with open(f"{folder}model_mmt_parameters.json", "r") as f:
-            parameters = json.load(f)
-            for parameter_name, parameter_value in parameters.get("parameters").items():
-                parameter_types[parameter_name] = str(type(parameter_value).__name__)
+        print("Upload Model")
 
         # model content
         with open(f"{folder}model_petri.json", "r") as f:
             model_content = json.load(f)
 
-        with open(folder + "model_sbml.xml", "r") as f:
-            mmt_template = f.read()
-
-        tree = ET.parse(folder + "model_sbml.xml")
+        tree = ET.parse(folders_src[0])
         root = tree.getroot()
         model_description = root[0][0][0][0].text
         model_name = root[0].attrib["name"]
@@ -293,7 +312,6 @@ for folder in folders:
                 "description": model_description,
                 "content": json.dumps(model_content),
                 "framework": "Petri Net",
-                "parameters": parameter_types,
             }
         )
         headers = {"Content-Type": "application/json"}
@@ -311,12 +329,80 @@ for folder in folders:
             relation_type="derivedfrom",
             user_id=person_id,
         )
-
-        add_concept(concept=concept, object_id=model_id, type="models")
+        for concept in model_concepts:
+            add_concept(concept=concept, object_id=model_id, type="models")
 
     except Exception as e:
         print(f" {e}")
 
+    ### upload model parameters ###
+    try:
+        print("Model Parameters")
+        # load parameters of the model and set the type values
+        parameter_types = []
+        with open(f"{folder}model_mmt_parameters.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("parameters").items():
+                param = {
+                    "model_id": model_id,
+                    "name": parameter_name,
+                    "type": str(type(parameter_value.get("value")).__name__),
+                    "default_value": str(parameter_value.get("value")),
+                    "state_variable": False,
+                }
+                parameter_types.append(param)
+
+        with open(f"{folder}model_mmt_initials.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("initials").items():
+                param = {
+                    "model_id": model_id,
+                    "name": parameter_name,
+                    "type": str(type(parameter_value.get("value")).__name__),
+                    "default_value": str(parameter_value.get("value")),
+                    "state_variable": True,
+                }
+                parameter_types.append(param)
+
+        payload = json.dumps(parameter_types)
+        headers = {"Content-Type": "application/json"}
+        response = requests.request(
+            "PUT", url + f"models/parameters/{model_id}", headers=headers, data=payload
+        )
+
+    except Exception as e:
+        print(e)
+
+    ## set concept to inital model parameters
+    try:
+        # get parameters
+        response = requests.request("GET", url + f"models/parameters/{model_id}")
+        parameters_model_json = response.json()
+
+        with open(f"{folder}model_mmt_initials.json", "r") as f:
+            init_params = json.load(f)
+            for init_parameter_name, init_parameter_value in init_params.get(
+                "initials"
+            ).items():
+                for parameter in parameters_model_json:
+                    if parameter.get("name") == init_parameter_name:
+                        ncit = init_parameter_value.get("identifiers").get("ncit", None)
+                        ido = init_parameter_value.get("identifiers").get("ido", None)
+                        if ncit is not None:
+                            add_concept(
+                                concept=f"ncit:{ncit}",
+                                object_id=parameter.get("id"),
+                                type="model_parameters",
+                            )
+                        if ido is not None:
+                            add_concept(
+                                concept=f"ido:{ido}",
+                                object_id=parameter.get("id"),
+                                type="model_parameters",
+                            )
+
+    except Exception as e:
+        print(e)
     ### upload simulation plan ###
     try:
         print("Upload Simulation Plan")
@@ -355,12 +441,48 @@ for folder in folders:
             user_id=person_id,
         )
 
-        add_concept(
-            concept=concept, object_id=intermediate_sbml_id, type="simulation_plans"
-        )
-
     except Exception as e:
         print(f" {e}")
+
+    ## create dataset from simulation run * backwards from how this would normally happen but we want dataset id to add to request
+
+    try:
+        # Open json to get relevant information
+        with open(folder + "sim_output.json", "r", encoding="utf-8") as sim_out:
+            # model_name = folder.split("/")[-2]
+            simulation_output = json.load(sim_out)
+            states = simulation_output["states"]
+            first_state_obj = states[0]
+            num_of_states = len(first_state_obj)
+
+            # Create the dataset with maintainer_id of 1
+            # assuming the first maintainer is already created.
+
+            dataset_response = create_dataset(
+                maintainer_id=1,
+                num_of_states=num_of_states,
+                biomodel_name=model_name,
+                biomodel_description=model_description,
+                url=url,
+            )
+            dataset_id = dataset_response["id"]
+            # Convert the json to a CSV
+            convert_biomd_json_to_csv(
+                json_file_path=folder + "sim_output.json",
+                output_file_path=folder + "sim_output.csv",
+            )
+            # Upload the CSV to TDS for full mock data
+            with open(folder + "sim_output.csv", "rb") as sim_csv:
+                print(f"Uploading file to dataset_id {dataset_id}")
+                upload_file_to_tds(id=dataset_id, file_object=sim_csv, url=url)
+            # Finish populating dataset metadata: Features, Qualifiers
+            for state in range(num_of_states):
+                create_feature(dataset_id, state, url=url)
+            create_qualifier(dataset_id, num_of_states, url=url)
+            asset_to_project(project_id, dataset_id, "datasets")
+
+    except FileNotFoundError:
+        print("sim_output.json not found in " + folder)
 
     ### simulation run ###
 
@@ -378,6 +500,7 @@ for folder in folders:
                 "simulator_id": simulation_plan_id,
                 "success": True,
                 "response": json.dumps(sim_output),
+                "dataset_id": dataset_id,
             }
         )
         headers = {"Content-Type": "application/json"}
@@ -397,10 +520,6 @@ for folder in folders:
             user_id=person_id,
         )
 
-        add_concept(
-            concept=concept, object_id=simulation_run_id, type="simulation_runs"
-        )
-
     except Exception as e:
         print(f" {e}")
 
@@ -408,21 +527,29 @@ for folder in folders:
     try:
 
         # creating simulation parameters
-        parameter_types = []
+        parameter_simulation = []
         with open(f"{folder}model_mmt_parameters.json", "r") as f:
             parameters = json.load(f)
             for parameter_name, parameter_value in parameters.get("parameters").items():
-                parameter_types.append(
+                parameter_simulation.append(
                     {
                         "name": parameter_name,
-                        "value": str(parameter_value),
-                        "type": str(type(parameter_value).__name__),
+                        "value": str(parameter_value.get("value")),
+                        "type": str(type(parameter_value.get("value")).__name__),
                     }
                 )
+        with open(f"{folder}model_mmt_initials.json", "r") as f:
+            parameters = json.load(f)
+            for parameter_name, parameter_value in parameters.get("initials").items():
+                param = {
+                    "name": parameter_name,
+                    "type": str(type(parameter_value.get("value")).__name__),
+                    "value": str(parameter_value.get("value")),
+                }
+                parameter_simulation.append(param)
 
-        payload = json.dumps(parameter_types)
+        payload = json.dumps(parameter_simulation)
         headers = {"Content-Type": "application/json"}
-
         response = requests.request(
             "PUT",
             url + f"simulations/runs/parameters/{simulation_run_id}",
@@ -430,24 +557,38 @@ for folder in folders:
             data=payload,
         )
 
+        time.sleep(1)
         # get parameters
         response = requests.request(
             "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
         )
         parameters_json = response.json()
 
-        for parameter in parameters_json:
-
-            add_concept(
-                concept=concept,
-                object_id=parameter.get("id"),
-                type="simulation_parameters",
-            )
-
+        with open(f"{folder}model_mmt_initials.json", "r") as f:
+            init_parameters = json.load(f)
+            for init_parameter_name, init_parameter_value in init_parameters.get(
+                "initials"
+            ).items():
+                for parameter in parameters_json:
+                    if parameter.get("name") == init_parameter_name:
+                        ncit = init_parameter_value.get("identifiers").get("ncit", None)
+                        ido = init_parameter_value.get("identifiers").get("ido", None)
+                        if ncit is not None:
+                            add_concept(
+                                concept=f"ncit:{ncit}",
+                                object_id=parameter.get("id"),
+                                type="simulation_parameters",
+                            )
+                        if ido is not None:
+                            add_concept(
+                                concept=f"ido:{ido}",
+                                object_id=parameter.get("id"),
+                                type="simulation_parameters",
+                            )
     except Exception as e:
         print(e)
 
-programatically_populate_datasets()
+populate_exemplar_datasets()
 
 ## now delete repo
 shutil.rmtree("experiments-main")

@@ -97,7 +97,14 @@ def test_model_cru():
             "name": "Foo",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "{}",
-            "parameters": {"x": ValueType.int},
+            "parameters": [
+                {
+                    "name": "test",
+                    "default_value": "1",
+                    "type": ValueType.int,
+                    "initial": False,
+                }
+            ],
             "framework": framework,
         }
         response_create = client.post(
@@ -114,14 +121,22 @@ def test_model_cru():
         assert 200 == response_get.status_code
         assert payload["name"] == response_get.json()["name"]
         assert (
-            "x" in payload["parameters"] and payload["parameters"]["x"] == ValueType.int
+            "type" in payload["parameters"][0]
+            and payload["parameters"][0]["type"] == ValueType.int
         )
         # Update
         new_payload = {
             "name": "Bar",
             "description": "No desc",
             "content": "[]",
-            "parameters": {"y": ValueType.bool},
+            "parameters": [
+                {
+                    "name": "test",
+                    "default_value": "2",
+                    "type": ValueType.int,
+                    "initial": False,
+                }
+            ],
             "framework": framework,
         }
         response_update = client.post(
@@ -138,6 +153,6 @@ def test_model_cru():
         assert 200 == response_get_again.status_code
         assert response_get.json()["name"] != response_get_again.json()["name"]
         assert (
-            "y" in new_payload["parameters"]
-            and new_payload["parameters"]["y"] == ValueType.bool
+            "type" in new_payload["parameters"][0]
+            and new_payload["parameters"][0]["type"] == ValueType.int
         )

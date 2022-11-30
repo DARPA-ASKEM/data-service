@@ -4,16 +4,17 @@ CRUD operations for concepts and related tables in the DB
 
 import json
 from logging import Logger
+from typing import List, Optional
 from urllib.parse import quote_plus
 
-import requests
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
+from sqlalchemy import func
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
 from tds.db import request_rdb
-from tds.settings import settings
+from tds.lib.concepts import fetch_from_dkg, mark_concept_active
 
 logger = Logger(__file__)
 router = APIRouter()
@@ -43,20 +44,8 @@ def search_concept_definitions(term: str, limit: int = 100, offset: int = 0):
     """
     Wraps search functionality from the DKG.
     """
-    headers = {"accept": "application/json", "Content-Type": "application/json"}
-    base_url = settings.DKG_URL + ":" + str(settings.DKG_API_PORT)
-    params = f"api/search?q={term}&limit={limit}&offset={offset}"
-    url = f"{base_url}/{params}"
-    logger.info("Sending data to %s", url)
-
-    response = requests.get(url, headers=headers, timeout=5)
-    logger.debug("response: %s", response)
-    logger.debug("response reason: %s", response.raw.reason)
-
-    if response.status_code == 200:
-        return json.loads(response.content.decode("utf8"))
-    logger.debug("Failed to fetch ontologies: %s", response)
-    raise Exception(f"DKG server returned the status {response.status_code}")
+    params = f"/search?q={term}&limit={limit}&offset={offset}"
+    return fetch_from_dkg(params)
 
 
 @router.get("/definitions/{curie}")
@@ -64,20 +53,77 @@ def get_concept_definition(curie: str):
     """
     Wraps fetch functionality from the DKG.
     """
-    headers = {"accept": "application/json", "Content-Type": "application/json"}
-    base_url = settings.DKG_URL + ":" + str(settings.DKG_API_PORT)
-    params = f"api/entity/{quote_plus(curie)}"
-    url = f"{base_url}/{params}"
-    logger.info("Sending data to %s", url)
+    params = f"/entity/{quote_plus(curie)}"
+    return fetch_from_dkg(params)
 
-    response = requests.get(url, headers=headers, timeout=5)
-    logger.debug("response: %s", response)
-    logger.debug("response reason: %s", response.raw.reason)
 
-    if response.status_code == 200:
-        return json.loads(response.content.decode("utf8"))
-    logger.debug("Failed to fetch ontologies: %s", response)
-    raise Exception("DKG server returned the status {response.status_code}")
+@router.get("/facets")
+def search_concept_using_facets(
+    types: List[schema.TaggableType] = Query(default=None),
+    curies: Optional[List[str]] = Query(default=None),
+    rdb: Engine = Depends(request_rdb),
+) -> Response:
+    """
+    Search along type and curie facets
+    """
+    with Session(rdb) as session:
+        search_body = {
+            "types": session.query(
+                func.count(orm.OntologyConcept.type), orm.OntologyConcept.type
+            ).group_by(orm.OntologyConcept.type),
+            "curies": session.query(
+                func.count(orm.OntologyConcept.curie),
+                orm.OntologyConcept.curie,
+                orm.ActiveConcept.name,
+            )
+            .join(
+                orm.ActiveConcept,
+                orm.OntologyConcept.curie == orm.ActiveConcept.curie,
+                isouter=True,
+            )
+            .group_by(orm.OntologyConcept.curie, orm.ActiveConcept.name),
+            "results": session.query(orm.OntologyConcept, orm.ActiveConcept.name).join(
+                orm.ActiveConcept,
+                orm.OntologyConcept.curie == orm.ActiveConcept.curie,
+                isouter=True,
+            ),
+        }
+        for key in search_body:
+            if types is not None:
+                search_body[key] = search_body[key].filter(
+                    orm.OntologyConcept.type.in_(types)
+                )
+            if curies is not None:
+                search_body[key] = search_body[key].filter(
+                    orm.OntologyConcept.curie.in_(curies)
+                )
+
+        return Response(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps(
+                {
+                    "facets": {
+                        "types": {hit[1]: hit[0] for hit in search_body["types"]},
+                        "concepts": {
+                            hit[1]: {"count": hit[0], "name": hit[2]}
+                            for hit in search_body["curies"]
+                        },
+                    },
+                    "results": [
+                        {
+                            "type": entry.type,
+                            "id": entry.object_id,
+                            "curie": entry.curie,
+                            "name": name,
+                        }
+                        for entry, name in search_body["results"]
+                    ],
+                }
+            ),
+        )
 
 
 @router.get("/{id}")
@@ -98,6 +144,7 @@ def create_concept(payload: schema.OntologyConcept, rdb: Engine = Depends(reques
     with Session(rdb) as session:
         concept_dict = payload.dict()
         concept = orm.OntologyConcept(**concept_dict)
+        mark_concept_active(session, concept.curie)
         session.add(concept)
         session.commit()
         return Response(
@@ -119,6 +166,7 @@ def update_concept(
     with Session(rdb) as session:
         data_payload = payload.dict(exclude_unset=True)
         data_payload["id"] = id
+        mark_concept_active(session, data_payload["curie"])
         logger.info(data_payload)
 
         data_to_update = session.query(orm.OntologyConcept).filter(
@@ -130,7 +178,7 @@ def update_concept(
 
 
 @router.delete("/{id}")
-def delete_concept(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+def delete_concept(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Delete a concept by ID
     """

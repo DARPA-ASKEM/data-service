@@ -194,11 +194,11 @@ def get_model_parameters(
 
 
 @router.put("/parameters/{id}", **update.fastapi_endpoint_config)
-def update_run_parameters(
+def update_model_parameters(
     payload: ModelParameters, id: int, rdb: Engine = Depends(request_rdb)
 ) -> Response:
     """
-    Update the parameters for a run
+    Update the parameters for a model
     """
     with Session(rdb) as session:
         adjust_model_params(id, payload, session)
@@ -222,6 +222,7 @@ def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
             parameters: Query[orm.ModelParameter] = session.query(
                 orm.ModelParameter
             ).filter(orm.ModelParameter.model_id == id)
+
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Model.from_orm(model, list(parameters))
@@ -241,8 +242,16 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
         session.add(model)
         session.commit()
         id: int = model.id
-        for name, type in parameters.items():
-            session.add(orm.ModelParameter(model_id=id, name=name, type=type))
+        for param in parameters:
+            session.add(
+                orm.ModelParameter(
+                    model_id=id,
+                    name=param["name"],
+                    default_value=param["default_value"],
+                    type=param["type"],
+                    state_variable=param.get("state_variable", False),
+                )
+            )
         session.commit()
     logger.info("new model created: %i", id)
     return Response(

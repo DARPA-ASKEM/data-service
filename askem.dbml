@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v3'
+  Note: 'v4'
 }
 
 Enum public.resource_type {
@@ -169,6 +169,7 @@ Table simulation_run {
   timestamp datetime [default: `now()`, not null]
   completed_at datetime
   success bool
+  dataset_id int
   response blob [note: 'The answer to the query whether its natural language or just a number.']
 }
 
@@ -178,6 +179,7 @@ Table model_parameter {
   name varchar [not null]
   type value_type [not null]
   default_value varchar
+  state_variable bool [not null]
 }
 
 
@@ -220,7 +222,7 @@ Table project_asset {
 
 Table ontology_concept {
   id int [pk]
-  curie varchar [not null]
+  curie varchar [ref: > active_concept.curie, not null]
   type taggable_type [not null]
   object_id int [not null]
   status ontological_field [not null]
@@ -254,3 +256,7 @@ Table association {
   role public.role
 }
 
+Table active_concept {
+  curie varchar [pk]
+  name varchar
+}

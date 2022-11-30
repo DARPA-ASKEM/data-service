@@ -26,14 +26,28 @@ def test_project_cru():
             "name": "Foo",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "{}",
-            "parameters": {"x": ValueType.int},
+            "parameters": [
+                {
+                    "name": "test",
+                    "default_value": "1",
+                    "type": ValueType.int,
+                    "initial": False,
+                }
+            ],
             "framework": framework,
         }
         model2 = {
             "name": "Foo2",
             "description": "Lorem ipsum dolor sit amet.",
             "content": "[]",
-            "parameters": {"y": ValueType.int},
+            "parameters": [
+                {
+                    "name": "test",
+                    "default_value": "1",
+                    "type": ValueType.int,
+                    "initial": False,
+                }
+            ],
             "framework": framework,
         }
         model1_id = client.post(

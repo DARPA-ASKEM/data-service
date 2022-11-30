@@ -3,9 +3,9 @@ name: Correctness
 on:
   workflow_call:
   push:
-    branches: [ 'main' ]
+    branches: [ 'main', 'dev' ]
   pull_request:
-    branches: [ 'main' ]
+    branches: [ 'main', 'dev' ]
 
 jobs:
   correctness:

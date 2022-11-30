@@ -167,6 +167,7 @@ class SimulationRun(BaseModel):
     timestamp: datetime.datetime = datetime.datetime.now()
     completed_at: Optional[datetime.datetime]
     success: Optional[bool]
+    dataset_id: Optional[int]
     response: Optional[bytes]
 
 
@@ -177,6 +178,7 @@ class ModelParameter(BaseModel):
     name: str
     type: ValueType
     default_value: Optional[str]
+    state_variable: bool
 
 
 class SimulationParameter(BaseModel):
@@ -204,6 +206,15 @@ class ProjectAsset(BaseModel):
     resource_id: Optional[int] = None
     resource_type: ResourceType
     external_ref: Optional[str]
+
+
+class OntologyConcept(BaseModel):
+
+    id: Optional[int] = None
+    curie: str
+    type: TaggableType
+    object_id: Optional[int] = None
+    status: OntologicalField
 
 
 class Provenance(BaseModel):
@@ -266,15 +277,6 @@ class Project(BaseModel):
     active: bool
 
 
-class OntologyConcept(BaseModel):
-
-    id: Optional[int] = None
-    curie: str
-    type: TaggableType
-    object_id: Optional[int] = None
-    status: OntologicalField
-
-
 class Person(BaseModel):
 
     id: Optional[int] = None
@@ -283,3 +285,9 @@ class Person(BaseModel):
     org: Optional[str]
     website: Optional[str]
     is_registered: bool
+
+
+class ActiveConcept(BaseModel):
+
+    curie: str
+    name: Optional[str]

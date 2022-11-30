@@ -9,8 +9,8 @@ from typing import Dict, Optional, Type
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
 from tds.schema.dataset import Dataset
-from tds.schema.model import Intermediate, Model
-from tds.schema.simulation import Plan, Run
+from tds.schema.model import Intermediate, Model, ModelDescription
+from tds.schema.simulation import Plan, Run, RunDescription
 
 
 class Extraction(schema.Extraction):
@@ -49,6 +49,24 @@ obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Intermediate: ResourceType.intermediates,
     Run: ResourceType.simulation_runs,
 }
+
+obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
+    Dataset: ResourceType.datasets,
+    Extraction: ResourceType.extractions,
+    ModelDescription: ResourceType.models,
+    Plan: ResourceType.plans,
+    Publication: ResourceType.publications,
+    Intermediate: ResourceType.intermediates,
+    RunDescription: ResourceType.simulation_runs,
+}
+
+
+def get_schema_description(resource_type: ResourceType) -> Type[Resource]:
+    """
+    Maps class to schema enum for descriptions
+    """
+    enum_to_obj = {type: resource for resource, type in obj_to_enum_desc.items()}
+    return enum_to_obj[resource_type]
 
 
 def get_resource_type(resource: Resource) -> Optional[ResourceType]:
