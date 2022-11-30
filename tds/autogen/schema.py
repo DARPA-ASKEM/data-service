@@ -208,6 +208,15 @@ class ProjectAsset(BaseModel):
     external_ref: Optional[str]
 
 
+class OntologyConcept(BaseModel):
+
+    id: Optional[int] = None
+    curie: str
+    type: TaggableType
+    object_id: Optional[int] = None
+    status: OntologicalField
+
+
 class Provenance(BaseModel):
 
     id: Optional[int] = None
@@ -268,15 +277,6 @@ class Project(BaseModel):
     active: bool
 
 
-class OntologyConcept(BaseModel):
-
-    id: Optional[int] = None
-    curie: str
-    type: TaggableType
-    object_id: Optional[int] = None
-    status: OntologicalField
-
-
 class Person(BaseModel):
 
     id: Optional[int] = None
@@ -285,3 +285,9 @@ class Person(BaseModel):
     org: Optional[str]
     website: Optional[str]
     is_registered: bool
+
+
+class ActiveConcept(BaseModel):
+
+    curie: str
+    name: Optional[str]
