@@ -202,9 +202,15 @@ for folder in folders:
 
         with open(folder + "document_xdd_gddid.txt", "r") as f:
             gddid = f.read()
-        print(xdd_mapping[gddid])
+        try:
+            title = xdd_mapping[gddid]
+        except KeyError as e:
+            print(
+                f"Publication title not found in xdd_mapping. Might need to resync with xdd. Error: {e}. Setting title to Unknown"
+            )
+            title = "Unknown"
 
-        payload = json.dumps({"xdd_uri": f"{gddid}", "title": xdd_mapping[gddid]})
+        payload = json.dumps({"xdd_uri": f"{gddid}", "title": title})
         headers = {"Content-Type": "application/json"}
 
         # return resource_id (a1)

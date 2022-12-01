@@ -74,7 +74,6 @@ def get_project_assets(
                             orm_type.id.in_(assets_key_ids[key])
                         )
                     )
-
                 else:
                     assets_key_objects[key] = [
                         orm_schema.from_orm(asset)
