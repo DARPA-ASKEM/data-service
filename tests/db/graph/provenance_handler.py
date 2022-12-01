@@ -21,7 +21,7 @@ def test_relation_handler_rdb_only():
             type=IntermediateFormat.other,
             content=b"",
         )
-        publication = Publication(id=0, xdd_uri="https://")
+        publication = Publication(id=0, xdd_uri="https://", title="title")
 
         # NOTE: Should these two asserts be their own test?
         assert get_resource_type(intermediate) == ResourceType.intermediates

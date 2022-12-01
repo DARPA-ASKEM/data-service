@@ -680,7 +680,8 @@ ALTER SEQUENCE public.provenance_id_seq OWNED BY public.provenance.id;
 
 CREATE TABLE public.publication (
     id integer NOT NULL,
-    xdd_uri character varying NOT NULL
+    xdd_uri character varying NOT NULL,
+    title character varying NOT NULL
 );
 
 

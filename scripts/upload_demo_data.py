@@ -29,7 +29,7 @@ def download_and_unzip(url, extract_to="."):
     zipfile.extractall(path=extract_to)
 
 
-time.sleep(5)
+time.sleep(4)
 
 print("Starting process to upload artifacts to postgres.")
 
@@ -171,6 +171,9 @@ def add_concept(concept, object_id, type):
     )
 
 
+with open("scripts/xdd_mapping.json", "r") as f:
+    xdd_mapping = json.load(f)
+
 for folder in folders:
     # get src/main files
     folders_src = glob.glob(folder + "src/main/*")
@@ -199,8 +202,15 @@ for folder in folders:
 
         with open(folder + "document_xdd_gddid.txt", "r") as f:
             gddid = f.read()
+        try:
+            title = xdd_mapping[gddid]
+        except KeyError as e:
+            print(
+                f"Publication title not found in xdd_mapping. Might need to resync with xdd. Error: {e}. Setting title to Unknown"
+            )
+            title = "Unknown"
 
-        payload = json.dumps({"xdd_uri": f"{gddid}"})
+        payload = json.dumps({"xdd_uri": f"{gddid}", "title": title})
         headers = {"Content-Type": "application/json"}
 
         # return resource_id (a1)
