@@ -39,6 +39,7 @@ black = "^22.10.0"
 pylint = "^2.15.5"
 pytest = "^7.2.0"
 pre-commit = "^2.20.0"
+strawberry-graphql = {extras = ["debug"], version = "^0.142.3"}
 
 [build-system]
 requires = ["poetry-core"]
