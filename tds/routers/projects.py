@@ -63,27 +63,26 @@ def get_project_assets(
             for asset in list(assets):
                 if asset.resource_type in types:
                     assets_key_ids[asset.resource_type].append(asset.resource_id)
-            assets_key_objects = defaultdict(list)
+
+            assets_key_objects = {}
             for key in assets_key_ids:
                 orm_type = get_resource_orm(key)
                 orm_schema = get_schema_description(key)
                 if key == ResourceType.datasets:
-                    assets_key_objects[key].append(
-                        list(
-                            session.query(orm_type).filter(
-                                orm_type.id.in_(assets_key_ids[key])
-                            )
+                    assets_key_objects[key] = list(
+                        session.query(orm_type).filter(
+                            orm_type.id.in_(assets_key_ids[key])
                         )
                     )
+
                 else:
-                    assets_key_objects[key].append(
-                        [
-                            orm_schema.from_orm(asset)
-                            for asset in session.query(orm_type).filter(
-                                orm_type.id.in_(assets_key_ids[key])
-                            )
-                        ]
-                    )
+                    assets_key_objects[key] = [
+                        orm_schema.from_orm(asset)
+                        for asset in session.query(orm_type).filter(
+                            orm_type.id.in_(assets_key_ids[key])
+                        )
+                    ]
+
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return assets_key_objects

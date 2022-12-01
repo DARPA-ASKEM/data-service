@@ -194,6 +194,7 @@ Table simulation_parameter {
 Table publication {
   id int [pk, note:"We cannot use the URI as a primary key due to the other asset using int types."]
   xdd_uri varchar [not null]
+  title varchar [not null]
 }
 
 Table extraction {

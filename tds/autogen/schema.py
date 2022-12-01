@@ -266,6 +266,7 @@ class Publication(BaseModel):
 
     id: Optional[int] = None
     xdd_uri: str
+    title: str
 
 
 class Project(BaseModel):
