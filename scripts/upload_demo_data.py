@@ -34,9 +34,9 @@ time.sleep(4)
 print("Starting process to upload artifacts to postgres.")
 
 
-download_and_unzip(
-    "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
-)
+# download_and_unzip(
+#     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+# )
 time.sleep(2)
 
 #### Person ####
@@ -598,7 +598,128 @@ for folder in folders:
     except Exception as e:
         print(e)
 
-populate_exemplar_datasets()
+    ### upload simulation run datasets ####
+
+    # todo
+
+    ### upload addition simulation runs ####
+
+    try:
+        print("Upload Simulation Runs")
+
+        path = "simulations/runs/descriptions"
+
+        runs = glob.glob(folder + "runs/*/")
+
+        for run in runs:
+
+            # load simulation run contents as json
+            with open(run + "output.json", "r") as f:
+                sim_output = f.read()
+
+            payload = json.dumps(
+                {
+                    "simulator_id": simulation_plan_id,
+                    "success": True,
+                    "response": json.dumps(sim_output),
+                    "dataset_id": None,
+                }
+            )
+            headers = {"Content-Type": "application/json"}
+
+            response = requests.request(
+                "POST", url + path, headers=headers, data=payload
+            )
+            sim_run_json = response.json()
+            simulation_run_id = sim_run_json.get("id")
+
+            asset_to_project(
+                project_id=1,
+                asset_id=int(simulation_run_id),
+                asset_type="simulation_runs",
+            )
+
+            add_provenance(
+                left={"id": simulation_run_id, "resource_type": "simulation_runs"},
+                relation_type="derivedfrom",
+                right={"id": simulation_plan_id, "resource_type": "plans"},
+                user_id=person_id,
+            )
+
+            ## add simulation parameters ##
+
+            parameter_simulation = []
+            with open(f"{run}parameters.json", "r") as f:
+                parameters = json.load(f)
+                for parameter_name, parameter_value in parameters.get(
+                    "parameters"
+                ).items():
+                    parameter_simulation.append(
+                        {
+                            "name": parameter_name,
+                            "value": str(parameter_value.get("value")),
+                            "type": str(type(parameter_value.get("value")).__name__),
+                        }
+                    )
+            with open(f"{run}initials.json", "r") as f:
+                parameters = json.load(f)
+                for parameter_name, parameter_value in parameters.get(
+                    "initials"
+                ).items():
+                    param = {
+                        "name": parameter_name,
+                        "type": str(type(parameter_value.get("value")).__name__),
+                        "value": str(parameter_value.get("value")),
+                    }
+                    parameter_simulation.append(param)
+
+            payload = json.dumps(parameter_simulation)
+            headers = {"Content-Type": "application/json"}
+            response = requests.request(
+                "PUT",
+                url + f"simulations/runs/parameters/{simulation_run_id}",
+                headers=headers,
+                data=payload,
+            )
+
+            time.sleep(1)
+            # get parameters
+            response = requests.request(
+                "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
+            )
+            parameters_json = response.json()
+
+            with open(f"{run}initials.json", "r") as f:
+                init_parameters = json.load(f)
+                for init_parameter_name, init_parameter_value in init_parameters.get(
+                    "initials"
+                ).items():
+                    for parameter in parameters_json:
+                        if parameter.get("name") == init_parameter_name:
+                            ncit = init_parameter_value.get("identifiers").get(
+                                "ncit", None
+                            )
+                            ido = init_parameter_value.get("identifiers").get(
+                                "ido", None
+                            )
+                            if ncit is not None:
+                                add_concept(
+                                    concept=f"ncit:{ncit}",
+                                    object_id=parameter.get("id"),
+                                    type="simulation_parameters",
+                                )
+                            if ido is not None:
+                                add_concept(
+                                    concept=f"ido:{ido}",
+                                    object_id=parameter.get("id"),
+                                    type="simulation_parameters",
+                                )
+
+    except Exception as e:
+        print(f" {e}")
+
+
+# populate_exemplar_datasets()
 
 ## now delete repo
-shutil.rmtree("experiments-main")
+# shutil.rmtree("experiments-main")
