@@ -2,7 +2,6 @@
 Model Schema
 """
 
-from enum import Enum
 from logging import Logger
 from typing import List
 
@@ -13,6 +12,7 @@ from strawberry.types import Info
 
 from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
+from tds.experimental.enum import ValueType
 from tds.schema.model import ModelDescription
 
 logger = Logger(__name__)
@@ -23,32 +23,23 @@ class ModelParameterSchema(schema.ModelParameter):
         orm_mode = True
 
 
-@strawberry.enum
-class ValueType(Enum):
-    binary = schema.ValueType.binary.name
-    bool = schema.ValueType.bool.name
-    float = schema.ValueType.float.name
-    int = schema.ValueType.int.name
-    str = schema.ValueType.str.name
-
-
 @strawberry.experimental.pydantic.type(model=ModelParameterSchema)
-class ModelParameter:
+class Parameter:
     id: strawberry.auto
+    model_id: strawberry.auto
     name: strawberry.auto
     type: ValueType
     default_value: strawberry.auto
     state_variable: strawberry.auto
 
     @staticmethod
-    def from_pydantic(instance: ModelParameterSchema) -> "ModelParameter":
+    def from_pydantic(instance: ModelParameterSchema) -> "Parameter":
         data = instance.dict()
         data["type"] = ValueType(data["type"].name)
-        data.pop("model_id")
-        return ModelParameter(**data)
+        return Parameter(**data)
 
 
-def list_parameters(model_id: int, info: Info) -> List[ModelParameter]:
+def list_parameters(model_id: int, info: Info) -> List[Parameter]:
     if entry_exists(info.context["rdb"].connect(), orm.Model, model_id):
         with Session(info.context["rdb"]) as session:
             parameters: List[orm.ModelParameter] = (
@@ -58,7 +49,7 @@ def list_parameters(model_id: int, info: Info) -> List[ModelParameter]:
             )
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    to_graphql = lambda model: ModelParameter.from_pydantic(
+    to_graphql = lambda model: Parameter.from_pydantic(
         ModelParameterSchema.from_orm(model)
     )
     return [to_graphql(param) for param in parameters]
@@ -74,7 +65,7 @@ class Model:
     content: str
 
     @strawberry.field
-    def parameters(self, info: Info) -> List[ModelParameter]:
+    def parameters(self, info: Info) -> List[Parameter]:
         return list_parameters(self.id, info)
 
     @staticmethod
