@@ -176,7 +176,7 @@ def add_concept(concept, object_id, type):
 with open("scripts/xdd_mapping.json", "r") as f:
     xdd_mapping = json.load(f)
 
-for folder in folders:
+for folder in folders[1:4]:
     # get src/main files
     folders_src = glob.glob(folder + "src/main/*")
 
@@ -415,6 +415,7 @@ for folder in folders:
 
     except Exception as e:
         print(e)
+
     ### upload simulation plan ###
     try:
         print("Upload Simulation Plan")
@@ -648,22 +649,10 @@ for folder in folders:
                     dataset_id, sim_output, url=url
                 )
                 asset_to_project(project_id, dataset_id, "datasets")
+                for concept in model_concepts:
+                    add_concept(concept=concept, object_id=dataset_id, type="datasets")
 
-    except FileNotFoundError:
-        print("output.json not found in " + run)
-
-    ### upload addition simulation runs ####
-
-    try:
-        print("Upload Simulation Runs")
-
-        path = "simulations/runs/descriptions"
-
-        runs = glob.glob(folder + "runs/*/")
-
-        for run in runs:
-
-            # load simulation run contents as json
+            ## upload simulation run ##
             with open(run + "output.json", "r") as f:
                 sim_output = f.read()
 
@@ -672,7 +661,7 @@ for folder in folders:
                     "simulator_id": simulation_plan_id,
                     "success": True,
                     "response": json.dumps(sim_output),
-                    "dataset_id": None,
+                    "dataset_id": dataset_id,
                 }
             )
             headers = {"Content-Type": "application/json"}
@@ -764,12 +753,26 @@ for folder in folders:
                                     object_id=parameter.get("id"),
                                     type="simulation_parameters",
                                 )
+                            ## add context concept as well ##
+                            try:
+                                context = init_parameter_value.get("context", {}).get(
+                                    "property", None
+                                )
+                                if context is not None:
+                                    print(f"adding concept context {context}")
+                                    add_concept(
+                                        concept=context,
+                                        object_id=parameter.get("id"),
+                                        type="simulation_parameters",
+                                    )
+                            except Exception as e:
+                                print(e)
 
-    except Exception as e:
-        print(f" {e}")
+    except FileNotFoundError:
+        print("output.json not found in " + run)
 
 
 populate_exemplar_datasets()
 
 ## now delete repo
-shutil.rmtree("experiments-main")
+# shutil.rmtree("experiments-main")
