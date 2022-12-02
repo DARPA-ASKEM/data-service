@@ -490,6 +490,8 @@ for folder in folders:
                 create_feature(dataset_id, state, url=url)
             create_qualifier(dataset_id, num_of_states, url=url)
             asset_to_project(project_id, dataset_id, "datasets")
+            for concept in model_concepts:
+                add_concept(concept=concept, object_id=dataset_id, type="datasets")
 
     except FileNotFoundError:
         print("sim_output.json not found in " + folder)
