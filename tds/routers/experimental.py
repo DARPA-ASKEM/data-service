@@ -2,6 +2,7 @@
 Experimental GraphQL router
 """
 
+from enum import Enum
 from logging import Logger
 from typing import Any, Dict, List
 
@@ -13,23 +14,56 @@ from strawberry.fastapi import GraphQLRouter
 from strawberry.types import Info
 
 from tds.autogen import orm, schema
-from tds.db import list_by_id, request_rdb
-from tds.schema import model
+from tds.db import entry_exists, list_by_id, request_rdb
+from tds.schema.model import ModelDescription
+from tds.schema.model import ModelParameter as ModelParameterSchema
 from tds.schema.project import ProjectMetadata
 
 logger = Logger(__name__)
 
 
-@strawberry.type
-class Parameter:
-    id: int
-    name: str
-    type: schema.ValueType
-    default_value: str
-    state_variable: bool
+@strawberry.enum
+class ValueType(Enum):
+    binary = schema.ValueType.binary.name
+    bool = schema.ValueType.bool.name
+    float = schema.ValueType.float.name
+    int = schema.ValueType.int.name
+    str = schema.ValueType.str.name
 
 
-@strawberry.experimental.pydantic.type(model=model.Model)
+@strawberry.experimental.pydantic.type(model=ModelParameterSchema)
+class ModelParameter:
+    id: strawberry.auto
+    name: strawberry.auto
+    type: ValueType
+    default_value: strawberry.auto
+    state_variable: strawberry.auto
+
+    @staticmethod
+    def from_pydantic(instance: ModelParameterSchema) -> "ModelParameter":
+        data = instance.dict()
+        data["type"] = ValueType(data["type"].name)
+        data.pop("model_id")
+        return ModelParameter(**data)
+
+
+def list_parameters(model_id: int, info: Info) -> List[ModelParameter]:
+    if entry_exists(info.context["rdb"].connect(), orm.Model, model_id):
+        with Session(info.context["rdb"]) as session:
+            parameters: List[orm.ModelParameter] = (
+                session.query(orm.ModelParameter)
+                .filter(orm.ModelParameter.model_id == model_id)
+                .all()
+            )
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    to_graphql = lambda model: ModelParameter.from_pydantic(
+        ModelParameterSchema.from_orm(model)
+    )
+    return [to_graphql(param) for param in parameters]
+
+
+@strawberry.experimental.pydantic.type(model=ModelDescription)
 class Model:
     id: strawberry.auto
     name: strawberry.auto
@@ -37,21 +71,24 @@ class Model:
     framework: strawberry.auto
     timestamp: strawberry.auto
     content: str
-    parameters: List[Parameter]
+
+    @strawberry.field
+    def parameters(self, info: Info) -> List[ModelParameter]:
+        return list_parameters(self.id, info)
 
     @staticmethod
-    def from_pydantic(instance: model.Model) -> "Model":
+    def from_pydantic(instance: ModelDescription) -> "Model":
         data = instance.dict()
         data["content"] = str(data["content"])
         data.pop("concept")  # TODO: Include
         return Model(**data)
 
 
-def list_models(info: Info) -> List["Model"]:
+def list_models(info: Info) -> List[Model]:
     fetched_models: List[orm.Model] = list_by_id(
         info.context["rdb"].connect(), orm.Model, 100, 0
     )
-    to_graphql = lambda model: Model.from_pydantic(model.Model.from_orm(model))
+    to_graphql = lambda model: Model.from_pydantic(ModelDescription.from_orm(model))
     return [to_graphql(model) for model in fetched_models]
 
 
