@@ -72,7 +72,7 @@ class Run:
     completed_at: strawberry.auto
     success: strawberry.auto
     dataset_id: strawberry.auto
-    # response: str
+    response: str
 
     @strawberry.field
     def parameters(self, info: Info) -> List[Parameter]:
@@ -81,12 +81,12 @@ class Run:
     @staticmethod
     def from_pydantic(instance: SimulationRunSchema) -> "Run":
         data = instance.dict()
-        data["content"] = str(data["content"])
         data["response"] = str(data["response"])
         return Run(**data)
 
 
 def list_runs(info: Info, simulator_id: Optional[int] = None) -> List[Run]:
+    simulator_id = None
     if simulator_id is not None:
         if entry_exists(info.context["rdb"].connect(), orm.SimulationRun, simulator_id):
             with Session(info.context["rdb"]) as session:
