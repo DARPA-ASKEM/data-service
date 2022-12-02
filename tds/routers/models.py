@@ -179,7 +179,7 @@ def get_model_description(
 @router.get("/model_parameters/{id}", **retrieve.fastapi_endpoint_config)
 def get_model_parameter(id: int, rdb: Engine = Depends(request_rdb)):
     """
-    Retrieve simulation parameter
+    Retrieve model parameter
     """
     with Session(rdb) as session:
         if (
