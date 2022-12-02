@@ -1,0 +1,45 @@
+---
+name: Build-SQL
+on:
+  workflow_call:
+  pull_request:
+    branches: [ 'main', 'dev' ]
+    paths:
+      - 'tds/schema/**.py'
+      - 'scripts/**.py'
+
+jobs:
+  build_sql:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.2.2
+      - name: Create environment
+        run:  poetry install
+      - name: Make init
+        run:  make init
+      - name: Make db-clean
+        run:  make db-clean
+      - name: Make up
+        run:  make up
+      - name: Make populate
+        run:  make populate
+      - name: Make db-full
+        run:  make db-full
+      - name: Add & Commit
+        uses: EndBug/add-and-commit@v9.1.1
+        with:
+            add: 'data'
+            message: 'Automatic build of data files'
+
