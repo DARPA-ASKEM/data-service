@@ -176,7 +176,7 @@ def add_concept(concept, object_id, type):
 with open("scripts/xdd_mapping.json", "r") as f:
     xdd_mapping = json.load(f)
 
-for folder in folders[1:4]:
+for folder in folders:
     # get src/main files
     folders_src = glob.glob(folder + "src/main/*")
 
@@ -775,4 +775,4 @@ for folder in folders[1:4]:
 populate_exemplar_datasets()
 
 ## now delete repo
-# shutil.rmtree("experiments-main")
+shutil.rmtree("experiments-main")
