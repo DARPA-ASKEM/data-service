@@ -121,6 +121,22 @@ def create_run_from_description(
     )
 
 
+@router.get("/simulation_parameters/{id}", **retrieve.fastapi_endpoint_config)
+def get_simulation_parameter(id: int, rdb: Engine = Depends(request_rdb)):
+    """
+    Retrieve simulation parameter
+    """
+    with Session(rdb) as session:
+        if (
+            session.query(orm.SimulationParameter)
+            .filter(orm.SimulationParameter.id == id)
+            .count()
+            == 1
+        ):
+            return session.query(orm.SimulationParameter).get(id)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
 @router.get("/runs/parameters/{id}", **retrieve.fastapi_endpoint_config)
 def get_run_parameters(
     id: int, rdb: Engine = Depends(request_rdb)
