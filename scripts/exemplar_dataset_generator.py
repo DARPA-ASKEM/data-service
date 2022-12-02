@@ -162,8 +162,6 @@ def create_qualifier(dataset_id, qualifier_obj):
         timeout=100,
     )
 
-    print(qualifier_response)
-
     return qualifier_response.json()
 
 
@@ -176,15 +174,11 @@ def create_concept(object_id, type, curie, status="obj"):
         "status": status,
     }
 
-    print(concept_payload)
-
     concept_response = requests.post(
         URL + "concepts",
         json=concept_payload,
         timeout=100,
     )
-
-    print(concept_response)
 
     return concept_response.json()
 
