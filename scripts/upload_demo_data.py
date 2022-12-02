@@ -36,9 +36,9 @@ def download_and_unzip(url, extract_to="."):
 print("Starting process to upload artifacts to postgres.")
 
 
-# download_and_unzip(
-#     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
-# )
+download_and_unzip(
+    "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+)
 time.sleep(2)
 
 #### Person ####
@@ -772,4 +772,4 @@ for folder in folders:
 populate_exemplar_datasets()
 
 ## now delete repo
-# shutil.rmtree("experiments-main")
+shutil.rmtree("experiments-main")
