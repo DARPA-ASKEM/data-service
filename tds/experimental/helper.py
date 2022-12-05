@@ -1,5 +1,5 @@
 """
-Straberry helpers
+Strawberry helpers
 """
 
 from typing import Any
