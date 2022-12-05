@@ -169,6 +169,7 @@ class SimulationRun(BaseModel):
     completed_at: Optional[datetime.datetime]
     success: Optional[bool]
     dataset_id: Optional[int]
+    description: Optional[str]
     response: Optional[bytes]
 
 

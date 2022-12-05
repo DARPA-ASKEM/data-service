@@ -171,6 +171,7 @@ Table simulation_run {
   completed_at datetime
   success bool
   dataset_id int
+  description text
   response blob [note: 'The answer to the query whether its natural language or just a number.']
 }
 
