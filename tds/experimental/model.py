@@ -24,7 +24,7 @@ class ModelParameterSchema(schema.ModelParameter):
 
 
 @strawberry.experimental.pydantic.type(model=ModelParameterSchema)
-class Parameter:
+class ModelParameter:
     id: strawberry.auto
     model_id: strawberry.auto
     name: strawberry.auto
@@ -33,13 +33,13 @@ class Parameter:
     state_variable: strawberry.auto
 
     @staticmethod
-    def from_pydantic(instance: ModelParameterSchema) -> "Parameter":
+    def from_pydantic(instance: ModelParameterSchema) -> "ModelParameter":
         data = instance.dict()
         data["type"] = ValueType(data["type"].name)
-        return Parameter(**data)
+        return ModelParameter(**data)
 
 
-def list_parameters(model_id: int, info: Info) -> List[Parameter]:
+def list_parameters(model_id: int, info: Info) -> List[ModelParameter]:
     if entry_exists(info.context["rdb"].connect(), orm.Model, model_id):
         with Session(info.context["rdb"]) as session:
             parameters: List[orm.ModelParameter] = (
@@ -49,7 +49,7 @@ def list_parameters(model_id: int, info: Info) -> List[Parameter]:
             )
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    to_graphql = lambda model: Parameter.from_pydantic(
+    to_graphql = lambda model: ModelParameter.from_pydantic(
         ModelParameterSchema.from_orm(model)
     )
     return [to_graphql(param) for param in parameters]
@@ -65,7 +65,7 @@ class Model:
     content: str
 
     @strawberry.field
-    def parameters(self, info: Info) -> List[Parameter]:
+    def parameters(self, info: Info) -> List[ModelParameter]:
         return list_parameters(self.id, info)
 
     @staticmethod
