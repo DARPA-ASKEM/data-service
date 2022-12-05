@@ -92,6 +92,7 @@ Table dataset {
   geospatial_resolution varchar
   annotations json
   maintainer int [not null, ref: > public.person.id]
+  simulation_run bool
 }
 
 Table feature {

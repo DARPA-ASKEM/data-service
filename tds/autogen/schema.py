@@ -120,6 +120,7 @@ class Dataset(BaseModel):
     geospatial_resolution: Optional[str]
     annotations: Optional[Json]
     maintainer: int
+    simulation_run: Optional[bool]
 
 
 class Feature(BaseModel):
