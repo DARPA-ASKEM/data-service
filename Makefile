@@ -32,19 +32,26 @@ down:
 
 .PHONY:db-clean
 db-clean:
-	rm ./data/*.sql || true;
+	rm -r ./data/*.sql;
 
-.PHONY:db-schema
-db-schema:
+#$(eval d001 := "BAR")
+data/001_schema.sql:$(shell find tds/schema/ tds/autogen/ -type f -name '*.py')
+	$(eval d001 := "BAR")
 	docker compose exec -u postgres rdb /bin/bash -c 'pg_dump -s -h "localhost" -U "$$POSTGRES_USER" "$$POSTGRES_DB" > /tmp/001_schema.sql'; \
 	docker compose cp rdb:/tmp/001_schema.sql ./data;
 
-.PHONY:db-data
-db-data:
+data/002_data.sql:data/001_schema.sql $(shell find scripts/ -type f -name '*.py')
+	$(eval d002 := "FOO")
 	docker compose exec -u postgres rdb /bin/bash -c 'pg_dump -a -h "localhost" -U "$$POSTGRES_USER" "$$POSTGRES_DB" > /tmp/002_data.sql'; \
 	docker compose cp rdb:/tmp/002_data.sql ./data;
 
 
 .PHONY:db-full
-db-full:db-clean db-schema db-data
+db-full: | data/001_schema.sql data/002_data.sql
 
+
+repopulate-db: | data/001_schema.sql data/002_data.sql
+	$(eval needed := $(d001)$(d002))
+	@if [ "$(d001)" != "" ]; then \
+		make down; make db-clean; make up; make populate; make db-full; \
+	fi
