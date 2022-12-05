@@ -2,6 +2,7 @@
 Simulation Schema
 """
 
+from json import dumps
 from logging import Logger
 from typing import List, Optional
 
@@ -29,6 +30,14 @@ class SimulationRunSchema(schema.SimulationRun):
 
 
 class SimulationPlanSchema(schema.SimulationPlan):
+    @classmethod
+    def from_orm(cls, body: orm.SimulationPlan) -> "SimulationPlanSchema":
+        """
+        Handle ORM conversion while coercing `dict` to JSON
+        """
+        setattr(body, "content", dumps(body.content))
+        return super().from_orm(body)
+
     class Config:
         orm_mode = True
 
@@ -64,7 +73,7 @@ def list_parameters(run_id: int, info: Info) -> List[RunParameter]:
     return [to_graphql(param) for param in parameters]
 
 
-@strawberry.experimental.pydantic.type(model=SimulationRun)
+@strawberry.experimental.pydantic.type(model=SimulationRunSchema)
 class Run:
     id: strawberry.auto
     simulator_id: strawberry.auto
@@ -76,9 +85,7 @@ class Run:
 
     @strawberry.field
     def parameters(self, info: Info) -> List[RunParameter]:
-        sample = list_parameters(self.id, info)
-        logger.error(type(sample[0]))
-        return sample
+        return list_parameters(self.id, info)
 
     @staticmethod
     def from_pydantic(instance: SimulationRunSchema) -> "Run":
@@ -88,20 +95,43 @@ class Run:
 
 
 def list_runs(info: Info, simulator_id: Optional[int] = None) -> List[Run]:
-    simulator_id = None
     if simulator_id is not None:
-        if entry_exists(info.context["rdb"].connect(), orm.SimulationRun, simulator_id):
-            with Session(info.context["rdb"]) as session:
-                fetched_runs: List[orm.SimulationRun] = (
-                    session.query(orm.SimulationRun)
-                    .filter(orm.SimulationParameter.simulator_id == simulator_id)
-                    .all()
-                )
-        else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        with Session(info.context["rdb"]) as session:
+            fetched_runs: List[orm.SimulationRun] = (
+                session.query(orm.SimulationRun)
+                .filter(orm.SimulationRun.simulator_id == simulator_id)
+                .all()
+            )
     else:
         fetched_runs: List[orm.SimulationRun] = list_by_id(
             info.context["rdb"].connect(), orm.SimulationRun, 100, 0
         )
     to_graphql = lambda run: Run.from_pydantic(SimulationRunSchema.from_orm(run))
     return [to_graphql(run) for run in fetched_runs]
+
+
+@strawberry.experimental.pydantic.type(model=SimulationPlanSchema)
+class Plan:
+    id: strawberry.auto
+    model_id: strawberry.auto
+    simulator: strawberry.auto
+    query: strawberry.auto
+    content: str
+
+    @strawberry.field
+    def runs(self, info: Info) -> List[Run]:
+        return list_runs(info, self.id)
+
+    @staticmethod
+    def from_pydantic(instance: SimulationPlanSchema) -> "Plan":
+        data = instance.dict()
+        data["content"] = str(data["content"])
+        return Plan(**data)
+
+
+def list_plans(info: Info) -> List[Plan]:
+    fetched_plans: List[orm.SimulationPlan] = list_by_id(
+        info.context["rdb"].connect(), orm.SimulationPlan, 100, 0
+    )
+    to_graphql = lambda plan: Plan.from_pydantic(SimulationPlanSchema.from_orm(plan))
+    return [to_graphql(plan) for plan in fetched_plans]
