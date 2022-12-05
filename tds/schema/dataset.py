@@ -27,7 +27,6 @@ class Dataset(schema.Dataset):
     features: List[Feature]
     qualifiers: List[Qualifier]
     concept: Optional[Concept]
-    simulation_run: bool = False
 
     class Config:
         orm_mode = True
