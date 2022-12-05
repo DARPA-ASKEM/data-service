@@ -44,9 +44,9 @@ from util import (
 print("Starting process to upload artifacts to postgres.")
 
 
-# download_and_unzip(
-#     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
-# )
+download_and_unzip(
+    "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+)
 time.sleep(2)
 
 person = create_person()
@@ -60,7 +60,7 @@ folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
 
 upload_starter_kit_models()
 
-for folder in folders[1:5]:
+for folder in folders:
     # get src/main files
 
     folders_src = glob.glob(folder + "src/main/*")
@@ -461,4 +461,4 @@ for folder in folders[1:5]:
 populate_exemplar_datasets()
 
 ## now delete repo
-# shutil.rmtree("experiments-main")
+shutil.rmtree("experiments-main")
