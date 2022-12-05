@@ -7,6 +7,7 @@ on:
     paths:
       - 'tds/schema/**.py'
       - 'scripts/**.py'
+      - 'askem.dbml'
 
 jobs:
   build_sql:
