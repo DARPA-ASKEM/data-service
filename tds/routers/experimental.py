@@ -20,6 +20,10 @@ logger = Logger(__name__)
 
 @strawberry.type
 class Query:
+    """
+    Top level GraphQL retrieval query
+    """
+
     projects: List[Project] = strawberry.field(resolver=list_projects)
     models: List[Model] = strawberry.field(resolver=list_models)
     runs: List[Run] = strawberry.field(resolver=list_runs)
@@ -32,6 +36,9 @@ schema = strawberry.Schema(query=Query)
 async def get_context(
     rdb=Depends(request_rdb),
 ):
+    """
+    Provides FastAPI dependencies to GraphQL
+    """
     return {
         "rdb": rdb,
     }

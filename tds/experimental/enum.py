@@ -14,6 +14,10 @@ logger = Logger(__name__)
 
 @strawberry.enum
 class ValueType(Enum):
+    """
+    Possible value types duplicated from the autogen schema
+    """
+
     binary = schema.ValueType.binary.name
     bool = schema.ValueType.bool.name
     float = schema.ValueType.float.name

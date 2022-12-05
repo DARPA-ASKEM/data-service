@@ -14,7 +14,8 @@ from strawberry.types import Info
 from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
 from tds.experimental.enum import ValueType
-from tds.schema.simulation import SimulationRun
+from tds.experimental.helper import orm_to_graphql
+from tds.experimental.model import Model
 
 logger = Logger(__name__)
 
@@ -58,19 +59,13 @@ class RunParameter:
 
 
 def list_parameters(run_id: int, info: Info) -> List[RunParameter]:
-    if entry_exists(info.context["rdb"].connect(), orm.SimulationRun, run_id):
-        with Session(info.context["rdb"]) as session:
-            parameters: List[orm.SimulationParameter] = (
-                session.query(orm.SimulationParameter)
-                .filter(orm.SimulationParameter.run_id == run_id)
-                .all()
-            )
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    to_graphql = lambda param: RunParameter.from_pydantic(
-        SimulationParameterSchema.from_orm(param)
-    )
-    return [to_graphql(param) for param in parameters]
+    with Session(info.context["rdb"]) as session:
+        parameters: List[orm.SimulationParameter] = (
+            session.query(orm.SimulationParameter)
+            .filter(orm.SimulationParameter.run_id == run_id)
+            .all()
+        )
+    return [orm_to_graphql(RunParameter, param) for param in parameters]
 
 
 @strawberry.experimental.pydantic.type(model=SimulationRunSchema)
@@ -106,8 +101,7 @@ def list_runs(info: Info, simulator_id: Optional[int] = None) -> List[Run]:
         fetched_runs: List[orm.SimulationRun] = list_by_id(
             info.context["rdb"].connect(), orm.SimulationRun, 100, 0
         )
-    to_graphql = lambda run: Run.from_pydantic(SimulationRunSchema.from_orm(run))
-    return [to_graphql(run) for run in fetched_runs]
+    return [orm_to_graphql(Run, run) for run in fetched_runs]
 
 
 @strawberry.experimental.pydantic.type(model=SimulationPlanSchema)
@@ -117,6 +111,15 @@ class Plan:
     simulator: strawberry.auto
     query: strawberry.auto
     content: str
+
+    @strawberry.field
+    def model(self, info: Info) -> Model:
+        if entry_exists(info.context["rdb"].connect(), orm.Model, self.model_id):
+            with Session(info.context["rdb"]) as session:
+                model = session.query(orm.Model).get(self.model_id)
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        return orm_to_graphql(Model, model)
 
     @strawberry.field
     def runs(self, info: Info) -> List[Run]:
@@ -133,5 +136,4 @@ def list_plans(info: Info) -> List[Plan]:
     fetched_plans: List[orm.SimulationPlan] = list_by_id(
         info.context["rdb"].connect(), orm.SimulationPlan, 100, 0
     )
-    to_graphql = lambda plan: Plan.from_pydantic(SimulationPlanSchema.from_orm(plan))
-    return [to_graphql(plan) for plan in fetched_plans]
+    return [orm_to_graphql(Plan, plan) for plan in fetched_plans]
