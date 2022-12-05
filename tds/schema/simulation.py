@@ -69,3 +69,6 @@ class Run(SimulationRun):
             orm_to_params(parameters),
         )
         return super().from_orm(body)
+
+    class Config:
+        orm_mode = True
