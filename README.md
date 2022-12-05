@@ -1,4 +1,4 @@
-# ASKEM Data Store API
+# ASKEM Data Service API
 
 ## Usage
 
@@ -6,12 +6,23 @@ The API can be started by simply calling
 
 ```
 make up
-make populate
 ```
 
-`make populate` only has to be called if you want to initialize the demo data.
-
 Navigate to [http://localhost:8001/](http://localhost:8001/) to view the documentation for the endpoints
+
+## Populated Data
+
+Sample data is automatically populated into the data service on `make up`
+via `.sql` files and dataset files. These can be found in the `./data` directory.
+
+In order to regenerate these files, run the following commands:
+```
+make down
+make db-clean
+make up
+make populate
+make db-full
+```
 
 
 ## Development

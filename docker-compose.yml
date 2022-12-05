@@ -34,7 +34,7 @@ services:
       - rdb
     volumes:
       - $PWD/tds:/api/tds
-      - dataset-storage:/datasets
+      - $PWD/data/datasets:/datasets
   graphdb:
     image: neo4j:latest
     ports:
@@ -45,6 +45,3 @@ services:
       - NEO4J_dbms_memory_pagecache_size=512M
     networks:
       - data-api
-
-volumes:
-  dataset-storage:
