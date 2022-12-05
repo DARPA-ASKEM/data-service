@@ -44,25 +44,6 @@ def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.get("/search/features")
-def search_feature(
-    dataset_id: int = None,
-    feature_name: str = None,
-    rdb: Engine = Depends(request_rdb),
-):
-    """
-    Search features by dataset id and/or name
-    """
-    with Session(rdb) as session:
-        query = session.query(orm.Feature)
-        if dataset_id:
-            query = query.filter(orm.Feature.dataset_id == int(dataset_id))
-        if feature_name:
-            query = query.filter(orm.Feature.name == feature_name)
-        result = query.all()
-        return result
-
-
 @router.post("/features")
 def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
     """
@@ -242,6 +223,35 @@ def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     with Session(rdb) as session:
         result = session.query(orm.Dataset).get(id)
         return result
+
+
+@router.get("/{id}/features")
+def search_feature(
+    id: int,
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Search features by dataset id and/or name
+    """
+    with Session(rdb) as session:
+        dataset = session.query(orm.Dataset).get(id)
+        query = session.query(orm.Feature).filter(orm.Feature.dataset_id == int(id))
+        result = query.all()
+
+        for feature in result:
+            feature_id = feature.id
+            result_list = (
+                session.query(orm.OntologyConcept)
+                .filter(
+                    orm.OntologyConcept.type == "features",
+                    orm.OntologyConcept.object_id == feature_id,
+                )
+                .all()
+            )
+            feature.concepts = result_list
+        dataset.features = result
+
+        return dataset
 
 
 @router.post("")

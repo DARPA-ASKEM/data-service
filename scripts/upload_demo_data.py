@@ -9,6 +9,7 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 import requests
+import sim_runs_dataset_generator
 from demo_dataset_generator import (
     create_dataset,
     create_feature,
@@ -19,6 +20,7 @@ from demo_dataset_generator import (
 # from demo_dataset_generator import programatically_populate_datasets
 from exemplar_dataset_generator import populate_exemplar_datasets
 from json_to_csv import convert_biomd_json_to_csv
+from sim_runs_json_to_csv import convert_sim_runs_to_csv
 
 url = "http://localhost:8001/"
 
@@ -29,7 +31,7 @@ def download_and_unzip(url, extract_to="."):
     zipfile.extractall(path=extract_to)
 
 
-time.sleep(4)
+# time.sleep(4)
 
 print("Starting process to upload artifacts to postgres.")
 
@@ -413,6 +415,7 @@ for folder in folders:
 
     except Exception as e:
         print(e)
+
     ### upload simulation plan ###
     try:
         print("Upload Simulation Plan")
@@ -599,6 +602,175 @@ for folder in folders:
                             )
     except Exception as e:
         print(e)
+
+    ### upload simulation run datasets ####
+
+    try:
+
+        print("Upload Simulation Run Datasets")
+
+        runs = glob.glob(folder + "runs/*/")
+
+        for run in runs:
+
+            # load simulation run contents as json
+            with open(run + "output.json", "r") as f:
+                sim_output = f.read()
+                sim_output = json.loads(sim_output)
+
+                # Create the dataset with maintainer_id of 1
+                # assuming the first maintainer is already created.
+
+                dataset_response = sim_runs_dataset_generator.create_dataset(
+                    maintainer_id=1,
+                    dataset_object=sim_output,
+                    biomodel_name=model_name,
+                    biomodel_description=model_description,
+                    url=url,
+                )
+                dataset_id = dataset_response["id"]
+                # Convert the json to a CSV
+                convert_sim_runs_to_csv(
+                    json_file_path=run + "output.json",
+                    output_file_path=run + "sim_output.csv",
+                )
+                # Upload the CSV to TDS for full mock data
+                with open(run + "sim_output.csv", "rb") as sim_csv:
+                    print(f"Uploading file to dataset_id {dataset_id}")
+                    sim_runs_dataset_generator.upload_file_to_tds(
+                        id=dataset_id, file_object=sim_csv, url=url
+                    )
+                # Finish populating dataset metadata: Features, Qualifiers
+                for feature_obj in list(sim_output.values()):
+                    sim_runs_dataset_generator.create_feature(
+                        dataset_id, feature_obj, url=url
+                    )
+                sim_runs_dataset_generator.create_qualifier(
+                    dataset_id, sim_output, url=url
+                )
+                asset_to_project(project_id, dataset_id, "datasets")
+                for concept in model_concepts:
+                    add_concept(concept=concept, object_id=dataset_id, type="datasets")
+
+            ## upload simulation run ##
+            with open(run + "output.json", "r") as f:
+                sim_output = f.read()
+
+            payload = json.dumps(
+                {
+                    "simulator_id": simulation_plan_id,
+                    "success": True,
+                    "response": json.dumps(sim_output),
+                    "dataset_id": dataset_id,
+                }
+            )
+            headers = {"Content-Type": "application/json"}
+
+            response = requests.request(
+                "POST", url + path, headers=headers, data=payload
+            )
+            sim_run_json = response.json()
+            simulation_run_id = sim_run_json.get("id")
+
+            asset_to_project(
+                project_id=1,
+                asset_id=int(simulation_run_id),
+                asset_type="simulation_runs",
+            )
+
+            add_provenance(
+                left={"id": simulation_run_id, "resource_type": "simulation_runs"},
+                relation_type="derivedfrom",
+                right={"id": simulation_plan_id, "resource_type": "plans"},
+                user_id=person_id,
+            )
+
+            ## add simulation parameters ##
+
+            parameter_simulation = []
+            with open(f"{run}parameters.json", "r") as f:
+                parameters = json.load(f)
+                for parameter_name, parameter_value in parameters.get(
+                    "parameters"
+                ).items():
+                    parameter_simulation.append(
+                        {
+                            "name": parameter_name,
+                            "value": str(parameter_value.get("value")),
+                            "type": str(type(parameter_value.get("value")).__name__),
+                        }
+                    )
+            with open(f"{run}initials.json", "r") as f:
+                parameters = json.load(f)
+                for parameter_name, parameter_value in parameters.get(
+                    "initials"
+                ).items():
+                    param = {
+                        "name": parameter_name,
+                        "type": str(type(parameter_value.get("value")).__name__),
+                        "value": str(parameter_value.get("value")),
+                    }
+                    parameter_simulation.append(param)
+
+            payload = json.dumps(parameter_simulation)
+            headers = {"Content-Type": "application/json"}
+            response = requests.request(
+                "PUT",
+                url + f"simulations/runs/parameters/{simulation_run_id}",
+                headers=headers,
+                data=payload,
+            )
+
+            time.sleep(1)
+            # get parameters
+            response = requests.request(
+                "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
+            )
+            parameters_json = response.json()
+
+            with open(f"{run}initials.json", "r") as f:
+                init_parameters = json.load(f)
+                for init_parameter_name, init_parameter_value in init_parameters.get(
+                    "initials"
+                ).items():
+                    for parameter in parameters_json:
+                        if parameter.get("name") == init_parameter_name:
+                            ncit = init_parameter_value.get("identifiers").get(
+                                "ncit", None
+                            )
+                            ido = init_parameter_value.get("identifiers").get(
+                                "ido", None
+                            )
+                            if ncit is not None:
+                                add_concept(
+                                    concept=f"ncit:{ncit}",
+                                    object_id=parameter.get("id"),
+                                    type="simulation_parameters",
+                                )
+                            if ido is not None:
+                                add_concept(
+                                    concept=f"ido:{ido}",
+                                    object_id=parameter.get("id"),
+                                    type="simulation_parameters",
+                                )
+                            ## add context concept as well ##
+                            try:
+                                context = init_parameter_value.get("context", {}).get(
+                                    "property", None
+                                )
+                                if context is not None:
+                                    print(f"adding concept context {context}")
+                                    add_concept(
+                                        concept=context,
+                                        object_id=parameter.get("id"),
+                                        type="simulation_parameters",
+                                    )
+                            except Exception as e:
+                                print(e)
+
+    except FileNotFoundError:
+        print("output.json not found in " + run)
+
 
 populate_exemplar_datasets()
 
