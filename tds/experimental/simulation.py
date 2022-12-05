@@ -34,7 +34,7 @@ class SimulationPlanSchema(schema.SimulationPlan):
 
 
 @strawberry.experimental.pydantic.type(model=SimulationParameterSchema)
-class Parameter:
+class RunParameter:
     id: strawberry.auto
     run_id: strawberry.auto
     name: strawberry.auto
@@ -42,13 +42,13 @@ class Parameter:
     type: ValueType
 
     @staticmethod
-    def from_pydantic(instance: SimulationParameterSchema) -> "Parameter":
+    def from_pydantic(instance: SimulationParameterSchema) -> "RunParameter":
         data = instance.dict()
         data["type"] = ValueType(data["type"].name)
-        return Parameter(**data)
+        return RunParameter(**data)
 
 
-def list_parameters(run_id: int, info: Info) -> List[Parameter]:
+def list_parameters(run_id: int, info: Info) -> List[RunParameter]:
     if entry_exists(info.context["rdb"].connect(), orm.SimulationRun, run_id):
         with Session(info.context["rdb"]) as session:
             parameters: List[orm.SimulationParameter] = (
@@ -58,7 +58,7 @@ def list_parameters(run_id: int, info: Info) -> List[Parameter]:
             )
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    to_graphql = lambda param: Parameter.from_pydantic(
+    to_graphql = lambda param: RunParameter.from_pydantic(
         SimulationParameterSchema.from_orm(param)
     )
     return [to_graphql(param) for param in parameters]
@@ -75,8 +75,10 @@ class Run:
     response: str
 
     @strawberry.field
-    def parameters(self, info: Info) -> List[Parameter]:
-        return list_parameters(self.id, info)
+    def parameters(self, info: Info) -> List[RunParameter]:
+        sample = list_parameters(self.id, info)
+        logger.error(type(sample[0]))
+        return sample
 
     @staticmethod
     def from_pydantic(instance: SimulationRunSchema) -> "Run":
