@@ -16,6 +16,7 @@ def create_dataset(
     url="http://localhost:8001",
     biomodel_name=None,
     biomodel_description=None,
+    simulation_run=True,
 ):
     """Creates a demo dataset using a maintainer_id and number of states.
 
@@ -34,6 +35,7 @@ def create_dataset(
         "url": "",
         "description": biomodel_description,
         "maintainer": maintainer_id,
+        "simulation_run": simulation_run,
     }
 
     initial_dataset_response = requests.post(
