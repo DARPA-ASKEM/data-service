@@ -13,6 +13,7 @@ from strawberry.types import Info
 from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
 from tds.experimental.enum import ValueType
+from tds.experimental.helper import orm_to_graphql
 from tds.schema.model import ModelDescription
 
 logger = Logger(__name__)
@@ -40,19 +41,13 @@ class ModelParameter:
 
 
 def list_parameters(model_id: int, info: Info) -> List[ModelParameter]:
-    if entry_exists(info.context["rdb"].connect(), orm.Model, model_id):
-        with Session(info.context["rdb"]) as session:
-            parameters: List[orm.ModelParameter] = (
-                session.query(orm.ModelParameter)
-                .filter(orm.ModelParameter.model_id == model_id)
-                .all()
-            )
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    to_graphql = lambda model: ModelParameter.from_pydantic(
-        ModelParameterSchema.from_orm(model)
-    )
-    return [to_graphql(param) for param in parameters]
+    with Session(info.context["rdb"]) as session:
+        parameters: List[orm.ModelParameter] = (
+            session.query(orm.ModelParameter)
+            .filter(orm.ModelParameter.model_id == model_id)
+            .all()
+        )
+    return [orm_to_graphql(ModelParameter, param) for param in parameters]
 
 
 @strawberry.experimental.pydantic.type(model=ModelDescription)
@@ -80,5 +75,4 @@ def list_models(info: Info) -> List[Model]:
     fetched_models: List[orm.Model] = list_by_id(
         info.context["rdb"].connect(), orm.Model, 100, 0
     )
-    to_graphql = lambda model: Model.from_pydantic(ModelDescription.from_orm(model))
-    return [to_graphql(model) for model in fetched_models]
+    return [orm_to_graphql(Model, model) for model in fetched_models]
