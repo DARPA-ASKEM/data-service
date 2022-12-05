@@ -13,7 +13,7 @@ from tds.autogen import schema
 from tds.db import request_rdb
 from tds.experimental.model import Model, list_models
 from tds.experimental.project import Project, list_projects
-from tds.experimental.simulation import Run, list_runs
+from tds.experimental.simulation import Plan, Run, list_plans, list_runs
 
 logger = Logger(__name__)
 
@@ -23,6 +23,7 @@ class Query:
     projects: List[Project] = strawberry.field(resolver=list_projects)
     models: List[Model] = strawberry.field(resolver=list_models)
     runs: List[Run] = strawberry.field(resolver=list_runs)
+    plans: List[Plan] = strawberry.field(resolver=list_plans)
 
 
 schema = strawberry.Schema(query=Query)
