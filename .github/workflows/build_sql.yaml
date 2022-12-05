@@ -30,8 +30,14 @@ jobs:
         run:  poetry install
       - name: Make init
         run:  make init
-      - name: Make db-repopulate
-        run:  make db-repopulate
+      - name: Make db-clean
+        run:  make db-clean
+      - name: Make up
+        run:  make up
+      - name: Make populate
+        run:  make populate
+      - name: Make db-full
+        run:  make db-full
       - name: Add & Commit
         uses: EndBug/add-and-commit@v9.1.1
         with:
