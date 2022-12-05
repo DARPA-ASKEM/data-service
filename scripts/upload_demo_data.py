@@ -59,10 +59,13 @@ create_framework()
 
 # loop over models
 folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
+print(folders)
 
 
-for folder in folders[1:2]:
+for folder in folders[-2:-1]:
+    print(folder)
     # get src/main files
+
     folders_src = glob.glob(folder + "src/main/*")
 
     ## get concepts ##

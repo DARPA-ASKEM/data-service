@@ -102,9 +102,7 @@ def create_publication(path, url=url, title="xdd_mapping"):
 def create_intermediate(path, type, source, url=url):
     print("Create intermediate")
     try:
-        print(path)
         with open(path, "r") as f:
-            print("here")
             if type == "sbml":
                 template = f.read()
                 payload = json.dumps(
@@ -206,7 +204,7 @@ def create_run(path, plan_id, success, dataset_id=None, url=url):
     return simulation_run_id
 
 
-def create_parameters(path_parameters, path_initials, model_id, url=url):
+def create_model_parameters(path_parameters, path_initials, model_id, url=url):
     print("uploading model parameters")
     try:
         parameter_types = []
@@ -248,6 +246,7 @@ def create_parameters(path_parameters, path_initials, model_id, url=url):
 def create_simulation_parameters(
     path_parameters, path_initials, run_id, concepts=True, url=url
 ):
+    print("uploading simulation parameters")
     # creating simulation parameters
     parameter_simulation = []
     with open(path_parameters, "r") as f:
