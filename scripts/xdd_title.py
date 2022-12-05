@@ -5,14 +5,20 @@ import requests
 
 url = "https://xdd.wisc.edu/api/articles?docid="
 xdd = "5ef119afa58f1dfd5209bd33"
-folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
+folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") + glob.glob(
+    "experiments*/thin-thread-examples/starter-kit/*/"
+)
 
 
 def get_xdd_title(xdd_id, url="https://xdd.wisc.edu/api/articles?docid="):
+    print(xdd_id)
     response = requests.request("GET", url + xdd_id)
 
     resp_json = response.json()
-    return resp_json["success"]["data"][0]["title"]
+    if "success" in resp_json:
+        return resp_json["success"]["data"][0]["title"]
+    else:
+        return None
 
 
 mapping = {}
@@ -20,6 +26,7 @@ for folder in folders:
     with open(folder + "document_xdd_gddid.txt", "r") as f:
         gddid = f.read()
         mapping[gddid] = get_xdd_title(gddid)
+
 
 with open("scripts/xdd_mapping.json", "w") as f:
     f.write(json.dumps(mapping))

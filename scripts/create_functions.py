@@ -73,6 +73,11 @@ def create_publication(path, url=url, title="xdd_mapping"):
 
         with open(path, "r") as f:
             gddid = f.read()
+            print(gddid)
+
+        if gddid is None or gddid == "":
+            raise Exception("Missing gddid")
+
         with open("scripts/xdd_mapping.json", "r") as f:
             xdd_mapping = json.load(f)
 
@@ -96,7 +101,7 @@ def create_publication(path, url=url, title="xdd_mapping"):
         publication_id = publication_json.get("id")
         return publication_id
     except Exception as e:
-        print(f"error opening {path}document_doi.txt . - {e}")
+        print(f"error opening {path} : document_doi.txt . - {e}")
 
 
 def create_intermediate(path, type, source, url=url):
@@ -211,11 +216,18 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
         with open(path_parameters, "r") as f:
             parameters = json.load(f)
             for parameter_name, parameter_value in parameters.get("parameters").items():
+                if parameter_value.get("value") == None:
+                    type_ = "float"
+                    default_value = None
+                else:
+                    type_ = str(type(parameter_value.get("value")).__name__)
+                    default_value = str(parameter_value.get("value"))
+
                 param = {
                     "model_id": model_id,
                     "name": parameter_name,
-                    "type": str(type(parameter_value.get("value")).__name__),
-                    "default_value": str(parameter_value.get("value")),
+                    "type": type_,
+                    "default_value": default_value,
                     "state_variable": False,
                 }
                 parameter_types.append(param)
@@ -223,11 +235,17 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
         with open(path_initials, "r") as f:
             parameters = json.load(f)
             for parameter_name, parameter_value in parameters.get("initials").items():
+                if parameter_value.get("value") == None:
+                    type_ = "float"
+                    default_value = None
+                else:
+                    type_ = str(type(parameter_value.get("value")).__name__)
+                    default_value = str(parameter_value.get("value"))
                 param = {
                     "model_id": model_id,
                     "name": parameter_name,
-                    "type": str(type(parameter_value.get("value")).__name__),
-                    "default_value": str(parameter_value.get("value")),
+                    "type": type_,
+                    "default_value": default_value,
                     "state_variable": True,
                 }
                 parameter_types.append(param)
@@ -237,6 +255,7 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
         response = requests.request(
             "PUT", url + f"models/parameters/{model_id}", headers=headers, data=payload
         )
+        print(response.text)
         return response
 
     except Exception as e:

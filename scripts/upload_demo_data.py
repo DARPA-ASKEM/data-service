@@ -8,7 +8,6 @@ from urllib.request import urlopen
 
 import requests
 import sim_runs_dataset_generator
-
 from create_functions import (
     create_framework,
     create_intermediate,
@@ -21,7 +20,6 @@ from create_functions import (
     create_run,
     create_simulation_parameters,
 )
-
 from demo_dataset_generator import (
     create_dataset,
     create_feature,
@@ -33,7 +31,7 @@ from demo_dataset_generator import (
 from exemplar_dataset_generator import populate_exemplar_datasets
 from json_to_csv import convert_biomd_json_to_csv
 from sim_runs_json_to_csv import convert_sim_runs_to_csv
-
+from upload_starter_kit_models import upload_starter_kit_models
 from util import (
     add_concept,
     add_provenance,
@@ -59,11 +57,10 @@ create_framework()
 
 # loop over models
 folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
-print(folders)
 
+upload_starter_kit_models()
 
-for folder in folders[-2:-1]:
-    print(folder)
+for folder in folders[1:5]:
     # get src/main files
 
     folders_src = glob.glob(folder + "src/main/*")
@@ -71,7 +68,6 @@ for folder in folders[-2:-1]:
     ## get concepts ##
 
     model_concepts = get_model_concepts(folder)
-    print(model_concepts)
 
     # publications ##
     try:
@@ -243,7 +239,7 @@ for folder in folders[-2:-1]:
             dataset_response = create_dataset(
                 maintainer_id=1,
                 num_of_states=num_of_states,
-                biomodel_name=model_name,
+                biomodel_name=f"Biomodel simulation output :" + model_name,
                 biomodel_description=model_description,
                 url=url,
             )
@@ -342,7 +338,6 @@ for folder in folders[-2:-1]:
         runs = glob.glob(folder + "runs/*/")
 
         for run in runs:
-
             # load simulation run contents as json
             with open(run + "output.json", "r") as f:
                 sim_output = f.read()
@@ -354,7 +349,10 @@ for folder in folders[-2:-1]:
                 dataset_response = sim_runs_dataset_generator.create_dataset(
                     maintainer_id=1,
                     dataset_object=sim_output,
-                    biomodel_name=model_name,
+                    biomodel_name="Biomodel simulation output: "
+                    + model_name
+                    + " run number - "
+                    + run.split("/")[-2],
                     biomodel_description=model_description,
                     url=url,
                 )
@@ -382,8 +380,12 @@ for folder in folders[-2:-1]:
                 for concept in model_concepts:
                     add_concept(concept=concept, object_id=dataset_id, type="datasets")
 
-        
-            simulation_run_id = create_run(path=run + "output.json", plan_id=simulation_plan_id, success=True, dataset_id=dataset_id)
+            simulation_run_id = create_run(
+                path=run + "output.json",
+                plan_id=simulation_plan_id,
+                success=True,
+                dataset_id=dataset_id,
+            )
 
             asset_to_project(
                 project_id=1,
@@ -403,7 +405,7 @@ for folder in folders[-2:-1]:
                 path_parameters=f"{run}parameters.json",
                 path_initials=f"{run}initials.json",
                 run_id=simulation_run_id,
-                )
+            )
 
             time.sleep(1)
             # get parameters
