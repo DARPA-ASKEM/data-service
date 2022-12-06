@@ -105,7 +105,6 @@ def create_run_from_description(
     """
     with Session(rdb) as session:
         run_payload = payload.dict()
-        print(run_payload)
         run = orm.SimulationRun(**run_payload)
         session.add(run)
         session.commit()

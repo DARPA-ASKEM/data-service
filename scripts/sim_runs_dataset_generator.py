@@ -140,7 +140,7 @@ def create_dataset(
     }
 
     dataset_payload = {
-        "name": f"Biomodel simulation output {biomodel_name}",
+        "name": f"{biomodel_name}",
         "url": "",
         "description": f"Dataset from simulation run output- Model description: {biomodel_description}",
         "deprecated": False,
