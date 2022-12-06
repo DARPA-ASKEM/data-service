@@ -130,6 +130,7 @@ class Dataset(Base):
     geospatial_resolution = sa.Column(sa.String())
     annotations = sa.Column(JSON())
     maintainer = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
+    simulation_run = sa.Column(sa.Boolean(), server_default='False')
 
 
 class Feature(Base):
