@@ -71,6 +71,7 @@ def list_parameters(run_id: int, info: Info) -> List[RunParameter]:
 @strawberry.experimental.pydantic.type(model=SimulationRunSchema)
 class Run:
     id: strawberry.auto
+    description: strawberry.auto
     simulator_id: strawberry.auto
     timestamp: strawberry.auto
     completed_at: strawberry.auto
