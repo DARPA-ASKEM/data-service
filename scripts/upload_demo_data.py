@@ -469,8 +469,8 @@ for folder in folders:
     except FileNotFoundError:
         print("output.json not found in " + run)
 
-
 populate_exemplar_datasets()
+
 
 ## now delete repo
 shutil.rmtree("experiments-main")
