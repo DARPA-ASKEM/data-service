@@ -56,13 +56,18 @@ project_id = project.get("id")
 create_framework()
 
 # loop over models
-folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
+folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") + glob.glob(
+    "experiments*/thin-thread-examples/demo/BIOMD*/"
+)
 
-upload_starter_kit_models()
+# upload_starter_kit_models()
 
-for folder in folders:
+for folder in folders[-2:]:
+    print(folder)
+    print(folders)
     # get src/main files
-
+    if "biomodels/BIOMD0000000955" in folder:
+        continue
     folders_src = glob.glob(folder + "src/main/*")
 
     ## get concepts ##
