@@ -1,6 +1,6 @@
 import glob
 import json
-import random
+import os
 import shutil
 import time
 import xml.etree.ElementTree as ET
@@ -110,9 +110,13 @@ def upload_starter_kit_models(person_id=1, project_id=1):
 
         ## model ##
         try:
-
-            model_description = folder.split("/")[-1] + ": description"
-            model_name = folder.split("/")[-1]
+            print(folder.split("/"))
+            model_description = folder.split("/")[-2] + ": description"
+            model_name = folder.split("/")[-2]
+            if os.path.exists(folder + "description.json"):
+                with open(folder + "description.json", "r") as f:
+                    desc = f.read()
+                    model_description = json.loads(desc).get("description", "")
 
             model_id = create_model(
                 path=f"{folder}model_petri.json",
