@@ -363,7 +363,7 @@ def get_csv_from_dataset(
             timeout=15,
         )
         return StreamingResponse(response.raw, headers=response.headers)
-    path = data_paths[1]
+    path = data_paths[0]
     if path.endswith(".parquet.gzip"):
         # Build single dataframe
         dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
