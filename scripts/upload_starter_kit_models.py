@@ -271,6 +271,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                     plan_id=simulation_plan_id,
                     success=True,
                     dataset_id=dataset_id,
+                    description=model_description,
                 )
 
                 asset_to_project(

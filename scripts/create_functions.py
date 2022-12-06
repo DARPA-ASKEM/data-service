@@ -186,7 +186,7 @@ def create_plan(
     return simulation_plan_id
 
 
-def create_run(path, plan_id, success, dataset_id=None, url=url):
+def create_run(path, plan_id, success, description=None, dataset_id=None, url=url):
     # load simulation run contents as json
     with open(path, "r") as f:
         sim_output = f.read()
@@ -197,6 +197,7 @@ def create_run(path, plan_id, success, dataset_id=None, url=url):
             "success": success,
             "response": json.dumps(sim_output),
             "dataset_id": dataset_id,
+            "description": description,
         }
     )
     headers = {"Content-Type": "application/json"}
