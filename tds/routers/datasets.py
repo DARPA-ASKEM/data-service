@@ -207,12 +207,23 @@ def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 @router.get("")
 def get_datasets(
-    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
+    page_size: int = 100,
+    page: int = 0,
+    is_simulation: bool = False,
+    rdb: Engine = Depends(request_rdb),
 ):
     """
     Get a specific number of datasets
     """
-    return list_by_id(rdb.connect(), orm.Dataset, page_size, page)
+    with Session(rdb) as session:
+        return (
+            session.query(orm.Dataset)
+            .filter(orm.Dataset.simulation_run == is_simulation)
+            .order_by(orm.Dataset.id.asc())
+            .limit(page_size)
+            .offset(page)
+            .all()
+        )
 
 
 @router.get("/{id}")
