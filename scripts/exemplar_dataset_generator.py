@@ -238,15 +238,20 @@ def populate_exemplar_datasets():
                         upload_file_to_tds(id=dataset_id, file_object=exemplar_parquet)
                         print(dataset_id)
                 # Finish populating dataset metadata: Features, Qualifiers
+                list_of_curies = []
                 for feature_object in features:
                     feature_response = create_feature(dataset_id, feature_object)
                     feature_id = feature_response["id"]
                     if feature_object["primaryOntologyId"]:
+                        list_of_curies.append(feature_object["primaryOntologyId"])
                         create_concept(
                             object_id=feature_id,
                             type="features",
                             curie=feature_object["primaryOntologyId"],
                         )
+                unique_curies = [*set(list_of_curies)]
+                for curie in unique_curies:
+                    create_concept(object_id=dataset_id, type="datasets", curie=curie)
                 for qualifier_object in qualifiers:
                     create_qualifier(dataset_id, qualifier_object)
                 asset_to_project(1, dataset_id, "datasets")

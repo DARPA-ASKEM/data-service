@@ -59,7 +59,8 @@ create_framework()
 folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") + glob.glob(
     "experiments*/thin-thread-examples/demo/BIOMD*/"
 )
-
+populate_exemplar_datasets()
+s
 upload_starter_kit_models()
 
 for folder in folders:
@@ -469,8 +470,6 @@ for folder in folders:
     except FileNotFoundError:
         print("output.json not found in " + run)
 
-
-populate_exemplar_datasets()
 
 ## now delete repo
 shutil.rmtree("experiments-main")
