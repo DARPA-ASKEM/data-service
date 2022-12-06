@@ -205,6 +205,7 @@ for folder in folders:
         print(e)
     ### upload simulation plan ###
     try:
+        print("upload simulation plan")
         simulation_plan_id = create_plan(
             path="scripts/simulation-plan_ATE.json",
             name=f"{model_id}_simulation_plan",
