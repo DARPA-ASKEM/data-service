@@ -179,6 +179,8 @@ def search_concept_using_facets(
             ]
         )
         for key in dataset_search_body:
+            if key == "types":
+                continue
             if curies is not None:
                 default_search_body[key] = default_search_body[key].filter(
                     orm.OntologyConcept.curie.in_(curies)
@@ -186,12 +188,15 @@ def search_concept_using_facets(
 
         if "datasets" in types:
             search_body["facets"]["types"]["datasets"] = dataset_search_body["types"]
-            search_body["facets"]["concepts"].update(
-                {
-                    hit[1]: {"count": hit[0], "name": hit[2]}
-                    for hit in dataset_search_body["curies"]
-                }
-            )
+            for hit in dataset_search_body["curies"]:
+                if hit[1] not in search_body["facets"]["concepts"]:
+                    search_body["facets"]["concepts"][hit[1]] = {
+                        "count": hit[0],
+                        "name": hit[2],
+                    }
+                else:
+                    search_body["facets"]["concepts"][hit[1]]["count"] += hit[0]
+
             search_body["results"].extend(
                 [
                     {
