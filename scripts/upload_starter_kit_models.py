@@ -110,7 +110,6 @@ def upload_starter_kit_models(person_id=1, project_id=1):
 
         ## model ##
         try:
-            print(folder.split("/"))
             model_description = folder.split("/")[-2] + ": description"
             model_name = folder.split("/")[-2]
             if os.path.exists(folder + "description.json"):

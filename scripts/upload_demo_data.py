@@ -61,7 +61,7 @@ folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") + glo
 )
 
 upload_starter_kit_models()
-s
+
 for folder in folders:
 
     # get src/main files
