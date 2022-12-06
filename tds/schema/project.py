@@ -2,7 +2,6 @@
 Provides the API interface for models.
 """
 # pylint: disable=missing-class-docstring
-from collections import defaultdict
 from typing import Dict, List, Optional, Set
 
 from tds.autogen import orm, schema
@@ -21,7 +20,7 @@ class Project(schema.Project):
         """
         Handle the creation of asset dict
         """
-        assets = defaultdict(list)
+        assets = {type: [] for type in schema.ResourceType}
         for asset in project_assets:
             assets[asset.resource_type].append(asset.resource_id)
 
