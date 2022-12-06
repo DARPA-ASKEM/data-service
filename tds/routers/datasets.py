@@ -363,21 +363,24 @@ def get_csv_from_dataset(
             timeout=15,
         )
         return StreamingResponse(response.raw, headers=response.headers)
-    for path in data_paths:
-        if path.endswith(".parquet.gzip"):
-            # Build single dataframe
-            dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
-            output = stream_csv_from_data_paths(dataframe, wide_format)
-            return StreamingResponse(
-                iter([output]),
-                media_type="text/csv",
-            )
-        file = get_rawfile(path)
-        if wide_format:
-            dataframe = pandas.read_csv(file)
-            output = stream_csv_from_data_paths(dataframe, wide_format)
-            return StreamingResponse(iter([output]), media_type="text/csv")
-        return StreamingResponse(file, media_type="text/csv")
+    path = data_paths[0]
+    if path.endswith(".parquet.gzip"):
+        # Build single dataframe
+        dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
+        print(dataframe)
+        output = stream_csv_from_data_paths(dataframe, wide_format)
+        response = StreamingResponse(
+            iter([output]),
+            media_type="application/json",
+        )
+        response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+        return response
+    file = get_rawfile(path)
+    if wide_format:
+        dataframe = pandas.read_csv(file)
+        output = stream_csv_from_data_paths(dataframe, wide_format)
+        return StreamingResponse(iter([output]), media_type="text/csv")
+    return StreamingResponse(file, media_type="text/csv")
 
 
 @router.post("/{id}/upload/file")
