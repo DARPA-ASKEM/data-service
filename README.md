@@ -5,8 +5,11 @@
 The API can be started by simply calling
 
 ```
+make init
 make up
 ```
+
+`make init` only needs to be called the first time the application is launched. Each subsequent time, `make up` starts the application.
 
 Navigate to [http://localhost:8001/](http://localhost:8001/) to view the documentation for the endpoints
 
