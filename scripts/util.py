@@ -83,10 +83,14 @@ def get_model_concepts(folder):
 
         for key in template.keys():
             if key == "subject" or key == "outcome":
+
                 for identifier in template[key].get("identifiers"):
-                    model_concepts.append(
-                        f"{identifier}:{template[key].get('identifiers').get(identifier)}"
-                    )
+                    if "biomodels" in identifier:
+                        pass
+                    else:
+                        model_concepts.append(
+                            f"{identifier}:{template[key].get('identifiers').get(identifier)}"
+                        )
             elif key == "controllers":
                 for controller in template[key]:
 

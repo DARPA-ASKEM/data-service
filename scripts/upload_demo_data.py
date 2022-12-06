@@ -1,6 +1,6 @@
 import glob
 import json
-import random
+import os
 import shutil
 import time
 import xml.etree.ElementTree as ET
@@ -44,9 +44,9 @@ from util import (
 print("Starting process to upload artifacts to postgres.")
 
 
-download_and_unzip(
-    "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
-)
+# download_and_unzip(
+#     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+# )
 time.sleep(2)
 
 person = create_person()
@@ -54,6 +54,7 @@ person_id = person.get("id")
 project = create_project()
 project_id = project.get("id")
 create_framework()
+print("here")
 
 # loop over models
 folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") + glob.glob(
@@ -62,7 +63,7 @@ folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") + glo
 
 # upload_starter_kit_models()
 
-for folder in folders:
+for folder in folders[-1:]:
     print(folder)
     print(folders)
     # get src/main files
@@ -347,6 +348,12 @@ for folder in folders:
             with open(run + "output.json", "r") as f:
                 sim_output = f.read()
                 sim_output = json.loads(sim_output)
+
+                ## get run description
+                if os.path.exists(run + "description.json"):
+                    with open(run + "description.json", "r") as f:
+                        desc = f.read()
+                        model_description = json.loads(desc).get("description", "")
 
                 # Create the dataset with maintainer_id of 1
                 # assuming the first maintainer is already created.
