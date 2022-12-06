@@ -149,7 +149,7 @@ def delete_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Response
 
 @router.get("/descriptions")
 def list_model_descriptions(
-    page: int = 100, page_size: int = 0, rdb: Engine = Depends(request_rdb)
+    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
 ) -> List[Model]:
 
     """
@@ -158,7 +158,7 @@ def list_model_descriptions(
     This will return the full list of models, even the previous ones from
     edit history.
     """
-    return list_by_id(rdb.connect(), orm.Model, page, page_size)
+    return list_by_id(rdb.connect(), orm.Model, page_size, page)
 
 
 @router.get("/descriptions/{id}", **retrieve.fastapi_endpoint_config)
