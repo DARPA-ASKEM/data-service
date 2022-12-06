@@ -60,7 +60,7 @@ folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") + glo
     "experiments*/thin-thread-examples/demo/BIOMD*/"
 )
 
-# upload_starter_kit_models()
+upload_starter_kit_models()
 
 for folder in folders:
 
