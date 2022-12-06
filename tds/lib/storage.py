@@ -126,9 +126,11 @@ def stream_csv_from_data_paths(dataframe, wide_format=False):
         copy=False,
     )
     if wide_format:
+        index_cols = list(dataframe.columns)
+        del index_cols[7:9]
         dataframe_wide = pandas.pivot_table(
             dataframe,
-            index=["timestamp", "country", "admin1", "admin2", "admin3", "lat", "lng"],
+            index=index_cols,
             columns="feature",
             values="value",
             aggfunc="first",
