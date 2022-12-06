@@ -3,12 +3,11 @@ CRUD operations for projects
 """
 
 import json
-from collections import defaultdict
 from logging import Logger
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi import Query as Query_Fastapi
+from fastapi import Query as FastAPIQuery
 from fastapi import Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
@@ -37,7 +36,7 @@ def list_projects(
 @router.get("/{id}/assets", **retrieve.fastapi_endpoint_config)
 def get_project_assets(
     id: int,
-    types: List[ResourceType] = Query_Fastapi(
+    types: List[ResourceType] = FastAPIQuery(
         default=[
             "publications",
             "models",
@@ -59,7 +58,7 @@ def get_project_assets(
             assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
                 orm.ProjectAsset.project_id == id
             )
-            assets_key_ids = defaultdict(list)
+            assets_key_ids = {type: [] for type in types}
             for asset in list(assets):
                 if asset.resource_type in types:
                     assets_key_ids[asset.resource_type].append(asset.resource_id)
