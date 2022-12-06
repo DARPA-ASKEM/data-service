@@ -189,6 +189,7 @@ class SimulationRun(Base):
     completed_at = sa.Column(sa.DateTime())
     success = sa.Column(sa.Boolean())
     dataset_id = sa.Column(sa.Integer())
+    description = sa.Column(sa.Text())
     response = sa.Column(sa.LargeBinary())
 
 
