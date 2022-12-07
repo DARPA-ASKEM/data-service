@@ -225,18 +225,15 @@ def get_datasets(
             .offset(page)
             .all()
         )
-        dataset_ids = []
-        for dataset in datasets:
-            dataset_ids.append(dataset.id)
+        dataset_ids = [dataset.id for dataset in datasets]
 
         features = (
             session.query(orm.Feature)
             .filter(orm.Feature.dataset_id.in_(dataset_ids))
             .all()
         )
-        feature_ids = []
-        for feature in features:
-            feature_ids.append(feature.id)
+
+        feature_ids = [feature.id for feature in features]
         concepts = (
             session.query(orm.OntologyConcept)
             .filter(
