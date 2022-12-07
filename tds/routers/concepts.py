@@ -8,7 +8,7 @@ from typing import List, Optional
 from urllib.parse import quote_plus
 
 from fastapi import APIRouter, Depends, Query, Response, status
-from sqlalchemy import func
+from sqlalchemy import and_, func, or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -57,72 +57,105 @@ def get_concept_definition(curie: str):
     return fetch_from_dkg(params)
 
 
+def get_taggable_orm(taggable_type: schema.TaggableType):
+    """
+    Maps resource type to ORM
+    """
+    enum_to_orm = {
+        schema.TaggableType.features: orm.Feature,
+        schema.TaggableType.qualifiers: orm.Qualifier,
+        schema.TaggableType.datasets: orm.Dataset,
+        schema.TaggableType.simulation_plans: orm.SimulationPlan,
+        schema.TaggableType.models: orm.Model,
+        schema.TaggableType.model_parameters: orm.ModelParameter,
+        schema.TaggableType.projects: orm.Project,
+        schema.TaggableType.publications: orm.Publication,
+        schema.TaggableType.simulation_runs: orm.SimulationRun,
+        schema.TaggableType.intermediates: orm.Intermediate,
+        schema.TaggableType.simulation_parameters: orm.SimulationParameter,
+    }
+    return enum_to_orm[taggable_type]
+
+
 @router.get("/facets")
 def search_concept_using_facets(
-    types: List[schema.TaggableType] = Query(default=None),
+    types: List[schema.TaggableType] = Query(default=list(schema.TaggableType)),
     curies: Optional[List[str]] = Query(default=None),
+    is_simulation: Optional[bool] = Query(default=None),
     rdb: Engine = Depends(request_rdb),
 ) -> Response:
     """
     Search along type and curie facets
     """
     with Session(rdb) as session:
-        search_body = {
-            "types": session.query(
-                func.count(orm.OntologyConcept.type), orm.OntologyConcept.type
-            ).group_by(orm.OntologyConcept.type),
-            "curies": session.query(
-                func.count(orm.OntologyConcept.curie),
-                orm.OntologyConcept.curie,
-                orm.ActiveConcept.name,
-            )
-            .join(
-                orm.ActiveConcept,
-                orm.OntologyConcept.curie == orm.ActiveConcept.curie,
+        base_query = session.query(orm.OntologyConcept).filter(
+            orm.OntologyConcept.type.in_(types)
+        )
+        if curies is not None:
+            base_query = base_query.filter(orm.OntologyConcept.curie.in_(curies))
+        if is_simulation is not None:
+            base_query = base_query.join(
+                orm.Dataset,
+                and_(
+                    orm.OntologyConcept.type == schema.TaggableType.datasets,
+                    orm.OntologyConcept.object_id == orm.Dataset.id,
+                ),
                 isouter=True,
+            ).filter(
+                or_(
+                    orm.OntologyConcept.type != schema.TaggableType.datasets,
+                    orm.Dataset.simulation_run == is_simulation,
+                )
             )
-            .group_by(orm.OntologyConcept.curie, orm.ActiveConcept.name),
-            "results": session.query(orm.OntologyConcept, orm.ActiveConcept.name).join(
-                orm.ActiveConcept,
-                orm.OntologyConcept.curie == orm.ActiveConcept.curie,
-                isouter=True,
-            ),
+        result = {
+            "facets": {
+                "types": {  # pylint: disable=unnecessary-comprehension
+                    type: count
+                    for type, count in base_query.with_entities(
+                        orm.OntologyConcept.type,
+                        func.count(
+                            func.distinct(
+                                orm.OntologyConcept.type, orm.OntologyConcept.object_id
+                            )
+                        ),
+                    ).group_by(orm.OntologyConcept.type)
+                },
+                "concepts": {
+                    curie: {"count": count, "name": name}
+                    for curie, name, count in base_query.with_entities(
+                        orm.OntologyConcept.curie,
+                        orm.ActiveConcept.name,
+                        func.count(orm.OntologyConcept.curie),
+                    )
+                    .join(
+                        orm.ActiveConcept,
+                        orm.OntologyConcept.curie == orm.ActiveConcept.curie,
+                        isouter=True,
+                    )
+                    .group_by(orm.OntologyConcept.curie, orm.ActiveConcept.name)
+                },
+            },
+            "results": [
+                {
+                    "type": entry.type,
+                    "id": entry.object_id,
+                    "curie": entry.curie,
+                    "name": name,
+                }
+                for entry, name in base_query.with_entities(
+                    orm.OntologyConcept, orm.ActiveConcept.name
+                ).join(
+                    orm.ActiveConcept,
+                    orm.OntologyConcept.curie == orm.ActiveConcept.curie,
+                )
+            ],
         }
-        for key in search_body:
-            if types is not None:
-                search_body[key] = search_body[key].filter(
-                    orm.OntologyConcept.type.in_(types)
-                )
-            if curies is not None:
-                search_body[key] = search_body[key].filter(
-                    orm.OntologyConcept.curie.in_(curies)
-                )
-
         return Response(
             status_code=status.HTTP_200_OK,
             headers={
                 "content-type": "application/json",
             },
-            content=json.dumps(
-                {
-                    "facets": {
-                        "types": {hit[1]: hit[0] for hit in search_body["types"]},
-                        "concepts": {
-                            hit[1]: {"count": hit[0], "name": hit[2]}
-                            for hit in search_body["curies"]
-                        },
-                    },
-                    "results": [
-                        {
-                            "type": entry.type,
-                            "id": entry.object_id,
-                            "curie": entry.curie,
-                            "name": name,
-                        }
-                        for entry, name in search_body["results"]
-                    ],
-                }
-            ),
+            content=json.dumps(result),
         )
 
 

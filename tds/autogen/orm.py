@@ -130,6 +130,7 @@ class Dataset(Base):
     geospatial_resolution = sa.Column(sa.String())
     annotations = sa.Column(JSON())
     maintainer = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
+    simulation_run = sa.Column(sa.Boolean(), server_default='False')
 
 
 class Feature(Base):
@@ -188,6 +189,7 @@ class SimulationRun(Base):
     completed_at = sa.Column(sa.DateTime())
     success = sa.Column(sa.Boolean())
     dataset_id = sa.Column(sa.Integer())
+    description = sa.Column(sa.Text())
     response = sa.Column(sa.LargeBinary())
 
 
@@ -308,6 +310,7 @@ class Publication(Base):
 
     id = sa.Column(sa.Integer(), primary_key=True)
     xdd_uri = sa.Column(sa.String(), nullable=False)
+    title = sa.Column(sa.String(), nullable=False)
 
 
 class Project(Base):

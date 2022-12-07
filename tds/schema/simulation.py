@@ -72,12 +72,3 @@ class Run(SimulationRun):
 
     class Config:
         orm_mode = True
-        schema_extra = {
-            "example": {
-                "simulator_id": 0,
-                "timestamp": "datetime",
-                "completed_at": "optional-datetime",
-                "response": "blob",
-                "parameters": [],
-            }
-        }

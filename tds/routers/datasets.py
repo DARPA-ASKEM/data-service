@@ -44,25 +44,6 @@ def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.get("/search/features")
-def search_feature(
-    dataset_id: int = None,
-    feature_name: str = None,
-    rdb: Engine = Depends(request_rdb),
-):
-    """
-    Search features by dataset id and/or name
-    """
-    with Session(rdb) as session:
-        query = session.query(orm.Feature)
-        if dataset_id:
-            query = query.filter(orm.Feature.dataset_id == int(dataset_id))
-        if feature_name:
-            query = query.filter(orm.Feature.name == feature_name)
-        result = query.all()
-        return result
-
-
 @router.post("/features")
 def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
     """
@@ -226,12 +207,54 @@ def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 @router.get("")
 def get_datasets(
-    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
+    page_size: int = 100,
+    page: int = 0,
+    is_simulation: Optional[bool] = None,
+    rdb: Engine = Depends(request_rdb),
 ):
     """
     Get a specific number of datasets
     """
-    return list_by_id(rdb.connect(), orm.Dataset, page_size, page)
+    with Session(rdb) as session:
+        if is_simulation:  # Deprecated, makes pylint pass.
+            pass
+        datasets = (
+            session.query(orm.Dataset)
+            .order_by(orm.Dataset.id.asc())
+            .limit(page_size)
+            .offset(page)
+            .all()
+        )
+        dataset_ids = [dataset.id for dataset in datasets]
+
+        features = (
+            session.query(orm.Feature)
+            .filter(orm.Feature.dataset_id.in_(dataset_ids))
+            .all()
+        )
+
+        feature_ids = [feature.id for feature in features]
+        concepts = (
+            session.query(orm.OntologyConcept)
+            .filter(
+                orm.OntologyConcept.type == "features",
+                orm.OntologyConcept.object_id.in_(feature_ids),
+            )
+            .all()
+        )
+        for feature in features:
+            results_list = []
+            for concept in concepts:
+                if concept.object_id == feature.id:
+                    results_list.append(concept)
+            feature.concepts = results_list
+        for dataset in datasets:
+            features_list = []
+            for feature in features:
+                if feature.dataset_id == dataset.id:
+                    features_list.append(feature)
+            dataset.annotations["annotations"]["feature"] = features_list
+        return datasets
 
 
 @router.get("/{id}")
@@ -242,6 +265,35 @@ def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     with Session(rdb) as session:
         result = session.query(orm.Dataset).get(id)
         return result
+
+
+@router.get("/{id}/features")
+def search_feature(
+    id: int,
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Search features by dataset id and/or name
+    """
+    with Session(rdb) as session:
+        dataset = session.query(orm.Dataset).get(id)
+        query = session.query(orm.Feature).filter(orm.Feature.dataset_id == int(id))
+        result = query.all()
+
+        for feature in result:
+            feature_id = feature.id
+            result_list = (
+                session.query(orm.OntologyConcept)
+                .filter(
+                    orm.OntologyConcept.type == "features",
+                    orm.OntologyConcept.object_id == feature_id,
+                )
+                .all()
+            )
+            feature.concepts = result_list
+        dataset.features = result
+
+        return dataset
 
 
 @router.post("")
@@ -342,21 +394,24 @@ def get_csv_from_dataset(
             timeout=15,
         )
         return StreamingResponse(response.raw, headers=response.headers)
-    for path in data_paths:
-        if path.endswith(".parquet.gzip"):
-            # Build single dataframe
-            dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
-            output = stream_csv_from_data_paths(dataframe, wide_format)
-            return StreamingResponse(
-                iter([output]),
-                media_type="text/csv",
-            )
-        file = get_rawfile(path)
-        if wide_format:
-            dataframe = pandas.read_csv(file)
-            output = stream_csv_from_data_paths(dataframe, wide_format)
-            return StreamingResponse(iter([output]), media_type="text/csv")
-        return StreamingResponse(file, media_type="text/csv")
+    path = data_paths[0]
+    if path.endswith(".parquet.gzip"):
+        # Build single dataframe
+        dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
+        print(dataframe)
+        output = stream_csv_from_data_paths(dataframe, wide_format)
+        response = StreamingResponse(
+            iter([output]),
+            media_type="application/json",
+        )
+        response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+        return response
+    file = get_rawfile(path)
+    if wide_format:
+        dataframe = pandas.read_csv(file)
+        output = stream_csv_from_data_paths(dataframe, wide_format)
+        return StreamingResponse(iter([output]), media_type="text/csv")
+    return StreamingResponse(file, media_type="text/csv")
 
 
 @router.post("/{id}/upload/file")

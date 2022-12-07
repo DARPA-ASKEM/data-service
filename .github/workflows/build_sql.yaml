@@ -1,0 +1,42 @@
+---
+name: Build-SQL
+on:
+  workflow_call:
+  pull_request:
+    branches: [ 'dev' ]
+    paths:
+      - 'tds/autogen/**.py'
+      - 'tds/schema/**.py'
+      - 'scripts/**.py'
+      - 'askem.dbml'
+
+jobs:
+  build_sql:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GHP_ACCESS_TOKEN }}
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.2.2
+      - name: Create environment
+        run:  poetry install
+      - name: Make init
+        run:  make init
+      - name: Make repopulate-db
+        run:  make repopulate-db
+      - name: Add & Commit
+        uses: EndBug/add-and-commit@v9.1.1
+        with:
+            add: 'data'
+            message: 'Automatic build of data files'
+

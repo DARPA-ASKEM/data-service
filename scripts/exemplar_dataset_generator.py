@@ -162,9 +162,25 @@ def create_qualifier(dataset_id, qualifier_obj):
         timeout=100,
     )
 
-    print(qualifier_response)
-
     return qualifier_response.json()
+
+
+def create_concept(object_id, type, curie, status="obj"):
+
+    concept_payload = {
+        "curie": curie,
+        "type": type,
+        "object_id": object_id,
+        "status": status,
+    }
+
+    concept_response = requests.post(
+        URL + "concepts",
+        json=concept_payload,
+        timeout=100,
+    )
+
+    return concept_response.json()
 
 
 def upload_file_to_tds(id, file_object):
@@ -222,8 +238,20 @@ def populate_exemplar_datasets():
                         upload_file_to_tds(id=dataset_id, file_object=exemplar_parquet)
                         print(dataset_id)
                 # Finish populating dataset metadata: Features, Qualifiers
+                list_of_curies = []
                 for feature_object in features:
-                    create_feature(dataset_id, feature_object)
+                    feature_response = create_feature(dataset_id, feature_object)
+                    feature_id = feature_response["id"]
+                    if feature_object["primaryOntologyId"]:
+                        list_of_curies.append(feature_object["primaryOntologyId"])
+                        create_concept(
+                            object_id=feature_id,
+                            type="features",
+                            curie=feature_object["primaryOntologyId"],
+                        )
+                unique_curies = [*set(list_of_curies)]
+                for curie in unique_curies:
+                    create_concept(object_id=dataset_id, type="datasets", curie=curie)
                 for qualifier_object in qualifiers:
                     create_qualifier(dataset_id, qualifier_object)
                 asset_to_project(1, dataset_id, "datasets")

@@ -219,7 +219,8 @@ CREATE TABLE public.dataset (
     temporal_resolution character varying,
     geospatial_resolution character varying,
     annotations json,
-    maintainer integer NOT NULL
+    maintainer integer NOT NULL,
+    simulation_run boolean DEFAULT false
 );
 
 
@@ -680,7 +681,8 @@ ALTER SEQUENCE public.provenance_id_seq OWNED BY public.provenance.id;
 
 CREATE TABLE public.publication (
     id integer NOT NULL,
-    xdd_uri character varying NOT NULL
+    xdd_uri character varying NOT NULL,
+    title character varying NOT NULL
 );
 
 
@@ -865,6 +867,7 @@ CREATE TABLE public.simulation_run (
     completed_at timestamp without time zone,
     success boolean,
     dataset_id integer,
+    description text,
     response bytea
 );
 
@@ -1384,4 +1387,5 @@ ALTER TABLE ONLY public.simulation_run
 --
 -- PostgreSQL database dump complete
 --
+
 

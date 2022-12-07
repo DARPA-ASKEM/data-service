@@ -120,6 +120,7 @@ class Dataset(BaseModel):
     geospatial_resolution: Optional[str]
     annotations: Optional[Json]
     maintainer: int
+    simulation_run: Optional[bool] = False
 
 
 class Feature(BaseModel):
@@ -168,6 +169,7 @@ class SimulationRun(BaseModel):
     completed_at: Optional[datetime.datetime]
     success: Optional[bool]
     dataset_id: Optional[int]
+    description: Optional[str]
     response: Optional[bytes]
 
 
@@ -266,6 +268,7 @@ class Publication(BaseModel):
 
     id: Optional[int] = None
     xdd_uri: str
+    title: str
 
 
 class Project(BaseModel):

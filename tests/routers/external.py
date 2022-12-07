@@ -51,7 +51,8 @@ def test_publication_crd():
     """
     with demo_api("external") as client:
         # Creation
-        publication = Publication(xdd_uri="fake")
+        publication = Publication(xdd_uri="fake", title="test")
+
         response_post = client.post(
             "/external/publications",
             data=publication.json(),
