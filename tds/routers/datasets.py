@@ -209,21 +209,52 @@ def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 def get_datasets(
     page_size: int = 100,
     page: int = 0,
-    is_simulation: bool = False,
+    is_simulation: Optional[bool] = None,
     rdb: Engine = Depends(request_rdb),
 ):
     """
     Get a specific number of datasets
     """
     with Session(rdb) as session:
-        return (
+        if is_simulation:  # Deprecated, makes pylint pass.
+            pass
+        datasets = (
             session.query(orm.Dataset)
-            .filter(orm.Dataset.simulation_run == is_simulation)
             .order_by(orm.Dataset.id.asc())
             .limit(page_size)
             .offset(page)
             .all()
         )
+        dataset_ids = [dataset.id for dataset in datasets]
+
+        features = (
+            session.query(orm.Feature)
+            .filter(orm.Feature.dataset_id.in_(dataset_ids))
+            .all()
+        )
+
+        feature_ids = [feature.id for feature in features]
+        concepts = (
+            session.query(orm.OntologyConcept)
+            .filter(
+                orm.OntologyConcept.type == "features",
+                orm.OntologyConcept.object_id.in_(feature_ids),
+            )
+            .all()
+        )
+        for feature in features:
+            results_list = []
+            for concept in concepts:
+                if concept.object_id == feature.id:
+                    results_list.append(concept)
+            feature.concepts = results_list
+        for dataset in datasets:
+            features_list = []
+            for feature in features:
+                if feature.dataset_id == dataset.id:
+                    features_list.append(feature)
+            dataset.annotations["annotations"]["feature"] = features_list
+        return datasets
 
 
 @router.get("/{id}")

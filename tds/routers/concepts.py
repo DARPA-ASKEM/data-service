@@ -8,7 +8,7 @@ from typing import List, Optional
 from urllib.parse import quote_plus
 
 from fastapi import APIRouter, Depends, Query, Response, status
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -79,9 +79,9 @@ def get_taggable_orm(taggable_type: schema.TaggableType):
 
 @router.get("/facets")
 def search_concept_using_facets(
-    types: List[schema.TaggableType] = Query(default=None),
+    types: List[schema.TaggableType] = Query(default=list(schema.TaggableType)),
     curies: Optional[List[str]] = Query(default=None),
-    is_simulation: bool = Query(default=False),
+    is_simulation: Optional[bool] = Query(default=None),
     rdb: Engine = Depends(request_rdb),
 ) -> Response:
     """
@@ -114,7 +114,9 @@ def search_concept_using_facets(
         }
         dataset_search_body = {
             "types": session.query(orm.Dataset)
-            .filter(orm.Dataset.simulation_run == is_simulation)
+            .filter(
+                or_(is_simulation is None, orm.Dataset.simulation_run == is_simulation)
+            )
             .count(),
             "curies": session.query(
                 func.count(orm.OntologyConcept.curie),
@@ -131,7 +133,9 @@ def search_concept_using_facets(
                 orm.Dataset,
                 orm.OntologyConcept.object_id == orm.Dataset.id,
             )
-            .filter(orm.Dataset.simulation_run == is_simulation)
+            .filter(
+                or_(is_simulation is None, orm.Dataset.simulation_run == is_simulation)
+            )
             .group_by(orm.OntologyConcept.curie, orm.ActiveConcept.name),
             "results": session.query(orm.OntologyConcept, orm.ActiveConcept.name)
             .join(
@@ -144,7 +148,9 @@ def search_concept_using_facets(
                 orm.Dataset,
                 orm.OntologyConcept.object_id == orm.Dataset.id,
             )
-            .filter(orm.Dataset.simulation_run == is_simulation),
+            .filter(
+                or_(is_simulation is None, orm.Dataset.simulation_run == is_simulation)
+            ),
         }
 
         search_body = {"facets": {"types": {}, "concepts": {}}, "results": []}
