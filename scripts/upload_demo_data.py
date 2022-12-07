@@ -471,5 +471,5 @@ for folder in folders:
 populate_exemplar_datasets()
 
 
-## now delete repo
-# shutil.rmtree("experiments-main")
+## now delete the repo
+shutil.rmtree("experiments-main")
