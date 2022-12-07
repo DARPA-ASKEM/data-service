@@ -8,7 +8,7 @@ from typing import List, Optional
 from urllib.parse import quote_plus
 
 from fastapi import APIRouter, Depends, Query, Response, status
-from sqlalchemy import func, or_, and_
+from sqlalchemy import and_, func, or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
