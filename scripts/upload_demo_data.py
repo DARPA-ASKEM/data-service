@@ -356,7 +356,6 @@ for folder in folders:
 
                 # Create the dataset with maintainer_id of 1
                 # assuming the first maintainer is already created.
-
                 dataset_response = sim_runs_dataset_generator.create_dataset(
                     maintainer_id=1,
                     dataset_object=sim_output,
@@ -473,4 +472,4 @@ populate_exemplar_datasets()
 
 
 ## now delete repo
-shutil.rmtree("experiments-main")
+# shutil.rmtree("experiments-main")
