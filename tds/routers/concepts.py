@@ -144,15 +144,13 @@ def search_concept_using_facets(
                 }
                 for entry, name in base_query.with_entities(
                     orm.OntologyConcept, orm.ActiveConcept.name
-                )
-                .join(
+                ).join(
                     orm.ActiveConcept,
                     orm.OntologyConcept.curie == orm.ActiveConcept.curie,
-                    isouter=True,
                 )
-                .distinct(orm.OntologyConcept.type, orm.OntologyConcept.object_id)
             ],
         }
+        print(f'lent{len(result.get("results"))}')
         return Response(
             status_code=status.HTTP_200_OK,
             headers={
