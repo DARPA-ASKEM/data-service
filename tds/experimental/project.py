@@ -38,7 +38,8 @@ def list_assets(project_id: int, info: Info) -> List[Asset]:
             )
 
             IMPLEMENTED_TYPES = [
-                orm.ResourceType(type) for type in ["plans", "models", "runs"]
+                orm.ResourceType(type)
+                for type in ["plans", "models", "simulation_runs"]
             ]
 
             assets = [
