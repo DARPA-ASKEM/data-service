@@ -144,13 +144,10 @@ def search_concept_using_facets(
                 }
                 for entry, name in base_query.with_entities(
                     orm.OntologyConcept, orm.ActiveConcept.name
-                )
-                .join(
+                ).join(
                     orm.ActiveConcept,
                     orm.OntologyConcept.curie == orm.ActiveConcept.curie,
-                    isouter=True,
                 )
-                .distinct(orm.OntologyConcept.type, orm.OntologyConcept.object_id)
             ],
         }
         return Response(
