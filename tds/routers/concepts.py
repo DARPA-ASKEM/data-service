@@ -150,7 +150,6 @@ def search_concept_using_facets(
                 )
             ],
         }
-        print(f'lent{len(result.get("results"))}')
         return Response(
             status_code=status.HTTP_200_OK,
             headers={
