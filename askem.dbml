@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v4'
+  Note: 'v5'
 }
 
 Enum public.resource_type {
