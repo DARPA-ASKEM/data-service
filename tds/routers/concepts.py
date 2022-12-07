@@ -107,31 +107,33 @@ def search_concept_using_facets(
                     orm.Dataset.simulation_run == is_simulation,
                 )
             )
-        search_body = {
-            "types": {  # pylint: disable=unnecessary-comprehension
-                type: count
-                for type, count in base_query.with_entities(
-                    orm.OntologyConcept.type,
-                    func.count(
-                        func.distinct(
-                            orm.OntologyConcept.type, orm.OntologyConcept.object_id
-                        )
-                    ),
-                ).group_by(orm.OntologyConcept.type)
-            },
-            "concepts": {
-                curie: {"count": count, "name": name}
-                for curie, name, count in base_query.with_entities(
-                    orm.OntologyConcept.curie,
-                    orm.ActiveConcept.name,
-                    func.count(orm.OntologyConcept.curie),
-                )
-                .join(
-                    orm.ActiveConcept,
-                    orm.OntologyConcept.curie == orm.ActiveConcept.curie,
-                    isouter=True,
-                )
-                .group_by(orm.OntologyConcept.curie, orm.ActiveConcept.name)
+        result = {
+            "facets": {
+                "types": {  # pylint: disable=unnecessary-comprehension
+                    type: count
+                    for type, count in base_query.with_entities(
+                        orm.OntologyConcept.type,
+                        func.count(
+                            func.distinct(
+                                orm.OntologyConcept.type, orm.OntologyConcept.object_id
+                            )
+                        ),
+                    ).group_by(orm.OntologyConcept.type)
+                },
+                "concepts": {
+                    curie: {"count": count, "name": name}
+                    for curie, name, count in base_query.with_entities(
+                        orm.OntologyConcept.curie,
+                        orm.ActiveConcept.name,
+                        func.count(orm.OntologyConcept.curie),
+                    )
+                    .join(
+                        orm.ActiveConcept,
+                        orm.OntologyConcept.curie == orm.ActiveConcept.curie,
+                        isouter=True,
+                    )
+                    .group_by(orm.OntologyConcept.curie, orm.ActiveConcept.name)
+                },
             },
             "results": [
                 {
@@ -156,7 +158,7 @@ def search_concept_using_facets(
             headers={
                 "content-type": "application/json",
             },
-            content=json.dumps(search_body),
+            content=json.dumps(result),
         )
 
 
