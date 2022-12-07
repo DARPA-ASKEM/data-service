@@ -8,7 +8,7 @@ from typing import List, Optional
 from urllib.parse import quote_plus
 
 from fastapi import APIRouter, Depends, Query, Response, status
-from sqlalchemy import func, or_
+from sqlalchemy import and_, func, or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -88,133 +88,69 @@ def search_concept_using_facets(
     Search along type and curie facets
     """
     with Session(rdb) as session:
-        default_search_body = {
-            "types": {
-                type: session.query(get_taggable_orm(type)).count() for type in types
-            },
-            "curies": session.query(
-                func.count(orm.OntologyConcept.curie),
-                orm.OntologyConcept.curie,
-                orm.ActiveConcept.name,
-            )
-            .join(
-                orm.ActiveConcept,
-                orm.OntologyConcept.curie == orm.ActiveConcept.curie,
-                isouter=True,
-            )
-            .filter(orm.OntologyConcept.type != "datasets")
-            .group_by(orm.OntologyConcept.curie, orm.ActiveConcept.name),
-            "results": session.query(orm.OntologyConcept, orm.ActiveConcept.name)
-            .join(
-                orm.ActiveConcept,
-                orm.OntologyConcept.curie == orm.ActiveConcept.curie,
-                isouter=True,
-            )
-            .filter(orm.OntologyConcept.type != "datasets"),
-        }
-        dataset_search_body = {
-            "types": session.query(orm.Dataset)
-            .filter(
-                or_(is_simulation is None, orm.Dataset.simulation_run == is_simulation)
-            )
-            .count(),
-            "curies": session.query(
-                func.count(orm.OntologyConcept.curie),
-                orm.OntologyConcept.curie,
-                orm.ActiveConcept.name,
-            )
-            .join(
-                orm.ActiveConcept,
-                orm.OntologyConcept.curie == orm.ActiveConcept.curie,
-                isouter=True,
-            )
-            .filter(orm.OntologyConcept.type == "datasets")
-            .join(
-                orm.Dataset,
-                orm.OntologyConcept.object_id == orm.Dataset.id,
-            )
-            .filter(
-                or_(is_simulation is None, orm.Dataset.simulation_run == is_simulation)
-            )
-            .group_by(orm.OntologyConcept.curie, orm.ActiveConcept.name),
-            "results": session.query(orm.OntologyConcept, orm.ActiveConcept.name)
-            .join(
-                orm.ActiveConcept,
-                orm.OntologyConcept.curie == orm.ActiveConcept.curie,
-                isouter=True,
-            )
-            .filter(orm.OntologyConcept.type == "datasets")
-            .join(
-                orm.Dataset,
-                orm.OntologyConcept.object_id == orm.Dataset.id,
-            )
-            .filter(
-                or_(is_simulation is None, orm.Dataset.simulation_run == is_simulation)
-            ),
-        }
-
-        search_body = {"facets": {"types": {}, "concepts": {}}, "results": []}
-        for key in default_search_body:
-            if key == "types":
-                continue
-            if types is not None:
-                default_search_body[key] = default_search_body[key].filter(
-                    orm.OntologyConcept.type.in_(types)
-                )
-            if curies is not None:
-                default_search_body[key] = default_search_body[key].filter(
-                    orm.OntologyConcept.curie.in_(curies)
-                )
-
-        search_body["facets"]["types"].update(default_search_body["types"])
-        search_body["facets"]["concepts"].update(
-            {
-                hit[1]: {"count": hit[0], "name": hit[2]}
-                for hit in default_search_body["curies"]
-            }
+        base_query = session.query(orm.OntologyConcept).filter(
+            orm.OntologyConcept.type.in_(types)
         )
-        search_body["results"].extend(
-            [
+        if curies is not None:
+            base_query = base_query.filter(orm.OntologyConcept.curie.in_(curies))
+        if is_simulation is not None:
+            base_query = base_query.join(
+                orm.Dataset,
+                and_(
+                    orm.OntologyConcept.type == schema.TaggableType.datasets,
+                    orm.OntologyConcept.object_id == orm.Dataset.id,
+                ),
+                isouter=True,
+            ).filter(
+                or_(
+                    orm.OntologyConcept.type != schema.TaggableType.datasets,
+                    orm.Dataset.simulation_run == is_simulation,
+                )
+            )
+        search_body = {
+            "types": {  # pylint: disable=unnecessary-comprehension
+                type: count
+                for type, count in base_query.with_entities(
+                    orm.OntologyConcept.type,
+                    func.count(
+                        func.distinct(
+                            orm.OntologyConcept.type, orm.OntologyConcept.object_id
+                        )
+                    ),
+                ).group_by(orm.OntologyConcept.type)
+            },
+            "concepts": {
+                curie: {"count": count, "name": name}
+                for curie, name, count in base_query.with_entities(
+                    orm.OntologyConcept.curie,
+                    orm.ActiveConcept.name,
+                    func.count(orm.OntologyConcept.curie),
+                )
+                .join(
+                    orm.ActiveConcept,
+                    orm.OntologyConcept.curie == orm.ActiveConcept.curie,
+                    isouter=True,
+                )
+                .group_by(orm.OntologyConcept.curie, orm.ActiveConcept.name)
+            },
+            "results": [
                 {
                     "type": entry.type,
                     "id": entry.object_id,
                     "curie": entry.curie,
                     "name": name,
                 }
-                for entry, name in default_search_body["results"]
-            ]
-        )
-        for key in dataset_search_body:
-            if key == "types":
-                continue
-            if curies is not None:
-                default_search_body[key] = default_search_body[key].filter(
-                    orm.OntologyConcept.curie.in_(curies)
+                for entry, name in base_query.with_entities(
+                    orm.OntologyConcept, orm.ActiveConcept.name
                 )
-
-        if "datasets" in types:
-            search_body["facets"]["types"]["datasets"] = dataset_search_body["types"]
-            for hit in dataset_search_body["curies"]:
-                if hit[1] not in search_body["facets"]["concepts"]:
-                    search_body["facets"]["concepts"][hit[1]] = {
-                        "count": hit[0],
-                        "name": hit[2],
-                    }
-                else:
-                    search_body["facets"]["concepts"][hit[1]]["count"] += hit[0]
-
-            search_body["results"].extend(
-                [
-                    {
-                        "type": entry.type,
-                        "id": entry.object_id,
-                        "curie": entry.curie,
-                        "name": name,
-                    }
-                    for entry, name in dataset_search_body["results"]
-                ]
-            )
-
+                .join(
+                    orm.ActiveConcept,
+                    orm.OntologyConcept.curie == orm.ActiveConcept.curie,
+                    isouter=True,
+                )
+                .distinct(orm.OntologyConcept.type, orm.OntologyConcept.object_id)
+            ],
+        }
         return Response(
             status_code=status.HTTP_200_OK,
             headers={
