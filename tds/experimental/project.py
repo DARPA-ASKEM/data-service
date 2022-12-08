@@ -21,9 +21,17 @@ from tds.schema.resource import get_resource_orm
 logger = Logger(__name__)
 
 
-get_orm_from_alt_enum = lambda entry: get_resource_orm(
-    schema.ResourceType(entry.resource_type.name)
-)
+IMPLEMENTED_TYPES = [
+    orm.ResourceType(type) for type in ["plans", "models", "simulation_runs"]
+]
+
+orm_enum_to_type = {
+    orm.ResourceType.plans: Plan,
+    orm.ResourceType.models: Model,
+    orm.ResourceType.simulation_runs: Run,
+}
+
+get_orm_from_alt_enum = lambda type: get_resource_orm(schema.ResourceType(type.name))
 
 Asset = Model | Plan | Run
 
@@ -37,15 +45,12 @@ def list_assets(project_id: int, info: Info) -> List[Asset]:
                 .all()
             )
 
-            IMPLEMENTED_TYPES = [
-                orm.ResourceType(type)
-                for type in ["plans", "models", "simulation_runs"]
-            ]
-
             assets = [
                 orm_to_graphql(
-                    get_orm_from_alt_enum(entry),
-                    session.query(get_orm_from_alt_enum(entry)).get(entry.resource_id),
+                    orm_enum_to_type[entry.resource_type],
+                    session.query(get_orm_from_alt_enum(entry.resource_type)).get(
+                        entry.resource_id
+                    ),
                 )
                 for entry in assets_xref
                 if entry.resource_type in IMPLEMENTED_TYPES

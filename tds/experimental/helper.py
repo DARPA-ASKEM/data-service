@@ -2,7 +2,10 @@
 Strawberry helpers
 """
 
+from logging import Logger
 from typing import Any
+
+logger = Logger(__name__)
 
 
 def orm_to_graphql(graphql_class: Any, orm: Any):
