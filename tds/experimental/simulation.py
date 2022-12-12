@@ -14,7 +14,7 @@ from strawberry.types import Info
 from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
 from tds.experimental.enum import ValueType
-from tds.experimental.helper import orm_to_graphql
+from tds.experimental.helper import sqlalchemy_type
 from tds.experimental.model import Model
 
 logger = Logger(__name__)
@@ -43,6 +43,7 @@ class SimulationPlanSchema(schema.SimulationPlan):
         orm_mode = True
 
 
+@sqlalchemy_type(orm.SimulationParameter)
 @strawberry.experimental.pydantic.type(model=SimulationParameterSchema)
 class RunParameter:
     id: strawberry.auto
@@ -65,9 +66,10 @@ def list_parameters(run_id: int, info: Info) -> List[RunParameter]:
             .filter(orm.SimulationParameter.run_id == run_id)
             .all()
         )
-    return [orm_to_graphql(RunParameter, param) for param in parameters]
+    return [RunParameter.from_orm(param) for param in parameters]
 
 
+@sqlalchemy_type(orm.SimulationRun)
 @strawberry.experimental.pydantic.type(model=SimulationRunSchema)
 class Run:
     id: strawberry.auto
@@ -102,9 +104,10 @@ def list_runs(info: Info, simulator_id: Optional[int] = None) -> List[Run]:
         fetched_runs: List[orm.SimulationRun] = list_by_id(
             info.context["rdb"].connect(), orm.SimulationRun, 100, 0
         )
-    return [orm_to_graphql(Run, run) for run in fetched_runs]
+    return [Run.from_orm(run) for run in fetched_runs]
 
 
+@sqlalchemy_type(orm.SimulationPlan)
 @strawberry.experimental.pydantic.type(model=SimulationPlanSchema)
 class Plan:
     id: strawberry.auto
@@ -120,7 +123,7 @@ class Plan:
                 model = session.query(orm.Model).get(self.model_id)
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-        return orm_to_graphql(Model, model)
+        return Model.from_orm(model)
 
     @strawberry.field
     def runs(self, info: Info) -> List[Run]:
@@ -137,4 +140,4 @@ def list_plans(info: Info) -> List[Plan]:
     fetched_plans: List[orm.SimulationPlan] = list_by_id(
         info.context["rdb"].connect(), orm.SimulationPlan, 100, 0
     )
-    return [orm_to_graphql(Plan, plan) for plan in fetched_plans]
+    return [Plan.from_orm(plan) for plan in fetched_plans]

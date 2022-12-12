@@ -4,6 +4,7 @@ Scalar Schema
 
 from enum import Enum
 from logging import Logger
+from typing import Optional
 
 import strawberry
 
@@ -23,3 +24,32 @@ class ValueType(Enum):
     float = schema.ValueType.float.name
     int = schema.ValueType.int.name
     str = schema.ValueType.str.name
+
+
+@strawberry.enum
+class TaggableType(Enum):
+    """
+    Possible taggable types duplicated from the autogen schema
+    """
+
+    datasets = schema.TaggableType.datasets.name
+    features = schema.TaggableType.features.name
+    intermediates = schema.TaggableType.intermediates.name
+    model_parameters = schema.TaggableType.model_parameters.name
+    models = schema.TaggableType.models.name
+    projects = schema.TaggableType.projects.name
+    publications = schema.TaggableType.publications.name
+    qualifiers = schema.TaggableType.qualifiers.name
+    simulation_parameters = schema.TaggableType.simulation_parameters.name
+    simulation_plans = schema.TaggableType.simulation_plans.name
+    simulation_runs = schema.TaggableType.simulation_runs.name
+
+
+@strawberry.enum
+class OntologicalField(Enum):
+    """
+    Possible fields duplicated from the autogen schema
+    """
+
+    obj = schema.OntologicalField.obj.name
+    unit = schema.OntologicalField.unit.name

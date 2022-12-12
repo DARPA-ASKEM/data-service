@@ -12,7 +12,8 @@ from strawberry.types import Info
 
 from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
-from tds.experimental.helper import orm_to_graphql
+from tds.experimental.dataset import Dataset
+from tds.experimental.helper import sqlalchemy_type
 from tds.experimental.model import Model
 from tds.experimental.simulation import Plan, Run
 from tds.schema.project import ProjectMetadata
@@ -22,18 +23,20 @@ logger = Logger(__name__)
 
 
 IMPLEMENTED_TYPES = [
-    orm.ResourceType(type) for type in ["plans", "models", "simulation_runs"]
+    orm.ResourceType(type)
+    for type in ["plans", "models", "simulation_runs", "datasets"]
 ]
 
 orm_enum_to_type = {
     orm.ResourceType.plans: Plan,
     orm.ResourceType.models: Model,
     orm.ResourceType.simulation_runs: Run,
+    orm.ResourceType.datasets: Dataset,
 }
 
 get_orm_from_alt_enum = lambda type: get_resource_orm(schema.ResourceType(type.name))
 
-Asset = Model | Plan | Run
+Asset = Model | Plan | Run | Dataset
 
 
 def list_assets(project_id: int, info: Info) -> List[Asset]:
@@ -46,12 +49,7 @@ def list_assets(project_id: int, info: Info) -> List[Asset]:
             )
 
             assets = [
-                orm_to_graphql(
-                    orm_enum_to_type[entry.resource_type],
-                    session.query(get_orm_from_alt_enum(entry.resource_type)).get(
-                        entry.resource_id
-                    ),
-                )
+                orm_enum_to_type[entry.resource_type].fetch_from_sql(entry.resource_id)
                 for entry in assets_xref
                 if entry.resource_type in IMPLEMENTED_TYPES
             ]
@@ -61,6 +59,7 @@ def list_assets(project_id: int, info: Info) -> List[Asset]:
     return assets
 
 
+@sqlalchemy_type(orm.Project)
 @strawberry.experimental.pydantic.type(model=ProjectMetadata)
 class Project:
     id: strawberry.auto
@@ -78,4 +77,4 @@ def list_projects(info: Info) -> List[Project]:
     fetched_projects: List[orm.Project] = list_by_id(
         info.context["rdb"].connect(), orm.Project, 100, 0
     )
-    return [orm_to_graphql(Project, proj) for proj in fetched_projects]
+    return [Project.from_orm(proj) for proj in fetched_projects]

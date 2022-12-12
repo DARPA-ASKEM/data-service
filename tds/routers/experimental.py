@@ -11,6 +11,8 @@ from strawberry.fastapi import GraphQLRouter
 
 from tds.autogen import schema
 from tds.db import request_rdb
+from tds.experimental.concept import Concept, list_concepts
+from tds.experimental.dataset import Dataset, list_datasets
 from tds.experimental.model import Model, list_models
 from tds.experimental.project import Project, list_projects
 from tds.experimental.simulation import Plan, Run, list_plans, list_runs
@@ -28,6 +30,8 @@ class Query:
     models: List[Model] = strawberry.field(resolver=list_models)
     runs: List[Run] = strawberry.field(resolver=list_runs)
     plans: List[Plan] = strawberry.field(resolver=list_plans)
+    datasets: List[Dataset] = strawberry.field(resolver=list_datasets)
+    concepts: List[Concept] = strawberry.field(resolver=list_concepts)
 
 
 schema = strawberry.Schema(query=Query)
