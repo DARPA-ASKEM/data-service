@@ -6,8 +6,8 @@ import requests
 url = "https://xdd.wisc.edu/api/articles?docid="
 xdd = "5ef119afa58f1dfd5209bd33"
 folders = sorted(
-    glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") +
-    glob.glob("experiments*/thin-thread-examples/starter-kit/*/")
+    glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
+    + glob.glob("experiments*/thin-thread-examples/starter-kit/*/")
 )
 
 

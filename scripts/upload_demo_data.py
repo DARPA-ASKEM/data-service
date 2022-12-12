@@ -57,8 +57,8 @@ create_framework()
 
 # loop over models
 folders = sorted(
-    glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") +
-    glob.glob("experiments*/thin-thread-examples/demo/BIOMD*/")
+    glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
+    + glob.glob("experiments*/thin-thread-examples/demo/BIOMD*/")
 )
 
 upload_starter_kit_models()
