@@ -30,7 +30,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
     # loop over models
     folders = glob.glob("experiments*/thin-thread-examples/starter-kit/*/")
 
-    for folder in folders:
+    for folder in sorted(folders):
 
         ## get concepts ##
 
@@ -213,7 +213,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
         ### simulation run ###
 
         try:
-            runs = glob.glob(folder + "runs/*/")
+            runs = sorted(glob.glob(folder + "runs/*/"))
 
             for run in runs:
 
