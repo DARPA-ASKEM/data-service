@@ -215,7 +215,7 @@ def populate_exemplar_datasets():
     """
     folders = glob.glob("experiments-main/thin-thread-examples/exemplar_datasets/*/")
 
-    for folder in folders:
+    for folder in sorted(folders):
         print(folder)
         try:
             # Open json to get relevant information
