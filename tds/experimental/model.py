@@ -13,7 +13,7 @@ from strawberry.types import Info
 from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
 from tds.experimental.enum import ValueType
-from tds.experimental.helper import orm_to_graphql
+from tds.experimental.helper import sqlalchemy_type
 from tds.schema.model import ModelDescription
 
 logger = Logger(__name__)
@@ -24,6 +24,7 @@ class ModelParameterSchema(schema.ModelParameter):
         orm_mode = True
 
 
+@sqlalchemy_type(orm.ModelParameter)
 @strawberry.experimental.pydantic.type(model=ModelParameterSchema)
 class ModelParameter:
     id: strawberry.auto
@@ -47,9 +48,10 @@ def list_parameters(model_id: int, info: Info) -> List[ModelParameter]:
             .filter(orm.ModelParameter.model_id == model_id)
             .all()
         )
-    return [orm_to_graphql(ModelParameter, param) for param in parameters]
+    return [ModelParameter.from_orm(param) for param in parameters]
 
 
+@sqlalchemy_type(orm.Model)
 @strawberry.experimental.pydantic.type(model=ModelDescription)
 class Model:
     id: strawberry.auto
@@ -75,4 +77,4 @@ def list_models(info: Info) -> List[Model]:
     fetched_models: List[orm.Model] = list_by_id(
         info.context["rdb"].connect(), orm.Model, 100, 0
     )
-    return [orm_to_graphql(Model, model) for model in fetched_models]
+    return [Model.from_orm(model) for model in fetched_models]
