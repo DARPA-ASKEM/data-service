@@ -4,7 +4,7 @@ Strawberry helpers
 
 # from inspect import getargvalues, getfullargspec, currentframe
 from logging import Logger
-from typing import Any
+from typing import Any, List
 
 from sqlalchemy.orm import Session
 
@@ -26,8 +26,15 @@ def sqlalchemy_type(orm: Any):
         graphql_cls.from_orm = from_orm
 
         @staticmethod
-        def fetch_from_sql(session: Session, id: int):
-            return graphql_cls.from_orm(session.query(orm).get(id))
+        def fetch_from_sql(session: Session, id: int | List[int]):
+            if "id" not in dir(orm):
+                raise Exception('"id" is not implemented for this clas')
+
+            if type(id) is int:
+                return graphql_cls.from_orm(session.query(orm).get(id))
+
+            results = session.query(orm).filter(orm.id.in_(id)).all()
+            return [graphql_cls.from_orm(result) for result in results]
 
         graphql_cls.fetch_from_sql = fetch_from_sql
 

@@ -92,7 +92,16 @@ class Run:
         return Run(**data)
 
 
-def list_runs(info: Info, simulator_id: Optional[int] = None) -> List[Run]:
+def list_runs(
+    info: Info, simulator_id: Optional[int] = None, ids: Optional[List[int]] = None
+) -> List[Run]:
+    if ids is not None and simulator_id is not None:
+        raise Exception("Conflicting search terms given")
+
+    if ids is not None:
+        with Session(info.context["rdb"]) as session:
+            return Run.fetch_from_sql(session, ids)
+
     if simulator_id is not None:
         with Session(info.context["rdb"]) as session:
             fetched_runs: List[orm.SimulationRun] = (
@@ -136,7 +145,11 @@ class Plan:
         return Plan(**data)
 
 
-def list_plans(info: Info) -> List[Plan]:
+def list_plans(info: Info, ids: Optional[List[int]] = None) -> List[Plan]:
+    if ids is not None:
+        with Session(info.context["rdb"]) as session:
+            return Plan.fetch_from_sql(session, ids)
+
     fetched_plans: List[orm.SimulationPlan] = list_by_id(
         info.context["rdb"].connect(), orm.SimulationPlan, 100, 0
     )

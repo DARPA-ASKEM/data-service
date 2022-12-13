@@ -4,7 +4,7 @@ Dataset Schema
 
 from json import dumps
 from logging import Logger
-from typing import List
+from typing import List, Optional
 
 import strawberry
 from sqlalchemy.orm import Session
@@ -128,7 +128,11 @@ class Dataset:
         return Dataset(**data)
 
 
-def list_datasets(info: Info) -> List[Dataset]:
+def list_datasets(info: Info, ids: Optional[List[int]] = None) -> List[Dataset]:
+    if ids is not None:
+        with Session(info.context["rdb"]) as session:
+            return Dataset.fetch_from_sql(session, ids)
+
     fetched_datasets: List[orm.Dataset] = list_by_id(
         info.context["rdb"].connect(), orm.Dataset, 100, 0
     )
