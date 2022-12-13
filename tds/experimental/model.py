@@ -2,17 +2,18 @@
 Model Schema
 """
 
+# pylint: disable=missing-class-docstring, invalid-name, no-member, missing-function-docstring
+
 from enum import Enum
 from logging import Logger
 from typing import List, Optional
 
 import strawberry
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from strawberry.types import Info
 
 from tds.autogen import orm, schema
-from tds.db import entry_exists, list_by_id
+from tds.db import list_by_id
 from tds.experimental.enum import ValueType
 from tds.experimental.helper import (
     MultipleOptionsError,

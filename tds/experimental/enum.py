@@ -2,9 +2,10 @@
 Scalar Schema
 """
 
+# pylint: disable=invalid-name
+
 from enum import Enum
 from logging import Logger
-from typing import Optional
 
 import strawberry
 
