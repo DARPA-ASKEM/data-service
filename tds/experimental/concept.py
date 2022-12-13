@@ -2,6 +2,8 @@
 Concept Schema
 """
 
+# pylint: disable=missing-class-docstring, no-member, missing-function-docstring
+
 from logging import Logger
 from typing import List, Optional
 

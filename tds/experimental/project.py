@@ -2,6 +2,8 @@
 Project Schema
 """
 
+# pylint: disable=missing-class-docstring, no-member, missing-function-docstring
+
 from logging import Logger
 from typing import List, Optional
 
@@ -36,7 +38,10 @@ orm_enum_to_type = {
     orm.ResourceType.publications: Publication,
 }
 
-get_orm_from_alt_enum = lambda type: get_resource_orm(schema.ResourceType(type.name))
+
+def get_orm_from_alt_enum(type):
+    return get_resource_orm(schema.ResourceType(type.name))
+
 
 Asset = Model | Plan | Run | Dataset | Intermediate | Publication
 
