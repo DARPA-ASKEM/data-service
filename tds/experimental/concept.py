@@ -11,28 +11,44 @@ from strawberry.types import Info
 
 from tds.autogen import orm, schema
 from tds.db import list_by_id
-from tds.experimental.dataset import Dataset
+from tds.experimental.dataset import Dataset, Feature, Qualifier
 from tds.experimental.enum import OntologicalField, TaggableType
 from tds.experimental.helper import sqlalchemy_type
-from tds.experimental.model import Model
-from tds.experimental.simulation import Plan, Run
+from tds.experimental.model import Intermediate, Model, ModelParameter
+from tds.experimental.project import Project
+from tds.experimental.publication import Publication
+from tds.experimental.simulation import Plan, Run, RunParameter
 
 logger = Logger(__name__)
 
-
-IMPLEMENTED_TYPES = [
-    orm.TaggableType(type)
-    for type in ["simulation_plans", "models", "simulation_runs", "datasets"]
-]
-
 orm_enum_to_type = {
-    orm.TaggableType.simulation_plans: Plan,
-    orm.TaggableType.models: Model,
-    orm.TaggableType.simulation_runs: Run,
-    orm.TaggableType.datasets: Dataset,
+    TaggableType.simulation_plans: Plan,
+    TaggableType.models: Model,
+    TaggableType.simulation_runs: Run,
+    TaggableType.datasets: Dataset,
+    TaggableType.intermediates: Intermediate,
+    TaggableType.publications: Publication,
+    TaggableType.projects: Project,
+    TaggableType.simulation_parameters: RunParameter,
+    TaggableType.model_parameters: ModelParameter,
+    TaggableType.features: Feature,
+    TaggableType.qualifiers: Qualifier,
 }
 
-Object = Model | Plan | Run | Dataset
+Object = (
+    Model
+    | Plan
+    | Run
+    | Dataset
+    | Intermediate
+    | Publication
+    | Project
+    | RunParameter
+    | Model
+    | Feature
+    | Qualifier
+    | ModelParameter
+)
 
 
 class ConceptSchema(schema.OntologyConcept):
@@ -53,7 +69,7 @@ class Concept:
     @strawberry.field
     def name(self, info: Info) -> Optional[str]:
         with Session(info.context["rdb"]) as session:
-            return self.from_orm(session.query(orm).get(self.curie)).name
+            return session.query(orm.ActiveConcept).get(self.curie).name
 
     @strawberry.field
     def object(self, info: Info) -> Object:
