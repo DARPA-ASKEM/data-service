@@ -74,9 +74,10 @@ class Feature:
                 session.query(orm.QualifierXref)
                 .join(orm.Qualifier, orm.QualifierXref.qualifier_id == orm.Qualifier.id)
                 .filter(orm.QualifierXref.feature_id == self.id)
+                .with_entities(orm.Qualifier)
                 .all()
             )
-        return [Qualifier.from_orm(qualifier[1]) for qualifier in fetched_qualifiers]
+        return [Qualifier.from_orm(qualifier) for qualifier in fetched_qualifiers]
 
     @staticmethod
     def from_pydantic(instance: FeatureSchema) -> "Feature":
