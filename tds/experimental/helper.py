@@ -4,11 +4,13 @@ Strawberry helpers
 
 # pylint: disable=protected-access
 
+from inspect import currentframe, getargvalues, getfullargspec
 from logging import Logger
 from typing import Any, List
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
+from strawberry import Info
 
 from tds.autogen import orm, schema
 
@@ -84,6 +86,36 @@ def sqlalchemy_type(orm_cls: Any):
             return [graphql_cls.from_orm(result) for result in results]
 
         graphql_cls.fetch_from_sql = fetch_from_sql
+
+        filterable_fields = [
+            k for k, v in graphql_cls.__dataclass_fields__.items() if v.compare
+        ]
+        field_types = {
+            k: Optional[graphql_cls.__annotations__[k]] for k in filterable_fields
+        }
+
+        @staticmethod
+        def sql_search(info: Info):
+            filters = []
+            kwargs = getargvalues(currentframe())[3]
+            for field_name, filter_value in kwargs.items():
+                if field_name not in filterable_fields or filter_value is None:
+                    continue
+                else:
+                    filters.append(getattr(orm, field_name) == filter_value)
+
+            with Session(info.context["rdb"]) as session:
+                sql_results = session.query(orm).filter(*filters).all()
+            return [orm_to_graphql(graphql_cls, entry) for entry in sql_results]
+
+        sql_search.__annotations__.update(field_types)
+        src = sql_search.__code__
+        sql_search.__code__.replace(
+            co_argcount=len(field_types) + src.co_argcount,
+            co_varnames=src.co_varnames + tuple(filterable_fields),
+        )
+        sql_search.__defaults__ = (None,) * len(field_types)
+        graphql_cls.sql_search = sql_search
 
         return graphql_cls
 
