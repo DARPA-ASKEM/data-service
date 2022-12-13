@@ -2,6 +2,8 @@
 Strawberry helpers
 """
 
+# pylint: disable=protected-access
+
 from logging import Logger
 from typing import Any, List
 
@@ -64,9 +66,7 @@ def sqlalchemy_type(orm_cls: Any):
             if "_pydantic_type" not in dir(graphql_cls):
                 raise TypeError("This schema does not inherit from a pydantic class")
             return graphql_cls.from_pydantic(
-                graphql_cls._pydantic_type.from_orm(
-                    orm_obj
-                )  # pylint: disable=protected-access
+                graphql_cls._pydantic_type.from_orm(orm_obj)
             )
 
         graphql_cls.from_orm = from_orm
