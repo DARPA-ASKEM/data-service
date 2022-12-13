@@ -84,8 +84,17 @@ class Concept:
         return Concept(**data)
 
 
-def list_concepts(info: Info) -> List[Concept]:
-    fetched_concepts: List[orm.Project] = list_by_id(
-        info.context["rdb"].connect(), orm.OntologyConcept, 100, 0
-    )
+def list_concepts(info: Info, curies: Optional[List[str]] = None) -> List[Concept]:
+    if curies is not None:
+        with Session(info.context["rdb"]) as session:
+            fetched_concepts = (
+                session.query(orm.OntologyConcept)
+                .filter(orm.OntologyConcept.curie.in_(curies))
+                .all()
+            )
+
+    else:
+        fetched_concepts: List[orm.Project] = list_by_id(
+            info.context["rdb"].connect(), orm.OntologyConcept, 100, 0
+        )
     return [Concept.from_orm(concept) for concept in fetched_concepts]
