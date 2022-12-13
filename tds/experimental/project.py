@@ -3,7 +3,7 @@ Project Schema
 """
 
 from logging import Logger
-from typing import List
+from typing import List, Optional
 
 import strawberry
 from fastapi import HTTPException, status
@@ -70,7 +70,11 @@ class Project:
         return list_assets(self.id, info)
 
 
-def list_projects(info: Info) -> List[Project]:
+def list_projects(info: Info, ids: Optional[List[int]] = None) -> List[Project]:
+    if ids is not None:
+        with Session(info.context["rdb"]) as session:
+            return Project.fetch_from_sql(session, ids)
+
     fetched_projects: List[orm.Project] = list_by_id(
         info.context["rdb"].connect(), orm.Project, 100, 0
     )

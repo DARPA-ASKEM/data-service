@@ -4,7 +4,7 @@ Model Schema
 
 from enum import Enum
 from logging import Logger
-from typing import List
+from typing import List, Optional
 
 import strawberry
 from fastapi import HTTPException, status
@@ -74,7 +74,11 @@ class Model:
         return Model(**data)
 
 
-def list_models(info: Info) -> List[Model]:
+def list_models(info: Info, ids: Optional[List[int]] = None) -> List[Model]:
+    if ids is not None:
+        with Session(info.context["rdb"]) as session:
+            return Model.fetch_from_sql(session, ids)
+
     fetched_models: List[orm.Model] = list_by_id(
         info.context["rdb"].connect(), orm.Model, 100, 0
     )
@@ -119,7 +123,13 @@ class Intermediate:
         return Intermediate(**data)
 
 
-def list_intermediates(info: Info) -> List[Intermediate]:
+def list_intermediates(
+    info: Info, ids: Optional[List[int]] = None
+) -> List[Intermediate]:
+    if ids is not None:
+        with Session(info.context["rdb"]) as session:
+            return Intermediate.fetch_from_sql(session, ids)
+
     fetched_intermediates: List[orm.Intermediate] = list_by_id(
         info.context["rdb"].connect(), orm.Model, 100, 0
     )

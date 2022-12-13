@@ -3,9 +3,10 @@ Publication Schema
 """
 
 from logging import Logger
-from typing import List
+from typing import List, Optional
 
 import strawberry
+from sqlalchemy.orm import Session
 from strawberry.types import Info
 
 from tds.autogen import orm, schema
@@ -28,7 +29,10 @@ class Publication:
     title: strawberry.auto
 
 
-def list_publications(info: Info) -> List[Publication]:
+def list_publications(info: Info, ids: Optional[List[int]] = None) -> List[Publication]:
+    if ids is not None:
+        with Session(info.context["rdb"]) as session:
+            return Publication.fetch_from_sql(session, ids)
     fetched_publications: List[orm.Intermediate] = list_by_id(
         info.context["rdb"].connect(), orm.Model, 100, 0
     )
