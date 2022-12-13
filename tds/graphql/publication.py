@@ -13,11 +13,7 @@ from strawberry.types import Info
 
 from tds.autogen import orm, schema
 from tds.db import list_by_id
-from tds.experimental.helper import (
-    MultipleOptionsError,
-    fetch_by_curie,
-    sqlalchemy_type,
-)
+from tds.graphql.helper import MultipleOptionsError, fetch_by_curie, sqlalchemy_type
 
 logger = Logger(__name__)
 

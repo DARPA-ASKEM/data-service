@@ -13,13 +13,13 @@ from strawberry.types import Info
 
 from tds.autogen import orm, schema
 from tds.db import list_by_id
-from tds.experimental.dataset import Dataset, Feature, Qualifier
-from tds.experimental.enum import OntologicalField, TaggableType
-from tds.experimental.helper import sqlalchemy_type
-from tds.experimental.model import Intermediate, Model, ModelParameter
-from tds.experimental.project import Project
-from tds.experimental.publication import Publication
-from tds.experimental.simulation import Plan, Run, RunParameter
+from tds.graphql.dataset import Dataset, Feature, Qualifier
+from tds.graphql.enum import OntologicalField, TaggableType
+from tds.graphql.helper import sqlalchemy_type
+from tds.graphql.model import Intermediate, Model, ModelParameter
+from tds.graphql.project import Project
+from tds.graphql.publication import Publication
+from tds.graphql.simulation import Plan, Run, RunParameter
 
 logger = Logger(__name__)
 

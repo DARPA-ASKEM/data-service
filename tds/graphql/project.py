@@ -14,15 +14,11 @@ from strawberry.types import Info
 
 from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
-from tds.experimental.dataset import Dataset
-from tds.experimental.helper import (
-    MultipleOptionsError,
-    fetch_by_curie,
-    sqlalchemy_type,
-)
-from tds.experimental.model import Intermediate, Model
-from tds.experimental.publication import Publication
-from tds.experimental.simulation import Plan, Run
+from tds.graphql.dataset import Dataset
+from tds.graphql.helper import MultipleOptionsError, fetch_by_curie, sqlalchemy_type
+from tds.graphql.model import Intermediate, Model
+from tds.graphql.publication import Publication
+from tds.graphql.simulation import Plan, Run
 from tds.schema.project import ProjectMetadata
 from tds.schema.resource import get_resource_orm
 

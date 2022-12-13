@@ -11,12 +11,12 @@ from strawberry.fastapi import GraphQLRouter
 
 from tds.autogen import schema
 from tds.db import request_rdb
-from tds.experimental.concept import Concept, list_concepts
-from tds.experimental.dataset import Dataset, list_datasets
-from tds.experimental.model import Intermediate, Model, list_intermediates, list_models
-from tds.experimental.project import Project, list_projects
-from tds.experimental.publication import Publication, list_publications
-from tds.experimental.simulation import Plan, Run, list_plans, list_runs
+from tds.graphql.concept import Concept, list_concepts
+from tds.graphql.dataset import Dataset, list_datasets
+from tds.graphql.model import Intermediate, Model, list_intermediates, list_models
+from tds.graphql.project import Project, list_projects
+from tds.graphql.publication import Publication, list_publications
+from tds.graphql.simulation import Plan, Run, list_plans, list_runs
 
 logger = Logger(__name__)
 
