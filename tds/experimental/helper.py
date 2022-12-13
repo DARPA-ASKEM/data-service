@@ -32,10 +32,10 @@ def sqlalchemy_type(orm: Any):
         graphql_cls.fetch_from_sql = fetch_from_sql
 
         """
-
         filterable_fields = [ k for k,v in graphql_cls.__dataclass_fields__.items() if v.compare]
         field_types = { k: Optional[graphql_cls.__annotations__[k]] for k in filterable_fields }
 
+        @staticmethod
         def sql_search(info: Info):
             filters = []
             kwargs = getargvalues(currentframe())[3]
@@ -57,6 +57,7 @@ def sqlalchemy_type(orm: Any):
         sql_search.__defaults__ = (None,) * len(field_types)
         graphql_cls.sql_search = sql_search
         """
+
         return graphql_cls
 
     return add_sqlaclhemy_integration

@@ -2,6 +2,7 @@
 Model Schema
 """
 
+from enum import Enum
 from logging import Logger
 from typing import List
 
@@ -78,3 +79,50 @@ def list_models(info: Info) -> List[Model]:
         info.context["rdb"].connect(), orm.Model, 100, 0
     )
     return [Model.from_orm(model) for model in fetched_models]
+
+
+class IntermediateSchema(schema.Intermediate):
+    class Config:
+        orm_mode = True
+
+
+@strawberry.enum
+class IntermediateSource(Enum):
+
+    mrepresentationa = schema.IntermediateSource.mrepresentationa.name
+    skema = schema.IntermediateSource.skema.name
+
+
+@strawberry.enum
+class IntermediateFormat(Enum):
+    bilayer = schema.IntermediateFormat.bilayer.name
+    gromet = schema.IntermediateFormat.gromet.name
+    sbml = schema.IntermediateFormat.sbml.name
+    other = schema.IntermediateFormat.other.name
+
+
+@sqlalchemy_type(orm.Intermediate)
+@strawberry.experimental.pydantic.type(model=IntermediateSchema)
+class Intermediate:
+    id: strawberry.auto
+    timestamp: strawberry.auto
+    source: IntermediateSource
+    type: IntermediateFormat
+    content: str
+
+    @staticmethod
+    def from_pydantic(instance: IntermediateSchema) -> "Intermediate":
+        data = instance.dict()
+        data["type"] = IntermediateFormat(data["type"].name)
+        data["source"] = IntermediateSource(data["source"].name)
+        data["content"] = str(data["content"])
+        return Intermediate(**data)
+
+
+def list_intermediates(info: Info) -> List[Intermediate]:
+    fetched_intermediates: List[orm.Intermediate] = list_by_id(
+        info.context["rdb"].connect(), orm.Model, 100, 0
+    )
+    return [
+        Intermediate.from_orm(intermediate) for intermediate in fetched_intermediates
+    ]

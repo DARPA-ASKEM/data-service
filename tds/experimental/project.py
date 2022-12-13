@@ -14,7 +14,8 @@ from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
 from tds.experimental.dataset import Dataset
 from tds.experimental.helper import sqlalchemy_type
-from tds.experimental.model import Model
+from tds.experimental.model import Intermediate, Model
+from tds.experimental.publication import Publication
 from tds.experimental.simulation import Plan, Run
 from tds.schema.project import ProjectMetadata
 from tds.schema.resource import get_resource_orm
@@ -22,21 +23,18 @@ from tds.schema.resource import get_resource_orm
 logger = Logger(__name__)
 
 
-IMPLEMENTED_TYPES = [
-    orm.ResourceType(type)
-    for type in ["plans", "models", "simulation_runs", "datasets"]
-]
-
 orm_enum_to_type = {
     orm.ResourceType.plans: Plan,
     orm.ResourceType.models: Model,
     orm.ResourceType.simulation_runs: Run,
     orm.ResourceType.datasets: Dataset,
+    orm.ResourceType.intermediates: Intermediate,
+    orm.ResourceType.publications: Publication,
 }
 
 get_orm_from_alt_enum = lambda type: get_resource_orm(schema.ResourceType(type.name))
 
-Asset = Model | Plan | Run | Dataset
+Asset = Model | Plan | Run | Dataset | Intermediate | Publication
 
 
 def list_assets(project_id: int, info: Info) -> List[Asset]:
@@ -51,7 +49,6 @@ def list_assets(project_id: int, info: Info) -> List[Asset]:
             assets = [
                 orm_enum_to_type[entry.resource_type].fetch_from_sql(entry.resource_id)
                 for entry in assets_xref
-                if entry.resource_type in IMPLEMENTED_TYPES
             ]
 
     else:
