@@ -153,7 +153,7 @@ def list_intermediates(
             return Intermediate.fetch_from_sql(session, ids)
 
     fetched_intermediates: List[orm.Intermediate] = list_by_id(
-        info.context["rdb"].connect(), orm.Model, 100, 0
+        info.context["rdb"].connect(), orm.Intermediate, 100, 0
     )
     return [
         Intermediate.from_orm(intermediate) for intermediate in fetched_intermediates
