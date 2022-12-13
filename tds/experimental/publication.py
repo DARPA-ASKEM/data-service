@@ -47,7 +47,7 @@ def list_publications(
     if ids is not None:
         with Session(info.context["rdb"]) as session:
             return Publication.fetch_from_sql(session, ids)
-    fetched_publications: List[orm.Intermediate] = list_by_id(
-        info.context["rdb"].connect(), orm.Model, 100, 0
+    fetched_publications: List[orm.Publication] = list_by_id(
+        info.context["rdb"].connect(), orm.Publication, 100, 0
     )
     return [Publication.from_orm(publication) for publication in fetched_publications]
