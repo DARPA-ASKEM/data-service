@@ -13,7 +13,11 @@ from strawberry.types import Info
 from tds.autogen import orm, schema
 from tds.db import list_by_id
 from tds.experimental.enum import ValueType
-from tds.experimental.helper import sqlalchemy_type
+from tds.experimental.helper import (
+    MultipleOptionsError,
+    fetch_by_curie,
+    sqlalchemy_type,
+)
 
 logger = Logger(__name__)
 
@@ -129,7 +133,16 @@ class Dataset:
         return Dataset(**data)
 
 
-def list_datasets(info: Info, ids: Optional[List[int]] = None) -> List[Dataset]:
+def list_datasets(
+    info: Info, ids: Optional[List[int]] = None, curies: Optional[List[str]] = None
+) -> List[Dataset]:
+    if ids is not None and curies is not None:
+        raise MultipleOptionsError
+
+    if curies is not None:
+        with Session(info.context["rdb"]) as session:
+            return fetch_by_curie(session, Dataset, "datasets", curies)
+
     if ids is not None:
         with Session(info.context["rdb"]) as session:
             return Dataset.fetch_from_sql(session, ids)

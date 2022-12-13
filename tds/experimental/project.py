@@ -13,7 +13,11 @@ from strawberry.types import Info
 from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
 from tds.experimental.dataset import Dataset
-from tds.experimental.helper import sqlalchemy_type
+from tds.experimental.helper import (
+    MultipleOptionsError,
+    fetch_by_curie,
+    sqlalchemy_type,
+)
 from tds.experimental.model import Intermediate, Model
 from tds.experimental.publication import Publication
 from tds.experimental.simulation import Plan, Run
@@ -70,7 +74,16 @@ class Project:
         return list_assets(self.id, info)
 
 
-def list_projects(info: Info, ids: Optional[List[int]] = None) -> List[Project]:
+def list_projects(
+    info: Info, ids: Optional[List[int]] = None, curies: Optional[List[int]] = None
+) -> List[Project]:
+    if ids is not None and curies is not None:
+        raise MultipleOptionsError
+
+    if curies is not None:
+        with Session(info.context["rdb"]) as session:
+            return fetch_by_curie(session, Project, "projects", curies)
+
     if ids is not None:
         with Session(info.context["rdb"]) as session:
             return Project.fetch_from_sql(session, ids)

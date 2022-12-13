@@ -14,7 +14,11 @@ from strawberry.types import Info
 from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id
 from tds.experimental.enum import ValueType
-from tds.experimental.helper import sqlalchemy_type
+from tds.experimental.helper import (
+    MultipleOptionsError,
+    fetch_by_curie,
+    sqlalchemy_type,
+)
 from tds.experimental.model import Model
 
 logger = Logger(__name__)
@@ -93,10 +97,17 @@ class Run:
 
 
 def list_runs(
-    info: Info, simulator_id: Optional[int] = None, ids: Optional[List[int]] = None
+    info: Info,
+    simulator_id: Optional[int] = None,
+    ids: Optional[List[int]] = None,
+    curies: Optional[List[str]] = None,
 ) -> List[Run]:
-    if ids is not None and simulator_id is not None:
-        raise Exception("Conflicting search terms given")
+    if ids is not None and curies is not None:  # TODO: restrict simulator_id
+        raise MultipleOptionsError
+
+    if curies is not None:
+        with Session(info.context["rdb"]) as session:
+            return fetch_by_curie(session, Run, "simulation_runs", curies)
 
     if ids is not None:
         with Session(info.context["rdb"]) as session:
@@ -145,7 +156,16 @@ class Plan:
         return Plan(**data)
 
 
-def list_plans(info: Info, ids: Optional[List[int]] = None) -> List[Plan]:
+def list_plans(
+    info: Info, ids: Optional[List[int]] = None, curies: Optional[List[str]] = None
+) -> List[Plan]:
+    if ids is not None and curies is not None:
+        raise MultipleOptionsError
+
+    if curies is not None:
+        with Session(info.context["rdb"]) as session:
+            return fetch_by_curie(session, Plan, "simulation_plans", curies)
+
     if ids is not None:
         with Session(info.context["rdb"]) as session:
             return Plan.fetch_from_sql(session, ids)
