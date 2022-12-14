@@ -33,7 +33,7 @@ Resource = Dataset | Extraction | Model | Plan | Publication | Intermediate | Ru
 ORMResource = (
     orm.Dataset
     | orm.Extraction
-    | orm.Model
+    | orm.ModelDescription
     | orm.SimulationPlan
     | orm.Publication
     | orm.Intermediate
@@ -93,7 +93,7 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
         {
             ResourceType.datasets: orm.Dataset,
             ResourceType.extractions: orm.Extraction,
-            ResourceType.models: orm.Model,
+            ResourceType.models: orm.ModelDescription,
             ResourceType.plans: orm.SimulationPlan,
             ResourceType.publications: orm.Publication,
             ResourceType.intermediates: orm.Intermediate,
