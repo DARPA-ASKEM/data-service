@@ -66,7 +66,7 @@ class Model(schema.ModelDescription):
         """
         Handle ORM conversion while coercing `dict` to JSON
         """
-        setattr(body, "content", ModelContent.from_orm(state).content)
+        setattr(body, "content", dumps(ModelContent.from_orm(state).content))
         setattr(body, "parameters", orm_to_params(parameters))
         return super().from_orm(body)
 

@@ -4,15 +4,14 @@ CRUD operations for models
 
 import json
 from logging import Logger
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from neo4j import Driver
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
-from tds.db import entry_exists, list_by_id, request_graph_db, request_rdb
+from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.models import adjust_model_params
 from tds.operation import create, delete, retrieve, update
 from tds.schema.model import (
@@ -294,19 +293,20 @@ def update_model(
     """
     Update model content
     """
-    # TODO: Use to record provenance `provenance_handler = ProvenanceHandler(rdb, graph_db)`
+    # TODO: reinclude `provenance_handler = ProvenanceHandler(rdb, graph_db)`
     if entry_exists(rdb.connect(), orm.ModelDescription, id):
         model_payload = payload.dict()
-        model_payload.pop("timestamp")
-        model_payload.pop("id")
         content = model_payload.pop("content")
         with Session(rdb) as session:
             state = orm.ModelState(content=content)
             session.add(state)
             session.commit()
 
-            model = session.query(orm.ModelDescription).get(id).update(**model_payload)
-            session.add(model)
+            model = session.query(orm.ModelDescription).get(id)
+            model.state_id = state.id
+            model.name = model_payload["name"]
+            model.description = model_payload["description"]
+            model.framework = model_payload["framework"]
             session.commit()
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

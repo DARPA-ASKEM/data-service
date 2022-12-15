@@ -145,8 +145,7 @@ def test_model_cru():
             headers={"Content-type": "application/json", "Accept": "text/plain"},
         )
         new_id = response_update.json()["id"]
-        assert id != new_id
-        assert 201 == response_update.status_code
+        assert 200 == response_update.status_code
         response_get_again = client.get(
             f"/models/{new_id}", headers={"Accept": "application/json"}
         )

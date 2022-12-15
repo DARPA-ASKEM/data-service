@@ -75,7 +75,6 @@ class Model:
     @staticmethod
     def from_pydantic(instance: ModelDescription) -> "Model":
         data = instance.dict()
-        data["content"] = str(data["content"])
         data.pop("concept")  # TODO: Include
         return Model(**data)
 
@@ -95,7 +94,7 @@ def list_models(
         with Session(info.context["rdb"]) as session:
             return Model.fetch_from_sql(session, ids)
 
-    fetched_models: List[orm.Model] = list_by_id(
+    fetched_models: List[orm.ModelDescription] = list_by_id(
         info.context["rdb"].connect(), orm.ModelDescription, 100, 0
     )
     return [Model.from_orm(model) for model in fetched_models]
