@@ -76,3 +76,10 @@ repopulate-db:
 		make populate; \
 		make db-full; \
 	fi
+
+check-dates:
+	find tds/schema/ data/ -maxdepth 1 -ls; \
+	echo '==============='; \
+	date; \
+	touch newfile; \
+	find tds/routers/ data/ newfile -maxdepth 1 -ls; \
