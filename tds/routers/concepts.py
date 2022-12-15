@@ -66,7 +66,7 @@ def get_taggable_orm(taggable_type: schema.TaggableType):
         schema.TaggableType.qualifiers: orm.Qualifier,
         schema.TaggableType.datasets: orm.Dataset,
         schema.TaggableType.simulation_plans: orm.SimulationPlan,
-        schema.TaggableType.models: orm.Model,
+        schema.TaggableType.models: orm.ModelDescription,
         schema.TaggableType.model_parameters: orm.ModelParameter,
         schema.TaggableType.projects: orm.Project,
         schema.TaggableType.publications: orm.Publication,

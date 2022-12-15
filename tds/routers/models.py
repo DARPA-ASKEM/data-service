@@ -4,22 +4,14 @@ CRUD operations for models
 
 import json
 from logging import Logger
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from neo4j import Driver
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
-from tds.autogen.schema import RelationType
-from tds.db import (
-    ProvenanceHandler,
-    entry_exists,
-    list_by_id,
-    request_graph_db,
-    request_rdb,
-)
+from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.models import adjust_model_params
 from tds.operation import create, delete, retrieve, update
 from tds.schema.model import (
@@ -158,7 +150,7 @@ def list_model_descriptions(
     This will return the full list of models, even the previous ones from
     edit history.
     """
-    return list_by_id(rdb.connect(), orm.Model, page_size, page)
+    return list_by_id(rdb.connect(), orm.ModelDescription, page_size, page)
 
 
 @router.get("/descriptions/{id}", **retrieve.fastapi_endpoint_config)
@@ -168,9 +160,9 @@ def get_model_description(
     """
     Retrieve model
     """
-    if entry_exists(rdb.connect(), orm.Model, id):
+    if entry_exists(rdb.connect(), orm.ModelDescription, id):
         with Session(rdb) as session:
-            model = session.query(orm.Model).get(id)
+            model = session.query(orm.ModelDescription).get(id)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return ModelDescription.from_orm(model)
@@ -199,7 +191,7 @@ def get_model_parameters(
     """
     Retrieve model
     """
-    if entry_exists(rdb.connect(), orm.Model, id):
+    if entry_exists(rdb.connect(), orm.ModelDescription, id):
         with Session(rdb) as session:
             parameters: Query[orm.ModelParameter] = session.query(
                 orm.ModelParameter
@@ -232,16 +224,19 @@ def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
     """
     Retrieve model
     """
-    if entry_exists(rdb.connect(), orm.Model, id):
+    if entry_exists(rdb.connect(), orm.ModelDescription, id):
         with Session(rdb) as session:
-            model = session.query(orm.Model).get(id)
-            parameters: Query[orm.ModelParameter] = session.query(
-                orm.ModelParameter
-            ).filter(orm.ModelParameter.model_id == id)
+            model = session.query(orm.ModelDescription).get(id)
+            content = session.query(orm.ModelState).get(model.state_id)
+            parameters: List[orm.ModelParameter] = (
+                session.query(orm.ModelParameter)
+                .filter(orm.ModelParameter.model_id == id)
+                .all()
+            )
 
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Model.from_orm(model, list(parameters))
+    return Model.from_orm(model, content, parameters)
 
 
 @router.post("", **create.fastapi_endpoint_config)
@@ -252,9 +247,18 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
     with Session(rdb) as session:
         model_payload = payload.dict()
         model_payload.pop("concept")  # TODO: Save ontology term
+
+        print(model_payload)
+        content = model_payload.pop("content")
+        state = orm.ModelState(content=content)
+        session.add(state)
+        session.commit()
+        model_payload["state_id"] = state.id
+
         parameters = model_payload.pop("parameters")
         model_payload.pop("id")
-        model = orm.Model(**model_payload)
+
+        model = orm.ModelDescription(**model_payload)
         session.add(model)
         session.commit()
         id: int = model.id
@@ -284,23 +288,32 @@ def update_model(
     payload: Model,
     id: int,
     rdb: Engine = Depends(request_rdb),
-    graph_db: Optional[Driver] = Depends(request_graph_db),
+    # graph_db: Optional[Driver] = Depends(request_graph_db),
 ) -> Response:
     """
     Update model content
     """
-    provenance_handler = ProvenanceHandler(rdb, graph_db)
-    if entry_exists(rdb.connect(), orm.Model, id):
-        new_id = json.loads(create_model(payload, rdb).body)["id"]
-        old_model = get_model(id, rdb)
-        new_model = get_model(new_id, rdb)
-        provenance_handler.create(new_model, old_model, RelationType.editedFrom)
+    # TODO: reinclude `provenance_handler = ProvenanceHandler(rdb, graph_db)`
+    if entry_exists(rdb.connect(), orm.ModelDescription, id):
+        model_payload = payload.dict()
+        content = model_payload.pop("content")
+        with Session(rdb) as session:
+            state = orm.ModelState(content=content)
+            session.add(state)
+            session.commit()
+
+            model = session.query(orm.ModelDescription).get(id)
+            model.state_id = state.id
+            model.name = model_payload["name"]
+            model.description = model_payload["description"]
+            model.framework = model_payload["framework"]
+            session.commit()
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Response(
-        status_code=status.HTTP_201_CREATED,
+        status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps({"id": new_id}),
+        content=json.dumps({"id": id}),
     )

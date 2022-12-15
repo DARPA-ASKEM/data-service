@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v5'
+  Note: 'v6'
 }
 
 Enum public.resource_type {
@@ -124,11 +124,17 @@ Table model_framework {
   semantics varchar [not null]
 }
 
-Table model {
+Table model_description {
   id int [pk]
   name varchar [not null]
   description text
   framework varchar [ref: > model_framework.name, not null]
+  timestamp datetime [default: `now()`, not null]
+  state_id int [ref:> model_state.id, not null]
+}
+
+Table model_state {
+  id int [pk]
   timestamp datetime [default: `now()`, not null]
   content json
 }
@@ -158,7 +164,7 @@ Table model_runtime {
 
 Table simulation_plan {
   id int [pk]
-  model_id int [ref: > model.id, not null]
+  model_id int [ref: > model_description.id, not null]
   simulator varchar [not null]
   query varchar [not null]
   content json [not null]
@@ -177,13 +183,12 @@ Table simulation_run {
 
 Table model_parameter {
   id int [pk]
-  model_id int [ref: > model.id, not null]
+  model_id int [ref: > model_description.id, not null]
   name varchar [not null]
   type value_type [not null]
   default_value varchar
   state_variable bool [not null]
 }
-
 
 Table simulation_parameter {
   id int [pk]

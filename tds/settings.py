@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     Data store configuration
     """
 
-    DBML_VERSION: str = "v5"
+    DBML_VERSION: str = "v6"
     GENERATED_PATH: str = "./tds/autogen"
     DBML_PATH: str = "./askem.dbml"
     SQL_URL: str = "rdb"

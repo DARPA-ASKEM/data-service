@@ -103,6 +103,18 @@ class QualifierXref(Base):
     feature_id = sa.Column(sa.Integer(), sa.ForeignKey('feature.id'), nullable=False)
 
 
+class ModelDescription(Base):
+
+    __tablename__ = 'model_description'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    name = sa.Column(sa.String(), nullable=False)
+    description = sa.Column(sa.Text())
+    framework = sa.Column(sa.String(), sa.ForeignKey('model_framework.name'), nullable=False)
+    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
+    state_id = sa.Column(sa.Integer(), sa.ForeignKey('model_state.id'), nullable=False)
+
+
 class ModelRuntime(Base):
 
     __tablename__ = 'model_runtime'
@@ -156,24 +168,12 @@ class Qualifier(Base):
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class Model(Base):
-
-    __tablename__ = 'model'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.Text())
-    framework = sa.Column(sa.String(), sa.ForeignKey('model_framework.name'), nullable=False)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    content = sa.Column(JSON())
-
-
 class SimulationPlan(Base):
 
     __tablename__ = 'simulation_plan'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model_description.id'), nullable=False)
     simulator = sa.Column(sa.String(), nullable=False)
     query = sa.Column(sa.String(), nullable=False)
     content = sa.Column(JSON(), nullable=False)
@@ -198,7 +198,7 @@ class ModelParameter(Base):
     __tablename__ = 'model_parameter'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model.id'), nullable=False)
+    model_id = sa.Column(sa.Integer(), sa.ForeignKey('model_description.id'), nullable=False)
     name = sa.Column(sa.String(), nullable=False)
     type = sa.Column(sa.Enum(ValueType), nullable=False)
     default_value = sa.Column(sa.String())
@@ -281,6 +281,15 @@ class ModelFramework(Base):
     name = sa.Column(sa.String(), primary_key=True)
     version = sa.Column(sa.String(), nullable=False)
     semantics = sa.Column(sa.String(), nullable=False)
+
+
+class ModelState(Base):
+
+    __tablename__ = 'model_state'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
+    content = sa.Column(JSON())
 
 
 class Intermediate(Base):

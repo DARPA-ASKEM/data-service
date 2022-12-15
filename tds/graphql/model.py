@@ -53,7 +53,7 @@ def list_parameters(model_id: int, info: Info) -> List[ModelParameter]:
     return [ModelParameter.from_orm(param) for param in parameters]
 
 
-@sqlalchemy_type(orm.Model)
+@sqlalchemy_type(orm.ModelDescription)
 @strawberry.experimental.pydantic.type(model=ModelDescription)
 class Model:
     id: strawberry.auto
@@ -61,7 +61,12 @@ class Model:
     description: strawberry.auto
     framework: strawberry.auto
     timestamp: strawberry.auto
-    content: str
+    state_id: strawberry.auto
+
+    @strawberry.field
+    def content(self, info: Info) -> str:
+        with Session(info.context["rdb"]) as session:
+            return str(session.query(orm.ModelState).get(self.state_id).content)
 
     @strawberry.field
     def parameters(self, info: Info) -> List[ModelParameter]:
@@ -70,7 +75,6 @@ class Model:
     @staticmethod
     def from_pydantic(instance: ModelDescription) -> "Model":
         data = instance.dict()
-        data["content"] = str(data["content"])
         data.pop("concept")  # TODO: Include
         return Model(**data)
 
@@ -90,8 +94,8 @@ def list_models(
         with Session(info.context["rdb"]) as session:
             return Model.fetch_from_sql(session, ids)
 
-    fetched_models: List[orm.Model] = list_by_id(
-        info.context["rdb"].connect(), orm.Model, 100, 0
+    fetched_models: List[orm.ModelDescription] = list_by_id(
+        info.context["rdb"].connect(), orm.ModelDescription, 100, 0
     )
     return [Model.from_orm(model) for model in fetched_models]
 
