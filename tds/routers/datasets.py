@@ -54,8 +54,9 @@ def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
         featurep = payload.dict()
         del featurep["id"]
         feature = orm.Feature(**featurep)
-        exists = session.query(orm.Feature).filter_by(**featurep).first() is not None
-        if exists:
+        exists = session.query(orm.Feature).filter_by(**featurep).first()
+        if exists is not None:
+            featurep["id"] = exists.id
             return Response(
                 status_code=status.HTTP_200_OK,
                 headers={
@@ -137,10 +138,9 @@ def create_qualifier(
         qualifierp = payload.dict()
         del qualifierp["id"]
         qualifier = orm.Qualifier(**qualifierp)
-        exists = (
-            session.query(orm.Qualifier).filter_by(**qualifierp).first() is not None
-        )
-        if exists:
+        exists = session.query(orm.Qualifier).filter_by(**qualifierp).first()
+        if exists is not None:
+            qualifierp["id"] = exists.id
             return Response(
                 status_code=status.HTTP_200_OK,
                 headers={
