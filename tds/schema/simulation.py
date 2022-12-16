@@ -31,7 +31,7 @@ class Plan(SimulationPlan):
         """
         Handle ORM conversion while coercing `dict` to JSON
         """
-        setattr(body, "content", dumps(body.content))
+        body.__dict__["content"] = dumps(body.content)
         return super().from_orm(body)
 
     class Config:

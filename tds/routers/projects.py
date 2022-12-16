@@ -80,7 +80,6 @@ def get_project_assets(
                             orm_type.id.in_(assets_key_ids[key])
                         )
                     ]
-
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return assets_key_objects
