@@ -4,8 +4,12 @@ on:
   workflow_call:
   push:
     branches: ['main', 'dev']
+    paths-ignore:
+      - '/data/**'
   pull_request:
     branches: ['main', 'dev']
+    paths-ignore:
+      - '/data/**'
 
 jobs:
   formatting:
