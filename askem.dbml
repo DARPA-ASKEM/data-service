@@ -6,8 +6,17 @@ Project askem {
 Enum public.resource_type {
    datasets
    models
-   extractions
    plans
+   intermediates
+   publications
+   simulation_runs
+}
+
+Enum public.provenance_type {
+   datasets
+   models
+   plans
+   states
    intermediates
    publications
    simulation_runs
@@ -17,14 +26,14 @@ Enum relation_type {
   DERIVED_FROM
   COPIED_FROM
   CITES
-  GLUED_FROM
-  STRATIFIED_FROM
+  COMBINED_FROM
   EDITED_FROM
   USES
   EQUIVALENT_OF
   EXTRACTED_FROM
   REINTERPRETS
   GENERATED_BY
+  BEGINS_AT
 }
 
 Enum taggable_type {

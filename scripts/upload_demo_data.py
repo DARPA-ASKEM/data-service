@@ -45,10 +45,10 @@ from util import (
 print("Starting process to upload artifacts to postgres.")
 
 
-download_and_unzip(
-    "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
-)
-time.sleep(2)
+# download_and_unzip(
+#     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+# )
+# time.sleep(2)
 
 person = create_person()
 person_id = person.get("id")

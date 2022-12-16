@@ -1,7 +1,5 @@
 import glob
 import json
-import os
-import shutil
 import time
 import xml.etree.ElementTree as ET
 from urllib.request import urlopen
@@ -26,7 +24,7 @@ from util import add_concept, add_provenance, asset_to_project, get_model_concep
 print("Upload fake data")
 
 
-loop_of_relationships = [
+recipe = [
     {
         "publication_reliationship": "CITES",
         "publication_id_to": 1,
@@ -41,13 +39,11 @@ loop_of_relationships = [
         "model_relationship": "EDITED_FROM",
         "model_id_to": 4,
     },
-    {"publication_reliationship": "CITES", "publication_id_to": 3},
-]
-loop_of_relationships = [
     {
         "publication_reliationship": "CITES",
-        "publication_id_to": 4,
-    }
+        "publication_id_to": 3,
+        "model_name": "Merged",
+    },
 ]
 
 
@@ -61,7 +57,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
         print(folder)
         model_concepts = get_model_concepts(folder)
 
-        for loop in loop_of_relationships:
+        for loop in recipe:
             print(loop)
             # publications ##
             try:
@@ -218,7 +214,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                 runs = glob.glob(folder + "runs/*/")
                 if loop.get("runs_relationship", None) is None:
                     raise
-                for run in runs:
+                for run in runs[1:4]:
 
                     # load simulation run contents as json
                     with open(run + "output.json", "r") as f:
