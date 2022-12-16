@@ -21,12 +21,17 @@ class ResourceType(str, Enum):
 
 class RelationType(str, Enum):
 
-    cites = 'cites'
-    copiedfrom = 'copiedfrom'
-    derivedfrom = 'derivedfrom'
-    editedFrom = 'editedFrom'
-    gluedFrom = 'gluedFrom'
-    stratifiedFrom = 'stratifiedFrom'
+    CITES = 'CITES'
+    COPIED_FROM = 'COPIED_FROM'
+    DERIVED_FROM = 'DERIVED_FROM'
+    EDITED_FROM = 'EDITED_FROM'
+    EQUIVALENT_OF = 'EQUIVALENT_OF'
+    EXTRACTED_FROM = 'EXTRACTED_FROM'
+    GENERATED_BY = 'GENERATED_BY'
+    GLUED_FROM = 'GLUED_FROM'
+    REINTERPRETS = 'REINTERPRETS'
+    STRATIFIED_FROM = 'STRATIFIED_FROM'
+    USES = 'USES'
     
 
 class TaggableType(str, Enum):

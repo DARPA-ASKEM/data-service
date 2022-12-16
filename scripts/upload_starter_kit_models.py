@@ -77,7 +77,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 add_provenance(
                     left={"id": intermediate_mmt_id, "resource_type": "intermediates"},
                     right={"id": publication_id, "resource_type": "publications"},
-                    relation_type="derivedfrom",
+                    relation_type="DERIVED_FROM",
                     user_id=person_id,
                 )
         except Exception as e:
@@ -96,7 +96,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             add_provenance(
                 left={"id": intermediate_grom_id, "resource_type": "intermediates"},
                 right={"id": publication_id, "resource_type": "publications"},
-                relation_type="derivedfrom",
+                relation_type="DERIVED_FROM",
                 user_id=person_id,
             )
             for concept in model_concepts:
@@ -129,7 +129,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             add_provenance(
                 left={"id": model_id, "resource_type": "models"},
                 right={"id": intermediate_grom_id, "resource_type": "intermediates"},
-                relation_type="derivedfrom",
+                relation_type="DERIVED_FROM",
                 user_id=person_id,
             )
             for concept in model_concepts:
@@ -200,7 +200,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
 
             add_provenance(
                 left={"id": simulation_plan_id, "resource_type": "plans"},
-                relation_type="derivedfrom",
+                relation_type="USES",
                 right={"id": model_id, "resource_type": "models"},
                 user_id=person_id,
             )
@@ -285,8 +285,20 @@ def upload_starter_kit_models(person_id=1, project_id=1):
 
                 add_provenance(
                     left={"id": simulation_run_id, "resource_type": "simulation_runs"},
-                    relation_type="derivedfrom",
+                    relation_type="DERIVED_FROM",
                     right={"id": simulation_plan_id, "resource_type": "plans"},
+                    user_id=person_id,
+                )
+                add_provenance(
+                    left={"id": simulation_run_id, "resource_type": "simulation_runs"},
+                    relation_type="EQUIVALENT_OF",
+                    right={"id": dataset_id, "resource_type": "datasets"},
+                    user_id=person_id,
+                )
+                add_provenance(
+                    right={"id": simulation_run_id, "resource_type": "simulation_runs"},
+                    relation_type="EQUIVALENT_OF",
+                    left={"id": dataset_id, "resource_type": "datasets"},
                     user_id=person_id,
                 )
 

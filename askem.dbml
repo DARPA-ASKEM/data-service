@@ -14,12 +14,17 @@ Enum public.resource_type {
 }
 
 Enum relation_type {
-  derivedfrom
-  copiedfrom
-  cites
-  gluedFrom
-  stratifiedFrom
-  editedFrom
+  DERIVED_FROM
+  COPIED_FROM
+  CITES
+  GLUED_FROM
+  STRATIFIED_FROM
+  EDITED_FROM
+  USES
+  EQUIVALENT_OF
+  EXTRACTED_FROM
+  REINTERPRETS
+  GENERATED_BY
 }
 
 Enum taggable_type {

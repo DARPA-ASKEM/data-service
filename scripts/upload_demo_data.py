@@ -30,6 +30,7 @@ from demo_dataset_generator import (
 # from demo_dataset_generator import programatically_populate_datasets
 from exemplar_dataset_generator import populate_exemplar_datasets
 from json_to_csv import convert_biomd_json_to_csv
+from provenance_fake_data import upload_fake_provanence_data
 from sim_runs_json_to_csv import convert_sim_runs_to_csv
 from upload_starter_kit_models import upload_starter_kit_models
 from util import (
@@ -62,7 +63,7 @@ folders = sorted(
 )
 
 upload_starter_kit_models()
-
+upload_fake_provanence_data()
 for folder in folders:
 
     # get src/main files
@@ -473,4 +474,4 @@ populate_exemplar_datasets()
 
 
 ## now delete the repo
-shutil.rmtree("experiments-main")
+# shutil.rmtree("experiments-main")
