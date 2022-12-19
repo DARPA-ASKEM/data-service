@@ -159,7 +159,6 @@ def update_run_parameters(
     """
     Update the parameters for a run
     """
-    print("made 8it")
     with Session(rdb) as session:
         adjust_run_params(id, payload, session)
         session.commit()

@@ -4,6 +4,7 @@ CRUD operations for datasets and related tables in the DB
 
 import json
 import os
+from collections import defaultdict
 from logging import DEBUG, Logger
 from typing import List, Optional
 
@@ -242,18 +243,18 @@ def get_datasets(
             )
             .all()
         )
+
+        concept_index = defaultdict(list)
+        for concept in concepts:
+            concept_index[concept.object_id].append(concept)
+
+        feature_index = defaultdict(list)
         for feature in features:
-            results_list = []
-            for concept in concepts:
-                if concept.object_id == feature.id:
-                    results_list.append(concept)
-            feature.concepts = results_list
+            feature.concepts = concept_index[feature.id]
+            feature_index[feature.dataset_id].append(feature)
+
         for dataset in datasets:
-            features_list = []
-            for feature in features:
-                if feature.dataset_id == dataset.id:
-                    features_list.append(feature)
-            dataset.annotations["annotations"]["feature"] = features_list
+            dataset.annotations["annotations"]["feature"] = feature_index[dataset.id]
         return datasets
 
 

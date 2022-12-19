@@ -43,7 +43,7 @@ class ModelContent(schema.ModelState):
         """
         Handle ORM conversion while coercing `dict` to JSON
         """
-        setattr(body, "content", dumps(body.content))
+        body.__dict__["content"] = dumps(body.content)
 
         return super().from_orm(body)
 
@@ -66,8 +66,8 @@ class Model(schema.ModelDescription):
         """
         Handle ORM conversion while coercing `dict` to JSON
         """
-        setattr(body, "content", dumps(ModelContent.from_orm(state).content))
-        setattr(body, "parameters", orm_to_params(parameters))
+        body.__dict__["content"] = dumps(ModelContent.from_orm(state).content)
+        body.__dict__["parameters"] = orm_to_params(parameters)
         return super().from_orm(body)
 
     class Config:

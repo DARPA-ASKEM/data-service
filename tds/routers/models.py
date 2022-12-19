@@ -129,7 +129,6 @@ def delete_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Response
     with Session(rdb) as session:
         if entry_exists(rdb.connect(), orm.Intermediate, id):
             intermediate = session.query(orm.Intermediate).get(id)
-            print(intermediate)
             session.delete(intermediate)
             session.commit()
         else:

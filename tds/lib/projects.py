@@ -38,7 +38,6 @@ def adjust_project_assets(
     """
     Add new entries and remove unused entries
     """
-
     active = defaultdict(list)
     for asset in session.query(orm.ProjectAsset).filter(
         orm.ProjectAsset.project_id == project_id

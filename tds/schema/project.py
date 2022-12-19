@@ -24,7 +24,7 @@ class Project(schema.Project):
         for asset in project_assets:
             assets[asset.resource_type].append(asset.resource_id)
 
-        setattr(body, "assets", assets)
+        body.__dict__["assets"] = assets
         return super().from_orm(body)
 
     class Config:
