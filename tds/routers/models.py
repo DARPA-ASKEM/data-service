@@ -326,29 +326,25 @@ def copy_model(
     """
     with Session(rdb) as session:
         old_model_id = id
-        # get old model and old content
 
+        # query old model and old content
         model = session.query(orm.ModelDescription).get(old_model_id)
         framework = model.framework
         description = model.description
         name = model.name
-        print(f"{framework} , {description}, {name}")
-
         # set old state id so we have it
         old_state_id = model.state_id
-        print(f"old_state_id {old_state_id}")
-        content = session.query(orm.ModelState).get(model.state_id)
 
+        content = session.query(orm.ModelState).get(model.state_id)
         # take off content id so we can save it again in the database with new id
         content_payload = content.__dict__
         state = orm.ModelState(content=content_payload.get("content"))
         session.add(state)
         session.commit()
+
         new_state_id = state.id
-        print(f"new state id {new_state_id}")
         model = session.query(orm.ModelDescription).get(old_model_id)
 
-        print(model)
         new_model = orm.ModelDescription(
             name=payload.get("name", name),
             description=payload.get("description", description),
@@ -358,18 +354,15 @@ def copy_model(
         session.add(new_model)
         session.commit()
         new_model_id = new_model.id
-        print(f"new model id {new_model_id}")
 
         parameters: List[orm.ModelParameter] = (
             session.query(orm.ModelParameter)
             .filter(orm.ModelParameter.model_id == old_model_id)
             .all()
         )
-        print(f"parameters {parameters}")
 
         # set the parameters as the same for copied model
         for param in parameters:
-            print(param.name)
             session.add(
                 orm.ModelParameter(
                     model_id=new_model_id,
@@ -382,7 +375,6 @@ def copy_model(
         session.commit()
 
         if settings.NEO4J:
-            print("Neo4j is set")
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             prov_payload = Provenance(
                 left=new_state_id,
@@ -402,8 +394,8 @@ def copy_model(
                 relation_type="BEGINS_AT",
                 user_id=payload.get("user_id", None),
             )
-
             provenance_handler.create_entry(prov_payload)
+
     logger.info("new model created: %i", id)
     return Response(
         status_code=status.HTTP_201_CREATED,
