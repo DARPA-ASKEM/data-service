@@ -6,8 +6,6 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
-from fastapi.testclient import TestClient
-
 from tests.helpers import demo_api_context
 
 
@@ -84,5 +82,5 @@ class CRUD(ABC):
         pass
 
     @abstractmethod
-    def test_rest_delete(self, router: TestClient):
+    def test_rest_delete(self):
         pass
