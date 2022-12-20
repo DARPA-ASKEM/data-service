@@ -45,3 +45,11 @@ services:
       - NEO4J_dbms_memory_pagecache_size=512M
     networks:
       - data-api
+  minio:
+    image: minio/minio
+    command: server /data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    networks:
+      - data-api

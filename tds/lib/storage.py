@@ -1,5 +1,6 @@
 """File storage library for functions related to getting and putting files.
 """
+import io
 import os
 import tempfile
 from urllib.parse import urlparse
@@ -7,9 +8,19 @@ from urllib.parse import urlparse
 import boto3
 import botocore
 import pandas
+from minio import Minio
+from minio.error import S3Error
 
 # S3 OBJECT
 s3 = boto3.client("s3")
+
+# MinIO object
+client = Minio(
+    os.getenv("MINIO_URL"),
+    access_key=os.getenv("S3_ACCESS_KEY_ID"),
+    secret_key=os.getenv("S3_SECRET_ACCESS_KEY"),
+    secure=False,
+)
 
 
 def get_rawfile(path):
@@ -57,16 +68,29 @@ def put_rawfile(path, fileobj):
         RuntimeError: If the path URI does not begin with 'file' or 's3'
         there is no handler for it yet.
     """
+
     location_info = urlparse(path)
+
+    print(path)
 
     if location_info.scheme.lower() == "file":
         if not os.path.isdir(os.path.dirname(location_info.path)):
             os.makedirs(os.path.dirname(location_info.path), exist_ok=True)
         with open(location_info.path, "wb") as output_file:
             output_file.write(fileobj.read())
-    elif location_info.scheme.lower() == "s3":
+    elif location_info.scheme.lower() in ["s3", "minio"]:
+        found = client.bucket_exists(location_info.netloc)
+        if not found:
+            client.make_bucket(location_info.netloc)
+        else:
+            print(f"Bucket {location_info.netloc} already exists")
         output_path = location_info.path.lstrip("/")
-        s3.put_object(Bucket=location_info.netloc, Key=output_path, Body=fileobj)
+        client.put_object(
+            bucket_name=location_info.netloc,
+            object_name=output_path,
+            data=io.BytesIO(fileobj),
+            length=len(io.BytesIO(fileobj)),
+        )
     else:
         raise RuntimeError("File storage format is unknown")
 
