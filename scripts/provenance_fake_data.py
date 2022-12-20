@@ -24,6 +24,11 @@ from util import add_concept, add_provenance, asset_to_project, get_model_concep
 
 print("Upload fake data")
 
+# This array allows you to create abitrary provenance.
+# Each dict is a loop which will have access to every type of artifact.
+# By setting the artifact_to_id is the id that the new artifact will connect to.
+# you can also connect existing artifacts (only publications for now) by setting existing_pub_right and exisiting_pub_left
+# The goal is to create a more complicated and interconnected graph to test out search queries.
 
 recipe = [
     {
@@ -91,10 +96,6 @@ recipe = [
         "model_relationship": "COPIED_FROM",
         "model_id_to": 6,
     },
-    # {
-    #      "existing_pub_left":2,
-    #     "existing_pub_right":1,
-    # }
 ]
 
 
@@ -142,10 +143,8 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
 
             ##  connect exisiting  publications
             try:
-                print("trying")
-                print(loop)
+
                 if loop.get("existing_pub_left", None) is not None:
-                    print("hi")
                     add_provenance(
                         left={
                             "id": loop.get("existing_pub_left"),
@@ -190,7 +189,6 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                 )
                 state_model_json = response.json()
                 state_id = state_model_json.get("state_id")
-                print(state_id)
 
                 if loop.get("model_id_to") is None:
                     loop["model_id_to"] = prev_model_id
@@ -198,15 +196,13 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
             except Exception as e:
                 print(f" {e}")
 
-            except Exception as e:
-                print(e)
-
             ### upload simulation plan ###
             try:
                 if loop.get("simulation_relationship", None) is None:
                     raise
                 if loop.get("simulation_id_to", None) is None:
                     loop["simulation_id_to"] = prev_model_id
+
                 simulation_plan_id = create_plan(
                     path="scripts/simulation-plan_ATE.json",
                     name=f"{loop['simulation_id_to']}_simulation_plan",
@@ -230,8 +226,6 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
 
             except Exception as e:
                 print(f" {e}")
-
-            ## create dataset from simulation run * backwards from how this would normally happen but we want dataset id to add to request
 
             ### simulation run ###
 
@@ -386,6 +380,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                                         print(e)
             except Exception as e:
                 print(e)
+    # dataset extracted by
     try:
         if loop.get("dataset_relationship", None) is None:
             raise

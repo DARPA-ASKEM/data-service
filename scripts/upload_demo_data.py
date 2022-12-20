@@ -45,9 +45,9 @@ from util import (
 print("Starting process to upload artifacts to postgres.")
 
 
-# download_and_unzip(
-#     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
-# )
+download_and_unzip(
+    "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+)
 # time.sleep(2)
 
 person = create_person()
@@ -64,7 +64,7 @@ folders = sorted(
 
 upload_starter_kit_models()
 
-upload_fake_provanence_data()
+# upload_fake_provanence_data()
 
 
 for folder in folders:
