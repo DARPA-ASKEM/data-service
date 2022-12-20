@@ -429,8 +429,7 @@ def update_model(
             model = session.query(orm.ModelDescription).get(id)
 
             old_state = model.state_id
-            print(old_state)
-            print(model)
+
             model.state_id = state.id
             model.name = model_payload["name"]
             model.description = model_payload["description"]
@@ -438,10 +437,8 @@ def update_model(
             model.state_id = state.id
             session.commit()
             if settings.NEO4J:
-                print("Neo4j is set")
                 provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
-                print(state.id)
-                print(old_state)
+
                 payload = Provenance(
                     left=state.id,
                     left_type="model_revisions",

@@ -33,7 +33,6 @@ class ProvenanceHandler:
         """
         Draws a relation between two resources
         """
-        print(entry)
         with Session(self.__connection__) as session:
             provenance = orm.Provenance(**entry.dict())
             session.add(provenance)
