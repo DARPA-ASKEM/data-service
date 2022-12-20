@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     DKG_API_PORT = 8771
     DKG_DESC_PORT = 8772
     NEO4J = True
+    NEO4J_driver = "neo4j://graphdb.data-api:7687"
+    NEO4J_PASSWORD = "password"
+    NEO4J_USER = "neo4j"
 
 
 settings = Settings()

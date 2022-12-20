@@ -4,8 +4,10 @@ Initializes connection to Neo4j
 
 from neo4j import GraphDatabase
 
+from tds.settings import settings
+
 ENGINE = GraphDatabase.driver(
-    "neo4j://graphdb.data-api:7687", auth=("neo4j", "password")
+    settings.NEO4J_driver, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD)
 )
 
 
