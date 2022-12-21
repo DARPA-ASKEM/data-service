@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
-from tds.autogen import orm
+from tds.autogen import orm, schema
 from tds.db import (
     ProvenanceHandler,
     entry_exists,
@@ -314,55 +314,60 @@ def create_model(
     )
 
 
-@router.post("/{id}/copy", **create.fastapi_endpoint_config)
+@router.post("/opts/{model_operation}", **create.fastapi_endpoint_config)
 def copy_model(
     payload: dict,
-    id: int,
+    model_operation: schema.ModelOperations,
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
 ) -> Response:
-    """
-    Create model and return its ID
-    """
     with Session(rdb) as session:
-        old_model_id = id
-
+        left_model_id = payload.get("left")
         # query old model and old content
-        model = session.query(orm.ModelDescription).get(old_model_id)
-        framework = model.framework
-        description = model.description
-        name = model.name
-        # set old state id so we have it
-        old_state_id = model.state_id
+        l_model = session.query(orm.ModelDescription).get(left_model_id)
+        l_framework = l_model.framework
+        l_description = l_model.description
+        l_name = l_model.name
+        left_state_id = l_model.state_id
 
-        content = session.query(orm.ModelState).get(model.state_id)
-        # take off content id so we can save it again in the database with new id
-        content_payload = content.__dict__
-        state = orm.ModelState(content=content_payload.get("content"))
+        if payload.get("right", False):
+            right_model_id = payload.get("right")
+            r_model = session.query(orm.ModelDescription).get(right_model_id)
+            right_state_id = r_model.state_id
+
+        if model_operation == "copy":
+            l_content = session.query(orm.ModelState).get(left_model_id)
+            l_content_dict = l_content.__dict__
+            state = orm.ModelState(content=l_content_dict.get("content"))
+
+        elif model_operation == "decompose" or model_operation == "glue":
+            state = orm.ModelState(content=payload.get("content"))
+        else:
+            raise
+
         session.add(state)
         session.commit()
-
         new_state_id = state.id
-        model = session.query(orm.ModelDescription).get(old_model_id)
 
+        # add new model
         new_model = orm.ModelDescription(
-            name=payload.get("name", name),
-            description=payload.get("description", description),
-            framework=framework,
+            name=payload.get("name"),
+            description=payload.get("description"),
+            framework=payload.get("framework"),
             state_id=new_state_id,
         )
         session.add(new_model)
         session.commit()
         new_model_id = new_model.id
 
+        # add parameters to new model. Default to left model id parameters.
         parameters: List[orm.ModelParameter] = (
             session.query(orm.ModelParameter)
-            .filter(orm.ModelParameter.model_id == old_model_id)
+            .filter(orm.ModelParameter.model_id == left_model_id)
             .all()
         )
-
-        # set the parameters as the same for copied model
-        for param in parameters:
+        # if parameters are set use those for new model
+        for param in payload.get("parameters", parameters):
             session.add(
                 orm.ModelParameter(
                     model_id=new_model_id,
@@ -374,18 +379,37 @@ def copy_model(
             )
         session.commit()
 
+        model_opt_relationship_mapping = {
+            "copy": "COPIED_FROM",
+            "decompose": "DECOMPOSED_FROM",
+            "stratify": "STRATIFED_FROM",
+            "glue": "GLUED_FROM",
+        }
+        # if neo4j is true
         if settings.NEO4J:
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             prov_payload = Provenance(
                 left=new_state_id,
                 left_type="model_revision",
-                right=old_state_id,
+                right=left_state_id,
                 right_type="model_revision",
-                relation_type="COPIED_FROM",
+                relation_type=model_opt_relationship_mapping[model_operation],
                 user_id=payload.get("user_id", None),
             )
             provenance_handler.create_entry(prov_payload)
 
+            if model_operation == "glue":
+                prov_payload = Provenance(
+                    left=new_state_id,
+                    left_type="model_revision",
+                    right=right_state_id,
+                    right_type="model_revision",
+                    relation_type=model_opt_relationship_mapping[model_operation],
+                    user_id=payload.get("user_id", None),
+                )
+                provenance_handler.create_entry(prov_payload)
+
+            # add begins at relationship
             prov_payload = Provenance(
                 left=new_model_id,
                 left_type="model",
@@ -404,6 +428,285 @@ def copy_model(
         },
         content=json.dumps({"id": new_model_id}),
     )
+
+
+# @router.post("/opts/copy", **create.fastapi_endpoint_config)
+# def copy_model(
+#     payload: dict,
+#     rdb: Engine = Depends(request_rdb),
+#     graph_db=Depends(request_graph_db),
+# ) -> Response:
+#     """
+#     Copy model and return new model ID
+#     """
+#     with Session(rdb) as session:
+#         old_model_id = payload.get('left')
+
+#         # query old model and old content
+#         model = session.query(orm.ModelDescription).get(old_model_id)
+#         framework = model.framework
+#         description = model.description
+#         name = model.name
+#         # set old state id so we have it
+#         old_state_id = model.state_id
+
+#         content = session.query(orm.ModelState).get(model.state_id)
+#         # take off content id so we can save it again in the database with new id
+#         content_payload = content.__dict__
+#         state = orm.ModelState(content=content_payload.get("content"))
+#         session.add(state)
+#         session.commit()
+
+#         new_state_id = state.id
+#         model = session.query(orm.ModelDescription).get(old_model_id)
+
+#         new_model = orm.ModelDescription(
+#             name=payload.get("name", name),
+#             description=payload.get("description", description),
+#             framework=framework,
+#             state_id=new_state_id,
+#         )
+#         session.add(new_model)
+#         session.commit()
+#         new_model_id = new_model.id
+
+#         parameters: List[orm.ModelParameter] = (
+#             session.query(orm.ModelParameter)
+#             .filter(orm.ModelParameter.model_id == old_model_id)
+#             .all()
+#         )
+
+#         # set the parameters as the same for copied model
+#         for param in parameters:
+#             session.add(
+#                 orm.ModelParameter(
+#                     model_id=new_model_id,
+#                     name=param.name,
+#                     default_value=param.default_value,
+#                     type=param.type,
+#                     state_variable=param.state_variable,
+#                 )
+#             )
+#         session.commit()
+
+#         if settings.NEO4J:
+#             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+#             prov_payload = Provenance(
+#                 left=new_state_id,
+#                 left_type="model_revision",
+#                 right=old_state_id,
+#                 right_type="model_revision",
+#                 relation_type="COPIED_FROM",
+#                 user_id=payload.get("user_id", None),
+#             )
+#             provenance_handler.create_entry(prov_payload)
+
+#             prov_payload = Provenance(
+#                 left=new_model_id,
+#                 left_type="model",
+#                 right=new_state_id,
+#                 right_type="model_revision",
+#                 relation_type="BEGINS_AT",
+#                 user_id=payload.get("user_id", None),
+#             )
+#             provenance_handler.create_entry(prov_payload)
+
+#     logger.info("new model created: %i", id)
+#     return Response(
+#         status_code=status.HTTP_201_CREATED,
+#         headers={
+#             "content-type": "application/json",
+#         },
+#         content=json.dumps({"id": new_model_id}),
+#     )
+
+
+# @router.post("/opts/decompose", **create.fastapi_endpoint_config)
+# def decompose_model(
+#     payload: dict,
+#     rdb: Engine = Depends(request_rdb),
+#     graph_db=Depends(request_graph_db),
+# ) -> Response:
+#     """
+#     Decompose model and return new model ID
+#     """
+#     with Session(rdb) as session:
+#         old_model_id = payload.get('left')
+
+#         # query old model info and old content id
+#         model = session.query(orm.ModelDescription).get(old_model_id)
+#         framework = model.framework
+#         description = model.description
+#         name = model.name
+#         old_state_id = model.state_id
+
+#         # create new content node for new model
+#         state = orm.ModelState(content=payload.get('content'))
+#         session.add(state)
+#         session.commit()
+
+#         new_state_id = state.id
+
+#         new_model = orm.ModelDescription(
+#             name=payload.get("name", name),
+#             description=payload.get("description", description),
+#             framework=payload.get("framework", framework),
+#             state_id=new_state_id,
+#         )
+#         session.add(new_model)
+#         session.commit()
+#         new_model_id = new_model.id
+
+#         # if parameters are not set assume they use the same as the old model? maybe not a good idea
+#         parameters: List[orm.ModelParameter] = (
+#             session.query(orm.ModelParameter)
+#             .filter(orm.ModelParameter.model_id == old_model_id)
+#             .all()
+#         )
+
+#         # set the parameters as the same for copied model
+#         for param in payload.get("parameters", parameters):
+#             session.add(
+#                 orm.ModelParameter(
+#                     model_id=new_model_id,
+#                     name=param.name,
+#                     default_value=param.default_value,
+#                     type=param.type,
+#                     state_variable=param.state_variable,
+#                 )
+#             )
+#         session.commit()
+
+#         if settings.NEO4J:
+#             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+#             prov_payload = Provenance(
+#                 left=old_state_id,
+#                 left_type="model_revision",
+#                 right=new_state_id,
+#                 right_type="model_revision",
+#                 relation_type="DECOMPOSED_FROM",
+#                 user_id=payload.get("user_id", None),
+#             )
+#             provenance_handler.create_entry(prov_payload)
+
+#             prov_payload = Provenance(
+#                 left=new_model_id,
+#                 left_type="model",
+#                 right=new_state_id,
+#                 right_type="model_revision",
+#                 relation_type="BEGINS_AT",
+#                 user_id=payload.get("user_id", None),
+#             )
+#             provenance_handler.create_entry(prov_payload)
+
+#     logger.info("new model created: %i", id)
+#     return Response(
+#         status_code=status.HTTP_201_CREATED,
+#         headers={
+#             "content-type": "application/json",
+#         },
+#         content=json.dumps({"id": new_model_id}),
+#     )
+
+# @router.post("/opts/glue", **create.fastapi_endpoint_config)
+# def glue_models(
+#     payload: dict,
+#     id: int,
+#     rdb: Engine = Depends(request_rdb),
+#     graph_db=Depends(request_graph_db),
+# ) -> Response:
+#     """
+#     Decompose model and return new model ID
+#     """
+#     with Session(rdb) as session:
+#         left_id = payload.get('left')
+#         right_id = payload.get('right')
+
+#         # query left model info and old content id
+#         model = session.query(orm.ModelDescription).get(left_id)
+#         left_state_id = model.state_id
+
+#         # query right model info and right content id
+#         r_model = session.query(orm.ModelDescription).get(right_id)
+#         right_state_id = r_model.state_id
+
+#         # create new content node for new model
+#         state = orm.ModelState(content=payload.get('content'))
+#         session.add(state)
+#         session.commit()
+
+#         new_state_id = state.id
+
+#         new_model = orm.ModelDescription(
+#             name=payload.get("name"),
+#             description=payload.get("description"),
+#             framework=payload.get("framework"),
+#             state_id=new_state_id,
+#         )
+#         session.add(new_model)
+#         session.commit()
+#         new_model_id = new_model.id
+
+#         # if parameters are not set assume they use the same as the old model? maybe not a good idea
+#         parameters: List[orm.ModelParameter] = (
+#             session.query(orm.ModelParameter)
+#             .filter(orm.ModelParameter.model_id == left_id)
+#             .all()
+#         )
+
+#         # set the parameters as the same for copied model
+#         for param in payload.get("parameters", parameters):
+#             session.add(
+#                 orm.ModelParameter(
+#                     model_id=new_model_id,
+#                     name=param.name,
+#                     default_value=param.default_value,
+#                     type=param.type,
+#                     state_variable=param.state_variable,
+#                 )
+#             )
+#         session.commit()
+
+#         if settings.NEO4J:
+#             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+#             prov_payload = Provenance(
+#                 left=left_state_id,
+#                 left_type="model_revision",
+#                 right=new_state_id,
+#                 right_type="model_revision",
+#                 relation_type="GLUED_FROM",
+#                 user_id=payload.get("user_id", None),
+#             )
+#             provenance_handler.create_entry(prov_payload)
+#             prov_payload = Provenance(
+#                 left=right_state_id,
+#                 left_type="model_revision",
+#                 right=new_state_id,
+#                 right_type="model_revision",
+#                 relation_type="GLUED_FROM",
+#                 user_id=payload.get("user_id", None),
+#             )
+#             provenance_handler.create_entry(prov_payload)
+
+
+#             prov_payload = Provenance(
+#                 left=new_model_id,
+#                 left_type="model",
+#                 right=new_state_id,
+#                 right_type="model_revision",
+#                 relation_type="BEGINS_AT",
+#                 user_id=payload.get("user_id", None),
+#             )
+#             provenance_handler.create_entry(prov_payload)
+
+#     logger.info("new model created: %i", id)
+#     return Response(
+#         status_code=status.HTTP_201_CREATED,
+#         headers={
+#             "content-type": "application/json",
+#         },
+#         content=json.dumps({"id": new_model_id}),
+#     )
 
 
 @router.post("/{id}", **update.fastapi_endpoint_config)

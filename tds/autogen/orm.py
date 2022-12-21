@@ -35,13 +35,24 @@ class RelationType(str, Enum):
     CITES = 'CITES'
     COMBINED_FROM = 'COMBINED_FROM'
     COPIED_FROM = 'COPIED_FROM'
+    DECOMPOSED_FROM = 'DECOMPOSED_FROM'
     DERIVED_FROM = 'DERIVED_FROM'
     EDITED_FROM = 'EDITED_FROM'
     EQUIVALENT_OF = 'EQUIVALENT_OF'
     EXTRACTED_FROM = 'EXTRACTED_FROM'
     GENERATED_BY = 'GENERATED_BY'
+    GLUED_FROM = 'GLUED_FROM'
     REINTERPRETS = 'REINTERPRETS'
+    STRATIFIED_FROM = 'STRATIFIED_FROM'
     USES = 'USES'
+    
+
+class ModelOperations(str, Enum):
+
+    copy = 'copy'
+    decompose = 'decompose'
+    glue = 'glue'
+    stratify = 'stratify'
     
 
 class TaggableType(str, Enum):

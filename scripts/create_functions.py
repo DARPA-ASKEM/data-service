@@ -184,11 +184,13 @@ def update_model(path, name, description, framework, model_id, url=url):
 def copy_model(model_id, name, description, url=url):
     print("Upload Model")
 
-    payload = json.dumps({"name": name, "description": description, "user_id": 1})
+    payload = json.dumps(
+        {"name": name, "description": description, "user_id": 1, "left": model_id}
+    )
     headers = {"Content-Type": "application/json"}
 
     response = requests.request(
-        "POST", url + f"models/{model_id}/copy", headers=headers, data=payload
+        "POST", url + f"models/opts/copy", headers=headers, data=payload
     )
     model_json = response.json()
     model_id = model_json.get("id")

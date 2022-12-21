@@ -34,6 +34,16 @@ Enum relation_type {
   REINTERPRETS
   GENERATED_BY
   BEGINS_AT
+  DECOMPOSED_FROM
+  GLUED_FROM
+  STRATIFIED_FROM
+}
+
+Enum model_operations{
+  copy
+  stratify
+  glue
+  decompose
 }
 
 Enum taggable_type {
