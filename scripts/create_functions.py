@@ -73,7 +73,6 @@ def create_publication(path, url=url, title="xdd_mapping"):
 
         with open(path, "r") as f:
             gddid = f.read()
-            print(gddid)
 
         if gddid is None or gddid == "":
             raise Exception("Missing gddid")
@@ -154,7 +153,6 @@ def create_model(path, name, description, framework, url=url):
     headers = {"Content-Type": "application/json"}
 
     response = requests.request("POST", url + "models", headers=headers, data=payload)
-    print(f"hereeeee {response.text}")
     model_json = response.json()
     model_id = model_json.get("id")
     return model_id
@@ -178,7 +176,6 @@ def update_model(path, name, description, framework, model_id, url=url):
     response = requests.request(
         "POST", url + f"models/{model_id}", headers=headers, data=payload
     )
-    print(f"hereeeee {response.text}")
     model_json = response.json()
     model_id = model_json.get("id")
     return model_id
@@ -193,7 +190,6 @@ def copy_model(model_id, name, description, url=url):
     response = requests.request(
         "POST", url + f"models/{model_id}/copy", headers=headers, data=payload
     )
-    print(f"copied {response.text}")
     model_json = response.json()
     model_id = model_json.get("id")
     return model_id
@@ -296,7 +292,6 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
         response = requests.request(
             "PUT", url + f"models/parameters/{model_id}", headers=headers, data=payload
         )
-        print(response.text)
         return response
 
     except Exception as e:

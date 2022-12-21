@@ -16,13 +16,13 @@ class ResourceType(str, Enum):
 
 class ProvenanceType(str, Enum):
 
-    datasets = 'datasets'
-    intermediates = 'intermediates'
-    model_revisions = 'model_revisions'
-    models = 'models'
-    plans = 'plans'
-    publications = 'publications'
-    simulation_runs = 'simulation_runs'
+    dataset = 'dataset'
+    intermediate = 'intermediate'
+    model = 'model'
+    model_revision = 'model_revision'
+    plan = 'plan'
+    publication = 'publication'
+    simulation_run = 'simulation_run'
     
 
 class RelationType(str, Enum):

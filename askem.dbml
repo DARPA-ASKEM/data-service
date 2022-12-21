@@ -13,13 +13,13 @@ Enum public.resource_type {
 }
 
 Enum public.provenance_type {
-   datasets
-   models
-   plans
-   model_revisions
-   intermediates
-   publications
-   simulation_runs
+   dataset
+   model
+   plan
+   model_revision
+   intermediate
+   publication
+   simulation_run
 }
 
 Enum relation_type {

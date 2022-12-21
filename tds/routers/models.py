@@ -296,9 +296,9 @@ def create_model(
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             payload = Provenance(
                 left=model.id,
-                left_type="models",
+                left_type="model",
                 right=state.id,
-                right_type="model_revisions",
+                right_type="model_revision",
                 relation_type="BEGINS_AT",
                 user_id=model_payload.get("user_id", None),
             )
@@ -378,9 +378,9 @@ def copy_model(
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             prov_payload = Provenance(
                 left=new_state_id,
-                left_type="model_revisions",
+                left_type="model_revision",
                 right=old_state_id,
-                right_type="model_revisions",
+                right_type="model_revision",
                 relation_type="COPIED_FROM",
                 user_id=payload.get("user_id", None),
             )
@@ -388,9 +388,9 @@ def copy_model(
 
             prov_payload = Provenance(
                 left=new_model_id,
-                left_type="models",
+                left_type="model",
                 right=new_state_id,
-                right_type="model_revisions",
+                right_type="model_revision",
                 relation_type="BEGINS_AT",
                 user_id=payload.get("user_id", None),
             )
@@ -441,9 +441,9 @@ def update_model(
 
                 payload = Provenance(
                     left=state.id,
-                    left_type="model_revisions",
+                    left_type="model_revision",
                     right=old_state,
-                    right_type="model_revisions",
+                    right_type="model_revision",
                     relation_type="EDITED_FROM",
                     user_id=model_payload.get("user_id", None),
                 )

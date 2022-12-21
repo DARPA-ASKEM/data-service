@@ -139,24 +139,6 @@ class ProvenanceHandler:
             )
             session.run(right_node_query, right_id=provenance_payload.get("right"))
 
-            # Match our two nodes and create new relationship.
-            # Set user_id as property of relationship
-            # if provenance_payload.get("user_id") is None:
-            #     edge_query = (
-            #         f"Match (n1: {provenance_payload.get('left_type')} ) "
-            #         + "Where n1.id = $left_id "
-            #         + f"Match (n2: {provenance_payload.get('right_type')} ) "
-            #         + "Where n2.id = $right_id "
-            #         + "Merge (n1)-[:"
-            #         + provenance_payload.get("relation_type")
-            #         + "]->(n2)"
-            #     )
-            #     session.run(
-            #         edge_query,
-            #         left_id=provenance_payload.get("left"),
-            #         right_id=provenance_payload.get("right"),
-            #         user_id=provenance_payload.get("user_id"),
-            #     )
             def user_id_str(user_id):
                 if user_id is not None:
                     return " { user_id: $user_id}"

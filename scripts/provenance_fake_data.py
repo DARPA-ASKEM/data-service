@@ -133,10 +133,10 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                         concept=concept, object_id=publication_id, type="publications"
                     )
                 add_provenance(
-                    left={"id": publication_id, "resource_type": "publications"},
+                    left={"id": publication_id, "resource_type": "publication"},
                     right={
                         "id": loop.get("publication_id_to"),
-                        "resource_type": "publications",
+                        "resource_type": "publication",
                     },
                     relation_type=loop.get("publication_reliationship"),
                     user_id=None,
@@ -152,11 +152,11 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                     add_provenance(
                         left={
                             "id": loop.get("existing_pub_left"),
-                            "resource_type": "publications",
+                            "resource_type": "publication",
                         },
                         right={
                             "id": loop.get("existing_pub_right"),
-                            "resource_type": "publications",
+                            "resource_type": "publication",
                         },
                         relation_type="CITES",
                         user_id=person_id,
@@ -219,11 +219,11 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                 )
 
                 add_provenance(
-                    left={"id": simulation_plan_id, "resource_type": "plans"},
+                    left={"id": simulation_plan_id, "resource_type": "plan"},
                     relation_type=loop.get("simulation_relationship"),
                     right={
                         "id": loop["simulation_id_to"],
-                        "resource_type": "model_revisions",
+                        "resource_type": "model_revision",
                     },
                     user_id=person_id,
                 )
@@ -312,19 +312,19 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                     add_provenance(
                         left={
                             "id": simulation_run_id,
-                            "resource_type": "simulation_runs",
+                            "resource_type": "simulation_run",
                         },
                         relation_type="GENERATED_BY",
-                        right={"id": simulation_plan_id, "resource_type": "plans"},
+                        right={"id": simulation_plan_id, "resource_type": "plan"},
                         user_id=person_id,
                     )
                     add_provenance(
                         left={
                             "id": simulation_run_id,
-                            "resource_type": "simulation_runs",
+                            "resource_type": "simulation_run",
                         },
                         relation_type="REINTERPRETS",
-                        right={"id": dataset_id, "resource_type": "datasets"},
+                        right={"id": dataset_id, "resource_type": "dataset"},
                         user_id=person_id,
                     )
 
@@ -426,10 +426,10 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                 add_provenance(
                     right={
                         "id": loop.get("publication_id_to"),
-                        "resource_type": "publications",
+                        "resource_type": "publication",
                     },
                     relation_type=loop.get("dataset_relationship"),
-                    left={"id": dataset_id, "resource_type": "datasets"},
+                    left={"id": dataset_id, "resource_type": "dataset"},
                     user_id=person_id,
                 )
 
