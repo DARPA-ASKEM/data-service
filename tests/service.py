@@ -1,19 +1,26 @@
 """
 Enforce client-expected features
 """
+# pylint: disable=missing-class-docstring, missing-function-docstring
 
 from pytest import mark
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.autogen.schema import IntermediateFormat, IntermediateSource, ValueType
+from tds.autogen.schema import (
+    IntermediateFormat,
+    IntermediateSource,
+    ResourceType,
+    ValueType,
+)
 from tds.schema.model import Intermediate, ModelFramework
 from tds.schema.resource import Publication, Software
 from tests.suite import AllowedMethod
 from tests.suite import ASKEMEntityTestSuite as AETS
 from tests.suite import expected_status
 
-"""
+
+# TODO: The assets endpoints need testing
 class TestProject(AETS):
     enabled_routers = ["projects"]
 
@@ -43,12 +50,79 @@ class TestProject(AETS):
             session.add(model2)
             session.commit()
 
-            project = orm.Project(
-                name="sample",
+            project = orm.Project(name="sample", description="no desc", active=True)
+            session.add(project)
+            session.commit()
 
-
+            asset = orm.ProjectAsset(
+                project_id=1,
+                resource_id=1,
+                resource_type=ResourceType.models,
+                external_ref="https://",
             )
-"""
+            session.add(asset)
+            session.commit()
+
+    def test_rest_create(self):
+        # Arrange
+        payload = {
+            "name": "string",
+            "description": "string",
+            "assets": {ResourceType.models: [2]},
+            "active": True,
+        }
+        # Act
+        create_response, create_status = self.fetch(
+            "/projects", AllowedMethod.POST, payload
+        )
+        _, retrieve_status = self.fetch("/projects/2")
+
+        # Assert
+        assert create_status == expected_status[AllowedMethod.POST]
+        assert create_response["id"] != 1
+        assert retrieve_status == expected_status[AllowedMethod.GET]
+
+    def test_rest_retrieve(self):
+        # Act
+        response, status = self.fetch("/projects/1")
+
+        # Assert
+        assert status == expected_status[AllowedMethod.GET]
+        assert response["name"] == "sample"
+        assert response["description"] == "no desc"
+        assert response["active"]
+        assert len(response["assets"]["models"]) == 1
+
+    def test_rest_update(self):
+        # Arrange
+        payload = {
+            "name": "sample",
+            "description": "new_desc",
+            "assets": {ResourceType.models: [2]},
+            "active": True,
+        }
+        # Act
+        _, update_status = self.fetch("/projects/1", AllowedMethod.PUT, payload)
+        retrieve_response, retrieve_status = self.fetch("/projects/1")
+
+        # Assert
+        assert update_status == expected_status[AllowedMethod.PUT]
+        assert retrieve_status == expected_status[AllowedMethod.GET]
+        assert retrieve_response["name"] == "sample"
+        assert retrieve_response["description"] == "new_desc"
+        assert retrieve_response["active"]
+        assert len(retrieve_response["assets"]["models"]) == 1
+        assert retrieve_response["assets"]["models"][0] == 2
+
+    def test_rest_delete(self):
+        # Act
+        _, delete_status = self.fetch("/projects/1", AllowedMethod.DELETE)
+        retrieve_response, retrieve_status = self.fetch("/projects/1")
+
+        # Assert
+        assert delete_status == 200
+        assert retrieve_status == 200
+        assert not retrieve_response["active"]
 
 
 class TestRun(AETS):
@@ -212,7 +286,7 @@ class TestPlan(AETS):
         assert response["content"] == ""
 
 
-# NOTE: Individual testing of model parameter and model description endpoints missing
+# TODO: Individual testing of model parameter and model description endpoints missing
 class TestModel(AETS):
     enabled_routers = ["models"]
 

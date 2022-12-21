@@ -35,6 +35,9 @@ def test_build_api() -> None:
 
 
 def test_relation_handler_rdb_only():
+    """
+    Ensure the provenance handler can create a basic edge
+    """
     with demo_rdb() as rdb:
         relation_handler = ProvenanceHandler(rdb, None)
         intermediate = Intermediate(

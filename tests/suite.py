@@ -2,6 +2,8 @@
 Specify an interface for testing CRUD
 """
 
+# pylint: disable=no-member, unnecessary-dunder-call, attribute-defined-outside-init
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
@@ -10,6 +12,10 @@ from tests.helpers import demo_api_context
 
 
 class AllowedMethod(Enum):
+    """
+    The methods we will test over
+    """
+
     POST = "POST"
     GET = "GET"
     PUT = "PUT"
@@ -25,6 +31,13 @@ expected_status = {
 
 
 class ASKEMEntityTestSuite(ABC):
+    """
+    A Test Suite that provides common functions.
+
+    The service provides ASKEM entities which should behave in a relatively
+    uniform way.
+    """
+
     enabled_routers: List[str] = []
 
     def fetch(
@@ -33,6 +46,9 @@ class ASKEMEntityTestSuite(ABC):
         method: AllowedMethod = AllowedMethod.GET,
         payload: Optional[Dict] = None,
     ) -> Tuple[Any, int]:
+        """
+        Standardize HTTP calls and provide relevant data for testing
+        """
         match method:
             case AllowedMethod.POST:
                 response = self.client.post(
@@ -63,12 +79,18 @@ class ASKEMEntityTestSuite(ABC):
         return response.json(), response.status_code
 
     def teardown_method(self):
+        """
+        Exit `with` context of the `demo_api`
+        """
         if getattr(self, "ctx", None) is None:
             return
         self.ctx.__exit__(None, None, None)
         self.ctx = None
 
     def setup_method(self):
+        """
+        Enter `with` context of the `demo_api`
+        """
         routers = self.__class__().enabled_routers
         self.ctx = demo_api_context(*routers)
         self.client, self.rdb = self.ctx.__enter__()
@@ -76,4 +98,8 @@ class ASKEMEntityTestSuite(ABC):
 
     @abstractmethod
     def init_test_data(self):
-        pass
+        """
+        Initialize the test data directly using SQLAlchemy
+
+        This will be called at the end of `setup_method`
+        """
