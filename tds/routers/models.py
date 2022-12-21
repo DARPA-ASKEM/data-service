@@ -30,7 +30,7 @@ router = APIRouter()
 @router.post("/frameworks", **create.fastapi_endpoint_config)
 def create_framework(
     payload: ModelFramework, rdb: Engine = Depends(request_rdb)
-) -> str:
+) -> Response:
     """
     Create framework metadata
     """
@@ -40,8 +40,15 @@ def create_framework(
         framework = orm.ModelFramework(**framework_payload)
         session.add(framework)
         session.commit()
-    logger.info("new framework with %i", framework_payload.get("name"))
-    return framework_payload.get("name")
+        name: str = framework.name
+    logger.info("new framework with %i", name)
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"name": name}),
+    )
 
 
 @router.get("/frameworks/{name}", **retrieve.fastapi_endpoint_config)
@@ -247,7 +254,6 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
         model_payload = payload.dict()
         model_payload.pop("concept")  # TODO: Save ontology term
 
-        print(model_payload)
         content = model_payload.pop("content")
         state = orm.ModelState(content=content)
         session.add(state)
@@ -282,7 +288,7 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
     )
 
 
-@router.post("/{id}", **update.fastapi_endpoint_config)
+@router.put("/{id}", **update.fastapi_endpoint_config)
 def update_model(
     payload: Model,
     id: int,
@@ -296,16 +302,17 @@ def update_model(
     if entry_exists(rdb.connect(), orm.ModelDescription, id):
         model_payload = payload.dict()
         content = model_payload.pop("content")
+        model_payload.pop("parameters")
         with Session(rdb) as session:
             state = orm.ModelState(content=content)
             session.add(state)
             session.commit()
 
             model = session.query(orm.ModelDescription).get(id)
-            model.state_id = state.id
             model.name = model_payload["name"]
             model.description = model_payload["description"]
             model.framework = model_payload["framework"]
+            model.state_id = state.id
             session.commit()
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

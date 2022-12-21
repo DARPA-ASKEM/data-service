@@ -10,13 +10,21 @@ from tests.helpers import demo_api_context
 
 
 class AllowedMethod(Enum):
-    POST = 201
-    GET = 200
-    PUT = 200
-    DELETE = 204
+    POST = "POST"
+    GET = "GET"
+    PUT = "PUT"
+    DELETE = "DELETE"
 
 
-class CRUD(ABC):
+expected_status = {
+    AllowedMethod.POST: 201,
+    AllowedMethod.GET: 200,
+    AllowedMethod.PUT: 200,
+    AllowedMethod.DELETE: 204,
+}
+
+
+class ASKEMEntityTestSuite(ABC):
     enabled_routers: List[str] = []
 
     def fetch(
@@ -56,10 +64,18 @@ class CRUD(ABC):
 
         return response.json(), response.status_code
 
+    def clear(self):
+        if "ctx" not in dir(self) or self.ctx is None:
+            return
+        elif "__exit__" in dir(self.ctx):
+            self.ctx.__exit__(None, None, None)
+            self.ctx = None
+
     def teardown_method(self):
-        self.ctx.__exit__(None, None, None)
+        self.clear()
 
     def setup_method(self):
+        self.clear()
         routers = self.__class__().enabled_routers
         self.ctx = demo_api_context(*routers)
         self.client, self.rdb = self.ctx.__enter__()
