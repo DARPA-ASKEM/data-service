@@ -13,54 +13,203 @@ from tests.suite import AllowedMethod
 from tests.suite import ASKEMEntityTestSuite as AETS
 from tests.suite import expected_status
 
-
-class TestFramework(AETS):
-    enabled_routers = ["models"]
+"""
+class TestProject(AETS):
+    enabled_routers = ["projects"]
 
     def init_test_data(self):
         with Session(self.rdb) as session:
+            # Arrange Models
             framework = orm.ModelFramework(name="dummy", version="v0", semantics="")
             session.add(framework)
             session.commit()
+            state = orm.ModelState(content="")
+            session.add(state)
+            session.commit()
+            model = orm.ModelDescription(
+                name="test_model",
+                description="no text",
+                framework=framework.name,
+                state_id=state.id,
+            )
+            session.add(model)
+            session.commit()
+            model2 = orm.ModelDescription(
+                name="test_model_2",
+                description="no text_again",
+                framework=framework.name,
+                state_id=state.id,
+            )
+            session.add(model2)
+            session.commit()
+
+            project = orm.Project(
+                name="sample",
+
+
+            )
+"""
+
+
+class TestRun(AETS):
+    enabled_routers = ["simulations"]
+
+    def init_test_data(self):
+        with Session(self.rdb) as session:
+            # Arrange Model
+            framework = orm.ModelFramework(name="dummy", version="v0", semantics="")
+            session.add(framework)
+            session.commit()
+            state = orm.ModelState(content="")
+            session.add(state)
+            session.commit()
+            model = orm.ModelDescription(
+                name="test_model",
+                description="no text",
+                framework=framework.name,
+                state_id=state.id,
+            )
+            session.add(model)
+            session.commit()
+            model_param = orm.ModelParameter(
+                model_id=model.id,
+                name="first_test_param",
+                default_value="1",
+                type=ValueType.int,
+                state_variable=False,
+            )
+            session.add(model_param)
+            session.commit()
+
+            # Arrange Sim
+            plan = orm.SimulationPlan(
+                model_id=model.id, simulator="unknown", query="some query", content=""
+            )
+            session.add(plan)
+            session.commit()
+
+            run = orm.SimulationRun(
+                simulator_id=plan.id,
+                success=None,
+                completed_at=None,
+                response=b"sample",
+            )
+            session.add(run)
+            session.commit()
+
+            run_param = orm.SimulationParameter(
+                run_id=run.id,
+                name="x",
+                value="1",
+                type=ValueType.int,
+            )
+            session.add(run_param)
+            session.commit()
+
+    @mark.skip(reason="TODO: Add update functionality to simulation run")
+    def test_rest_update(self):
+        raise Exception("Run updates needs to be implemented")
 
     def test_rest_create(self):
         # Arrange
-        payload = {"name": "create_dummy", "version": "v0", "semantics": ""}
-
+        payload = {
+            "simulator_id": 1,
+            "success": None,
+            "completed_at": None,
+            "parameters": [{"name": "y", "value": "2", "type": ValueType.int}],
+            "response": "",
+        }
         # Act
         create_response, create_status = self.fetch(
-            "/models/frameworks", AllowedMethod.POST, payload
+            "/simulations/runs", AllowedMethod.POST, payload
         )
-        _, retrieve_status = self.fetch("/models/frameworks/create_dummy")
+        _, retrieve_status = self.fetch("/simulations/runs/2")
 
         # Assert
         assert create_status == expected_status[AllowedMethod.POST]
-        assert create_response["name"] == "create_dummy"
+        assert create_response["id"] != 1
         assert retrieve_status == expected_status[AllowedMethod.GET]
 
     def test_rest_retrieve(self):
         # Act
-        response, status = self.fetch("/models/frameworks/dummy")
-        framework = ModelFramework.parse_obj(response)
+        response, status = self.fetch("/simulations/runs/1")
 
         # Assert
         assert status == expected_status[AllowedMethod.GET]
-        assert framework.name == "dummy"
-        assert framework.version == "v0"
-        assert framework.semantics == ""
+        assert response["response"] == "sample"
+        assert response["parameters"][0]["name"] == "x"
 
-    @mark.skip(reason="update not implemented for frameworks")
+
+class TestPlan(AETS):
+    enabled_routers = ["models", "simulations"]
+
+    def init_test_data(self):
+        with Session(self.rdb) as session:
+            # Arrange Model
+            framework = orm.ModelFramework(name="dummy", version="v0", semantics="")
+            session.add(framework)
+            session.commit()
+            state = orm.ModelState(content="")
+            session.add(state)
+            session.commit()
+            model = orm.ModelDescription(
+                name="test_model",
+                description="no text",
+                framework=framework.name,
+                state_id=state.id,
+            )
+            session.add(model)
+            session.commit()
+            param = orm.ModelParameter(
+                model_id=model.id,
+                name="first_test_param",
+                default_value="1",
+                type=ValueType.int,
+                state_variable=False,
+            )
+            session.add(param)
+            session.commit()
+
+            # Arrange Sim
+            plan = orm.SimulationPlan(
+                model_id=model.id, simulator="unknown", query="some query", content=""
+            )
+            session.add(plan)
+            session.commit()
+
+    @mark.skip(reason="TODO: Add update functionality to simulation plan")
     def test_rest_update(self):
-        raise Exception("Framework object cannot be updated")
+        raise Exception("Plan updates needs to be implemented")
 
-    def test_rest_delete(self):
+    def test_rest_create(self):
+        # Arrange
+        payload = {
+            "model_id": 1,
+            "simulator": "still unknown",
+            "query": "new query",
+            "content": "{}",
+        }
+
         # Act
-        _, delete_status = self.fetch("/models/frameworks/dummy", AllowedMethod.DELETE)
-        _, retrieve_status = self.fetch("/models/frameworks/dummy")
+        create_response, create_status = self.fetch(
+            "/simulations/plans", AllowedMethod.POST, payload
+        )
+        _, retrieve_status = self.fetch("/simulations/plans/2")
 
         # Assert
-        assert delete_status == expected_status[AllowedMethod.DELETE]
-        assert retrieve_status == 404
+        assert create_status == expected_status[AllowedMethod.POST]
+        assert create_response["id"] != 1
+        assert retrieve_status == expected_status[AllowedMethod.GET]
+
+    def test_rest_retrieve(self):
+        # Act
+        response, status = self.fetch("/simulations/plans/1")
+
+        # Assert
+        assert status == expected_status[AllowedMethod.GET]
+        assert response["simulator"] == "unknown"
+        assert response["query"] == "some query"
+        assert response["content"] == ""
 
 
 # NOTE: Individual testing of model parameter and model description endpoints missing
@@ -154,9 +303,50 @@ class TestModel(AETS):
         assert retrieve_response["description"] == "No desc"
         assert retrieve_response["content"] == []
 
-    @mark.skip(reason="delete is an illegal action for models")
+
+class TestFramework(AETS):
+    enabled_routers = ["models"]
+
+    def init_test_data(self):
+        with Session(self.rdb) as session:
+            framework = orm.ModelFramework(name="dummy", version="v0", semantics="")
+            session.add(framework)
+            session.commit()
+
+    def test_rest_create(self):
+        # Arrange
+        payload = {"name": "create_dummy", "version": "v0", "semantics": ""}
+
+        # Act
+        create_response, create_status = self.fetch(
+            "/models/frameworks", AllowedMethod.POST, payload
+        )
+        _, retrieve_status = self.fetch("/models/frameworks/create_dummy")
+
+        # Assert
+        assert create_status == expected_status[AllowedMethod.POST]
+        assert create_response["name"] == "create_dummy"
+        assert retrieve_status == expected_status[AllowedMethod.GET]
+
+    def test_rest_retrieve(self):
+        # Act
+        response, status = self.fetch("/models/frameworks/dummy")
+        framework = ModelFramework.parse_obj(response)
+
+        # Assert
+        assert status == expected_status[AllowedMethod.GET]
+        assert framework.name == "dummy"
+        assert framework.version == "v0"
+        assert framework.semantics == ""
+
     def test_rest_delete(self):
-        raise Exception("A model cannot be deleted")
+        # Act
+        _, delete_status = self.fetch("/models/frameworks/dummy", AllowedMethod.DELETE)
+        _, retrieve_status = self.fetch("/models/frameworks/dummy")
+
+        # Assert
+        assert delete_status == expected_status[AllowedMethod.DELETE]
+        assert retrieve_status == 404
 
 
 class TestIntermediate(AETS):
@@ -201,10 +391,6 @@ class TestIntermediate(AETS):
         assert intermediate.source == IntermediateSource.skema
         assert intermediate.type == IntermediateFormat.gromet
         assert intermediate.content == b""
-
-    @mark.skip(reason="update not implemented for intermediates")
-    def test_rest_update(self):
-        raise Exception("Intermediate object cannot be updated")
 
     def test_rest_delete(self):
         # Act
@@ -253,10 +439,6 @@ class TestPublication(AETS):
         assert software.title == "test"
         assert software.xdd_uri == "fake"
 
-    @mark.skip(reason="update not implemented for publications")
-    def test_rest_update(self):
-        raise Exception("Publication object cannot be updated")
-
     def test_rest_delete(self):
         # Act
         _, delete_status = self.fetch("/external/publications/1", AllowedMethod.DELETE)
@@ -300,10 +482,6 @@ class TestSoftware(AETS):
         assert status == expected_status[AllowedMethod.GET]
         assert software.source == "test"
         assert software.storage_uri == "http://"
-
-    @mark.skip(reason="update not implemented for software")
-    def test_rest_update(self):
-        raise Exception("Software object cannot be updated")
 
     def test_rest_delete(self):
         # Act

@@ -20,6 +20,9 @@ def demo_rdb() -> Generator[Engine, None, None]:
     Wraps for generating an in-memory DB for running SQL-related tests
     """
 
+    if os.path.exists(".sqlite"):
+        os.remove(".sqlite")
+
     engine = create_engine(
         "sqlite:///.sqlite",
         creator=lambda: connect(

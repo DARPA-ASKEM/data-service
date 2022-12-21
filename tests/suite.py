@@ -58,24 +58,17 @@ class ASKEMEntityTestSuite(ABC):
                 response = self.client.delete(
                     path, headers={"Accept": "application/json"}
                 )
-
-        if AllowedMethod.DELETE == method:
-            return None, response.status_code
+                return None, response.status_code
 
         return response.json(), response.status_code
 
-    def clear(self):
-        if "ctx" not in dir(self) or self.ctx is None:
-            return
-        elif "__exit__" in dir(self.ctx):
-            self.ctx.__exit__(None, None, None)
-            self.ctx = None
-
     def teardown_method(self):
-        self.clear()
+        if getattr(self, "ctx", None) is None:
+            return
+        self.ctx.__exit__(None, None, None)
+        self.ctx = None
 
     def setup_method(self):
-        self.clear()
         routers = self.__class__().enabled_routers
         self.ctx = demo_api_context(*routers)
         self.client, self.rdb = self.ctx.__enter__()
@@ -83,20 +76,4 @@ class ASKEMEntityTestSuite(ABC):
 
     @abstractmethod
     def init_test_data(self):
-        pass
-
-    @abstractmethod
-    def test_rest_create(self):
-        pass
-
-    @abstractmethod
-    def test_rest_retrieve(self):
-        pass
-
-    @abstractmethod
-    def test_rest_update(self):
-        pass
-
-    @abstractmethod
-    def test_rest_delete(self):
         pass
