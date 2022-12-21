@@ -96,6 +96,10 @@ recipe = [
         "model_relationship": "COPIED_FROM",
         "model_id_to": 6,
     },
+    {
+        "publication_reliationship": "CITES",
+        "publication_id_to": 1,
+    },
 ]
 
 
@@ -135,7 +139,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                         "resource_type": "publications",
                     },
                     relation_type=loop.get("publication_reliationship"),
-                    user_id=person_id,
+                    user_id=None,
                 )
 
             except Exception as e:
