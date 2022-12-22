@@ -18,13 +18,14 @@ from tds.db import (
     request_graph_db,
     request_rdb,
 )
-from tds.lib.models import adjust_model_params
+from tds.lib.models import adjust_model_params, model_opt_relationship_mapping
 from tds.operation import create, delete, retrieve, update
 from tds.schema.model import (
     Intermediate,
     Model,
     ModelDescription,
     ModelFramework,
+    ModelOptPayload,
     ModelParameters,
     orm_to_params,
 )
@@ -315,8 +316,8 @@ def create_model(
 
 
 @router.post("/opts/{model_operation}", **create.fastapi_endpoint_config)
-def copy_model(
-    payload: dict,
+def model_opt(
+    payload: ModelOptPayload,
     model_operation: schema.ModelOperations,
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
@@ -379,12 +380,12 @@ def copy_model(
             )
         session.commit()
 
-        model_opt_relationship_mapping = {
-            "copy": "COPIED_FROM",
-            "decompose": "DECOMPOSED_FROM",
-            "stratify": "STRATIFED_FROM",
-            "glue": "GLUED_FROM",
-        }
+        # model_opt_relationship_mapping = {
+        #     "copy": "COPIED_FROM",
+        #     "decompose": "DECOMPOSED_FROM",
+        #     "stratify": "STRATIFED_FROM",
+        #     "glue": "GLUED_FROM",
+        # }
         # if neo4j is true
         if settings.NEO4J:
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
