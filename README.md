@@ -59,9 +59,9 @@ docker compose exec -u postgres rdb psql -h localhost -U dev askem
 ### Testing
 
 There are three types of tests:
-1. `tests/objects`: Tests REST and GraphQL representation of TERArium object. Affects MAJOR and MINOR SemVer.
-1. `tests/search`: Uses sample queries to check multi-object search. Affects MAJOR and MINOR SemVer.
-1. `tests/implementation`: Mirrors the directory structure of `tds`. Developers may add unit tests to this at their discretion. Affects PATCH SemVer.
+1. `tests/service.py`: Tests REST and GraphQL representation of TERArium object. Affects MAJOR and MINOR SemVer.
+1. `tests/search.py`: Uses sample queries to check multi-object search. Affects MAJOR and MINOR SemVer.
+1. `tests/unittest.py`:  Tests under-the-hood functionality at the discrection of the developer. Affects PATCH SemVer.
 
 ### Populated Data
 
