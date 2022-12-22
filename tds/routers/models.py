@@ -323,6 +323,7 @@ def model_opt(
     graph_db=Depends(request_graph_db),
 ) -> Response:
     with Session(rdb) as session:
+        payload = payload.dict()
         left_model_id = payload.get("left")
         # query old model and old content
         l_model = session.query(orm.ModelDescription).get(left_model_id)
@@ -362,31 +363,32 @@ def model_opt(
         new_model_id = new_model.id
 
         # add parameters to new model. Default to left model id parameters.
-        parameters: List[orm.ModelParameter] = (
+        parameters: List[dict] = (
             session.query(orm.ModelParameter)
             .filter(orm.ModelParameter.model_id == left_model_id)
             .all()
         )
+
+        if payload.get("parameters") is None:
+            payload["parameters"] = []
+            for parameter in parameters:
+                param = parameter.__dict__
+                payload["parameters"].append(param)
+
         # if parameters are set use those for new model
-        for param in payload.get("parameters", parameters):
+        for param in payload.get("parameters"):
+            print(param)
             session.add(
                 orm.ModelParameter(
                     model_id=new_model_id,
-                    name=param.name,
-                    default_value=param.default_value,
-                    type=param.type,
-                    state_variable=param.state_variable,
+                    name=param.get("name"),
+                    default_value=param.get("default_value"),
+                    type=param.get("type"),
+                    state_variable=param.get("state_variable"),
                 )
             )
         session.commit()
 
-        # model_opt_relationship_mapping = {
-        #     "copy": "COPIED_FROM",
-        #     "decompose": "DECOMPOSED_FROM",
-        #     "stratify": "STRATIFED_FROM",
-        #     "glue": "GLUED_FROM",
-        # }
-        # if neo4j is true
         if settings.NEO4J:
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             prov_payload = Provenance(
