@@ -363,13 +363,12 @@ def model_opt(
         new_model_id = new_model.id
 
         # add parameters to new model. Default to left model id parameters.
-        parameters: List[dict] = (
-            session.query(orm.ModelParameter)
-            .filter(orm.ModelParameter.model_id == left_model_id)
-            .all()
-        )
-
         if payload.get("parameters") is None:
+            parameters: List[dict] = (
+                session.query(orm.ModelParameter)
+                .filter(orm.ModelParameter.model_id == left_model_id)
+                .all()
+            )
             payload["parameters"] = []
             for parameter in parameters:
                 param = parameter.__dict__
@@ -377,7 +376,6 @@ def model_opt(
 
         # if parameters are set use those for new model
         for param in payload.get("parameters"):
-            print(param)
             session.add(
                 orm.ModelParameter(
                     model_id=new_model_id,
