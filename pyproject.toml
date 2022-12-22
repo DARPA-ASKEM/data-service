@@ -57,7 +57,7 @@ force-exclude = "autogen"
 
 [tool.pytest.ini_options]
 addopts = "--ignore-glob=*utils.py"
-python_files = ["tests/*.py"]
+python_files = ["tests/service.py", "tests/unittest.py", "tests/search.py"]
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.pylint.master]
