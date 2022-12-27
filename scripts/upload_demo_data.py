@@ -56,8 +56,9 @@ project_id = project.get("id")
 create_framework()
 
 # loop over models
-folders = glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/") + glob.glob(
-    "experiments*/thin-thread-examples/demo/BIOMD*/"
+folders = sorted(
+    glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
+    + glob.glob("experiments*/thin-thread-examples/demo/BIOMD*/")
 )
 
 upload_starter_kit_models()
@@ -67,7 +68,7 @@ for folder in folders:
     # get src/main files
     if "biomodels/BIOMD0000000955" in folder:
         continue
-    folders_src = glob.glob(folder + "src/main/*")
+    folders_src = sorted(glob.glob(folder + "src/main/*"))
 
     ## get concepts ##
 
@@ -342,7 +343,7 @@ for folder in folders:
 
         runs = glob.glob(folder + "runs/*/")
 
-        for run in runs:
+        for run in sorted(runs):
             # load simulation run contents as json
             with open(run + "output.json", "r") as f:
                 sim_output = f.read()

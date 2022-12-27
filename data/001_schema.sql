@@ -361,20 +361,42 @@ ALTER SEQUENCE public.intermediate_id_seq OWNED BY public.intermediate.id;
 
 
 --
--- Name: model; Type: TABLE; Schema: public; Owner: dev
+-- Name: model_description; Type: TABLE; Schema: public; Owner: dev
 --
 
-CREATE TABLE public.model (
+CREATE TABLE public.model_description (
     id integer NOT NULL,
     name character varying NOT NULL,
     description text,
     framework character varying NOT NULL,
     "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
-    content json
+    state_id integer NOT NULL
 );
 
 
-ALTER TABLE public.model OWNER TO dev;
+ALTER TABLE public.model_description OWNER TO dev;
+
+--
+-- Name: model_description_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
+--
+
+CREATE SEQUENCE public.model_description_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.model_description_id_seq OWNER TO dev;
+
+--
+-- Name: model_description_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
+--
+
+ALTER SEQUENCE public.model_description_id_seq OWNED BY public.model_description.id;
+
 
 --
 -- Name: model_framework; Type: TABLE; Schema: public; Owner: dev
@@ -388,28 +410,6 @@ CREATE TABLE public.model_framework (
 
 
 ALTER TABLE public.model_framework OWNER TO dev;
-
---
--- Name: model_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
---
-
-CREATE SEQUENCE public.model_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.model_id_seq OWNER TO dev;
-
---
--- Name: model_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
---
-
-ALTER SEQUENCE public.model_id_seq OWNED BY public.model.id;
-
 
 --
 -- Name: model_parameter; Type: TABLE; Schema: public; Owner: dev
@@ -484,6 +484,41 @@ ALTER TABLE public.model_runtime_id_seq OWNER TO dev;
 --
 
 ALTER SEQUENCE public.model_runtime_id_seq OWNED BY public.model_runtime.id;
+
+
+--
+-- Name: model_state; Type: TABLE; Schema: public; Owner: dev
+--
+
+CREATE TABLE public.model_state (
+    id integer NOT NULL,
+    "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
+    content json
+);
+
+
+ALTER TABLE public.model_state OWNER TO dev;
+
+--
+-- Name: model_state_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
+--
+
+CREATE SEQUENCE public.model_state_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.model_state_id_seq OWNER TO dev;
+
+--
+-- Name: model_state_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
+--
+
+ALTER SEQUENCE public.model_state_id_seq OWNED BY public.model_state.id;
 
 
 --
@@ -968,10 +1003,10 @@ ALTER TABLE ONLY public.intermediate ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- Name: model id; Type: DEFAULT; Schema: public; Owner: dev
+-- Name: model_description id; Type: DEFAULT; Schema: public; Owner: dev
 --
 
-ALTER TABLE ONLY public.model ALTER COLUMN id SET DEFAULT nextval('public.model_id_seq'::regclass);
+ALTER TABLE ONLY public.model_description ALTER COLUMN id SET DEFAULT nextval('public.model_description_id_seq'::regclass);
 
 
 --
@@ -986,6 +1021,13 @@ ALTER TABLE ONLY public.model_parameter ALTER COLUMN id SET DEFAULT nextval('pub
 --
 
 ALTER TABLE ONLY public.model_runtime ALTER COLUMN id SET DEFAULT nextval('public.model_runtime_id_seq'::regclass);
+
+
+--
+-- Name: model_state id; Type: DEFAULT; Schema: public; Owner: dev
+--
+
+ALTER TABLE ONLY public.model_state ALTER COLUMN id SET DEFAULT nextval('public.model_state_id_seq'::regclass);
 
 
 --
@@ -1121,6 +1163,14 @@ ALTER TABLE ONLY public.intermediate
 
 
 --
+-- Name: model_description model_description_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
+--
+
+ALTER TABLE ONLY public.model_description
+    ADD CONSTRAINT model_description_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: model_framework model_framework_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
 --
 
@@ -1137,19 +1187,19 @@ ALTER TABLE ONLY public.model_parameter
 
 
 --
--- Name: model model_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model
-    ADD CONSTRAINT model_pkey PRIMARY KEY (id);
-
-
---
 -- Name: model_runtime model_runtime_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
 --
 
 ALTER TABLE ONLY public.model_runtime
     ADD CONSTRAINT model_runtime_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: model_state model_state_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
+--
+
+ALTER TABLE ONLY public.model_state
+    ADD CONSTRAINT model_state_pkey PRIMARY KEY (id);
 
 
 --
@@ -1281,11 +1331,19 @@ ALTER TABLE ONLY public.feature
 
 
 --
--- Name: model model_framework_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
+-- Name: model_description model_description_framework_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
 --
 
-ALTER TABLE ONLY public.model
-    ADD CONSTRAINT model_framework_fkey FOREIGN KEY (framework) REFERENCES public.model_framework(name);
+ALTER TABLE ONLY public.model_description
+    ADD CONSTRAINT model_description_framework_fkey FOREIGN KEY (framework) REFERENCES public.model_framework(name);
+
+
+--
+-- Name: model_description model_description_state_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
+--
+
+ALTER TABLE ONLY public.model_description
+    ADD CONSTRAINT model_description_state_id_fkey FOREIGN KEY (state_id) REFERENCES public.model_state(id);
 
 
 --
@@ -1293,7 +1351,7 @@ ALTER TABLE ONLY public.model
 --
 
 ALTER TABLE ONLY public.model_parameter
-    ADD CONSTRAINT model_parameter_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.model(id);
+    ADD CONSTRAINT model_parameter_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.model_description(id);
 
 
 --
@@ -1373,7 +1431,7 @@ ALTER TABLE ONLY public.simulation_parameter
 --
 
 ALTER TABLE ONLY public.simulation_plan
-    ADD CONSTRAINT simulation_plan_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.model(id);
+    ADD CONSTRAINT simulation_plan_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.model_description(id);
 
 
 --
@@ -1387,5 +1445,4 @@ ALTER TABLE ONLY public.simulation_run
 --
 -- PostgreSQL database dump complete
 --
-
 

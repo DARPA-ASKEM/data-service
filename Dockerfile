@@ -12,6 +12,7 @@ COPY tests tests
 COPY tds tds 
 # Poetry complains if the README doesn't exist
 COPY README.md README.md
+COPY data/datasets /datasets
 RUN poetry install --only-root
 EXPOSE 8000
 CMD ["poetry", "run", "tds"]

@@ -13,20 +13,7 @@ make up
 
 Navigate to [http://localhost:8001/](http://localhost:8001/) to view the documentation for the endpoints
 
-## Populated Data
-
-Sample data is automatically populated into the data service on `make up`
-via `.sql` files and dataset files. These can be found in the `./data` directory.
-
-In order to regenerate these files, run the following commands:
-```
-make down
-make db-clean
-make up
-make populate
-make db-full
-```
-
+**EXPERIMENTAL**: Navigate to [http://localhost:8001/graphql](http://localhost:8001/graphql) to interactively use the GraphQL schema.
 
 ## Development
 
@@ -63,6 +50,32 @@ model-build check [current semantic version] ./src/autogen
 ```
 
 Where [current semantic version] is the version of your dbml - ex. v0.11.3 . If the tables don't exist yet it in Postgres, make sure to POST to the `/admin/db/init` endpoint.
+
+To access Postgres directly run:
+```
+docker compose exec -u postgres rdb psql -h localhost -U dev askem
+```
+
+### Testing
+
+There are three types of tests:
+1. `tests/service.py`: Tests REST and GraphQL representation of TERArium object. Affects MAJOR and MINOR SemVer.
+1. `tests/search.py`: Uses sample queries to check multi-object search. Affects MAJOR and MINOR SemVer.
+1. `tests/unittest.py`:  Tests under-the-hood functionality at the discrection of the developer. Affects PATCH SemVer.
+
+### Populated Data
+
+Sample data is automatically populated into the data service on `make up`
+via `.sql` files and dataset files. These can be found in the `./data` directory.
+
+In order to regenerate these files, run the following commands:
+```
+make down
+make db-clean
+make up
+make populate
+make db-full
+```
 
 ## ASKEM Data Model
 
