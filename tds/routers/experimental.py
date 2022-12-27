@@ -2,6 +2,7 @@
 Experimental provenance search
 """
 
+import enum
 import re
 from logging import Logger
 
@@ -18,10 +19,80 @@ from tds.settings import settings
 logger = Logger(__name__)
 router = APIRouter()
 
+# MOCKUP DO NOT USE IN PROD: NOT DERIVED FROM ASKEM.DBML
+class ProvenanceType(enum.Enum):
+    Dataset = "Dataset"
+    Model = "Model"
+    Plan = "Plan"
+    ModelRevision = "ModelRevision"
+    Intermediate = "Intermediate"
+    Publication = "Publication"
+    Run = "Run"
+
+
+# MOCKUP DO NOT USE IN PROD: NOT DERIVED FROM ASKEM.DBML
+class RelationType(enum.Enum):
+    DERIVED_FROM = "DERIVED_FROM"
+    COPIED_FROM = "COPIED_FROM"
+    CITES = "CITES"
+    COMBINED_FROM = "COMBINED_FROM"
+    EDITED_FROM = "EDITED_FROM"
+    USES = "USES"
+    EQUIVALENT_OF = "EQUIVALENT_OF"
+    EXTRACTED_FROM = "EXTRACTED_FROM"
+    REINTERPRETS = "REINTERPRETS"
+    GENERATED_BY = "GENERATED_BY"
+    BEGINS_AT = "BEGINS_AT"
+    DECOMPOSED_FROM = "DECOMPOSED_FROM"
+    GLUED_FROM = "GLUED_FROM"
+    STRATIFIED_FROM = "STRATIFIED_FROM"
+
+
+valid_relations = {
+    RelationType.COPIED_FROM: [
+        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    ],
+    RelationType.CITES: [(ProvenanceType.Publication, ProvenanceType.Publication)],
+    RelationType.COMBINED_FROM: [
+        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    ],
+    RelationType.EDITED_FROM: [
+        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    ],
+    RelationType.USES: [(ProvenanceType.Plan, ProvenanceType.ModelRevision)],
+    RelationType.EXTRACTED_FROM: [
+        (ProvenanceType.Intermediate, ProvenanceType.Publication),
+        (ProvenanceType.Dataset, ProvenanceType.Publication),
+        (ProvenanceType.Dataset, ProvenanceType.Run),
+    ],
+    RelationType.REINTERPRETS: [
+        (ProvenanceType.Dataset, ProvenanceType.Run),
+        (ProvenanceType.Intermediate, ProvenanceType.Intermediate),
+        (ProvenanceType.Intermediate, ProvenanceType.Intermediate),
+        (ProvenanceType.Model, ProvenanceType.Intermediate),
+    ],
+    RelationType.GENERATED_BY: [(ProvenanceType.Dataset, ProvenanceType.ModelRevision)],
+    RelationType.BEGINS_AT: [(ProvenanceType.ModelRevision, ProvenanceType.Model)],
+    RelationType.DECOMPOSED_FROM: [
+        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    ],
+    RelationType.GLUED_FROM: [
+        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    ],
+    RelationType.STRATIFIED_FROM: [
+        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    ],
+}
+
+db_desc = "Valid relations include:\n"
+# NOTE: Should we make these sentences more natural language related?
+for relation, mapping in valid_relations.items():
+    for (dom, codom) in mapping:
+        db_desc += f"{dom}-[relation]->{codom}\n"
+
 preamble = """
 I will type "Question:" followed by a question or command in English like "Question: Count all Publications" and you will return a 
-single line print "Query:" Followed by an openCypher query like "Query: `match (p:Publication) return count(p)`. Valid labels include
-Plan, Run, Intermediate, Model, ModelRevision, Publication.
+single line print "Query:" Followed by an openCypher query like "Query: `match (p:Publication) return count(p)`. 
 """
 
 examples = """
@@ -53,7 +124,7 @@ def convert_to_cypher(
     Convert English to Cypher.
     """
     user_query = f"Question: {query}\nQuery: "
-    prompt = preamble + "\n" + examples + "\n" + user_query
+    prompt = preamble + db_desc + "\n" + examples + "\n" + user_query
     completion = openai.Completion.create(
         engine="text-davinci-003",
         prompt=prompt,
