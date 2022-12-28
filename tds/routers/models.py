@@ -293,7 +293,6 @@ def create_model(
         session.commit()
         if settings.NEO4J:
             print("Neo4j is set")
-            # payload={"left":model.id,"left_type":"models","right":state.id,"right_type":"states","relationship_type":"BEGINS_AT"}
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             payload = Provenance(
                 left=model.id,
@@ -322,113 +321,118 @@ def model_opt(
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
 ) -> Response:
-    with Session(rdb) as session:
-        payload = payload.dict()
-        left_model_id = payload.get("left")
-        # query old model and old content
-        l_model = session.query(orm.ModelDescription).get(left_model_id)
-        l_framework = l_model.framework
-        l_description = l_model.description
-        l_name = l_model.name
-        left_state_id = l_model.state_id
+    """
+    Make modeling operations.
+    """
+    try:
+        with Session(rdb) as session:
+            payload = payload.dict()
+            # query old model and old content
+            l_model = session.query(orm.ModelDescription).get(payload.get("left"))
 
-        if payload.get("right", False):
-            right_model_id = payload.get("right")
-            r_model = session.query(orm.ModelDescription).get(right_model_id)
-            right_state_id = r_model.state_id
+            if payload.get("right", False):
+                r_model = session.query(orm.ModelDescription).get(payload.get("right"))
 
-        if model_operation == "copy":
-            l_content = session.query(orm.ModelState).get(left_model_id)
-            l_content_dict = l_content.__dict__
-            state = orm.ModelState(content=l_content_dict.get("content"))
-
-        elif model_operation == "decompose" or model_operation == "glue":
-            state = orm.ModelState(content=payload.get("content"))
-        else:
-            raise
-
-        session.add(state)
-        session.commit()
-        new_state_id = state.id
-
-        # add new model
-        new_model = orm.ModelDescription(
-            name=payload.get("name"),
-            description=payload.get("description"),
-            framework=payload.get("framework"),
-            state_id=new_state_id,
-        )
-        session.add(new_model)
-        session.commit()
-        new_model_id = new_model.id
-
-        # add parameters to new model. Default to left model id parameters.
-        if payload.get("parameters") is None:
-            parameters: List[dict] = (
-                session.query(orm.ModelParameter)
-                .filter(orm.ModelParameter.model_id == left_model_id)
-                .all()
-            )
-            payload["parameters"] = []
-            for parameter in parameters:
-                param = parameter.__dict__
-                payload["parameters"].append(param)
-
-        # if parameters are set use those for new model
-        for param in payload.get("parameters"):
-            session.add(
-                orm.ModelParameter(
-                    model_id=new_model_id,
-                    name=param.get("name"),
-                    default_value=param.get("default_value"),
-                    type=param.get("type"),
-                    state_variable=param.get("state_variable"),
+            if model_operation == "copy":
+                state = orm.ModelState(
+                    content=session.query(orm.ModelState)
+                    .get(payload.get("left"))
+                    .__dict__.get("content")
                 )
-            )
-        session.commit()
 
-        if settings.NEO4J:
-            provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
-            prov_payload = Provenance(
-                left=new_state_id,
-                left_type="Model_revision",
-                right=left_state_id,
-                right_type="Model_revision",
-                relation_type=model_opt_relationship_mapping[model_operation],
-                user_id=payload.get("user_id", None),
-            )
-            provenance_handler.create_entry(prov_payload)
+            elif model_operation in ("decompose", "glue"):
+                state = orm.ModelState(content=payload.get("content"))
+            else:
+                raise TypeError("Operation not supported")
 
-            if model_operation == "glue":
+            session.add(state)
+            session.commit()
+
+            # add new model
+            new_model = orm.ModelDescription(
+                name=payload.get("name"),
+                description=payload.get("description"),
+                framework=payload.get("framework"),
+                state_id=state.id,
+            )
+            session.add(new_model)
+            session.commit()
+
+            # add parameters to new model. Default to left model id parameters.
+            if payload.get("parameters") is None:
+                parameters: List[dict] = (
+                    session.query(orm.ModelParameter)
+                    .filter(orm.ModelParameter.model_id == payload.get("left"))
+                    .all()
+                )
+                payload["parameters"] = []
+                for parameter in parameters:
+                    payload["parameters"].append(parameter.__dict__)
+
+            # if parameters are set use those for new model
+            for param in payload.get("parameters"):
+                session.add(
+                    orm.ModelParameter(
+                        model_id=new_model.id,
+                        name=param.get("name"),
+                        default_value=param.get("default_value"),
+                        type=param.get("type"),
+                        state_variable=param.get("state_variable"),
+                    )
+                )
+            session.commit()
+
+            if settings.NEO4J:
+                provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
                 prov_payload = Provenance(
-                    left=new_state_id,
+                    left=state.id,
                     left_type="Model_revision",
-                    right=right_state_id,
+                    right=l_model.state_id,
                     right_type="Model_revision",
                     relation_type=model_opt_relationship_mapping[model_operation],
                     user_id=payload.get("user_id", None),
                 )
                 provenance_handler.create_entry(prov_payload)
 
-            # add begins at relationship
-            prov_payload = Provenance(
-                left=new_model_id,
-                left_type="Model",
-                right=new_state_id,
-                right_type="Model_revision",
-                relation_type="BEGINS_AT",
-                user_id=payload.get("user_id", None),
-            )
-            provenance_handler.create_entry(prov_payload)
+                if model_operation == "glue":
+                    prov_payload = Provenance(
+                        left=state.id,
+                        left_type="Model_revision",
+                        right=r_model.state_id,
+                        right_type="Model_revision",
+                        relation_type=model_opt_relationship_mapping[model_operation],
+                        user_id=payload.get("user_id", None),
+                    )
+                    provenance_handler.create_entry(prov_payload)
 
-    logger.info("new model created: %i", id)
-    return Response(
-        status_code=status.HTTP_201_CREATED,
-        headers={
-            "content-type": "application/json",
-        },
-        content=json.dumps({"id": new_model_id}),
-    )
+                # add begins at relationship
+                prov_payload = Provenance(
+                    left=new_model.id,
+                    left_type="Model",
+                    right=state.id,
+                    right_type="Model_revision",
+                    relation_type="BEGINS_AT",
+                    user_id=payload.get("user_id", None),
+                )
+                provenance_handler.create_entry(prov_payload)
+
+        logger.info("new model created: %i", id)
+        return Response(
+            status_code=status.HTTP_201_CREATED,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps({"id": new_model.id}),
+        )
+    except TypeError as error:
+        logger.error("An error occured : %s", error)
+        return Response(
+            status_code=status.HTTP_404_ERROR,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps({"message": "An error occured"}),
+        )
 
 
 @router.post("/{id}", **update.fastapi_endpoint_config)

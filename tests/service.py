@@ -367,7 +367,7 @@ class TestModel(AETS):
         }
 
         # Act
-        _, update_status = self.fetch("/models/1", AllowedMethod.PUT, payload)
+        _, update_status = self.fetch("/models/1", AllowedMethod.POST, payload)
         retrieve_response, retrieve_status = self.fetch("/models/1")
 
         # Assert

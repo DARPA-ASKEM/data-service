@@ -142,8 +142,7 @@ class ProvenanceHandler:
             def user_id_str(user_id):
                 if user_id is not None:
                     return " { user_id: $user_id}"
-                else:
-                    return ""
+                return ""
 
             edge_query = (
                 f"Match (n1: {provenance_payload.get('left_type')} ) "
