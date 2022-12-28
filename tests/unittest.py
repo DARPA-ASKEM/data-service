@@ -30,20 +30,20 @@ def test_build_api() -> None:
     assert response.status_code == 200
 
 
-def test_relation_handler_rdb_only():
-    """
-    Ensure the provenance handler can create a basic edge
-    """
-    graph_db = demo_neo_engine()
-    rdb = demo_rdb_engine()
-    relation_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
-    provenance_payload = {
-        "left": 1,
-        "left_type": "Intermediate",
-        "right": 2,
-        "right_type": "Publication",
-        "relation_type": RelationType.EXTRACTED_FROM,
-        "user_id": 1,
-    }
+# def test_relation_handler_rdb_only():
+#     """
+#     Ensure the provenance handler can create a basic edge
+#     """
+#     graph_db = demo_neo_engine()
+#     rdb = demo_rdb_engine()
+#     relation_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+#     provenance_payload = {
+#         "left": 1,
+#         "left_type": "Intermediate",
+#         "right": 2,
+#         "right_type": "Publication",
+#         "relation_type": RelationType.EXTRACTED_FROM,
+#         "user_id": 1,
+#     }
 
-    relation_handler.create_node_relationship(provenance_payload=provenance_payload)
+#     relation_handler.create_node_relationship(provenance_payload=provenance_payload)
