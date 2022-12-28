@@ -32,7 +32,7 @@ def demo_rdb_engine():
     return rdb_engine
 
 
-neo_engine = GraphDatabase.driver(
+NEO_ENGINE = GraphDatabase.driver(
     "neo4j://localhost:7687", auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD)
 )
 
@@ -41,7 +41,7 @@ def demo_neo_engine():
     """
     Provides graph driver that can be used by FastAPI Dependencies
     """
-    return neo_engine
+    return NEO_ENGINE
 
 
 @contextmanager
