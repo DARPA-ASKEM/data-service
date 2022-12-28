@@ -437,4 +437,4 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
         print(e)
 
 
-# upload_fake_provanence_data()
+upload_fake_provanence_data()

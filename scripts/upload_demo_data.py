@@ -65,7 +65,7 @@ folders = sorted(
 
 upload_starter_kit_models()
 upload_fake_provanence_data()
-s
+
 
 for folder in folders:
 
