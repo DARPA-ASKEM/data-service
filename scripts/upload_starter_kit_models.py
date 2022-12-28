@@ -75,8 +75,8 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 )
             if publication_id:
                 add_provenance(
-                    left={"id": intermediate_mmt_id, "resource_type": "intermediate"},
-                    right={"id": publication_id, "resource_type": "publication"},
+                    left={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
+                    right={"id": publication_id, "resource_type": "Publication"},
                     relation_type="EXTRACTED_FROM",
                     user_id=person_id,
                 )
@@ -88,15 +88,14 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             intermediate_grom_id = create_intermediate(
                 path=f"{folder}model_fn_gromet.json", type="gromet", source="skema"
             )
-            print(f"dsdd {intermediate_grom_id}")
             asset_to_project(
                 project_id=project_id,
                 asset_id=int(intermediate_grom_id),
                 asset_type="intermediates",
             )
             add_provenance(
-                left={"id": intermediate_grom_id, "resource_type": "intermediate"},
-                right={"id": publication_id, "resource_type": "publication"},
+                left={"id": intermediate_grom_id, "resource_type": "Intermediate"},
+                right={"id": publication_id, "resource_type": "Publication"},
                 relation_type="EXTRACTED_FROM",
                 user_id=person_id,
             )
@@ -132,8 +131,8 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             state_id = state_model_json.get("state_id")
 
             add_provenance(
-                left={"id": state_id, "resource_type": "model_revision"},
-                right={"id": intermediate_grom_id, "resource_type": "intermediate"},
+                left={"id": state_id, "resource_type": "Model_revision"},
+                right={"id": intermediate_grom_id, "resource_type": "Intermediate"},
                 relation_type="REINTERPRETS",
                 user_id=person_id,
             )
@@ -198,18 +197,15 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 model_id=model_id,
                 description=f"Simulation plan for model {model_id}",
             )
-            print("heeee")
-            print(simulation_plan_id)
-            print(state_id)
 
             asset_to_project(
                 project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
             )
 
             add_provenance(
-                left={"id": simulation_plan_id, "resource_type": "plan"},
+                left={"id": simulation_plan_id, "resource_type": "Plan"},
                 relation_type="USES",
-                right={"id": state_id, "resource_type": "model_revision"},
+                right={"id": state_id, "resource_type": "Model_revision"},
                 user_id=person_id,
             )
 
@@ -292,15 +288,15 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 )
 
                 add_provenance(
-                    left={"id": simulation_run_id, "resource_type": "simulation_run"},
+                    left={"id": simulation_run_id, "resource_type": "Simulation_run"},
                     relation_type="GENERATED_BY",
-                    right={"id": simulation_plan_id, "resource_type": "plan"},
+                    right={"id": simulation_plan_id, "resource_type": "Plan"},
                     user_id=person_id,
                 )
                 add_provenance(
-                    right={"id": simulation_run_id, "resource_type": "simulation_run"},
+                    right={"id": simulation_run_id, "resource_type": "Simulation_run"},
                     relation_type="REINTERPRETS",
-                    left={"id": dataset_id, "resource_type": "dataset"},
+                    left={"id": dataset_id, "resource_type": "Dataset"},
                     user_id=person_id,
                 )
 
