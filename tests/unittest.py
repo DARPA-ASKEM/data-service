@@ -3,7 +3,8 @@ Validate unit tests
 """
 
 from dbml_builder import get_dbml_version
-from fastapi import Depends
+
+# from fastapi import Depends
 from fastapi.testclient import TestClient
 
 from tds.autogen.schema import RelationType

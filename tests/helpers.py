@@ -15,30 +15,33 @@ from tds.db import init_dev_content, request_graph_db, request_rdb
 from tds.server.build import build_api
 from tds.settings import settings
 
-# pylint: disable-next=line-too-long
-url = f"postgresql://{settings.SQL_USER}:{settings.SQL_PASSWORD}@{settings.SQL_URL}:{settings.SQL_PORT}/askem"
 rdb_engine = create_engine(
-    url, pool_size=25, max_overflow=10, connect_args={"connect_timeout": 8}
+    "sqlite:///.sqlite",
+    creator=lambda: connect(
+        "file:.sqlite",
+        uri=True,
+        check_same_thread=False,
+    ),
 )
 
 
-async def demo_rdb_engine():
+def demo_rdb_engine():
     """
     Provides postgres engine that can be used by FastAPI Dependencies
     """
     return rdb_engine
 
 
-NEO_ENGINE = GraphDatabase.driver(
-    settings.NEO4J_driver, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD)
+neo_engine = GraphDatabase.driver(
+    "neo4j://localhost:7687", auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD)
 )
 
 
-async def demo_neo_engine():
+def demo_neo_engine():
     """
     Provides graph driver that can be used by FastAPI Dependencies
     """
-    return NEO_ENGINE
+    return neo_engine
 
 
 @contextmanager
