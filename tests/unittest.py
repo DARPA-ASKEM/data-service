@@ -3,6 +3,7 @@ Validate unit tests
 """
 
 from dbml_builder import get_dbml_version
+from fastapi import Depends
 from fastapi.testclient import TestClient
 
 from tds.autogen.schema import RelationType
@@ -32,9 +33,9 @@ def test_relation_handler_rdb_only():
     """
     Ensure the provenance handler can create a basic edge
     """
-    relation_handler = ProvenanceHandler(
-        rdb=demo_rdb_engine(), graph_db=demo_neo_engine()
-    )
+    graph_db = demo_neo_engine()
+    rdb = demo_rdb_engine()
+    relation_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
     provenance_payload = {
         "left": 1,
         "left_type": "Intermediate",
