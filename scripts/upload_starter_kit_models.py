@@ -298,9 +298,9 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                     user_id=person_id,
                 )
                 add_provenance(
-                    left={"id": simulation_run_id, "resource_type": "simulation_run"},
+                    right={"id": simulation_run_id, "resource_type": "simulation_run"},
                     relation_type="REINTERPRETS",
-                    right={"id": dataset_id, "resource_type": "dataset"},
+                    left={"id": dataset_id, "resource_type": "dataset"},
                     user_id=person_id,
                 )
 

@@ -25,6 +25,15 @@ class ProvenanceType(str, Enum):
     simulation_run = 'simulation_run'
     
 
+class ProvenanceSearchTypes(str, Enum):
+
+    child_nodes = 'child_nodes'
+    connected_nodes = 'connected_nodes'
+    derived_models = 'derived_models'
+    parent_model_revisions = 'parent_model_revisions'
+    parent_nodes = 'parent_nodes'
+    
+
 class RelationType(str, Enum):
 
     BEGINS_AT = 'BEGINS_AT'

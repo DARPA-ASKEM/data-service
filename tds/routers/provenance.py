@@ -12,7 +12,7 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.db import ProvenanceHandler, request_graph_db, request_rdb
+from tds.db import ProvenanceHandler, SearchProvenance, request_graph_db, request_rdb
 from tds.operation import create, delete, retrieve
 from tds.schema.provenance import Provenance
 
@@ -29,10 +29,9 @@ def get_provenance(id: int, rdb: Engine = Depends(request_rdb)):
         return Provenance.from_orm(session.query(orm.Provenance).get(id))
 
 
-@router.get("/derived_from")
+@router.post("/search")
 def search_provenance(
-    artifact_id: int,
-    artifact_type: str,
+    payload: dict,
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
 ) -> Response:
@@ -40,10 +39,11 @@ def search_provenance(
     Search provenance of for all artifacts that helped derive this artifact.
     """
     logger.info("search provenance")
-    provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
-    list_of_artifacts = provenance_handler.search_derivedfrom(
-        artifact_id=artifact_id, artifact_type=artifact_type
-    )
+    print(payload)
+    search_provenance_handler = SearchProvenance(rdb=rdb, graph_db=graph_db)
+
+    search_function = getattr(search_provenance_handler, payload.get("search_type"))
+    list_of_artifacts = search_function(payload=payload)
     return Response(
         headers={
             "content-type": "application/json",

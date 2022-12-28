@@ -22,6 +22,14 @@ Enum public.provenance_type {
    simulation_run
 }
 
+Enum provenance_search_types{
+  connected_nodes
+  child_nodes
+  parent_nodes
+  derived_models
+  parent_model_revisions
+}
+
 Enum relation_type {
   DERIVED_FROM
   COPIED_FROM
