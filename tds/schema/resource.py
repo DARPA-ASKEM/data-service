@@ -42,7 +42,6 @@ ORMResource = (
 
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
-    Extraction: ResourceType.extractions,
     Model: ResourceType.models,
     Plan: ResourceType.plans,
     Publication: ResourceType.publications,
@@ -52,7 +51,6 @@ obj_to_enum: Dict[Type[Resource], ResourceType] = {
 
 obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
-    Extraction: ResourceType.extractions,
     ModelDescription: ResourceType.models,
     Plan: ResourceType.plans,
     Publication: ResourceType.publications,

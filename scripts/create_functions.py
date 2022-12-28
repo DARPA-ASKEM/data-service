@@ -154,6 +154,46 @@ def create_model(path, name, description, framework, url=url):
     headers = {"Content-Type": "application/json"}
 
     response = requests.request("POST", url + "models", headers=headers, data=payload)
+    print(f"hereeeee {response.text}")
+    model_json = response.json()
+    model_id = model_json.get("id")
+    return model_id
+
+
+def update_model(path, name, description, framework, model_id, url=url):
+    print("Upload Model")
+
+    with open(path, "r") as f:
+        model_content = json.load(f)
+    payload = json.dumps(
+        {
+            "name": name,
+            "description": description,
+            "content": json.dumps(model_content),
+            "framework": framework,
+        }
+    )
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.request(
+        "POST", url + f"models/{model_id}", headers=headers, data=payload
+    )
+    print(f"hereeeee {response.text}")
+    model_json = response.json()
+    model_id = model_json.get("id")
+    return model_id
+
+
+def copy_model(model_id, name, description, url=url):
+    print("Upload Model")
+
+    payload = json.dumps({"name": name, "description": description, "user_id": 1})
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.request(
+        "POST", url + f"models/{model_id}/copy", headers=headers, data=payload
+    )
+    print(f"copied {response.text}")
     model_json = response.json()
     model_id = model_json.get("id")
     return model_id

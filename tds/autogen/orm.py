@@ -11,8 +11,18 @@ Base = declarative_base()
 class ResourceType(str, Enum):
 
     datasets = 'datasets'
-    extractions = 'extractions'
     intermediates = 'intermediates'
+    models = 'models'
+    plans = 'plans'
+    publications = 'publications'
+    simulation_runs = 'simulation_runs'
+    
+
+class ProvenanceType(str, Enum):
+
+    datasets = 'datasets'
+    intermediates = 'intermediates'
+    model_revisions = 'model_revisions'
     models = 'models'
     plans = 'plans'
     publications = 'publications'
@@ -21,16 +31,16 @@ class ResourceType(str, Enum):
 
 class RelationType(str, Enum):
 
+    BEGINS_AT = 'BEGINS_AT'
     CITES = 'CITES'
+    COMBINED_FROM = 'COMBINED_FROM'
     COPIED_FROM = 'COPIED_FROM'
     DERIVED_FROM = 'DERIVED_FROM'
     EDITED_FROM = 'EDITED_FROM'
     EQUIVALENT_OF = 'EQUIVALENT_OF'
     EXTRACTED_FROM = 'EXTRACTED_FROM'
     GENERATED_BY = 'GENERATED_BY'
-    GLUED_FROM = 'GLUED_FROM'
     REINTERPRETS = 'REINTERPRETS'
-    STRATIFIED_FROM = 'STRATIFIED_FROM'
     USES = 'USES'
     
 
@@ -262,9 +272,9 @@ class Provenance(Base):
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     relation_type = sa.Column(sa.Enum(RelationType), nullable=False)
     left = sa.Column(sa.Integer(), nullable=False)
-    left_type = sa.Column(sa.Enum(ResourceType), nullable=False)
+    left_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
     right = sa.Column(sa.Integer(), nullable=False)
-    right_type = sa.Column(sa.Enum(ResourceType), nullable=False)
+    right_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
     user_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'))
 
 

@@ -44,6 +44,7 @@ def add_provenance(left, right, relation_type, user_id):
             "user_id": user_id,
         }
     )
+    print(payload)
     headers = {"Content-Type": "application/json"}
 
     response = requests.request(
@@ -52,6 +53,7 @@ def add_provenance(left, right, relation_type, user_id):
         headers=headers,
         data=payload,
     )
+    print(response.text)
 
 
 def add_concept(concept, object_id, type):

@@ -61,6 +61,8 @@ def create_provenance(
     """
     Create provenance relationship
     """
+    print(rdb)
+    print(graph_db)
     provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
     id: int = provenance_handler.create_entry(payload)
 

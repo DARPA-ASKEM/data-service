@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     DKG_URL = "http://34.230.33.149"
     DKG_API_PORT = 8771
     DKG_DESC_PORT = 8772
+    NEO4J = True
 
 
 settings = Settings()

@@ -7,8 +7,18 @@ from pydantic import BaseModel, Json
 class ResourceType(str, Enum):
 
     datasets = 'datasets'
-    extractions = 'extractions'
     intermediates = 'intermediates'
+    models = 'models'
+    plans = 'plans'
+    publications = 'publications'
+    simulation_runs = 'simulation_runs'
+    
+
+class ProvenanceType(str, Enum):
+
+    datasets = 'datasets'
+    intermediates = 'intermediates'
+    model_revisions = 'model_revisions'
     models = 'models'
     plans = 'plans'
     publications = 'publications'
@@ -17,16 +27,16 @@ class ResourceType(str, Enum):
 
 class RelationType(str, Enum):
 
+    BEGINS_AT = 'BEGINS_AT'
     CITES = 'CITES'
+    COMBINED_FROM = 'COMBINED_FROM'
     COPIED_FROM = 'COPIED_FROM'
     DERIVED_FROM = 'DERIVED_FROM'
     EDITED_FROM = 'EDITED_FROM'
     EQUIVALENT_OF = 'EQUIVALENT_OF'
     EXTRACTED_FROM = 'EXTRACTED_FROM'
     GENERATED_BY = 'GENERATED_BY'
-    GLUED_FROM = 'GLUED_FROM'
     REINTERPRETS = 'REINTERPRETS'
-    STRATIFIED_FROM = 'STRATIFIED_FROM'
     USES = 'USES'
     
 
@@ -230,9 +240,9 @@ class Provenance(BaseModel):
     timestamp: datetime.datetime = datetime.datetime.now()
     relation_type: RelationType
     left: int
-    left_type: ResourceType
+    left_type: ProvenanceType
     right: int
-    right_type: ResourceType
+    right_type: ProvenanceType
     user_id: Optional[int]
 
 

@@ -16,7 +16,7 @@ Enum public.provenance_type {
    datasets
    models
    plans
-   states
+   model_revisions
    intermediates
    publications
    simulation_runs
@@ -255,9 +255,9 @@ Table provenance {
   timestamp datetime [default: `now()`, not null]
   relation_type relation_type [not null]
   left int [not null]
-  left_type resource_type [not null]
+  left_type provenance_type [not null]
   right int [not null]
-  right_type resource_type [not null]
+  right_type provenance_type [not null]
   user_id int [ref: > person.id]
 }
 

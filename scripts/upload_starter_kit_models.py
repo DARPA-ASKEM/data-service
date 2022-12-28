@@ -77,7 +77,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 add_provenance(
                     left={"id": intermediate_mmt_id, "resource_type": "intermediates"},
                     right={"id": publication_id, "resource_type": "publications"},
-                    relation_type="DERIVED_FROM",
+                    relation_type="EXTRACTED_FROM",
                     user_id=person_id,
                 )
         except Exception as e:
@@ -88,6 +88,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             intermediate_grom_id = create_intermediate(
                 path=f"{folder}model_fn_gromet.json", type="gromet", source="skema"
             )
+            print(f"dsdd {intermediate_grom_id}")
             asset_to_project(
                 project_id=project_id,
                 asset_id=int(intermediate_grom_id),
@@ -96,7 +97,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             add_provenance(
                 left={"id": intermediate_grom_id, "resource_type": "intermediates"},
                 right={"id": publication_id, "resource_type": "publications"},
-                relation_type="DERIVED_FROM",
+                relation_type="EXTRACTED_FROM",
                 user_id=person_id,
             )
             for concept in model_concepts:
@@ -126,10 +127,14 @@ def upload_starter_kit_models(person_id=1, project_id=1):
 
             asset_to_project(project_id=1, asset_id=int(model_id), asset_type="models")
 
+            response = requests.request("GET", url + f"models/{model_id}")
+            state_model_json = response.json()
+            state_id = state_model_json.get("state_id")
+
             add_provenance(
-                left={"id": model_id, "resource_type": "models"},
+                left={"id": state_id, "resource_type": "model_revisions"},
                 right={"id": intermediate_grom_id, "resource_type": "intermediates"},
-                relation_type="DERIVED_FROM",
+                relation_type="REINTERPRETS",
                 user_id=person_id,
             )
             for concept in model_concepts:
@@ -193,6 +198,9 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 model_id=model_id,
                 description=f"Simulation plan for model {model_id}",
             )
+            print("heeee")
+            print(simulation_plan_id)
+            print(state_id)
 
             asset_to_project(
                 project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
@@ -201,7 +209,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             add_provenance(
                 left={"id": simulation_plan_id, "resource_type": "plans"},
                 relation_type="USES",
-                right={"id": model_id, "resource_type": "models"},
+                right={"id": state_id, "resource_type": "model_revisions"},
                 user_id=person_id,
             )
 
@@ -285,20 +293,14 @@ def upload_starter_kit_models(person_id=1, project_id=1):
 
                 add_provenance(
                     left={"id": simulation_run_id, "resource_type": "simulation_runs"},
-                    relation_type="DERIVED_FROM",
+                    relation_type="GENERATED_BY",
                     right={"id": simulation_plan_id, "resource_type": "plans"},
                     user_id=person_id,
                 )
                 add_provenance(
                     left={"id": simulation_run_id, "resource_type": "simulation_runs"},
-                    relation_type="EQUIVALENT_OF",
+                    relation_type="REINTERPRETS",
                     right={"id": dataset_id, "resource_type": "datasets"},
-                    user_id=person_id,
-                )
-                add_provenance(
-                    right={"id": simulation_run_id, "resource_type": "simulation_runs"},
-                    relation_type="EQUIVALENT_OF",
-                    left={"id": dataset_id, "resource_type": "datasets"},
                     user_id=person_id,
                 )
 

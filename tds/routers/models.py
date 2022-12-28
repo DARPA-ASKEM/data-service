@@ -11,7 +11,13 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
-from tds.db import entry_exists, list_by_id, request_rdb
+from tds.db import (
+    ProvenanceHandler,
+    entry_exists,
+    list_by_id,
+    request_graph_db,
+    request_rdb,
+)
 from tds.lib.models import adjust_model_params
 from tds.operation import create, delete, retrieve, update
 from tds.schema.model import (
@@ -22,6 +28,8 @@ from tds.schema.model import (
     ModelParameters,
     orm_to_params,
 )
+from tds.schema.provenance import Provenance
+from tds.settings import settings
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -246,7 +254,11 @@ def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
 
 
 @router.post("", **create.fastapi_endpoint_config)
-def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response:
+def create_model(
+    payload: Model,
+    rdb: Engine = Depends(request_rdb),
+    graph_db=Depends(request_graph_db),
+) -> Response:
     """
     Create model and return its ID
     """
@@ -278,6 +290,20 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
                 )
             )
         session.commit()
+        if settings.NEO4J:
+            print("Neo4j is set")
+            # payload={"left":model.id,"left_type":"models","right":state.id,"right_type":"states","relationship_type":"BEGINS_AT"}
+            provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+            payload = Provenance(
+                left=model.id,
+                left_type="models",
+                right=state.id,
+                right_type="model_revisions",
+                relation_type="BEGINS_AT",
+                user_id=model_payload.get("user_id", None),
+            )
+
+            provenance_handler.create_entry(payload)
     logger.info("new model created: %i", id)
     return Response(
         status_code=status.HTTP_201_CREATED,
@@ -288,12 +314,112 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
     )
 
 
-@router.put("/{id}", **update.fastapi_endpoint_config)
+@router.post("/{id}/copy", **create.fastapi_endpoint_config)
+def copy_model(
+    payload: dict,
+    id: int,
+    rdb: Engine = Depends(request_rdb),
+    graph_db=Depends(request_graph_db),
+) -> Response:
+    """
+    Create model and return its ID
+    """
+    with Session(rdb) as session:
+        old_model_id = id
+        # get old model and old content
+
+        model = session.query(orm.ModelDescription).get(old_model_id)
+        framework = model.framework
+        description = model.description
+        name = model.name
+        print(f"{framework} , {description}, {name}")
+
+        # set old state id so we have it
+        old_state_id = model.state_id
+        print(f"old_state_id {old_state_id}")
+        content = session.query(orm.ModelState).get(model.state_id)
+
+        # take off content id so we can save it again in the database with new id
+        content_payload = content.__dict__
+        state = orm.ModelState(content=content_payload.get("content"))
+        session.add(state)
+        session.commit()
+        new_state_id = state.id
+        print(f"new state id {new_state_id}")
+        model = session.query(orm.ModelDescription).get(old_model_id)
+
+        print(model)
+        new_model = orm.ModelDescription(
+            name=payload.get("name", name),
+            description=payload.get("description", description),
+            framework=framework,
+            state_id=new_state_id,
+        )
+        session.add(new_model)
+        session.commit()
+        new_model_id = new_model.id
+        print(f"new model id {new_model_id}")
+
+        parameters: List[orm.ModelParameter] = (
+            session.query(orm.ModelParameter)
+            .filter(orm.ModelParameter.model_id == old_model_id)
+            .all()
+        )
+        print(f"parameters {parameters}")
+
+        # set the parameters as the same for copied model
+        for param in parameters:
+            print(param.name)
+            session.add(
+                orm.ModelParameter(
+                    model_id=new_model_id,
+                    name=param.name,
+                    default_value=param.default_value,
+                    type=param.type,
+                    state_variable=param.state_variable,
+                )
+            )
+        session.commit()
+
+        if settings.NEO4J:
+            print("Neo4j is set")
+            provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+            prov_payload = Provenance(
+                left=new_state_id,
+                left_type="model_revisions",
+                right=old_state_id,
+                right_type="model_revisions",
+                relation_type="COPIED_FROM",
+                user_id=payload.get("user_id", None),
+            )
+            provenance_handler.create_entry(prov_payload)
+
+            prov_payload = Provenance(
+                left=new_model_id,
+                left_type="models",
+                right=new_state_id,
+                right_type="model_revisions",
+                relation_type="BEGINS_AT",
+                user_id=payload.get("user_id", None),
+            )
+
+            provenance_handler.create_entry(prov_payload)
+    logger.info("new model created: %i", id)
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": new_model_id}),
+    )
+
+
+@router.post("/{id}", **update.fastapi_endpoint_config)
 def update_model(
     payload: Model,
     id: int,
     rdb: Engine = Depends(request_rdb),
-    # graph_db: Optional[Driver] = Depends(request_graph_db),
+    graph_db=Depends(request_graph_db),
 ) -> Response:
     """
     Update model content
@@ -309,11 +435,30 @@ def update_model(
             session.commit()
 
             model = session.query(orm.ModelDescription).get(id)
+
+            old_state = model.state_id
+            print(old_state)
+            print(model)
+            model.state_id = state.id
             model.name = model_payload["name"]
             model.description = model_payload["description"]
             model.framework = model_payload["framework"]
             model.state_id = state.id
             session.commit()
+            if settings.NEO4J:
+                print("Neo4j is set")
+                provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+                print(state.id)
+                print(old_state)
+                payload = Provenance(
+                    left=state.id,
+                    left_type="model_revisions",
+                    right=old_state,
+                    right_type="model_revisions",
+                    relation_type="EDITED_FROM",
+                    user_id=model_payload.get("user_id", None),
+                )
+                provenance_handler.create_entry(payload)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Response(

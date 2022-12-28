@@ -7,13 +7,14 @@ from urllib.request import urlopen
 import requests
 import sim_runs_dataset_generator
 from create_functions import (
+    copy_model,
     create_intermediate,
-    create_model,
     create_model_parameters,
     create_plan,
     create_publication,
     create_run,
     create_simulation_parameters,
+    update_model,
 )
 
 # from demo_dataset_generator import programatically_populate_datasets
@@ -28,38 +29,85 @@ recipe = [
     {
         "publication_reliationship": "CITES",
         "publication_id_to": 1,
+        "existing_pub_left": 2,
+        "existing_pub_right": 1,
         "model_name": "Edited model 1. V2",
         "model_relationship": "EDITED_FROM",
+        "model_id_to": 2,
+        "simulation_relationship": "USES",
+        "simulation_id_to": 5,
+        "runs_relationship": "GENERATED_BY",
+    },
+    {
+        "model_name": "Edited model 1. V2",
+        "model_relationship": "EDITED_FROM",
+        "model_id_to": 2,
+    },
+    {
+        "model_name": "Edited model 1. V5",
+        "model_relationship": "EDITED_FROM",
+        "model_id_to": 2,
+        "simulation_relationship": "USES",
+        "simulation_id_to": 6,
+        "runs_relationship": "GENERATED_BY",
+    },
+    {
+        "model_name": "Model 5",
+        "model_relationship": "COPIED_FROM",
         "model_id_to": 1,
     },
     {
-        "publication_reliationship": "CITES",
-        "publication_id_to": 1,
-        "model_name": "Edited model 1. V3",
+        "model_name": "Model 5 v2",
         "model_relationship": "EDITED_FROM",
         "model_id_to": 4,
     },
     {
-        "publication_reliationship": "CITES",
-        "publication_id_to": 3,
-        "model_name": "Merged",
+        "model_name": "Model 7",
+        "model_relationship": "COPIED_FROM",
+        "model_id_to": 4,
     },
+    {
+        "dataset_name": "Extracted dataset",
+        "dataset_relationship": "EXTRACTED_FROM",
+        "publication_id_to": 1,
+    },
+    {
+        "model_name": "Model ?",
+        "model_relationship": "COPIED_FROM",
+        "model_id_to": 2,
+    },
+    {
+        "model_name": "Model ? v3",
+        "model_relationship": "EDITED_FROM",
+        "model_id_to": 6,
+    },
+    {
+        "model_name": "Model ? v4",
+        "model_relationship": "EDITED_FROM",
+        "model_id_to": 6,
+    },
+    {
+        "model_name": "Model ? v5",
+        "model_relationship": "COPIED_FROM",
+        "model_id_to": 6,
+    },
+    # {
+    #      "existing_pub_left":2,
+    #     "existing_pub_right":1,
+    # }
 ]
 
 
 def upload_fake_provanence_data(person_id=1, project_id=1):
-    print("start")
-    # loop over models
     folders = glob.glob("experiments*/thin-thread-examples/starter-kit/*/")
     prev_model_id = None
-    print(folders)
+
     for folder in folders[2:3]:
-        print(folder)
         model_concepts = get_model_concepts(folder)
 
         for loop in recipe:
-            print(loop)
-            # publications ##
+
+            # add new publicaiton
             try:
                 if loop.get("publication_reliationship", None) is None:
                     raise
@@ -92,7 +140,28 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
             except Exception as e:
                 print(f"failed to upload publication: {e}")
 
-            ## model ##
+            ##  connect exisiting  publications
+            try:
+                print("trying")
+                print(loop)
+                if loop.get("existing_pub_left", None) is not None:
+                    print("hi")
+                    add_provenance(
+                        left={
+                            "id": loop.get("existing_pub_left"),
+                            "resource_type": "publications",
+                        },
+                        right={
+                            "id": loop.get("existing_pub_right"),
+                            "resource_type": "publications",
+                        },
+                        relation_type="CITES",
+                        user_id=person_id,
+                    )
+            except Exception as e:
+                print(e)
+
+            ## add new model ##
             try:
                 if loop.get("model_name") is None:
                     raise
@@ -101,84 +170,37 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                 )
                 model_name = loop.get("model_name")
 
-                model_id = create_model(
-                    path=f"{folder}model_petri.json",
-                    framework="Petri Net",
-                    description=model_description,
-                    name=model_name,
-                )
-                prev_model_id = model_id
-
-                asset_to_project(
-                    project_id=1, asset_id=int(model_id), asset_type="models"
-                )
-
-                ### upload model parameters ###
-                try:
-                    print("Model Parameters")
-                    # load parameters of the model and set the type values
-                    create_model_parameters(
-                        path_parameters=f"{folder}model_mmt_parameters.json",
-                        path_initials=f"{folder}model_mmt_initials.json",
-                        model_id=model_id,
+                if loop.get("model_relationship") == "EDITED_FROM":
+                    update_model(
+                        path=f"{folder}model_petri.json",
+                        framework="Petri Net",
+                        description=model_description,
+                        model_id=loop.get("model_id_to"),
+                        name=model_name,
+                    )
+                elif loop.get("model_relationship") == "COPIED_FROM":
+                    copy_model(
+                        model_id=loop.get("model_id_to"),
+                        name=loop.get("model_name"),
+                        description=model_description,
                     )
 
-                except Exception as e:
-                    print(e)
+                response = requests.request(
+                    "GET", url + f"models/{loop.get('model_id_to')}"
+                )
+                state_model_json = response.json()
+                state_id = state_model_json.get("state_id")
+                print(state_id)
 
-                ## set concept to inital model parameters
-                try:
-                    # get parameters
-                    response = requests.request(
-                        "GET", url + f"models/parameters/{model_id}"
-                    )
-                    parameters_model_json = response.json()
-
-                    with open(f"{folder}model_mmt_initials.json", "r") as f:
-                        init_params = json.load(f)
-                        for (
-                            init_parameter_name,
-                            init_parameter_value,
-                        ) in init_params.get("initials").items():
-                            for parameter in parameters_model_json:
-                                if parameter.get("name") == init_parameter_name:
-                                    ncit = init_parameter_value.get("identifiers").get(
-                                        "ncit", None
-                                    )
-                                    ido = init_parameter_value.get("identifiers").get(
-                                        "ido", None
-                                    )
-                                    if ncit is not None:
-                                        add_concept(
-                                            concept=f"ncit:{ncit}",
-                                            object_id=parameter.get("id"),
-                                            type="model_parameters",
-                                        )
-                                    if ido is not None:
-                                        add_concept(
-                                            concept=f"ido:{ido}",
-                                            object_id=parameter.get("id"),
-                                            type="model_parameters",
-                                        )
-                except Exception as e:
-                    print(e)
                 if loop.get("model_id_to") is None:
                     loop["model_id_to"] = prev_model_id
-
-                add_provenance(
-                    left={"id": model_id, "resource_type": "models"},
-                    right={"id": loop.get("model_id_to"), "resource_type": "models"},
-                    relation_type=loop.get("model_relationship"),
-                    user_id=person_id,
-                )
-                for concept in model_concepts:
-                    add_concept(concept=concept, object_id=model_id, type="models")
 
             except Exception as e:
                 print(f" {e}")
 
             except Exception as e:
                 print(e)
+
             ### upload simulation plan ###
             try:
                 if loop.get("simulation_relationship", None) is None:
@@ -188,7 +210,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                 simulation_plan_id = create_plan(
                     path="scripts/simulation-plan_ATE.json",
                     name=f"{loop['simulation_id_to']}_simulation_plan",
-                    model_id=loop["simulation_id_to"],
+                    model_id=loop["model_id_to"],
                     description=f"Simulation plan for model {loop['simulation_id_to']}",
                 )
 
@@ -198,8 +220,11 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
 
                 add_provenance(
                     left={"id": simulation_plan_id, "resource_type": "plans"},
-                    relation_type="USES",
-                    right={"id": loop["simulation_id_to"], "resource_type": "models"},
+                    relation_type=loop.get("simulation_relationship"),
+                    right={
+                        "id": loop["simulation_id_to"],
+                        "resource_type": "model_revisions",
+                    },
                     user_id=person_id,
                 )
 
@@ -211,6 +236,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
             ### simulation run ###
 
             try:
+                print("starting runs")
                 runs = glob.glob(folder + "runs/*/")
                 if loop.get("runs_relationship", None) is None:
                     raise
@@ -275,6 +301,9 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                         dataset_id=dataset_id,
                         description=model_description,
                     )
+                    print(
+                        f"simulation run id {simulation_plan_id} , {simulation_run_id}"
+                    )
 
                     asset_to_project(
                         project_id=1,
@@ -287,7 +316,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                             "id": simulation_run_id,
                             "resource_type": "simulation_runs",
                         },
-                        relation_type="DERIVED_FROM",
+                        relation_type="GENERATED_BY",
                         right={"id": simulation_plan_id, "resource_type": "plans"},
                         user_id=person_id,
                     )
@@ -296,7 +325,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                             "id": simulation_run_id,
                             "resource_type": "simulation_runs",
                         },
-                        relation_type="GENERATED_BY",
+                        relation_type="REINTERPRETS",
                         right={"id": dataset_id, "resource_type": "datasets"},
                         user_id=person_id,
                     )
@@ -357,6 +386,56 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                                         print(e)
             except Exception as e:
                 print(e)
+    try:
+        if loop.get("dataset_relationship", None) is None:
+            raise
+        runs = glob.glob(folder + "runs/*/")
+        for run in runs[1:2]:
+            with open(run + "output.json", "r") as f:
+                sim_output = f.read()
+                sim_output = json.loads(sim_output)
+
+                dataset_response = sim_runs_dataset_generator.create_dataset(
+                    maintainer_id=1,
+                    dataset_object=sim_output,
+                    biomodel_name="Dataset",
+                    biomodel_description="Dataset description",
+                    url=url,
+                )
+                dataset_id = dataset_response["id"]
+                # Convert the json to a CSV
+                convert_sim_runs_to_csv(
+                    json_file_path=run + "output.json",
+                    output_file_path=run + "sim_output.csv",
+                )
+                # Upload the CSV to TDS for full mock data
+                with open(run + "sim_output.csv", "rb") as sim_csv:
+                    print(f"Uploading file to dataset_id {dataset_id}")
+                    sim_runs_dataset_generator.upload_file_to_tds(
+                        id=dataset_id, file_object=sim_csv, url=url
+                    )
+                # Finish populating dataset metadata: Features, Qualifiers
+                for feature_obj in list(sim_output.values()):
+                    sim_runs_dataset_generator.create_feature(
+                        dataset_id, feature_obj, url=url
+                    )
+                sim_runs_dataset_generator.create_qualifier(
+                    dataset_id, sim_output, url=url
+                )
+                asset_to_project(project_id, dataset_id, "datasets")
+
+                add_provenance(
+                    right={
+                        "id": loop.get("publication_id_to"),
+                        "resource_type": "publications",
+                    },
+                    relation_type=loop.get("dataset_relationship"),
+                    left={"id": dataset_id, "resource_type": "datasets"},
+                    user_id=person_id,
+                )
+
+    except Exception as e:
+        print(e)
 
 
 # upload_fake_provanence_data()
