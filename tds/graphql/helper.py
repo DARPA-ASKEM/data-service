@@ -8,6 +8,7 @@ from logging import Logger
 from typing import Any, List
 
 from sqlalchemy import and_
+from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
@@ -72,18 +73,21 @@ def sqlalchemy_type(orm_cls: Any):
         graphql_cls.from_orm = from_orm
         graphql_cls.orm_cls = orm_cls
 
-        @staticmethod
-        def fetch_from_sql(session: Session, id: int | List[int]):
-            """
-            Fetch strawberry type from sql
-            """
-            if isinstance(id, int):
-                return graphql_cls.from_orm(session.query(orm_cls).get(id))
+        primary_keys = [key.name for key in inspect(orm_cls).primary_key]
+        if "id" in primary_keys:
 
-            results = session.query(orm_cls).filter(orm_cls.id.in_(id)).all()
-            return [graphql_cls.from_orm(result) for result in results]
+            @staticmethod
+            def fetch_from_sql(session: Session, id: int | List[int]):
+                """
+                Fetch strawberry type from sql
+                """
+                if isinstance(id, int):
+                    return graphql_cls.from_orm(session.query(orm_cls).get(id))
 
-        graphql_cls.fetch_from_sql = fetch_from_sql
+                results = session.query(orm_cls).filter(orm_cls.id.in_(id)).all()
+                return [graphql_cls.from_orm(result) for result in results]
+
+            graphql_cls.fetch_from_sql = fetch_from_sql
 
         return graphql_cls
 
