@@ -22,8 +22,6 @@ from json_to_csv import convert_biomd_json_to_csv
 from sim_runs_json_to_csv import convert_sim_runs_to_csv
 from util import add_concept, add_provenance, asset_to_project, get_model_concepts, url
 
-print("Upload fake data")
-
 # This array allows you to create abitrary provenance.
 # Each dict is a loop which will have access to every type of artifact.
 # By setting the artifact_to_id is the id that the new artifact will connect to.
@@ -437,4 +435,5 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
         print(e)
 
 
-upload_fake_provanence_data()
+if __name__ == "__main__":
+    upload_fake_provanence_data()

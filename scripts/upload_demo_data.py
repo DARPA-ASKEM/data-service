@@ -1,3 +1,4 @@
+import argparse
 import glob
 import json
 import os
@@ -42,8 +43,16 @@ from util import (
     url,
 )
 
-print("Starting process to upload artifacts to postgres.")
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--fake",
+    action=argparse.BooleanOptionalAction,
+    help="Create fake provenance",
+    default=False,
+)
+args = parser.parse_args()
 
+print("Starting process to upload artifacts to postgres.")
 
 download_and_unzip(
     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
@@ -64,7 +73,9 @@ folders = sorted(
 
 
 upload_starter_kit_models()
-upload_fake_provanence_data()
+
+if args.fake == True:
+    upload_fake_provanence_data()
 
 
 for folder in folders:
