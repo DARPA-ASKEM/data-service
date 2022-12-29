@@ -1,5 +1,5 @@
 """
-   Import provenance handler
+Import provenance handler
 """
 from tds.db.graph.provenance_handler import ProvenanceHandler
 

@@ -12,10 +12,10 @@ from tds.schema.model import ModelParameters
 logger = Logger(__file__)
 
 model_opt_relationship_mapping = {
-    "copy": "COPIED_FROM",
-    "decompose": "DECOMPOSED_FROM",
-    "stratify": "STRATIFED_FROM",
-    "glue": "GLUED_FROM",
+    orm.ModelOperations.copy: orm.RelationType.COPIED_FROM,
+    orm.ModelOperations.decompose: orm.RelationType.DECOMPOSED_FROM,
+    orm.ModelOperations.stratify: orm.RelationType.STRATIFIED_FROM,
+    orm.ModelOperations.glue: orm.RelationType.GLUED_FROM,
 }
 
 
