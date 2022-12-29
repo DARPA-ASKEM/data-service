@@ -10,18 +10,27 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
-from tds.autogen import orm
-from tds.db import entry_exists, list_by_id, request_rdb
-from tds.lib.models import adjust_model_params
+from tds.autogen import orm, schema
+from tds.db import (
+    ProvenanceHandler,
+    entry_exists,
+    list_by_id,
+    request_graph_db,
+    request_rdb,
+)
+from tds.lib.models import adjust_model_params, model_opt_relationship_mapping
 from tds.operation import create, delete, retrieve, update
 from tds.schema.model import (
     Intermediate,
     Model,
     ModelDescription,
     ModelFramework,
+    ModelOptPayload,
     ModelParameters,
     orm_to_params,
 )
+from tds.schema.provenance import Provenance
+from tds.settings import settings
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -246,7 +255,11 @@ def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
 
 
 @router.post("", **create.fastapi_endpoint_config)
-def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response:
+def create_model(
+    payload: Model,
+    rdb: Engine = Depends(request_rdb),
+    graph_db=Depends(request_graph_db),
+) -> Response:
     """
     Create model and return its ID
     """
@@ -278,6 +291,19 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
                 )
             )
         session.commit()
+        if settings.NEO4J:
+            print("Neo4j is set")
+            provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+            payload = Provenance(
+                left=model.id,
+                left_type="Model",
+                right=state.id,
+                right_type="Model_revision",
+                relation_type="BEGINS_AT",
+                user_id=model_payload.get("user_id", None),
+            )
+
+            provenance_handler.create_entry(payload)
     logger.info("new model created: %i", id)
     return Response(
         status_code=status.HTTP_201_CREATED,
@@ -288,12 +314,133 @@ def create_model(payload: Model, rdb: Engine = Depends(request_rdb)) -> Response
     )
 
 
-@router.put("/{id}", **update.fastapi_endpoint_config)
+@router.post("/opts/{model_operation}", **create.fastapi_endpoint_config)
+def model_opt(
+    payload: ModelOptPayload,
+    model_operation: schema.ModelOperations,
+    rdb: Engine = Depends(request_rdb),
+    graph_db=Depends(request_graph_db),
+) -> Response:
+    """
+    Make modeling operations.
+    """
+    try:
+        with Session(rdb) as session:
+            payload = payload.dict()
+            # query old model and old content
+            l_model = session.query(orm.ModelDescription).get(payload.get("left"))
+
+            if payload.get("right", False):
+                r_model = session.query(orm.ModelDescription).get(payload.get("right"))
+
+            if model_operation == "copy":
+                state = orm.ModelState(
+                    content=session.query(orm.ModelState)
+                    .get(payload.get("left"))
+                    .__dict__.get("content")
+                )
+
+            elif model_operation in ("decompose", "glue"):
+                state = orm.ModelState(content=payload.get("content"))
+            else:
+                raise TypeError("Operation not supported")
+
+            session.add(state)
+            session.commit()
+
+            # add new model
+            new_model = orm.ModelDescription(
+                name=payload.get("name"),
+                description=payload.get("description"),
+                framework=payload.get("framework"),
+                state_id=state.id,
+            )
+            session.add(new_model)
+            session.commit()
+
+            # add parameters to new model. Default to left model id parameters.
+            if payload.get("parameters") is None:
+                parameters: List[dict] = (
+                    session.query(orm.ModelParameter)
+                    .filter(orm.ModelParameter.model_id == payload.get("left"))
+                    .all()
+                )
+                payload["parameters"] = []
+                for parameter in parameters:
+                    payload["parameters"].append(parameter.__dict__)
+
+            # if parameters are set use those for new model
+            for param in payload.get("parameters"):
+                session.add(
+                    orm.ModelParameter(
+                        model_id=new_model.id,
+                        name=param.get("name"),
+                        default_value=param.get("default_value"),
+                        type=param.get("type"),
+                        state_variable=param.get("state_variable"),
+                    )
+                )
+            session.commit()
+
+            if settings.NEO4J:
+                provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+                prov_payload = Provenance(
+                    left=state.id,
+                    left_type="Model_revision",
+                    right=l_model.state_id,
+                    right_type="Model_revision",
+                    relation_type=model_opt_relationship_mapping[model_operation],
+                    user_id=payload.get("user_id", None),
+                )
+                provenance_handler.create_entry(prov_payload)
+
+                if model_operation == "glue":
+                    prov_payload = Provenance(
+                        left=state.id,
+                        left_type="Model_revision",
+                        right=r_model.state_id,
+                        right_type="Model_revision",
+                        relation_type=model_opt_relationship_mapping[model_operation],
+                        user_id=payload.get("user_id", None),
+                    )
+                    provenance_handler.create_entry(prov_payload)
+
+                # add begins at relationship
+                prov_payload = Provenance(
+                    left=new_model.id,
+                    left_type="Model",
+                    right=state.id,
+                    right_type="Model_revision",
+                    relation_type="BEGINS_AT",
+                    user_id=payload.get("user_id", None),
+                )
+                provenance_handler.create_entry(prov_payload)
+
+        logger.info("new model created: %i", id)
+        return Response(
+            status_code=status.HTTP_201_CREATED,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps({"id": new_model.id}),
+        )
+    except TypeError as error:
+        logger.error("An error occured : %s", error)
+        return Response(
+            status_code=status.HTTP_404_ERROR,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps({"message": "An error occured"}),
+        )
+
+
+@router.post("/{id}", **update.fastapi_endpoint_config)
 def update_model(
     payload: Model,
     id: int,
     rdb: Engine = Depends(request_rdb),
-    # graph_db: Optional[Driver] = Depends(request_graph_db),
+    graph_db=Depends(request_graph_db),
 ) -> Response:
     """
     Update model content
@@ -309,11 +456,27 @@ def update_model(
             session.commit()
 
             model = session.query(orm.ModelDescription).get(id)
+
+            old_state = model.state_id
+
+            model.state_id = state.id
             model.name = model_payload["name"]
             model.description = model_payload["description"]
             model.framework = model_payload["framework"]
             model.state_id = state.id
             session.commit()
+            if settings.NEO4J:
+                provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+
+                payload = Provenance(
+                    left=state.id,
+                    left_type="Model_revision",
+                    right=old_state,
+                    right_type="Model_revision",
+                    relation_type="EDITED_FROM",
+                    user_id=model_payload.get("user_id", None),
+                )
+                provenance_handler.create_entry(payload)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Response(

@@ -31,6 +31,9 @@ up:
 populate:up
 	poetry run python3 scripts/upload_demo_data.py;
 
+.PHONY:fake
+fake:up
+	poetry run python3 scripts/upload_demo_data.py --fake
 	
 .PHONY:down
 down:

@@ -6,20 +6,52 @@ Project askem {
 Enum public.resource_type {
    datasets
    models
-   extractions
    plans
    intermediates
    publications
    simulation_runs
 }
 
+Enum public.provenance_type {
+   Dataset
+   Model
+   Plan
+   Model_revision
+   Intermediate
+   Publication
+   Simulation_run
+}
+
+Enum provenance_search_types{
+  connected_nodes
+  child_nodes
+  parent_nodes
+  derived_models
+  parent_model_revisions
+}
+
 Enum relation_type {
-  derivedfrom
-  copiedfrom
-  cites
-  gluedFrom
-  stratifiedFrom
-  editedFrom
+  DERIVED_FROM
+  COPIED_FROM
+  CITES
+  COMBINED_FROM
+  EDITED_FROM
+  USES
+  EQUIVALENT_OF
+  EXTRACTED_FROM
+  REINTERPRETS
+  GENERATED_BY
+  BEGINS_AT
+  DECOMPOSED_FROM
+  GLUED_FROM
+  STRATIFIED_FROM
+}
+
+Enum model_operations{
+  copy
+  stratify
+  glue
+  decompose
 }
 
 Enum taggable_type {
@@ -241,9 +273,9 @@ Table provenance {
   timestamp datetime [default: `now()`, not null]
   relation_type relation_type [not null]
   left int [not null]
-  left_type resource_type [not null]
+  left_type provenance_type [not null]
   right int [not null]
-  right_type resource_type [not null]
+  right_type provenance_type [not null]
   user_id int [ref: > person.id]
 }
 

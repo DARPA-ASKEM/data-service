@@ -1,3 +1,4 @@
+import argparse
 import glob
 import json
 import os
@@ -30,6 +31,7 @@ from demo_dataset_generator import (
 # from demo_dataset_generator import programatically_populate_datasets
 from exemplar_dataset_generator import populate_exemplar_datasets
 from json_to_csv import convert_biomd_json_to_csv
+from provenance_fake_data import upload_fake_provanence_data
 from sim_runs_json_to_csv import convert_sim_runs_to_csv
 from upload_starter_kit_models import upload_starter_kit_models
 from util import (
@@ -41,13 +43,21 @@ from util import (
     url,
 )
 
-print("Starting process to upload artifacts to postgres.")
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--fake",
+    action=argparse.BooleanOptionalAction,
+    help="Create fake provenance",
+    default=False,
+)
+args = parser.parse_args()
 
+print("Starting process to upload artifacts to postgres.")
 
 download_and_unzip(
     "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
 )
-time.sleep(2)
+# time.sleep(2)
 
 person = create_person()
 person_id = person.get("id")
@@ -61,7 +71,12 @@ folders = sorted(
     + glob.glob("experiments*/thin-thread-examples/demo/BIOMD*/")
 )
 
+
 upload_starter_kit_models()
+
+if args.fake == True:
+    upload_fake_provanence_data()
+
 
 for folder in folders:
 
@@ -101,9 +116,9 @@ for folder in folders:
             project_id=1, asset_id=int(intermediate_mmt_id), asset_type="intermediates"
         )
         add_provenance(
-            left={"id": intermediate_mmt_id, "resource_type": "intermediates"},
-            right={"id": publication_id, "resource_type": "publications"},
-            relation_type="derivedfrom",
+            left={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
+            right={"id": publication_id, "resource_type": "Publication"},
+            relation_type="EXTRACTED_FROM",
             user_id=person_id,
         )
         for concept in model_concepts:
@@ -121,9 +136,9 @@ for folder in folders:
             project_id=1, asset_id=int(intermediate_sbml_id), asset_type="intermediates"
         )
         add_provenance(
-            left={"id": intermediate_sbml_id, "resource_type": "intermediates"},
-            right={"id": intermediate_mmt_id, "resource_type": "intermediates"},
-            relation_type="derivedfrom",
+            left={"id": intermediate_sbml_id, "resource_type": "Intermediate"},
+            right={"id": publication_id, "resource_type": "Publication"},
+            relation_type="EXTRACTED_FROM",
             user_id=person_id,
         )
         for concept in model_concepts:
@@ -149,10 +164,14 @@ for folder in folders:
 
         asset_to_project(project_id=1, asset_id=int(model_id), asset_type="models")
 
+        response = requests.request("GET", url + f"models/{model_id}")
+        state_model_json = response.json()
+        state_id = state_model_json.get("state_id")
+
         add_provenance(
-            left={"id": model_id, "resource_type": "models"},
-            right={"id": intermediate_sbml_id, "resource_type": "intermediates"},
-            relation_type="derivedfrom",
+            left={"id": state_id, "resource_type": "Model_revision"},
+            right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
+            relation_type="REINTERPRETS",
             user_id=person_id,
         )
         for concept in model_concepts:
@@ -219,121 +238,14 @@ for folder in folders:
         )
 
         add_provenance(
-            left={"id": simulation_plan_id, "resource_type": "plans"},
-            relation_type="derivedfrom",
-            right={"id": model_id, "resource_type": "models"},
+            left={"id": simulation_plan_id, "resource_type": "Plan"},
+            relation_type="USES",
+            right={"id": state_id, "resource_type": "Model_revision"},
             user_id=person_id,
         )
 
     except Exception as e:
         print(f" {e}")
-
-    ## create dataset from simulation run * backwards from how this would normally happen but we want dataset id to add to request
-
-    # try:
-    #     # Open json to get relevant information
-    #     with open(folder + "sim_output.json", "r", encoding="utf-8") as sim_out:
-    #         # model_name = folder.split("/")[-2]
-    #         simulation_output = json.load(sim_out)
-    #         states = simulation_output["states"]
-    #         first_state_obj = states[0]
-    #         num_of_states = len(first_state_obj)
-
-    #         # Create the dataset with maintainer_id of 1
-    #         # assuming the first maintainer is already created.
-
-    #         dataset_response = create_dataset(
-    #             maintainer_id=1,
-    #             num_of_states=num_of_states,
-    #             biomodel_name=f"Biomodel simulation output :" + model_name,
-    #             biomodel_description=model_description,
-    #             url=url,
-    #         )
-    #         dataset_id = dataset_response["id"]
-    #         # Convert the json to a CSV
-    #         convert_biomd_json_to_csv(
-    #             json_file_path=folder + "sim_output.json",
-    #             output_file_path=folder + "sim_output.csv",
-    #         )
-    #         # Upload the CSV to TDS for full mock data
-    #         with open(folder + "sim_output.csv", "rb") as sim_csv:
-    #             print(f"Uploading file to dataset_id {dataset_id}")
-    #             upload_file_to_tds(id=dataset_id, file_object=sim_csv, url=url)
-    #         # Finish populating dataset metadata: Features, Qualifiers
-    #         for state in range(num_of_states):
-    #             create_feature(dataset_id, state, url=url)
-    #         create_qualifier(dataset_id, num_of_states, url=url)
-    #         asset_to_project(project_id, dataset_id, "datasets")
-    #         for concept in model_concepts:
-    #             add_concept(concept=concept, object_id=dataset_id, type="datasets")
-
-    # except FileNotFoundError:
-    #     print("sim_output.json not found in " + folder)
-
-    # ### simulation run ###
-
-    # try:
-    #     print("Upload Simulation Run")
-
-    #     simulation_run_id = create_run(
-    #         path=folder + "sim_output.json",
-    #         plan_id=simulation_plan_id,
-    #         success=True,
-    #         dataset_id=dataset_id,
-    #     )
-    #     asset_to_project(
-    #         project_id=1, asset_id=int(simulation_run_id), asset_type="simulation_runs"
-    #     )
-
-    #     add_provenance(
-    #         left={"id": simulation_run_id, "resource_type": "simulation_runs"},
-    #         relation_type="derivedfrom",
-    #         right={"id": simulation_plan_id, "resource_type": "plans"},
-    #         user_id=person_id,
-    #     )
-
-    # except Exception as e:
-    #     print(f" {e}")
-
-    # ### Simulation parameters ###
-    # try:
-
-    #     create_simulation_parameters(
-    #         path_parameters=f"{folder}model_mmt_parameters.json",
-    #         path_initials=f"{folder}model_mmt_initials.json",
-    #         run_id=simulation_run_id,
-    #     )
-
-    #     time.sleep(1)
-    #     # get parameters
-    #     response = requests.request(
-    #         "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
-    #     )
-    #     parameters_json = response.json()
-
-    #     with open(f"{folder}model_mmt_initials.json", "r") as f:
-    #         init_parameters = json.load(f)
-    #         for init_parameter_name, init_parameter_value in init_parameters.get(
-    #             "initials"
-    #         ).items():
-    #             for parameter in parameters_json:
-    #                 if parameter.get("name") == init_parameter_name:
-    #                     ncit = init_parameter_value.get("identifiers").get("ncit", None)
-    #                     ido = init_parameter_value.get("identifiers").get("ido", None)
-    #                     if ncit is not None:
-    #                         add_concept(
-    #                             concept=f"ncit:{ncit}",
-    #                             object_id=parameter.get("id"),
-    #                             type="simulation_parameters",
-    #                         )
-    #                     if ido is not None:
-    #                         add_concept(
-    #                             concept=f"ido:{ido}",
-    #                             object_id=parameter.get("id"),
-    #                             type="simulation_parameters",
-    #                         )
-    # except Exception as e:
-    #     print(e)
 
     ### upload simulation run datasets ####
 
@@ -406,9 +318,15 @@ for folder in folders:
             )
 
             add_provenance(
-                left={"id": simulation_run_id, "resource_type": "simulation_runs"},
-                relation_type="derivedfrom",
-                right={"id": simulation_plan_id, "resource_type": "plans"},
+                left={"id": simulation_run_id, "resource_type": "Simulation_run"},
+                relation_type="GENERATED_BY",
+                right={"id": simulation_plan_id, "resource_type": "Plan"},
+                user_id=person_id,
+            )
+            add_provenance(
+                right={"id": simulation_run_id, "resource_type": "Simulation_run"},
+                relation_type="REINTERPRETS",
+                left={"id": dataset_id, "resource_type": "Dataset"},
                 user_id=person_id,
             )
 

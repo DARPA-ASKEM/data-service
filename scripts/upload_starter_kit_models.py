@@ -75,9 +75,9 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 )
             if publication_id:
                 add_provenance(
-                    left={"id": intermediate_mmt_id, "resource_type": "intermediates"},
-                    right={"id": publication_id, "resource_type": "publications"},
-                    relation_type="derivedfrom",
+                    left={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
+                    right={"id": publication_id, "resource_type": "Publication"},
+                    relation_type="EXTRACTED_FROM",
                     user_id=person_id,
                 )
         except Exception as e:
@@ -94,9 +94,9 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 asset_type="intermediates",
             )
             add_provenance(
-                left={"id": intermediate_grom_id, "resource_type": "intermediates"},
-                right={"id": publication_id, "resource_type": "publications"},
-                relation_type="derivedfrom",
+                left={"id": intermediate_grom_id, "resource_type": "Intermediate"},
+                right={"id": publication_id, "resource_type": "Publication"},
+                relation_type="EXTRACTED_FROM",
                 user_id=person_id,
             )
             for concept in model_concepts:
@@ -126,10 +126,14 @@ def upload_starter_kit_models(person_id=1, project_id=1):
 
             asset_to_project(project_id=1, asset_id=int(model_id), asset_type="models")
 
+            response = requests.request("GET", url + f"models/{model_id}")
+            state_model_json = response.json()
+            state_id = state_model_json.get("state_id")
+
             add_provenance(
-                left={"id": model_id, "resource_type": "models"},
-                right={"id": intermediate_grom_id, "resource_type": "intermediates"},
-                relation_type="derivedfrom",
+                left={"id": state_id, "resource_type": "Model_revision"},
+                right={"id": intermediate_grom_id, "resource_type": "Intermediate"},
+                relation_type="REINTERPRETS",
                 user_id=person_id,
             )
             for concept in model_concepts:
@@ -199,9 +203,9 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             )
 
             add_provenance(
-                left={"id": simulation_plan_id, "resource_type": "plans"},
-                relation_type="derivedfrom",
-                right={"id": model_id, "resource_type": "models"},
+                left={"id": simulation_plan_id, "resource_type": "Plan"},
+                relation_type="USES",
+                right={"id": state_id, "resource_type": "Model_revision"},
                 user_id=person_id,
             )
 
@@ -284,9 +288,15 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 )
 
                 add_provenance(
-                    left={"id": simulation_run_id, "resource_type": "simulation_runs"},
-                    relation_type="derivedfrom",
-                    right={"id": simulation_plan_id, "resource_type": "plans"},
+                    left={"id": simulation_run_id, "resource_type": "Simulation_run"},
+                    relation_type="GENERATED_BY",
+                    right={"id": simulation_plan_id, "resource_type": "Plan"},
+                    user_id=person_id,
+                )
+                add_provenance(
+                    right={"id": simulation_run_id, "resource_type": "Simulation_run"},
+                    relation_type="REINTERPRETS",
+                    left={"id": dataset_id, "resource_type": "Dataset"},
                     user_id=person_id,
                 )
 
