@@ -213,3 +213,16 @@ class ProvenanceHandler:
                 {"label": res.data().get("label")[0], "id": res.data().get("id")}
                 for res in response
             ]
+
+    def add_properties(self):
+        with self.graph_db.session() as session:
+            query = (
+                "match (n)-[r]->(m)"
+                + "SET n.name= labels(n)[0]"
+                + "SET m.name= labels(m)[0]"
+                + "SET r.name =type(r)"
+                + "return *"
+            )
+
+            response = session.run(query)
+            return True

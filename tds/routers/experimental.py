@@ -129,3 +129,18 @@ def search_provenance(
     """
     cypher = convert_to_cypher(query)
     raise NotImplemented
+
+
+@router.get("/set_properties")
+def set_properties(
+    rdb: Engine = Depends(request_rdb),
+    graph_db=Depends(request_graph_db),
+) -> str:
+    """
+    Convert English to Cypher.
+    """
+    if settings.NEO4J:
+        print("Neo4j is set")
+        provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+        success = provenance_handler.add_properties()
+        return success
