@@ -19,68 +19,46 @@ from tds.settings import settings
 logger = Logger(__name__)
 router = APIRouter()
 
-# MOCKUP DO NOT USE IN PROD: NOT DERIVED FROM ASKEM.DBML
-class ProvenanceType(enum.Enum):
-    Dataset = "Dataset"
-    Model = "Model"
-    Plan = "Plan"
-    ModelRevision = "ModelRevision"
-    Intermediate = "Intermediate"
-    Publication = "Publication"
-    Run = "Run"
-
-
-# MOCKUP DO NOT USE IN PROD: NOT DERIVED FROM ASKEM.DBML
-class RelationType(enum.Enum):
-    DERIVED_FROM = "DERIVED_FROM"
-    COPIED_FROM = "COPIED_FROM"
-    CITES = "CITES"
-    COMBINED_FROM = "COMBINED_FROM"
-    EDITED_FROM = "EDITED_FROM"
-    USES = "USES"
-    EQUIVALENT_OF = "EQUIVALENT_OF"
-    EXTRACTED_FROM = "EXTRACTED_FROM"
-    REINTERPRETS = "REINTERPRETS"
-    GENERATED_BY = "GENERATED_BY"
-    BEGINS_AT = "BEGINS_AT"
-    DECOMPOSED_FROM = "DECOMPOSED_FROM"
-    GLUED_FROM = "GLUED_FROM"
-    STRATIFIED_FROM = "STRATIFIED_FROM"
-
 
 valid_relations = {
-    RelationType.COPIED_FROM: [
-        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    orm.RelationType.COPIED_FROM: [
+        (orm.ProvenanceType.Model_revision, orm.ProvenanceType.Model_revision)
     ],
-    RelationType.CITES: [(ProvenanceType.Publication, ProvenanceType.Publication)],
-    RelationType.COMBINED_FROM: [
-        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    orm.RelationType.CITES: [
+        (orm.ProvenanceType.Publication, orm.ProvenanceType.Publication)
     ],
-    RelationType.EDITED_FROM: [
-        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    orm.RelationType.COMBINED_FROM: [
+        (orm.ProvenanceType.Model_revision, orm.ProvenanceType.Model_revision)
     ],
-    RelationType.USES: [(ProvenanceType.Plan, ProvenanceType.ModelRevision)],
-    RelationType.EXTRACTED_FROM: [
-        (ProvenanceType.Intermediate, ProvenanceType.Publication),
-        (ProvenanceType.Dataset, ProvenanceType.Publication),
-        (ProvenanceType.Dataset, ProvenanceType.Run),
+    orm.RelationType.EDITED_FROM: [
+        (orm.ProvenanceType.Model_revision, orm.ProvenanceType.Model_revision)
     ],
-    RelationType.REINTERPRETS: [
-        (ProvenanceType.Dataset, ProvenanceType.Run),
-        (ProvenanceType.Intermediate, ProvenanceType.Intermediate),
-        (ProvenanceType.Intermediate, ProvenanceType.Intermediate),
-        (ProvenanceType.Model, ProvenanceType.Intermediate),
+    orm.RelationType.USES: [
+        (orm.ProvenanceType.Plan, orm.ProvenanceType.Model_revision)
     ],
-    RelationType.GENERATED_BY: [(ProvenanceType.Dataset, ProvenanceType.ModelRevision)],
-    RelationType.BEGINS_AT: [(ProvenanceType.ModelRevision, ProvenanceType.Model)],
-    RelationType.DECOMPOSED_FROM: [
-        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    orm.RelationType.EXTRACTED_FROM: [
+        (orm.ProvenanceType.Intermediate, orm.ProvenanceType.Publication),
+        (orm.ProvenanceType.Dataset, orm.ProvenanceType.Publication),
     ],
-    RelationType.GLUED_FROM: [
-        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    orm.RelationType.REINTERPRETS: [
+        (orm.ProvenanceType.Dataset, orm.ProvenanceType.Simulation_run),
+        (orm.ProvenanceType.Intermediate, orm.ProvenanceType.Intermediate),
+        (orm.ProvenanceType.Model, orm.ProvenanceType.Intermediate),
     ],
-    RelationType.STRATIFIED_FROM: [
-        (ProvenanceType.ModelRevision, ProvenanceType.ModelRevision)
+    orm.RelationType.GENERATED_BY: [
+        (orm.ProvenanceType.Simulation_run, orm.ProvenanceType.Plan)
+    ],
+    orm.RelationType.BEGINS_AT: [
+        (orm.ProvenanceType.Model, orm.ProvenanceType.Model_revision)
+    ],
+    orm.RelationType.DECOMPOSED_FROM: [
+        (orm.ProvenanceType.Model_revision, orm.ProvenanceType.Model_revision)
+    ],
+    orm.RelationType.GLUED_FROM: [
+        (orm.ProvenanceType.Model_revision, orm.ProvenanceType.Model_revision)
+    ],
+    orm.RelationType.STRATIFIED_FROM: [
+        (orm.ProvenanceType.Model_revision, orm.ProvenanceType.Model_revision)
     ],
 }
 
@@ -99,20 +77,20 @@ examples = """
 Question: Match all nodes in the database
 Query: `Match (n) return n`
 
-Question: Which composed models are derived from Paper with ID of 1?
-Query: `Match (M:Model)-[r *1..]-> (i:Intermediate)- [r2:EXTRACTED_FROM]->(p:Publication) where p.id=1 return m`
+Question: Which composed models are derived from Paper with ID of 12?
+Query: `Match (m:Model)-[r *1..]->(i:Intermediate)-[r2:EXTRACTED_FROM]->(p:Publication) where p.id=12 return m`
 
 Question: Which datasets are associated with which model primitives?
 Query: `match (d:Dataset)-[r *1..]-(i:Intermediate) return d,r,i`
 
-Question: Return simulators that rely on Primitive with ID of 12 or 4
-Query: `match (p:Plan)-[r *1..]->(i:Intermediate) where i.id=4 or i.id=12 return p,r,i`
+Question: Return simulators that rely on Primitive with ID of 19 or 12
+Query: `match (p:Plan)-[r *1..]->(i:Intermediate) where i.id=19 or i.id=12 return p,r,i`
 
 Question: Which simulators were created by User with ID 999?
-Query: `match (p:Plan)-[r:USES]->(mr:ModelRevision) where r.user_id=999 return p`
+Query: `match (p:Plan)-[r:USES]->(mr:Model_revision) where r.user_id=999 return p`
 
 Question: What are prior versions of this composed model with id 5?
-Query: `Match (rev:ModelRevision)<-[r:BEGINS_AT]-(m:Model) where (m.id=5) match (rev2:ModelRevision)<-[r2 *1.. ]-(rev) return rev,rev2`
+Query: `Match (rev:Model_revision)<-[r:BEGINS_AT]-(m:Model) where (m.id=5) match (rev2:Model_revision)<-[r2 *1.. ]-(rev) return rev,rev2`
 """
 
 
