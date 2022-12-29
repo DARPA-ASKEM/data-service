@@ -7,13 +7,15 @@ from sqlite3 import connect
 from typing import Generator, Tuple
 
 from fastapi.testclient import TestClient
-from neo4j import GraphDatabase
+
+# from neo4j import GraphDatabase
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
 from tds.db import init_dev_content, request_graph_db, request_rdb
 from tds.server.build import build_api
-from tds.settings import settings
+
+# from tds.settings import settings
 
 # rdb_engine = create_engine(
 #     "sqlite:///.sqlite",
