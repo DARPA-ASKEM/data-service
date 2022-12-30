@@ -30,6 +30,19 @@ class SearchProvenance(ProvenanceHandler):
     def __getitem__(self, key):
         return self.__getattribute__(key)
 
+
+    def dynamic_relationship_direction(self, direction, relationship_type):
+        """
+        get direction of relationship based on direction type
+        """
+        if direction == "all":
+            return f"-[{relationship_type}]-"
+        if direction == "child":
+            return f"<-[{relationship_type}]-"
+        if direction == "parent":
+            return f"-[{relationship_type}]->"
+        raise Exception("relationship direction is not allowed.")
+
     def connected_nodes_by_direction(self, payload, direction):
         """
         Connect nodes
@@ -37,7 +50,13 @@ class SearchProvenance(ProvenanceHandler):
         with self.graph_db.session() as session:
             # return string of relationship excluding CONTAINS and IS_CONCEPT_OF
             relationships_str = relationships_array_as_str(
-                exclude=["CONTAINS", "IS_CONCEPT_OF"]
+                exclude=["CONTAINS", "IS_CONCEPT_OF"])
+
+            query = (
+                f"Match (n1: {payload.get('root_type')}) "
+                + f"{self.dynamic_relationship_direction(direction=direction, relationship_type='*')}(n2)"
+                + "Where n1.id = $root_id "
+                + "RETURN labels(n2) as label, n2.id as id"
             )
 
             # set the direction of the search dynamically
@@ -86,6 +105,23 @@ class SearchProvenance(ProvenanceHandler):
         """
         return self.connected_nodes_by_direction(payload=payload, direction="parent")
 
+
+    def derived_models_query_generater(self, root_type):
+        """
+        Return models derived from a publication or intermediate
+        """
+        if root_type == "Publication":
+            return (
+                "Match (m:Model)-[r *1..]->(i:Intermediate)-[r2:EXTRACTED_FROM]->"
+                + f"(n:{root_type})"
+            )
+        if root_type == "Intermediate":
+            return (
+                "Match (m:Model)-[r *1..]->(md:Model_revision)-[r2:REINTERPRETS]->"
+                + f"(n:{root_type})"
+            )
+        raise Exception(f"Models can not be derived from this type: {root_type}")
+
     def derived_models(self, payload):
         """
         Return models derived from artifact (Publication or Intermediate)
@@ -110,6 +146,7 @@ class SearchProvenance(ProvenanceHandler):
 
             return sorted(response_data, key=lambda i: list(i.keys()))
 
+
     def parent_model_revisions(self, payload):
         """
         Which model revisions help create the latest model which was used to create the artifact
@@ -122,7 +159,7 @@ class SearchProvenance(ProvenanceHandler):
         ):
             raise HTTPException(
                 status_code=404,
-                detail="Derived models can only be found from root types of Publication or Intermediates",
+                detail="Derived models can only be found from root types of Model, Simulation, Plan, Dataset",
             )
         with self.graph_db.session() as session:
 
