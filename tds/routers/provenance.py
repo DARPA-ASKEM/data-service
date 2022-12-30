@@ -7,11 +7,11 @@ router.provenance - very basic crud operations for provenance
 import json
 from logging import Logger
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
+from tds.autogen import orm, schema
 from tds.db import ProvenanceHandler, SearchProvenance, request_graph_db, request_rdb
 from tds.operation import create, delete, retrieve
 from tds.schema.provenance import Provenance
@@ -32,23 +32,26 @@ def get_provenance(id: int, rdb: Engine = Depends(request_rdb)):
 @router.post("/search")
 def search_provenance(
     payload: dict,
+    search_type: schema.ProvenanceSearchTypes = Query(
+        default=schema.ProvenanceSearchTypes.connected_nodes
+    ),
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
 ) -> Response:
     """
     Search provenance of for all artifacts that helped derive this artifact.
     """
-    logger.info("search provenance")
-    print(payload)
-    search_provenance_handler = SearchProvenance(rdb=rdb, graph_db=graph_db)
+    logger.info("Search provenance")
 
-    search_function = getattr(search_provenance_handler, payload.get("search_type"))
-    list_of_artifacts = search_function(payload=payload)
+    search_provenance_handler = SearchProvenance(rdb=rdb, graph_db=graph_db)
+    search_function = search_provenance_handler[search_type]
+    results = search_function(payload=payload)
+
     return Response(
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps({"provenance": list_of_artifacts}),
+        content=json.dumps({"result": results}),
     )
 
 
