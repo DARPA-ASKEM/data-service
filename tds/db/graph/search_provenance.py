@@ -4,7 +4,7 @@ Import provenance handler
 import logging
 from collections import defaultdict
 
-from fastapi import FastAPI, HTTPException
+from fastapi import HTTPException
 
 from tds.autogen import schema
 from tds.db.graph.provenance_handler import ProvenanceHandler
@@ -16,7 +16,6 @@ from tds.db.graph.query_helpers import (
     parent_model_query_generator,
     relationships_array_as_str,
 )
-from tds.schema.provenance import provenance_type_to_abbr
 
 
 class SearchProvenance(ProvenanceHandler):
@@ -30,19 +29,6 @@ class SearchProvenance(ProvenanceHandler):
     def __getitem__(self, key):
         return self.__getattribute__(key)
 
-
-    def dynamic_relationship_direction(self, direction, relationship_type):
-        """
-        get direction of relationship based on direction type
-        """
-        if direction == "all":
-            return f"-[{relationship_type}]-"
-        if direction == "child":
-            return f"<-[{relationship_type}]-"
-        if direction == "parent":
-            return f"-[{relationship_type}]->"
-        raise Exception("relationship direction is not allowed.")
-
     def connected_nodes_by_direction(self, payload, direction):
         """
         Connect nodes
@@ -50,13 +36,7 @@ class SearchProvenance(ProvenanceHandler):
         with self.graph_db.session() as session:
             # return string of relationship excluding CONTAINS and IS_CONCEPT_OF
             relationships_str = relationships_array_as_str(
-                exclude=["CONTAINS", "IS_CONCEPT_OF"])
-
-            query = (
-                f"Match (n1: {payload.get('root_type')}) "
-                + f"{self.dynamic_relationship_direction(direction=direction, relationship_type='*')}(n2)"
-                + "Where n1.id = $root_id "
-                + "RETURN labels(n2) as label, n2.id as id"
+                exclude=["CONTAINS", "IS_CONCEPT_OF"]
             )
 
             # set the direction of the search dynamically
@@ -105,23 +85,6 @@ class SearchProvenance(ProvenanceHandler):
         """
         return self.connected_nodes_by_direction(payload=payload, direction="parent")
 
-
-    def derived_models_query_generater(self, root_type):
-        """
-        Return models derived from a publication or intermediate
-        """
-        if root_type == "Publication":
-            return (
-                "Match (m:Model)-[r *1..]->(i:Intermediate)-[r2:EXTRACTED_FROM]->"
-                + f"(n:{root_type})"
-            )
-        if root_type == "Intermediate":
-            return (
-                "Match (m:Model)-[r *1..]->(md:Model_revision)-[r2:REINTERPRETS]->"
-                + f"(n:{root_type})"
-            )
-        raise Exception(f"Models can not be derived from this type: {root_type}")
-
     def derived_models(self, payload):
         """
         Return models derived from artifact (Publication or Intermediate)
@@ -129,15 +92,15 @@ class SearchProvenance(ProvenanceHandler):
         if payload.get("root_type") not in ("Publication", "Intermediate"):
             raise HTTPException(
                 status_code=404,
-                detail="Derived models can only be found from root types of Publication or Intermediates",
+                detail="Derived models can only be found from "
+                + "root types of Publication or Intermediates",
             )
 
         with self.graph_db.session() as session:
-
-            query = (
-                f" {derived_models_query_generater(root_type=payload.get('root_type'), root_id=payload.get('root_id'))} "
-                + "RETURN labels(Md) as label, Md.id as id"
+            generated_query = derived_models_query_generater(
+                root_type=payload.get("root_type"), root_id=payload.get("root_id")
             )
+            query = f" {generated_query} " + "RETURN labels(Md) as label, Md.id as id"
             response = session.run(query)
 
             response_data = [
@@ -146,10 +109,10 @@ class SearchProvenance(ProvenanceHandler):
 
             return sorted(response_data, key=lambda i: list(i.keys()))
 
-
     def parent_model_revisions(self, payload):
         """
-        Which model revisions help create the latest model which was used to create the artifact
+        Which model revisions help create the
+        latest model which was used to create the artifact
         """
         if payload.get("root_type") not in (
             "Model",
@@ -159,7 +122,8 @@ class SearchProvenance(ProvenanceHandler):
         ):
             raise HTTPException(
                 status_code=404,
-                detail="Derived models can only be found from root types of Model, Simulation, Plan, Dataset",
+                detail="Derived models can only be found "
+                + "from root types of Publication or Intermediates",
             )
         with self.graph_db.session() as session:
 
@@ -172,9 +136,9 @@ class SearchProvenance(ProvenanceHandler):
 
             query = (
                 f"{match_pattern}"
-                + f"Match (Mr2:ModelRevision)"
+                + "Match (Mr2:ModelRevision)"
                 + f"-[r2:{relationships_str} *1.. ]->(Mr) "
-                + f"With collect(Mr)+collect(Mr2) as Mrs "
+                + "With collect(Mr)+collect(Mr2) as Mrs "
                 + "Unwind Mrs as Both_rms "
                 + "With DISTINCT Both_rms "
                 + "RETURN labels(Both_rms) as label, Both_rms.id as id "
@@ -187,7 +151,8 @@ class SearchProvenance(ProvenanceHandler):
                 {res.data().get("label")[0]: res.data().get("id")} for res in response
             ]
 
-            ## if response is empty there is only one version of the model. Return just that node.
+            ## if response is empty there is only one version of the model.
+            # Return just that node.
             if len(response_data) == 0:
                 print("here")
                 query = f"{match_pattern}" + "RETURN labels(Mr) as label, Mr.id as id "
@@ -208,7 +173,8 @@ class SearchProvenance(ProvenanceHandler):
         if payload.get("root_type") not in ("Model"):
             raise HTTPException(
                 status_code=404,
-                detail="Parent models can only be found from root types of Model, Plan, SimulationRun, Dataset",
+                detail="Parent models can only be found from root "
+                + "types of Model, Plan, SimulationRun, Dataset",
             )
         with self.graph_db.session() as session:
 
@@ -246,6 +212,7 @@ class SearchProvenance(ProvenanceHandler):
         """
         Which models relay on which primatives
         """
+        print(payload)
         with self.graph_db.session() as session:
             match_node = match_node_builder(
                 node_type=schema.ProvenanceType.Intermediate
