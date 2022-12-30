@@ -28,6 +28,8 @@ Enum provenance_search_types{
   parent_nodes
   derived_models
   parent_model_revisions
+  model_to_primative
+  artifacts_created_by_user
 }
 
 Enum relation_type {

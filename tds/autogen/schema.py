@@ -27,9 +27,11 @@ class ProvenanceType(str, Enum):
 
 class ProvenanceSearchTypes(str, Enum):
 
+    artifacts_created_by_user = 'artifacts_created_by_user'
     child_nodes = 'child_nodes'
     connected_nodes = 'connected_nodes'
     derived_models = 'derived_models'
+    model_to_primative = 'model_to_primative'
     parent_model_revisions = 'parent_model_revisions'
     parent_nodes = 'parent_nodes'
     
