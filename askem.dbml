@@ -51,6 +51,8 @@ Enum provenance_search_types{
   concept_counts
   model_to_primative
   artifacts_created_by_user
+  concept
+  concept_counts
 }
 
 Enum relation_type {

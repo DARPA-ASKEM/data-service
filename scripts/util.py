@@ -71,6 +71,12 @@ resource_provenance_mapping = {
     "simulation_parameters": "PlanParameter",
     "model_parameters": "ModelParameter",
 }
+<<<<<<< HEAD
+=======
+
+
+def add_concept(concept, object_id, type, user_id=1):
+>>>>>>> eb4cc79 (updated names)
 
 
 def add_concept(concept, object_id, type, user_id=1):

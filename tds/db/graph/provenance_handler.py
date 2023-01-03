@@ -131,8 +131,12 @@ class ProvenanceHandler:
 
                 left_node_query = (
                     f"Merge (n: {provenance_payload.get('left_type')}"
+<<<<<<< HEAD
                     + f"{{id: {provenance_payload.get('left')} , "
                     + f"concept:'{provenance_payload.get('concept')}'}} )"
+=======
+                    + f"{{id: {provenance_payload.get('left')} , concept:'{provenance_payload.get('concept')}'}} )"
+>>>>>>> eb4cc79 (updated names)
                 )
             else:
                 left_node_query = (

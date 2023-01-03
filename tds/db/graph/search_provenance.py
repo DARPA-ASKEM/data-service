@@ -16,6 +16,7 @@ from tds.db.graph.query_helpers import (
     parent_model_query_generator,
     relationships_array_as_str,
 )
+from tds.schema.provenance import provenance_type_to_abbr
 
 
 class SearchProvenance(ProvenanceHandler):
@@ -181,6 +182,7 @@ class SearchProvenance(ProvenanceHandler):
             match_pattern = parent_model_query_generator(
                 payload.get("root_type"), payload.get("root_id")
             )
+            print(query)
 
             model_relationships = relationships_array_as_str(
                 include=[

@@ -353,6 +353,7 @@ def create_model(
                 print(parameter)
                 payload = Provenance(
                     left=parameter.get("id"),
+
                     left_type="ModelParameter",
                     right=model.state_id,
                     right_type="ModelRevision",
@@ -386,9 +387,9 @@ def model_opt(
         # query old model and old content
         # print(payload)
         l_model = session.query(orm.ModelDescription).get(payload.get("left"))
-        print(l_model)
         if payload.get("right", False):
             r_model = session.query(orm.ModelDescription).get(payload.get("right"))
+
 
         if model_operation == "copy":
             state = orm.ModelState(
@@ -426,7 +427,6 @@ def model_opt(
             for parameter in parameters:
                 payload["parameters"].append(parameter.__dict__)
 
-        # add parameters to new model
         for param in payload.get("parameters"):
             session.add(
                 orm.ModelParameter(
@@ -440,6 +440,7 @@ def model_opt(
         session.commit()
 
         if settings.NEO4J_ENABLED:
+
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             prov_payload = Provenance(
                 left=state.id,
@@ -452,6 +453,7 @@ def model_opt(
             provenance_handler.create_entry(prov_payload)
 
             if model_operation == "glue" and payload.get("right", False):
+
                 prov_payload = Provenance(
                     left=state.id,
                     left_type="ModelRevision",
@@ -492,6 +494,7 @@ def model_opt(
                     user_id=None,
                 )
                 provenance_handler.create_entry(payload)
+
 
     logger.info("new model created: %i", id)
     return Response(
