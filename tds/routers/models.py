@@ -291,14 +291,14 @@ def create_model(
                 )
             )
         session.commit()
-        if settings.NEO4J:
-            print("Neo4j is set")
+        if settings.NEO4J_ENABLED:
+            logger.info("Neo4j is set")
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             payload = Provenance(
                 left=model.id,
                 left_type="Model",
                 right=state.id,
-                right_type="Model_revision",
+                right_type="ModelRevision",
                 relation_type="BEGINS_AT",
                 user_id=model_payload.get("user_id", None),
             )
@@ -382,13 +382,13 @@ def model_opt(
                 )
             session.commit()
 
-            if settings.NEO4J:
+            if settings.NEO4J_ENABLED:
                 provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
                 prov_payload = Provenance(
                     left=state.id,
-                    left_type="Model_revision",
+                    left_type="ModelRevision",
                     right=l_model.state_id,
-                    right_type="Model_revision",
+                    right_type="ModelRevision",
                     relation_type=model_opt_relationship_mapping[model_operation],
                     user_id=payload.get("user_id", None),
                 )
@@ -397,9 +397,9 @@ def model_opt(
                 if model_operation == "glue":
                     prov_payload = Provenance(
                         left=state.id,
-                        left_type="Model_revision",
+                        left_type="ModelRevision",
                         right=r_model.state_id,
-                        right_type="Model_revision",
+                        right_type="ModelRevision",
                         relation_type=model_opt_relationship_mapping[model_operation],
                         user_id=payload.get("user_id", None),
                     )
@@ -410,7 +410,7 @@ def model_opt(
                     left=new_model.id,
                     left_type="Model",
                     right=state.id,
-                    right_type="Model_revision",
+                    right_type="ModelRevision",
                     relation_type="BEGINS_AT",
                     user_id=payload.get("user_id", None),
                 )
@@ -465,18 +465,18 @@ def update_model(
             model.framework = model_payload["framework"]
             model.state_id = state.id
             session.commit()
-            if settings.NEO4J:
+            if settings.NEO4J_ENABLED:
                 provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
 
-                payload = Provenance(
+                provenance_payload = Provenance(
                     left=state.id,
-                    left_type="Model_revision",
+                    left_type="ModelRevision",
                     right=old_state,
-                    right_type="Model_revision",
+                    right_type="ModelRevision",
                     relation_type="EDITED_FROM",
                     user_id=model_payload.get("user_id", None),
                 )
-                provenance_handler.create_entry(payload)
+                provenance_handler.create_entry(provenance_payload)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Response(

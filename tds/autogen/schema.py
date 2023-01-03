@@ -19,10 +19,10 @@ class ProvenanceType(str, Enum):
     Dataset = 'Dataset'
     Intermediate = 'Intermediate'
     Model = 'Model'
-    Model_revision = 'Model_revision'
+    ModelRevision = 'ModelRevision'
     Plan = 'Plan'
     Publication = 'Publication'
-    Simulation_run = 'Simulation_run'
+    SimulationRun = 'SimulationRun'
     
 
 class ProvenanceSearchTypes(str, Enum):

@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v6'
+  Note: 'v7'
 }
 
 Enum public.resource_type {
@@ -16,10 +16,10 @@ Enum public.provenance_type {
    Dataset
    Model
    Plan
-   Model_revision
+   ModelRevision
    Intermediate
    Publication
-   Simulation_run
+   SimulationRun
 }
 
 Enum provenance_search_types{
