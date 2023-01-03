@@ -2,18 +2,15 @@
 Experimental provenance search
 """
 
-import enum
 import re
 from logging import Logger
 
 import openai
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Session
 
 from tds.autogen import orm
 from tds.db import ProvenanceHandler, request_graph_db, request_rdb
-from tds.schema.provenance import Provenance
 from tds.settings import settings
 
 logger = Logger(__name__)
@@ -62,18 +59,18 @@ valid_relations = {
     ],
 }
 
-db_desc = "Valid relations include:\n"
+DB_DESC = "Valid relations include:\n"
 # NOTE: Should we make these sentences more natural language related?
 for relation, mapping in valid_relations.items():
     for (dom, codom) in mapping:
-        db_desc += f"{dom}-[relation]->{codom}\n"
+        DB_DESC += f"{dom}-[relation]->{codom}\n"
 
-preamble = """
+PREAMBLE = """
 I will type "Question:" followed by a question or command in English like "Question: Count all Publications" and you will return a 
 single line print "Query:" Followed by an openCypher query like "Query: `match (p:Publication) return count(p)`. 
 """
 
-examples = """
+EXAMPLES = """
 Question: Match all nodes in the database
 Query: `Match (n) return n`
 
@@ -102,7 +99,7 @@ def convert_to_cypher(
     Convert English to Cypher.
     """
     user_query = f"Question: {query}\nQuery: "
-    prompt = preamble + db_desc + "\n" + examples + "\n" + user_query
+    prompt = PREAMBLE + DB_DESC + "\n" + EXAMPLES + "\n" + user_query
     completion = openai.Completion.create(
         engine="text-davinci-003",
         prompt=prompt,
@@ -121,26 +118,27 @@ def convert_to_cypher(
 @router.get("/provenance")
 def search_provenance(
     query: str,
-    rdb: Engine = Depends(request_rdb),
-    graph_db=Depends(request_graph_db),
+    # rdb: Engine = Depends(request_rdb),
+    # graph_db=Depends(request_graph_db),
 ) -> str:
     """
     Convert English to Cypher.
     """
-    cypher = convert_to_cypher(query)
-    raise NotImplemented
+    # cypher = convert_to_cypher(query)
+    raise NotImplementedError
 
 
 @router.get("/set_properties")
 def set_properties(
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
-) -> str:
+) -> bool:
     """
-    Convert English to Cypher.
+    Modify DB contents to work with Neoviz
     """
-    if settings.NEO4J:
+    if settings.NEO4J_ENABLED:
         print("Neo4j is set")
         provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
         success = provenance_handler.add_properties()
         return success
+    return False

@@ -215,6 +215,9 @@ class ProvenanceHandler:
             ]
 
     def add_properties(self):
+        """
+        Modify properties so Neoviz can be used
+        """
         with self.graph_db.session() as session:
             query = (
                 "match (n)-[r]->(m)"
@@ -224,5 +227,5 @@ class ProvenanceHandler:
                 + "return *"
             )
 
-            response = session.run(query)
+            session.run(query)
             return True
