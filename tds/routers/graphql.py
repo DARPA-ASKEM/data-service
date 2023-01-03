@@ -13,7 +13,14 @@ from tds.autogen import schema
 from tds.db import request_rdb
 from tds.graphql.concept import Concept, list_concepts
 from tds.graphql.dataset import Dataset, list_datasets
-from tds.graphql.model import Intermediate, Model, list_intermediates, list_models
+from tds.graphql.model import (
+    Intermediate,
+    Model,
+    ModelFramework,
+    list_frameworks,
+    list_intermediates,
+    list_models,
+)
 from tds.graphql.project import Project, list_projects
 from tds.graphql.publication import Publication, list_publications
 from tds.graphql.simulation import Plan, Run, list_plans, list_runs
@@ -35,6 +42,7 @@ class Query:
     concepts: List[Concept] = strawberry.field(resolver=list_concepts)
     intermediates: List[Intermediate] = strawberry.field(resolver=list_intermediates)
     publications: List[Publication] = strawberry.field(resolver=list_publications)
+    frameworks: List[ModelFramework] = strawberry.field(resolver=list_frameworks)
 
 
 schema = strawberry.Schema(query=Query)
