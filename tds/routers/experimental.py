@@ -102,7 +102,6 @@ def convert_to_cypher(
     prompt = PREAMBLE + DB_DESC + "\n" + EXAMPLES + "\n" + user_query
     completion = openai.Completion.create(
         engine="text-davinci-003",
-        # engine="code-davinci-002",
         prompt=prompt,
         max_tokens=64,
         api_key=settings.OPENAI_KEY,
