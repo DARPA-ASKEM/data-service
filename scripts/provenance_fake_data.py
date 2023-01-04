@@ -111,13 +111,12 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
         for loop in recipe:
 
             # add new publicaiton
-            try:
-                if loop.get("publication_reliationship", None) is None:
-                    raise
 
-                publication_id = create_publication(
-                    path=folder + "document_xdd_gddid.txt"
-                )
+            if loop.get("publication_reliationship", None) is None:
+                raise
+
+            publication_id = create_publication(path=folder + "document_xdd_gddid.txt")
+            if publication_id is not None:
                 print(publication_id)
 
                 asset_to_project(
@@ -125,314 +124,295 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                     asset_id=int(publication_id),
                     asset_type="publications",
                 )
+            else:
+                print("skipping publication provenance")
 
-                for concept in model_concepts:
-                    add_concept(
-                        concept=concept, object_id=publication_id, type="publications"
-                    )
-                add_provenance(
-                    left={"id": publication_id, "resource_type": "Publication"},
-                    right={
-                        "id": loop.get("publication_id_to"),
-                        "resource_type": "Publication",
-                    },
-                    relation_type=loop.get("publication_reliationship"),
-                    user_id=None,
+            for concept in model_concepts:
+                add_concept(
+                    concept=concept, object_id=publication_id, type="publications"
                 )
-
-            except Exception as e:
-                print(f"failed to upload publication: {e}")
+            add_provenance(
+                left={"id": publication_id, "resource_type": "Publication"},
+                right={
+                    "id": loop.get("publication_id_to"),
+                    "resource_type": "Publication",
+                },
+                relation_type=loop.get("publication_reliationship"),
+                user_id=None,
+            )
 
             ##  connect exisiting  publications
-            try:
 
-                if loop.get("existing_pub_left", None) is not None:
-                    add_provenance(
-                        left={
-                            "id": loop.get("existing_pub_left"),
-                            "resource_type": "Publication",
-                        },
-                        right={
-                            "id": loop.get("existing_pub_right"),
-                            "resource_type": "Publication",
-                        },
-                        relation_type="CITES",
-                        user_id=person_id,
-                    )
-            except Exception as e:
-                print(e)
-
-            ## add new model ##
-            try:
-                if loop.get("model_name") is None:
-                    raise
-                model_description = (
-                    f"{loop.get('model_relationship')} - {loop.get('model_id_to')} "
-                )
-                model_name = loop.get("model_name")
-
-                if loop.get("model_relationship") == "EDITED_FROM":
-                    update_model(
-                        path=f"{folder}model_petri.json",
-                        framework="Petri Net",
-                        description=model_description,
-                        model_id=loop.get("model_id_to"),
-                        name=model_name,
-                    )
-                elif loop.get("model_relationship") == "COPIED_FROM":
-                    copy_model(
-                        model_id=loop.get("model_id_to"),
-                        name=loop.get("model_name"),
-                        description=model_description,
-                    )
-
-                response = requests.request(
-                    "GET", url + f"models/{loop.get('model_id_to')}"
-                )
-                state_model_json = response.json()
-                state_id = state_model_json.get("state_id")
-
-                if loop.get("model_id_to") is None:
-                    loop["model_id_to"] = prev_model_id
-
-            except Exception as e:
-                print(f" {e}")
-
-            ### upload simulation plan ###
-            try:
-                if loop.get("simulation_relationship", None) is None:
-                    raise
-                if loop.get("simulation_id_to", None) is None:
-                    loop["simulation_id_to"] = prev_model_id
-
-                simulation_plan_id = create_plan(
-                    path="scripts/simulation-plan_ATE.json",
-                    name=f"{loop['simulation_id_to']}_simulation_plan",
-                    model_id=loop["model_id_to"],
-                    description=f"Simulation plan for model {loop['simulation_id_to']}",
-                )
-
-                asset_to_project(
-                    project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
-                )
-
+            if loop.get("existing_pub_left", None) is not None:
                 add_provenance(
-                    left={"id": simulation_plan_id, "resource_type": "Plan"},
-                    relation_type=loop.get("simulation_relationship"),
-                    right={
-                        "id": loop["simulation_id_to"],
-                        "resource_type": "Model_revision",
+                    left={
+                        "id": loop.get("existing_pub_left"),
+                        "resource_type": "Publication",
                     },
+                    right={
+                        "id": loop.get("existing_pub_right"),
+                        "resource_type": "Publication",
+                    },
+                    relation_type="CITES",
                     user_id=person_id,
                 )
 
-            except Exception as e:
-                print(f" {e}")
+            ## add new model ##
+
+            if loop.get("model_name") is None:
+                raise
+            model_description = (
+                f"{loop.get('model_relationship')} - {loop.get('model_id_to')} "
+            )
+            model_name = loop.get("model_name")
+
+            if loop.get("model_relationship") == "EDITED_FROM":
+                update_model(
+                    path=f"{folder}model_petri.json",
+                    framework="Petri Net",
+                    description=model_description,
+                    model_id=loop.get("model_id_to"),
+                    name=model_name,
+                )
+            elif loop.get("model_relationship") == "COPIED_FROM":
+                copy_model(
+                    model_id=loop.get("model_id_to"),
+                    name=loop.get("model_name"),
+                    description=model_description,
+                )
+
+            response = requests.request(
+                "GET", url + f"models/{loop.get('model_id_to')}"
+            )
+            state_model_json = response.json()
+            state_id = state_model_json.get("state_id")
+
+            if loop.get("model_id_to") is None:
+                loop["model_id_to"] = prev_model_id
+
+            ### upload simulation plan ###
+
+            if loop.get("simulation_relationship", None) is None:
+                raise
+            if loop.get("simulation_id_to", None) is None:
+                loop["simulation_id_to"] = prev_model_id
+
+            simulation_plan_id = create_plan(
+                path="scripts/simulation-plan_ATE.json",
+                name=f"{loop['simulation_id_to']}_simulation_plan",
+                model_id=loop["model_id_to"],
+                description=f"Simulation plan for model {loop['simulation_id_to']}",
+            )
+
+            asset_to_project(
+                project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
+            )
+
+            add_provenance(
+                left={"id": simulation_plan_id, "resource_type": "Plan"},
+                relation_type=loop.get("simulation_relationship"),
+                right={
+                    "id": loop["simulation_id_to"],
+                    "resource_type": "Model_revision",
+                },
+                user_id=person_id,
+            )
 
             ### simulation run ###
 
-            try:
-                print("starting runs")
-                runs = glob.glob(folder + "runs/*/")
-                if loop.get("runs_relationship", None) is None:
-                    raise
-                for run in runs[1:4]:
+            print("starting runs")
+            runs = glob.glob(folder + "runs/*/")
+            if loop.get("runs_relationship", None) is None:
+                raise
+            for run in runs[1:4]:
 
-                    # load simulation run contents as json
-                    with open(run + "output.json", "r") as f:
-                        sim_output = f.read()
-                        sim_output = json.loads(sim_output)
+                # load simulation run contents as json
+                with open(run + "output.json", "r") as f:
+                    sim_output = f.read()
+                    sim_output = json.loads(sim_output)
 
-                        # Create the dataset with maintainer_id of 1
-                        # assuming the first maintainer is already created.
-                        model_description = (
-                            run.split("/")[-4]
-                            + " was used to create this dataset. Run number "
-                            + run.split("/")[-2]
+                    # Create the dataset with maintainer_id of 1
+                    # assuming the first maintainer is already created.
+                    model_description = (
+                        run.split("/")[-4]
+                        + " was used to create this dataset. Run number "
+                        + run.split("/")[-2]
+                    )
+                    model_name = (
+                        "Simulation output from "
+                        + run.split("/")[-4]
+                        + " : run number "
+                        + run.split("/")[-2]
+                    )
+
+                    dataset_response = sim_runs_dataset_generator.create_dataset(
+                        maintainer_id=1,
+                        dataset_object=sim_output,
+                        biomodel_name=model_name,
+                        biomodel_description=model_description,
+                        url=url,
+                    )
+                    dataset_id = dataset_response["id"]
+                    # Convert the json to a CSV
+                    convert_sim_runs_to_csv(
+                        json_file_path=run + "output.json",
+                        output_file_path=run + "sim_output.csv",
+                    )
+                    # Upload the CSV to TDS for full mock data
+                    with open(run + "sim_output.csv", "rb") as sim_csv:
+                        print(f"Uploading file to dataset_id {dataset_id}")
+                        sim_runs_dataset_generator.upload_file_to_tds(
+                            id=dataset_id, file_object=sim_csv, url=url
                         )
-                        model_name = (
-                            "Simulation output from "
-                            + run.split("/")[-4]
-                            + " : run number "
-                            + run.split("/")[-2]
+                    # Finish populating dataset metadata: Features, Qualifiers
+                    for feature_obj in list(sim_output.values()):
+                        sim_runs_dataset_generator.create_feature(
+                            dataset_id, feature_obj, url=url
+                        )
+                    sim_runs_dataset_generator.create_qualifier(
+                        dataset_id, sim_output, url=url
+                    )
+                    asset_to_project(project_id, dataset_id, "datasets")
+                    for concept in model_concepts:
+                        add_concept(
+                            concept=concept, object_id=dataset_id, type="datasets"
                         )
 
-                        dataset_response = sim_runs_dataset_generator.create_dataset(
-                            maintainer_id=1,
-                            dataset_object=sim_output,
-                            biomodel_name=model_name,
-                            biomodel_description=model_description,
-                            url=url,
-                        )
-                        dataset_id = dataset_response["id"]
-                        # Convert the json to a CSV
-                        convert_sim_runs_to_csv(
-                            json_file_path=run + "output.json",
-                            output_file_path=run + "sim_output.csv",
-                        )
-                        # Upload the CSV to TDS for full mock data
-                        with open(run + "sim_output.csv", "rb") as sim_csv:
-                            print(f"Uploading file to dataset_id {dataset_id}")
-                            sim_runs_dataset_generator.upload_file_to_tds(
-                                id=dataset_id, file_object=sim_csv, url=url
-                            )
-                        # Finish populating dataset metadata: Features, Qualifiers
-                        for feature_obj in list(sim_output.values()):
-                            sim_runs_dataset_generator.create_feature(
-                                dataset_id, feature_obj, url=url
-                            )
-                        sim_runs_dataset_generator.create_qualifier(
-                            dataset_id, sim_output, url=url
-                        )
-                        asset_to_project(project_id, dataset_id, "datasets")
-                        for concept in model_concepts:
-                            add_concept(
-                                concept=concept, object_id=dataset_id, type="datasets"
-                            )
-
-                    simulation_run_id = create_run(
-                        path=run + "output.json",
-                        plan_id=simulation_plan_id,
-                        success=True,
-                        dataset_id=dataset_id,
-                        description=model_description,
-                    )
-                    print(
-                        f"simulation run id {simulation_plan_id} , {simulation_run_id}"
-                    )
-
-                    asset_to_project(
-                        project_id=1,
-                        asset_id=int(simulation_run_id),
-                        asset_type="simulation_runs",
-                    )
-
-                    add_provenance(
-                        left={
-                            "id": simulation_run_id,
-                            "resource_type": "Simulation_run",
-                        },
-                        relation_type="GENERATED_BY",
-                        right={"id": simulation_plan_id, "resource_type": "Plan"},
-                        user_id=person_id,
-                    )
-                    add_provenance(
-                        right={
-                            "id": simulation_run_id,
-                            "resource_type": "Simulation_run",
-                        },
-                        relation_type="REINTERPRETS",
-                        left={"id": dataset_id, "resource_type": "Dataset"},
-                        user_id=person_id,
-                    )
-
-                    ## add simulation parameters ##
-                    create_simulation_parameters(
-                        path_parameters=f"{run}parameters.json",
-                        path_initials=f"{run}initials.json",
-                        run_id=simulation_run_id,
-                    )
-
-                    time.sleep(1)
-                    # get parameters
-                    response = requests.request(
-                        "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
-                    )
-                    parameters_json = response.json()
-
-                    with open(f"{run}initials.json", "r") as f:
-                        init_parameters = json.load(f)
-                        for (
-                            init_parameter_name,
-                            init_parameter_value,
-                        ) in init_parameters.get("initials").items():
-                            for parameter in parameters_json:
-                                if parameter.get("name") == init_parameter_name:
-                                    ncit = init_parameter_value.get("identifiers").get(
-                                        "ncit", None
-                                    )
-                                    ido = init_parameter_value.get("identifiers").get(
-                                        "ido", None
-                                    )
-                                    if ncit is not None:
-                                        add_concept(
-                                            concept=f"ncit:{ncit}",
-                                            object_id=parameter.get("id"),
-                                            type="simulation_parameters",
-                                        )
-                                    if ido is not None:
-                                        add_concept(
-                                            concept=f"ido:{ido}",
-                                            object_id=parameter.get("id"),
-                                            type="simulation_parameters",
-                                        )
-                                    ## add context concept as well ##
-                                    try:
-                                        context = init_parameter_value.get(
-                                            "context", {}
-                                        ).get("property", None)
-                                        if context is not None:
-                                            print(f"adding concept context {context}")
-                                            add_concept(
-                                                concept=context,
-                                                object_id=parameter.get("id"),
-                                                type="simulation_parameters",
-                                            )
-                                    except Exception as e:
-                                        print(e)
-            except Exception as e:
-                print(e)
-    # dataset extracted by
-    try:
-        if loop.get("dataset_relationship", None) is None:
-            raise
-        runs = glob.glob(folder + "runs/*/")
-        for run in runs[1:2]:
-            with open(run + "output.json", "r") as f:
-                sim_output = f.read()
-                sim_output = json.loads(sim_output)
-
-                dataset_response = sim_runs_dataset_generator.create_dataset(
-                    maintainer_id=1,
-                    dataset_object=sim_output,
-                    biomodel_name="Dataset",
-                    biomodel_description="Dataset description",
-                    url=url,
+                simulation_run_id = create_run(
+                    path=run + "output.json",
+                    plan_id=simulation_plan_id,
+                    success=True,
+                    dataset_id=dataset_id,
+                    description=model_description,
                 )
-                dataset_id = dataset_response["id"]
-                # Convert the json to a CSV
-                convert_sim_runs_to_csv(
-                    json_file_path=run + "output.json",
-                    output_file_path=run + "sim_output.csv",
+                print(f"simulation run id {simulation_plan_id} , {simulation_run_id}")
+
+                asset_to_project(
+                    project_id=1,
+                    asset_id=int(simulation_run_id),
+                    asset_type="simulation_runs",
                 )
-                # Upload the CSV to TDS for full mock data
-                with open(run + "sim_output.csv", "rb") as sim_csv:
-                    print(f"Uploading file to dataset_id {dataset_id}")
-                    sim_runs_dataset_generator.upload_file_to_tds(
-                        id=dataset_id, file_object=sim_csv, url=url
-                    )
-                # Finish populating dataset metadata: Features, Qualifiers
-                for feature_obj in list(sim_output.values()):
-                    sim_runs_dataset_generator.create_feature(
-                        dataset_id, feature_obj, url=url
-                    )
-                sim_runs_dataset_generator.create_qualifier(
-                    dataset_id, sim_output, url=url
-                )
-                asset_to_project(project_id, dataset_id, "datasets")
 
                 add_provenance(
-                    right={
-                        "id": loop.get("publication_id_to"),
-                        "resource_type": "Publication",
+                    left={
+                        "id": simulation_run_id,
+                        "resource_type": "Simulation_run",
                     },
-                    relation_type=loop.get("dataset_relationship"),
+                    relation_type="GENERATED_BY",
+                    right={"id": simulation_plan_id, "resource_type": "Plan"},
+                    user_id=person_id,
+                )
+                add_provenance(
+                    right={
+                        "id": simulation_run_id,
+                        "resource_type": "Simulation_run",
+                    },
+                    relation_type="REINTERPRETS",
                     left={"id": dataset_id, "resource_type": "Dataset"},
                     user_id=person_id,
                 )
 
-    except Exception as e:
-        print(e)
+                ## add simulation parameters ##
+                create_simulation_parameters(
+                    path_parameters=f"{run}parameters.json",
+                    path_initials=f"{run}initials.json",
+                    run_id=simulation_run_id,
+                )
+
+                time.sleep(1)
+                # get parameters
+                response = requests.request(
+                    "GET", url + f"simulations/runs/{simulation_run_id}/parameters"
+                )
+                parameters_json = response.json()
+
+                with open(f"{run}initials.json", "r") as f:
+                    init_parameters = json.load(f)
+                    for (
+                        init_parameter_name,
+                        init_parameter_value,
+                    ) in init_parameters.get("initials").items():
+                        for parameter in parameters_json:
+                            if parameter.get("name") == init_parameter_name:
+                                ncit = init_parameter_value.get("identifiers").get(
+                                    "ncit", None
+                                )
+                                ido = init_parameter_value.get("identifiers").get(
+                                    "ido", None
+                                )
+                                if ncit is not None:
+                                    add_concept(
+                                        concept=f"ncit:{ncit}",
+                                        object_id=parameter.get("id"),
+                                        type="simulation_parameters",
+                                    )
+                                if ido is not None:
+                                    add_concept(
+                                        concept=f"ido:{ido}",
+                                        object_id=parameter.get("id"),
+                                        type="simulation_parameters",
+                                    )
+                                ## add context concept as well ##
+
+                                context = init_parameter_value.get("context", {}).get(
+                                    "property", None
+                                )
+                                if context is not None:
+                                    print(f"adding concept context {context}")
+                                    add_concept(
+                                        concept=context,
+                                        object_id=parameter.get("id"),
+                                        type="simulation_parameters",
+                                    )
+
+            # dataset extracted by
+
+            if loop.get("dataset_relationship", None) is None:
+                raise
+            runs = glob.glob(folder + "runs/*/")
+            for run in runs[1:2]:
+                with open(run + "output.json", "r") as f:
+                    sim_output = f.read()
+                    sim_output = json.loads(sim_output)
+
+                    dataset_response = sim_runs_dataset_generator.create_dataset(
+                        maintainer_id=1,
+                        dataset_object=sim_output,
+                        biomodel_name="Dataset",
+                        biomodel_description="Dataset description",
+                        url=url,
+                    )
+                    dataset_id = dataset_response["id"]
+                    # Convert the json to a CSV
+                    convert_sim_runs_to_csv(
+                        json_file_path=run + "output.json",
+                        output_file_path=run + "sim_output.csv",
+                    )
+                    # Upload the CSV to TDS for full mock data
+                    with open(run + "sim_output.csv", "rb") as sim_csv:
+                        print(f"Uploading file to dataset_id {dataset_id}")
+                        sim_runs_dataset_generator.upload_file_to_tds(
+                            id=dataset_id, file_object=sim_csv, url=url
+                        )
+                    # Finish populating dataset metadata: Features, Qualifiers
+                    for feature_obj in list(sim_output.values()):
+                        sim_runs_dataset_generator.create_feature(
+                            dataset_id, feature_obj, url=url
+                        )
+                    sim_runs_dataset_generator.create_qualifier(
+                        dataset_id, sim_output, url=url
+                    )
+                    asset_to_project(project_id, dataset_id, "datasets")
+
+                    add_provenance(
+                        right={
+                            "id": loop.get("publication_id_to"),
+                            "resource_type": "Publication",
+                        },
+                        relation_type=loop.get("dataset_relationship"),
+                        left={"id": dataset_id, "resource_type": "Dataset"},
+                        user_id=person_id,
+                    )
 
 
 if __name__ == "__main__":

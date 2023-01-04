@@ -15,6 +15,12 @@ def download_and_unzip(url, extract_to="."):
 
 
 def asset_to_project(project_id, asset_id, asset_type):
+    if asset_id is None:
+        print(f"Unable to create member of {asset_type}")
+        return
+    else:
+        asset_id = int(asset_id)  # Note: Is this necessary?
+
     payload = json.dumps(
         {
             "project_id": project_id,
@@ -55,6 +61,9 @@ def add_provenance(left, right, relation_type, user_id):
 
 
 def add_concept(concept, object_id, type):
+    if object_id is None:
+        print("No object id is attached to the given concept")
+        return
 
     payload = json.dumps(
         {
