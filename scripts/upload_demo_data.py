@@ -169,7 +169,7 @@ for folder in folders:
         state_id = state_model_json.get("state_id")
 
         add_provenance(
-            left={"id": state_id, "resource_type": "Model_revision"},
+            left={"id": state_id, "resource_type": "ModelRevision"},
             right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
             relation_type="REINTERPRETS",
             user_id=person_id,
@@ -240,7 +240,7 @@ for folder in folders:
         add_provenance(
             left={"id": simulation_plan_id, "resource_type": "Plan"},
             relation_type="USES",
-            right={"id": state_id, "resource_type": "Model_revision"},
+            right={"id": state_id, "resource_type": "ModelRevision"},
             user_id=person_id,
         )
 
@@ -318,13 +318,13 @@ for folder in folders:
             )
 
             add_provenance(
-                left={"id": simulation_run_id, "resource_type": "Simulation_run"},
+                left={"id": simulation_run_id, "resource_type": "SimulationRun"},
                 relation_type="GENERATED_BY",
                 right={"id": simulation_plan_id, "resource_type": "Plan"},
                 user_id=person_id,
             )
             add_provenance(
-                right={"id": simulation_run_id, "resource_type": "Simulation_run"},
+                right={"id": simulation_run_id, "resource_type": "SimulationRun"},
                 relation_type="REINTERPRETS",
                 left={"id": dataset_id, "resource_type": "Dataset"},
                 user_id=person_id,
