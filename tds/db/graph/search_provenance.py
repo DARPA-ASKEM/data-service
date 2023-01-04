@@ -2,6 +2,11 @@
 Import provenance handler
 """
 from tds.db.graph.provenance_handler import ProvenanceHandler
+from tds.db.graph.query_helpers import (
+    derived_models_query_generater,
+    dynamic_relationship_direction,
+    parent_model_query_generator,
+)
 
 
 class SearchProvenance(ProvenanceHandler):
@@ -15,37 +20,28 @@ class SearchProvenance(ProvenanceHandler):
     def __getitem__(self, key):
         return self.__getattribute__(key)
 
-    def dynamic_relationship_direction(self, direction, relationship_type):
-        """
-        get direction of relationship based on direction type
-        """
-        if direction == "all":
-            return f"-[{relationship_type}]-"
-        if direction == "child":
-            return f"<-[{relationship_type}]-"
-        if direction == "parent":
-            return f"-[{relationship_type}]->"
-        raise Exception("relationship direction is not allowed.")
-
     def connected_nodes_by_direction(self, payload, direction):
         """
         Connect nodes
         """
         with self.graph_db.session() as session:
-
+            relation_direction = dynamic_relationship_direction(
+                direction=direction, relationship_type="*"
+            )
             query = (
                 f"Match (n1: {payload.get('root_type')}) "
-                + f"{self.dynamic_relationship_direction(direction=direction, relationship_type='*')}(n2)"
+                + f"{relation_direction}(n2)"
                 + "Where n1.id = $root_id "
                 + "RETURN labels(n2) as label, n2.id as id"
             )
 
             response = session.run(query, root_id=payload.get("root_id"))
 
-            return [
-                {"label": res.data().get("label")[0], "id": res.data().get("id")}
-                for res in response
+            response_data = [
+                {res.data().get("label")[0]: res.data().get("id")} for res in response
             ]
+
+            return sorted(response_data, key=lambda i: list(i.keys()))
 
     def connected_nodes(self, payload):
         """
@@ -65,22 +61,6 @@ class SearchProvenance(ProvenanceHandler):
         """
         return self.connected_nodes_by_direction(payload=payload, direction="parent")
 
-    def derived_models_query_generater(self, root_type):
-        """
-        Return models derived from a publication or intermediate
-        """
-        if root_type == "Publication":
-            return (
-                "Match (m:Model)-[r *1..]->(i:Intermediate)-[r2:EXTRACTED_FROM]->"
-                + f"(n:{root_type})"
-            )
-        if root_type == "Intermediate":
-            return (
-                "Match (m:Model)-[r *1..]->(md:Model_revision)-[r2:REINTERPRETS]->"
-                + f"(n:{root_type})"
-            )
-        raise Exception(f"Models can not be derived from this type: {root_type}")
-
     def derived_models(self, payload):
         """
         Return models derived from artifact (Publication or Intermediate)
@@ -88,47 +68,17 @@ class SearchProvenance(ProvenanceHandler):
         with self.graph_db.session() as session:
 
             query = (
-                f" {self.derived_models_query_generater(payload.get('root_type'))} "
+                f" {derived_models_query_generater(payload.get('root_type'))} "
                 + "Where n.id = $root_id "
                 + "RETURN labels(m) as label, m.id as id"
             )
-            print(query)
             response = session.run(query, root_id=payload.get("root_id"))
 
-            return [
-                {"label": res.data().get("label")[0], "id": res.data().get("id")}
-                for res in response
+            response_data = [
+                {res.data().get("label")[0]: res.data().get("id")} for res in response
             ]
 
-    def parent_model_query_generator(self, root_type, root_id):
-        """
-        Return query depending on root_type
-        """
-        if root_type == "Model":
-            print("here")
-            return (
-                f"Match(m:{root_type}"
-                + "{id:"
-                + f"{root_id}"
-                + "})-[r:BEGINS_AT]->(mr:Model_revision) "
-            )
-        if root_type == "Plan":
-            return (
-                f"Match(m:{root_type}"
-                + "{id:"
-                + f"{root_id}"
-                + "})-[r:USES]->(mr:Model_revision) "
-            )
-        if root_type in ("Simulation_run", "Dataset"):
-            return (
-                f"Match(m:{root_type}"
-                + "{id:"
-                + f"{root_id}"
-                + "})-[r *1..]->(mr:Model_revision) "
-            )
-        raise Exception(
-            f"Search for model revision is not available from this root type: {root_type}"
-        )
+            return sorted(response_data, key=lambda i: list(i.keys()))
 
     def parent_model_revisions(self, payload):
         """
@@ -137,19 +87,76 @@ class SearchProvenance(ProvenanceHandler):
         with self.graph_db.session() as session:
             # if payload.get("root_type") != "Model":
             #     raise Exception("This search only allows root_type of type model")
+            match_pattern = parent_model_query_generator(
+                payload.get("root_type"), payload.get("root_id")
+            )
+            print(match_pattern)
 
             query = (
-                f"{self.parent_model_query_generator(payload.get('root_type'),payload.get('root_id'))}"
+                f"{match_pattern}"
                 + "Match (mr2:Model_revision)-[r2 *1.. ]->(mr) "
                 + "With collect(mr)+collect(mr2) as mrs "
                 + "Unwind mrs as both_rms "
                 + "With DISTINCT both_rms "
                 + "RETURN labels(both_rms) as label, both_rms.id as id "
             )
-            print(query)
-            response = session.run(query, root_id=payload.get("root_id"))
+
+            response = session.run(
+                query,
+                root_id=payload.get("root_id"),
+                root_type=payload.get("root_type"),
+            )
+
+            ## if response is empty there is only one version of the model. Return just that node.
+            if len(response.data()) == 0:
+                query = f"{match_pattern}" + "RETURN labels(mr) as label, mr.id as id "
+                response = session.run(
+                    query,
+                    root_id=payload.get("root_id"),
+                    root_type=payload.get("root_type"),
+                )
+
+            response_data = [
+                {res.data().get("label")[0]: res.data().get("id")} for res in response
+            ]
+
+            return sorted(response_data, key=lambda i: list(i.keys()))
+
+    def model_to_primative(self, payload):
+        """
+        Which models relay on which primatives
+        """
+        with self.graph_db.session() as session:
+            query = (
+                "match(i:Intermediate)<-[r *1..]-(m:Model)"
+                "return i as Intermediate, r as relationship, m as Model"
+            )
+            response = session.run(query)
 
             return [
-                {"label": res.data().get("label")[0], "id": res.data().get("id")}
+                {
+                    "Intermediate": res.data().get("Intermediate").get("id"),
+                    "Model": res.data().get("Model").get("id"),
+                }
                 for res in response
             ]
+
+    def artifacts_created_by_user(self, payload):
+        """
+        Which nodes were created by user with id of ...
+        """
+        with self.graph_db.session() as session:
+            query = (
+                "match(n)-[r]->(n2) "
+                + f"where r.user_id={payload.get('user_id')} "
+                + "With collect(n)+collect(n2) as nodes "
+                + "Unwind nodes as both_nodes "
+                + "With DISTINCT both_nodes "
+                + "RETURN labels(both_nodes) as label, both_nodes.id as id "
+            )
+            response = session.run(query)
+            response_data = [
+                {res.data().get("label")[0]: res.data().get("id")} for res in response
+            ]
+
+            return sorted(response_data, key=lambda i: list(i.keys()))
