@@ -168,7 +168,7 @@ def list_model_descriptions(
     return list_by_id(rdb.connect(), orm.ModelDescription, page_size, page)
 
 
-@router.get("/descriptions/{id}", **retrieve.fastapi_endpoint_config)
+@router.get("/{id}/descriptions", **retrieve.fastapi_endpoint_config)
 def get_model_description(
     id: int, rdb: Engine = Depends(request_rdb)
 ) -> ModelDescription:
@@ -184,7 +184,7 @@ def get_model_description(
 
 
 @router.get("/model_parameters/{id}", **retrieve.fastapi_endpoint_config)
-def get_model_parameter(id: int, rdb: Engine = Depends(request_rdb)):
+def get_single_model_parameter(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Retrieve model parameter
     """
@@ -199,7 +199,7 @@ def get_model_parameter(id: int, rdb: Engine = Depends(request_rdb)):
         raise HTTPException(status_code=status.HTTP_404_NOT_F)
 
 
-@router.get("/parameters/{id}", **retrieve.fastapi_endpoint_config)
+@router.get("/{id}/parameters", **retrieve.fastapi_endpoint_config)
 def get_model_parameters(
     id: int, rdb: Engine = Depends(request_rdb)
 ) -> ModelParameters:
@@ -216,7 +216,7 @@ def get_model_parameters(
     return orm_to_params(list(parameters))
 
 
-@router.put("/parameters/{id}", **update.fastapi_endpoint_config)
+@router.put("/{id}/parameters", **update.fastapi_endpoint_config)
 def update_model_parameters(
     payload: ModelParameters, id: int, rdb: Engine = Depends(request_rdb)
 ) -> Response:

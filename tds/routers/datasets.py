@@ -210,15 +210,12 @@ def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 def get_datasets(
     page_size: int = 100,
     page: int = 0,
-    is_simulation: Optional[bool] = None,
     rdb: Engine = Depends(request_rdb),
 ):
     """
     Get a specific number of datasets
     """
     with Session(rdb) as session:
-        if is_simulation:  # Deprecated, makes pylint pass.
-            pass
         datasets = (
             session.query(orm.Dataset)
             .order_by(orm.Dataset.id.asc())
