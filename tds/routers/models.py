@@ -353,7 +353,6 @@ def create_model(
                 print(parameter)
                 payload = Provenance(
                     left=parameter.get("id"),
-
                     left_type="ModelParameter",
                     right=model.state_id,
                     right_type="ModelRevision",
@@ -389,7 +388,6 @@ def model_opt(
         l_model = session.query(orm.ModelDescription).get(payload.get("left"))
         if payload.get("right", False):
             r_model = session.query(orm.ModelDescription).get(payload.get("right"))
-
 
         if model_operation == "copy":
             state = orm.ModelState(
@@ -494,7 +492,6 @@ def model_opt(
                     user_id=None,
                 )
                 provenance_handler.create_entry(payload)
-
 
     logger.info("new model created: %i", id)
     return Response(

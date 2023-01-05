@@ -276,7 +276,6 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
         }
         parameter_types.append(param)
 
-
         payload = json.dumps(parameter_types)
         headers = {"Content-Type": "application/json"}
         response = requests.request(
