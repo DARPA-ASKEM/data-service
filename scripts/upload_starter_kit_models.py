@@ -30,7 +30,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
     # loop over models
     folders = glob.glob("experiments*/thin-thread-examples/starter-kit/*/")
 
-    for folder in sorted(folders)[2:3]:
+    for folder in sorted(folders):
 
         ## get concepts ##
 

@@ -323,7 +323,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                 time.sleep(1)
                 # get parameters
                 response = requests.request(
-                    "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
+                    "GET", url + f"simulations/runs/{simulation_run_id}/parameters"
                 )
                 parameters_json = response.json()
 
