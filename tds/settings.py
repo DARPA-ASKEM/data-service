@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     NEO4J_driver = "neo4j://graphdb.data-api:7687"
     NEO4J_PASSWORD = "password"
     NEO4J_USER = "neo4j"
-    OPENAI_KEY = "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"
+    OPENAI_KEY = "sk-..."
 
 
 settings = Settings()
