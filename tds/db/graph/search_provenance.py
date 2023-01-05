@@ -181,7 +181,6 @@ class SearchProvenance(ProvenanceHandler):
             match_pattern = parent_model_query_generator(
                 payload.get("root_type"), payload.get("root_id")
             )
-            print(query)
 
             model_relationships = relationships_array_as_str(
                 include=[
