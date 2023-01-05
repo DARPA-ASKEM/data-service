@@ -90,167 +90,138 @@ for folder in folders:
     model_concepts = get_model_concepts(folder)
 
     # publications ##
-    try:
+    publication_id = create_publication(path=folder + "document_xdd_gddid.txt")
 
-        publication_id = create_publication(path=folder + "document_xdd_gddid.txt")
+    asset_to_project(
+        project_id=1, asset_id=int(publication_id), asset_type="publications"
+    )
 
-        asset_to_project(
-            project_id=1, asset_id=int(publication_id), asset_type="publications"
-        )
-
-        for concept in model_concepts:
-            add_concept(concept=concept, object_id=publication_id, type="publications")
-
-    except Exception as e:
-        print(e)
+    for concept in model_concepts:
+        add_concept(concept=concept, object_id=publication_id, type="publications")
 
     ## intermediates ##
-    try:
-        intermediate_mmt_id = create_intermediate(
-            path=folder + "model_mmt_templates.json",
-            type="bilayer",
-            source="mrepresentationa",
+    intermediate_mmt_id = create_intermediate(
+        path=folder + "model_mmt_templates.json",
+        type="bilayer",
+        source="mrepresentationa",
+    )
+
+    asset_to_project(
+        project_id=1, asset_id=int(intermediate_mmt_id), asset_type="intermediates"
+    )
+    add_provenance(
+        left={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
+        right={"id": publication_id, "resource_type": "Publication"},
+        relation_type="EXTRACTED_FROM",
+        user_id=person_id,
+    )
+    for concept in model_concepts:
+        add_concept(
+            concept=concept, object_id=intermediate_mmt_id, type="intermediates"
         )
 
-        asset_to_project(
-            project_id=1, asset_id=int(intermediate_mmt_id), asset_type="intermediates"
-        )
-        add_provenance(
-            left={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
-            right={"id": publication_id, "resource_type": "Publication"},
-            relation_type="EXTRACTED_FROM",
-            user_id=person_id,
-        )
-        for concept in model_concepts:
-            add_concept(
-                concept=concept, object_id=intermediate_mmt_id, type="intermediates"
-            )
-    except Exception as e:
-        print(e)
+    intermediate_sbml_id = create_intermediate(
+        path=folders_src[0], type="sbml", source="mrepresentationa"
+    )
 
-    try:
-        intermediate_sbml_id = create_intermediate(
-            path=folders_src[0], type="sbml", source="mrepresentationa"
+    asset_to_project(
+        project_id=1, asset_id=int(intermediate_sbml_id), asset_type="intermediates"
+    )
+    add_provenance(
+        left={"id": intermediate_sbml_id, "resource_type": "Intermediate"},
+        right={"id": publication_id, "resource_type": "Publication"},
+        relation_type="EXTRACTED_FROM",
+        user_id=person_id,
+    )
+    for concept in model_concepts:
+        add_concept(
+            concept=concept, object_id=intermediate_sbml_id, type="intermediates"
         )
-        asset_to_project(
-            project_id=1, asset_id=int(intermediate_sbml_id), asset_type="intermediates"
-        )
-        add_provenance(
-            left={"id": intermediate_sbml_id, "resource_type": "Intermediate"},
-            right={"id": publication_id, "resource_type": "Publication"},
-            relation_type="EXTRACTED_FROM",
-            user_id=person_id,
-        )
-        for concept in model_concepts:
-            add_concept(
-                concept=concept, object_id=intermediate_sbml_id, type="intermediates"
-            )
-    except Exception as e:
-        print(e)
 
     ## model ##
-    try:
-        tree = ET.parse(folders_src[0])
-        root = tree.getroot()
-        model_description = root[0][0][0][0].text
-        model_name = root[0].attrib["name"]
+    tree = ET.parse(folders_src[0])
+    root = tree.getroot()
+    model_description = root[0][0][0][0].text
+    model_name = root[0].attrib["name"]
 
-        model_id = create_model(
-            path=f"{folder}model_petri.json",
-            framework="Petri Net",
-            description=model_description,
-            name=model_name,
-        )
+    model_id = create_model(
+        path=f"{folder}model_petri.json",
+        framework="Petri Net",
+        description=model_description,
+        name=model_name,
+    )
 
-        asset_to_project(project_id=1, asset_id=int(model_id), asset_type="models")
+    asset_to_project(project_id=1, asset_id=int(model_id), asset_type="models")
 
-        response = requests.request("GET", url + f"models/{model_id}")
-        state_model_json = response.json()
-        state_id = state_model_json.get("state_id")
+    response = requests.request("GET", url + f"models/{model_id}")
+    state_model_json = response.json()
+    state_id = state_model_json.get("state_id")
 
-        add_provenance(
-            left={"id": state_id, "resource_type": "ModelRevision"},
-            right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
-            relation_type="REINTERPRETS",
-            user_id=person_id,
-        )
-        for concept in model_concepts:
-            add_concept(concept=concept, object_id=model_id, type="models")
-
-    except Exception as e:
-        print(f" {e}")
+    add_provenance(
+        left={"id": state_id, "resource_type": "ModelRevision"},
+        right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
+        relation_type="REINTERPRETS",
+        user_id=person_id,
+    )
+    for concept in model_concepts:
+        add_concept(concept=concept, object_id=model_id, type="models")
 
     ### upload model parameters ###
-    try:
-        print("Model Parameters")
-        # load parameters of the model and set the type values
-        create_model_parameters(
-            path_parameters=f"{folder}model_mmt_parameters.json",
-            path_initials=f"{folder}model_mmt_initials.json",
-            model_id=model_id,
-        )
-
-    except Exception as e:
-        print(e)
+    print("Model Parameters")
+    # load parameters of the model and set the type values
+    create_model_parameters(
+        path_parameters=f"{folder}model_mmt_parameters.json",
+        path_initials=f"{folder}model_mmt_initials.json",
+        model_id=model_id,
+    )
 
     ## set concept to inital model parameters
-    try:
-        # get parameters
-        response = requests.request("GET", url + f"models/parameters/{model_id}")
-        parameters_model_json = response.json()
+    # get parameters
+    response = requests.request("GET", url + f"models/{model_id}/parameters")
+    parameters_model_json = response.json()
 
-        with open(f"{folder}model_mmt_initials.json", "r") as f:
-            init_params = json.load(f)
-            for init_parameter_name, init_parameter_value in init_params.get(
-                "initials"
-            ).items():
-                for parameter in parameters_model_json:
-                    if parameter.get("name") == init_parameter_name:
-                        ncit = init_parameter_value.get("identifiers").get("ncit", None)
-                        ido = init_parameter_value.get("identifiers").get("ido", None)
-                        if ncit is not None:
-                            add_concept(
-                                concept=f"ncit:{ncit}",
-                                object_id=parameter.get("id"),
-                                type="model_parameters",
-                            )
-                        if ido is not None:
-                            add_concept(
-                                concept=f"ido:{ido}",
-                                object_id=parameter.get("id"),
-                                type="model_parameters",
-                            )
+    with open(f"{folder}model_mmt_initials.json", "r") as f:
+        init_params = json.load(f)
+        for init_parameter_name, init_parameter_value in init_params.get(
+            "initials"
+        ).items():
+            for parameter in parameters_model_json:
+                if parameter.get("name") == init_parameter_name:
+                    ncit = init_parameter_value.get("identifiers").get("ncit", None)
+                    ido = init_parameter_value.get("identifiers").get("ido", None)
+                    if ncit is not None:
+                        add_concept(
+                            concept=f"ncit:{ncit}",
+                            object_id=parameter.get("id"),
+                            type="model_parameters",
+                        )
+                    if ido is not None:
+                        add_concept(
+                            concept=f"ido:{ido}",
+                            object_id=parameter.get("id"),
+                            type="model_parameters",
+                        )
 
-    except Exception as e:
-        print(e)
     ### upload simulation plan ###
-    try:
-        print("upload simulation plan")
-        simulation_plan_id = create_plan(
-            path="scripts/simulation-plan_ATE.json",
-            name=f"{model_id}_simulation_plan",
-            model_id=model_id,
-            description=f"Simulation plan for model {model_id}",
-        )
+    print("upload simulation plan")
+    simulation_plan_id = create_plan(
+        path="scripts/simulation-plan_ATE.json",
+        name=f"{model_id}_simulation_plan",
+        model_id=model_id,
+        description=f"Simulation plan for model {model_id}",
+    )
 
-        asset_to_project(
-            project_id=1, asset_id=int(simulation_plan_id), asset_type="plans"
-        )
+    asset_to_project(project_id=1, asset_id=int(simulation_plan_id), asset_type="plans")
 
-        add_provenance(
-            left={"id": simulation_plan_id, "resource_type": "Plan"},
-            relation_type="USES",
-            right={"id": state_id, "resource_type": "ModelRevision"},
-            user_id=person_id,
-        )
-
-    except Exception as e:
-        print(f" {e}")
+    add_provenance(
+        left={"id": simulation_plan_id, "resource_type": "Plan"},
+        relation_type="USES",
+        right={"id": state_id, "resource_type": "ModelRevision"},
+        user_id=person_id,
+    )
 
     ### upload simulation run datasets ####
-
     try:
-
         print("Upload Simulation Run Datasets")
 
         runs = glob.glob(folder + "runs/*/")
@@ -330,6 +301,8 @@ for folder in folders:
                 user_id=person_id,
             )
 
+            # how to sync branches of git submodules
+
             ## add simulation parameters ##
             create_simulation_parameters(
                 path_parameters=f"{run}parameters.json",
@@ -340,7 +313,7 @@ for folder in folders:
             time.sleep(1)
             # get parameters
             response = requests.request(
-                "GET", url + f"simulations/runs/parameters/{simulation_run_id}"
+                "GET", url + f"simulations/runs/{simulation_run_id}/parameters"
             )
             parameters_json = response.json()
 
