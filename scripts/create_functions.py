@@ -153,9 +153,7 @@ def create_model(path, name, description, framework, url=url):
         }
     )
     headers = {"Content-Type": "application/json"}
-    print(payload)
     response = requests.request("POST", url + "models", headers=headers, data=payload)
-    print(response.text)
     model_json = response.json()
     model_id = model_json.get("id")
     return model_id
@@ -166,7 +164,6 @@ def update_model(path, name, description, framework, model_id, url=url):
 
     with open(path, "r") as f:
         model_content = json.load(f)
-    print(model_content)
     payload = json.dumps(
         {
             "name": name,
@@ -180,7 +177,6 @@ def update_model(path, name, description, framework, model_id, url=url):
     response = requests.request(
         "POST", url + f"models/{model_id}", headers=headers, data=payload
     )
-    print(response.text)
     model_json = response.json()
     model_id = model_json.get("id")
     return model_id
@@ -292,7 +288,6 @@ def create_simulation_parameters(
     parameter_simulation = []
     with open(path_parameters, "r") as f:
         parameters = json.load(f)
-        print(parameters)
         for parameter_name, parameter_value in parameters.get("parameters").items():
             parameter_simulation.append(
                 {
