@@ -92,25 +92,6 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             add_concept(
                 concept=concept, object_id=intermediate_mmt_id, type="intermediates"
             )
-        if publication_id:
-            add_provenance(
-                left={"id": project_id, "resource_type": "Project"},
-                right={"id": intermediate_grom_id, "resource_type": "Intermediate"},
-                relation_type="CONTAINS",
-                user_id=person_id,
-            )
-            add_provenance(
-                left={"id": project_id, "resource_type": "Project"},
-                right={"id": intermediate_grom_id, "resource_type": "Intermediate"},
-                relation_type="CONTAINS",
-                user_id=person_id,
-            )
-            add_provenance(
-                left={"id": intermediate_grom_id, "resource_type": "Intermediate"},
-                right={"id": publication_id, "resource_type": "Publication"},
-                relation_type="EXTRACTED_FROM",
-                user_id=person_id,
-            )
 
         intermediate_grom_id = create_intermediate(
             path=f"{folder}model_fn_gromet.json", type="gromet", source="skema"
@@ -121,11 +102,21 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             asset_type="intermediates",
         )
         add_provenance(
-            left={"id": intermediate_grom_id, "resource_type": "Intermediate"},
-            right={"id": publication_id, "resource_type": "Publication"},
-            relation_type="EXTRACTED_FROM",
+            left={"id": project_id, "resource_type": "Project"},
+            right={"id": intermediate_grom_id, "resource_type": "Intermediate"},
+            relation_type="CONTAINS",
             user_id=person_id,
         )
+
+        if publication_id:
+
+            add_provenance(
+                left={"id": intermediate_grom_id, "resource_type": "Intermediate"},
+                right={"id": publication_id, "resource_type": "Publication"},
+                relation_type="EXTRACTED_FROM",
+                user_id=person_id,
+            )
+
         for concept in model_concepts:
             add_concept(
                 concept=concept,
