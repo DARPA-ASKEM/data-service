@@ -255,29 +255,47 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
     parameter_types = []
     with open(path_parameters, "r") as f:
         parameters = json.load(f)
-    for parameter_name, parameter_value in parameters.get("parameters").items():
-        if parameter_value.get("value") == None:
-            type_ = "float"
-            default_value = None
-        else:
-            type_ = str(type(parameter_value.get("value")).__name__)
-            default_value = str(parameter_value.get("value"))
+        for parameter_name, parameter_value in parameters.get("parameters").items():
+            if parameter_value.get("value") == None:
+                type_ = "float"
+                default_value = None
+            else:
+                type_ = str(type(parameter_value.get("value")).__name__)
+                default_value = str(parameter_value.get("value"))
 
-        param = {
-            "model_id": model_id,
-            "name": parameter_name,
-            "type": type_,
-            "default_value": default_value,
-            "state_variable": False,
-        }
-        parameter_types.append(param)
+            param = {
+                "model_id": model_id,
+                "name": parameter_name,
+                "type": type_,
+                "default_value": default_value,
+                "state_variable": False,
+            }
+            parameter_types.append(param)
 
-        payload = json.dumps(parameter_types)
-        headers = {"Content-Type": "application/json"}
-        response = requests.request(
-            "PUT", url + f"models/{model_id}/parameters", headers=headers, data=payload
-        )
-        return response
+    with open(path_initials, "r") as f:
+        parameters = json.load(f)
+        for parameter_name, parameter_value in parameters.get("initials").items():
+            if parameter_value.get("value") == None:
+                type_ = "float"
+                default_value = None
+            else:
+                type_ = str(type(parameter_value.get("value")).__name__)
+                default_value = str(parameter_value.get("value"))
+            param = {
+                "model_id": model_id,
+                "name": parameter_name,
+                "type": type_,
+                "default_value": default_value,
+                "state_variable": True,
+            }
+            parameter_types.append(param)
+
+    payload = json.dumps(parameter_types)
+    headers = {"Content-Type": "application/json"}
+    response = requests.request(
+        "PUT", url + f"models/{model_id}/parameters", headers=headers, data=payload
+    )
+    return response
 
 
 def create_simulation_parameters(
