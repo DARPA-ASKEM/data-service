@@ -123,7 +123,7 @@ class SearchProvenance(ProvenanceHandler):
             raise HTTPException(
                 status_code=404,
                 detail="Derived models can only be found "
-                + "from root types of Publication or Intermediates",
+                + "from root types of Model, SimulationRun, Plan and Dataset",
             )
         with self.graph_db.session() as session:
 
@@ -143,8 +143,6 @@ class SearchProvenance(ProvenanceHandler):
                 + "With DISTINCT Both_rms "
                 + "RETURN labels(Both_rms) as label, Both_rms.id as id "
             )
-            print("heee")
-            print(query)
 
             response = session.run(query)
             response_data = [
