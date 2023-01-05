@@ -73,7 +73,7 @@ folders = sorted(
 
 
 upload_starter_kit_models()
-s
+
 if args.fake == True:
     upload_fake_provanence_data()
 

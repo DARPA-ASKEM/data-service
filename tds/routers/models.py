@@ -230,7 +230,7 @@ def update_model_parameters(
         adjust_model_params(id, payload, session)
         session.commit()
 
-    if settings.NEO4J:
+    if settings.NEO4J_ENABLED:
         print("hererer")
         with Session(rdb) as session:
 
@@ -248,7 +248,7 @@ def update_model_parameters(
             for parameter in updated_parameters:
                 print(parameter)
                 payload = Provenance(
-                    left=parameter.id,
+                    left=parameter.get("id"),
                     left_type="ModelParameter",
                     right=model.state_id,
                     right_type="ModelRevision",
@@ -322,7 +322,7 @@ def create_model(
             )
         session.commit()
 
-    if settings.NEO4J:
+    if settings.NEO4J_ENABLED:
         print("Neo4j is set")
         provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
 
@@ -352,7 +352,7 @@ def create_model(
             for parameter in created_parameters:
                 print(parameter)
                 payload = Provenance(
-                    left=parameter.id,
+                    left=parameter.get("id"),
                     left_type="ModelParameter",
                     right=model.state_id,
                     right_type="ModelRevision",
@@ -384,8 +384,9 @@ def model_opt(
     with Session(rdb) as session:
         payload = payload.dict()
         # query old model and old content
+        # print(payload)
         l_model = session.query(orm.ModelDescription).get(payload.get("left"))
-
+        print(l_model)
         if payload.get("right", False):
             r_model = session.query(orm.ModelDescription).get(payload.get("right"))
 
@@ -425,7 +426,7 @@ def model_opt(
             for parameter in parameters:
                 payload["parameters"].append(parameter.__dict__)
 
-        # if parameters are set use those for new model
+        # add parameters to new model
         for param in payload.get("parameters"):
             session.add(
                 orm.ModelParameter(
@@ -438,7 +439,7 @@ def model_opt(
             )
         session.commit()
 
-        if settings.NEO4J:
+        if settings.NEO4J_ENABLED:
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             prov_payload = Provenance(
                 left=state.id,
@@ -450,7 +451,7 @@ def model_opt(
             )
             provenance_handler.create_entry(prov_payload)
 
-            if model_operation == "glue":
+            if model_operation == "glue" and payload.get("right", False):
                 prov_payload = Provenance(
                     left=state.id,
                     left_type="ModelRevision",
@@ -460,17 +461,6 @@ def model_opt(
                     user_id=payload.get("user_id", None),
                 )
                 provenance_handler.create_entry(prov_payload)
-
-                if model_operation == "glue":
-                    prov_payload = Provenance(
-                        left=state.id,
-                        left_type="ModelRevision",
-                        right=r_model.state_id,
-                        right_type="ModelRevision",
-                        relation_type=model_opt_relationship_mapping[model_operation],
-                        user_id=payload.get("user_id", None),
-                    )
-                    provenance_handler.create_entry(prov_payload)
 
             # add begins at relationship
             prov_payload = Provenance(
@@ -482,6 +472,26 @@ def model_opt(
                 user_id=payload.get("user_id", None),
             )
             provenance_handler.create_entry(prov_payload)
+
+            # get recently added parameters for the new model
+            parameters: Query[orm.ModelParameter] = session.query(
+                orm.ModelParameter
+            ).filter(orm.ModelParameter.model_id == new_model.id)
+
+            created_parameters = orm_to_params(list(parameters))
+            print(created_parameters)
+            # add ModelParameter nodes
+            for parameter in created_parameters:
+                print(parameter)
+                payload = Provenance(
+                    left=parameter.get("id"),
+                    left_type="ModelParameter",
+                    right=new_model.state_id,
+                    right_type="ModelRevision",
+                    relation_type="PARAMETER_OF",
+                    user_id=None,
+                )
+                provenance_handler.create_entry(payload)
 
     logger.info("new model created: %i", id)
     return Response(
@@ -524,6 +534,7 @@ def update_model(
             model.state_id = state.id
             session.commit()
             if settings.NEO4J_ENABLED:
+                print("here")
                 provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
 
                 provenance_payload = Provenance(
@@ -534,7 +545,9 @@ def update_model(
                     relation_type="EDITED_FROM",
                     user_id=model_payload.get("user_id", None),
                 )
+                print(provenance_payload)
                 provenance_handler.create_entry(provenance_payload)
+
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Response(

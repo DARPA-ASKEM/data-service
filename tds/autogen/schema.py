@@ -27,7 +27,6 @@ class ProvenanceType(str, Enum):
     Project = 'Project'
     Publication = 'Publication'
     SimulationRun = 'SimulationRun'
-
     
 
 class ProvenanceAbbreviations(str, Enum):

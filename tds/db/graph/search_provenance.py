@@ -54,6 +54,7 @@ class SearchProvenance(ProvenanceHandler):
             query = (
                 f"{match_node}"
                 + f"{relation_direction}(n) "
+                + "With DISTINCT n "
                 + "RETURN labels(n) as label, n.id as id"
             )
             print(query)
@@ -113,6 +114,16 @@ class SearchProvenance(ProvenanceHandler):
         """
         Which model revisions help create the latest model which was used to create the artifact
         """
+        if payload.get("root_type") not in (
+            "Model",
+            "SimulationRun",
+            "Plan",
+            "Dataset",
+        ):
+            raise HTTPException(
+                status_code=404,
+                detail="Derived models can only be found from root types of Publication or Intermediates",
+            )
         with self.graph_db.session() as session:
 
             match_pattern = parent_model_query_generator(
@@ -131,15 +142,63 @@ class SearchProvenance(ProvenanceHandler):
                 + "With DISTINCT Both_rms "
                 + "RETURN labels(Both_rms) as label, Both_rms.id as id "
             )
+            print("heee")
             print(query)
 
             response = session.run(query)
+            response_data = [
+                {res.data().get("label")[0]: res.data().get("id")} for res in response
+            ]
 
             ## if response is empty there is only one version of the model. Return just that node.
-            if len(response.data()) == 0:
+            if len(response_data) == 0:
+                print("here")
                 query = f"{match_pattern}" + "RETURN labels(Mr) as label, Mr.id as id "
                 response = session.run(query)
+                response_data = [
+                    {res.data().get("label")[0]: res.data().get("id")}
+                    for res in response
+                ]
 
+            print(response_data)
+
+            return sorted(response_data, key=lambda i: list(i.keys()))
+
+    def parent_models(self, payload):
+        """
+        Which models help create the latest model
+        """
+        if payload.get("root_type") not in ("Model"):
+            raise HTTPException(
+                status_code=404,
+                detail="Parent models can only be found from root types of Model, Plan, SimulationRun, Dataset",
+            )
+        with self.graph_db.session() as session:
+
+            match_pattern = parent_model_query_generator(
+                payload.get("root_type"), payload.get("root_id")
+            )
+
+            model_relationships = relationships_array_as_str(
+                include=[
+                    "EDITED_FROM",
+                    "COPIED_FROM",
+                    "GLUED_FROM",
+                    "DECOMPOSED_FROM",
+                    "STRATIFIED_FROM",
+                ]
+            )
+
+            query = (
+                match_pattern
+                + f"Match (Mr)-[:{model_relationships} *1..]->(Mr2:ModelRevision)"
+                + "With collect(Mr)+collect(Mr2) as Mrs "
+                + "Unwind Mrs as Both_rms "
+                + "With DISTINCT Both_rms "
+                + "Match (md2:Model)-[:BEGINS_AT]->(Both_rms) "
+                + "Return labels(md2) as label, md2.id as id"
+            )
+            response = session.run(query)
             response_data = [
                 {res.data().get("label")[0]: res.data().get("id")} for res in response
             ]

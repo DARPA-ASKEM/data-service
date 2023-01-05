@@ -16,7 +16,8 @@ from tds.schema.resource import Resource, get_resource_type
 
 class ProvenanceHandler:
     """
-    The handler wraps crud operations and writes to both the relational and graph DBs
+    The handler wraps crud operations and writes to
+    both the relational and graph DBs
     """
 
     def __init__(self, rdb: Engine, graph_db: Optional[Driver] = None):
@@ -130,7 +131,8 @@ class ProvenanceHandler:
 
                 left_node_query = (
                     f"Merge (n: {provenance_payload.get('left_type')}"
-                    + f"{{id: {provenance_payload.get('left')} , concept:'{provenance_payload.get('concept')}'}} )"
+                    + f"{{id: {provenance_payload.get('left')} , "
+                    + f"concept:'{provenance_payload.get('concept')}'}} )"
                 )
             else:
                 left_node_query = (
