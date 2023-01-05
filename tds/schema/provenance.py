@@ -3,7 +3,6 @@ tds.schema.provenance - API facing provenance schema
 """
 from typing import Dict, Type
 
-
 # pylint: disable=missing-class-docstring
 from tds.autogen import schema
 
