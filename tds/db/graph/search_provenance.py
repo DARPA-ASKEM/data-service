@@ -16,7 +16,6 @@ from tds.db.graph.query_helpers import (
     parent_model_query_generator,
     relationships_array_as_str,
 )
-from tds.schema.provenance import provenance_type_to_abbr
 
 
 class SearchProvenance(ProvenanceHandler):
