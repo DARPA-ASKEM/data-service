@@ -54,6 +54,7 @@ class ProvenanceSearchTypes(str, Enum):
     derived_models = 'derived_models'
     model_to_primative = 'model_to_primative'
     parent_model_revisions = 'parent_model_revisions'
+    parent_models = 'parent_models'
     parent_nodes = 'parent_nodes'
     
 
