@@ -11,7 +11,6 @@ Base = declarative_base()
 class ResourceType(str, Enum):
 
     datasets = 'datasets'
-    extractions = 'extractions'
     intermediates = 'intermediates'
     models = 'models'
     plans = 'plans'
@@ -19,14 +18,50 @@ class ResourceType(str, Enum):
     simulation_runs = 'simulation_runs'
     
 
+class ProvenanceType(str, Enum):
+
+    Dataset = 'Dataset'
+    Intermediate = 'Intermediate'
+    Model = 'Model'
+    ModelRevision = 'ModelRevision'
+    Plan = 'Plan'
+    Publication = 'Publication'
+    SimulationRun = 'SimulationRun'
+    
+
+class ProvenanceSearchTypes(str, Enum):
+
+    child_nodes = 'child_nodes'
+    connected_nodes = 'connected_nodes'
+    derived_models = 'derived_models'
+    parent_model_revisions = 'parent_model_revisions'
+    parent_nodes = 'parent_nodes'
+    
+
 class RelationType(str, Enum):
 
-    cites = 'cites'
-    copiedfrom = 'copiedfrom'
-    derivedfrom = 'derivedfrom'
-    editedFrom = 'editedFrom'
-    gluedFrom = 'gluedFrom'
-    stratifiedFrom = 'stratifiedFrom'
+    BEGINS_AT = 'BEGINS_AT'
+    CITES = 'CITES'
+    COMBINED_FROM = 'COMBINED_FROM'
+    COPIED_FROM = 'COPIED_FROM'
+    DECOMPOSED_FROM = 'DECOMPOSED_FROM'
+    DERIVED_FROM = 'DERIVED_FROM'
+    EDITED_FROM = 'EDITED_FROM'
+    EQUIVALENT_OF = 'EQUIVALENT_OF'
+    EXTRACTED_FROM = 'EXTRACTED_FROM'
+    GENERATED_BY = 'GENERATED_BY'
+    GLUED_FROM = 'GLUED_FROM'
+    REINTERPRETS = 'REINTERPRETS'
+    STRATIFIED_FROM = 'STRATIFIED_FROM'
+    USES = 'USES'
+    
+
+class ModelOperations(str, Enum):
+
+    copy = 'copy'
+    decompose = 'decompose'
+    glue = 'glue'
+    stratify = 'stratify'
     
 
 class TaggableType(str, Enum):
@@ -257,9 +292,9 @@ class Provenance(Base):
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     relation_type = sa.Column(sa.Enum(RelationType), nullable=False)
     left = sa.Column(sa.Integer(), nullable=False)
-    left_type = sa.Column(sa.Enum(ResourceType), nullable=False)
+    left_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
     right = sa.Column(sa.Integer(), nullable=False)
-    right_type = sa.Column(sa.Enum(ResourceType), nullable=False)
+    right_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
     user_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'))
 
 

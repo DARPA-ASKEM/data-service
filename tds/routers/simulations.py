@@ -85,7 +85,7 @@ def list_run_descriptions(
     return list_by_id(rdb.connect(), orm.SimulationRun, page_size, page)
 
 
-@router.get("/runs/descriptions/{id}", **retrieve.fastapi_endpoint_config)
+@router.get("/runs/{id}/descriptions", **retrieve.fastapi_endpoint_config)
 def get_run_description(id: int, rdb: Engine = Depends(request_rdb)) -> RunDescription:
     """
     Retrieve run metadata
@@ -121,7 +121,7 @@ def create_run_from_description(
 
 
 @router.get("/simulation_parameters/{id}", **retrieve.fastapi_endpoint_config)
-def get_simulation_parameter(id: int, rdb: Engine = Depends(request_rdb)):
+def get_single_simulation_parameter(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Retrieve simulation parameter
     """
@@ -136,7 +136,7 @@ def get_simulation_parameter(id: int, rdb: Engine = Depends(request_rdb)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.get("/runs/parameters/{id}", **retrieve.fastapi_endpoint_config)
+@router.get("/runs/{id}/parameters", **retrieve.fastapi_endpoint_config)
 def get_run_parameters(
     id: int, rdb: Engine = Depends(request_rdb)
 ) -> SimulationParameters:
@@ -152,7 +152,7 @@ def get_run_parameters(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.put("/runs/parameters/{id}", **update.fastapi_endpoint_config)
+@router.put("/runs/{id}/parameters", **update.fastapi_endpoint_config)
 def update_run_parameters(
     payload: SimulationParameters, id: int, rdb: Engine = Depends(request_rdb)
 ) -> Response:

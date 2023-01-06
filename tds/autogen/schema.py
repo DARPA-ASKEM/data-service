@@ -7,7 +7,6 @@ from pydantic import BaseModel, Json
 class ResourceType(str, Enum):
 
     datasets = 'datasets'
-    extractions = 'extractions'
     intermediates = 'intermediates'
     models = 'models'
     plans = 'plans'
@@ -15,14 +14,50 @@ class ResourceType(str, Enum):
     simulation_runs = 'simulation_runs'
     
 
+class ProvenanceType(str, Enum):
+
+    Dataset = 'Dataset'
+    Intermediate = 'Intermediate'
+    Model = 'Model'
+    ModelRevision = 'ModelRevision'
+    Plan = 'Plan'
+    Publication = 'Publication'
+    SimulationRun = 'SimulationRun'
+    
+
+class ProvenanceSearchTypes(str, Enum):
+
+    child_nodes = 'child_nodes'
+    connected_nodes = 'connected_nodes'
+    derived_models = 'derived_models'
+    parent_model_revisions = 'parent_model_revisions'
+    parent_nodes = 'parent_nodes'
+    
+
 class RelationType(str, Enum):
 
-    cites = 'cites'
-    copiedfrom = 'copiedfrom'
-    derivedfrom = 'derivedfrom'
-    editedFrom = 'editedFrom'
-    gluedFrom = 'gluedFrom'
-    stratifiedFrom = 'stratifiedFrom'
+    BEGINS_AT = 'BEGINS_AT'
+    CITES = 'CITES'
+    COMBINED_FROM = 'COMBINED_FROM'
+    COPIED_FROM = 'COPIED_FROM'
+    DECOMPOSED_FROM = 'DECOMPOSED_FROM'
+    DERIVED_FROM = 'DERIVED_FROM'
+    EDITED_FROM = 'EDITED_FROM'
+    EQUIVALENT_OF = 'EQUIVALENT_OF'
+    EXTRACTED_FROM = 'EXTRACTED_FROM'
+    GENERATED_BY = 'GENERATED_BY'
+    GLUED_FROM = 'GLUED_FROM'
+    REINTERPRETS = 'REINTERPRETS'
+    STRATIFIED_FROM = 'STRATIFIED_FROM'
+    USES = 'USES'
+    
+
+class ModelOperations(str, Enum):
+
+    copy = 'copy'
+    decompose = 'decompose'
+    glue = 'glue'
+    stratify = 'stratify'
     
 
 class TaggableType(str, Enum):
@@ -225,9 +260,9 @@ class Provenance(BaseModel):
     timestamp: datetime.datetime = datetime.datetime.now()
     relation_type: RelationType
     left: int
-    left_type: ResourceType
+    left_type: ProvenanceType
     right: int
-    right_type: ResourceType
+    right_type: ProvenanceType
     user_id: Optional[int]
 
 

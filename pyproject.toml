@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tds"
-version = "0.3.3"
+version = "0.3.4"
 
 description = "The API that sits on top of the data store for the ASKEM program."
 authors = ["Five Grant <five@jataware.com>"]
@@ -30,6 +30,7 @@ python-multipart = "^0.0.5"
 pandas = "^1.5.2"
 strawberry-graphql = {extras = ["fastapi"], version = "^0.142.3"}
 minio = "^7.1.12"
+openai = "^0.25.0"
 
 [tool.poetry.scripts]
 tds = "tds.main:cli"
@@ -58,7 +59,7 @@ force-exclude = "autogen"
 
 [tool.pytest.ini_options]
 addopts = "--ignore-glob=*utils.py"
-python_files = ["tests/*.py"]
+python_files = ["tests/service.py", "tests/unittest.py", "tests/search.py"]
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.pylint.master]

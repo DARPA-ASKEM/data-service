@@ -33,7 +33,6 @@ class ProvenanceHandler:
         """
         Draws a relation between two resources
         """
-
         with Session(self.__connection__) as session:
             provenance = orm.Provenance(**entry.dict())
             session.add(provenance)
@@ -140,8 +139,11 @@ class ProvenanceHandler:
             )
             session.run(right_node_query, right_id=provenance_payload.get("right"))
 
-            # Match our two nodes and create new relationship.
-            # Set user_id as property of relationship
+            def user_id_str(user_id):
+                if user_id is not None:
+                    return " { user_id: $user_id}"
+                return ""
+
             edge_query = (
                 f"Match (n1: {provenance_payload.get('left_type')} ) "
                 + "Where n1.id = $left_id "
@@ -149,14 +151,15 @@ class ProvenanceHandler:
                 + "Where n2.id = $right_id "
                 + "Merge (n1)-[:"
                 + provenance_payload.get("relation_type")
-                + " {user_id : $user_id"
-                + "}]->(n2)"
+                + user_id_str(provenance_payload.get("user_id"))
+                + "]->(n2)"
             )
+
             session.run(
                 edge_query,
                 left_id=provenance_payload.get("left"),
                 right_id=provenance_payload.get("right"),
-                user_id=provenance_payload.get("user_id"),
+                user_id=provenance_payload.get("user_id", None),
             )
 
     def delete_node_relationship(self, provenance_payload):
@@ -210,3 +213,19 @@ class ProvenanceHandler:
                 {"label": res.data().get("label")[0], "id": res.data().get("id")}
                 for res in response
             ]
+
+    def add_properties(self):
+        """
+        Modify properties so Neoviz can be used
+        """
+        with self.graph_db.session() as session:
+            query = (
+                "match (n)-[r]->(m)"
+                + "SET n.name= labels(n)[0]"
+                + "SET m.name= labels(m)[0]"
+                + "SET r.name =type(r)"
+                + "return *"
+            )
+
+            session.run(query)
+            return True

@@ -11,6 +11,13 @@ from tds.schema.model import ModelParameters
 
 logger = Logger(__file__)
 
+model_opt_relationship_mapping = {
+    orm.ModelOperations.copy: orm.RelationType.COPIED_FROM,
+    orm.ModelOperations.decompose: orm.RelationType.DECOMPOSED_FROM,
+    orm.ModelOperations.stratify: orm.RelationType.STRATIFIED_FROM,
+    orm.ModelOperations.glue: orm.RelationType.GLUED_FROM,
+}
+
 
 def adjust_model_params(model_id: int, parameters: ModelParameters, session: Session):
     """

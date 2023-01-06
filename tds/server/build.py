@@ -7,6 +7,7 @@ from pkgutil import iter_modules
 from typing import List
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 API_DESCRIPTION = "TDS handles data between TERArium and other ASKEM components."
 
@@ -48,6 +49,18 @@ def build_api(*args: str) -> FastAPI:
         description=API_DESCRIPTION,
         docs_url="/",
     )
+    origins = [
+        "http://localhost",
+        "http://localhost:8080",
+    ]
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     for router_name in args if len(args) != 0 else find_valid_routers():
         attach_router(api, router_name)
     return api
