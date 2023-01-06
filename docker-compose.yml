@@ -45,3 +45,17 @@ services:
       - NEO4J_dbms_memory_pagecache_size=512M
     networks:
       - data-api
+  minio:
+    build:
+      context: ./
+      dockerfile: Dockerfile.minio
+    environment:
+      MINIO_ROOT_USER: miniouser
+      MINIO_ROOT_PASSWORD: miniopass
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - $PWD/data:/data
+    networks:
+      - data-api

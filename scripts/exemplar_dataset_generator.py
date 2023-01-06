@@ -64,7 +64,7 @@ def create_dataset(maintainer_id, meta_object):
     data_path_list = []
     for data_path in meta_object["data_paths"]:
         file_name = data_path.split("/")[-1]
-        data_path_string = f"file:///datasets/{dataset_id}/{file_name}"
+        data_path_string = f"s3://datasets/{dataset_id}/{file_name}"
         data_path_list.append(data_path_string)
 
     annotation = {
