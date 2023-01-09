@@ -26,19 +26,6 @@ Enum public.provenance_type {
    Concept
 }
 
-Enum provenance_abbreviations{
-  Ds 
-  Md
-  Mp
-  Sp 
-  Pp
-  Mr
-  In
-  Pu
-  Sr
-  Pr
-  Cn
-}
 
 Enum provenance_search_types{
   connected_nodes

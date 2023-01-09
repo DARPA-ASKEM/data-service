@@ -21,15 +21,15 @@ class ProvenancePayload:
 provenance_type_to_abbr: Dict[
     Type[schema.ProvenanceType], schema.ProvenanceAbbreviations
 ] = {
-    schema.ProvenanceType.Dataset: schema.ProvenanceAbbreviations.Ds,
-    schema.ProvenanceType.Model: schema.ProvenanceAbbreviations.Md,
-    schema.ProvenanceType.Plan: schema.ProvenanceAbbreviations.Sp,
-    schema.ProvenanceType.Publication: schema.ProvenanceAbbreviations.Pu,
-    schema.ProvenanceType.Intermediate: schema.ProvenanceAbbreviations.In,
-    schema.ProvenanceType.SimulationRun: schema.ProvenanceAbbreviations.Sr,
-    schema.ProvenanceType.Project: schema.ProvenanceAbbreviations.Pr,
-    schema.ProvenanceType.ModelRevision: schema.ProvenanceAbbreviations.Mr,
-    schema.ProvenanceType.Concept: schema.ProvenanceAbbreviations.Cn,
-    schema.ProvenanceType.ModelParameter: schema.ProvenanceAbbreviations.Mp,
-    schema.ProvenanceType.PlanParameter: schema.ProvenanceAbbreviations.Pp,
+    schema.ProvenanceType.Dataset: "Ds",
+    schema.ProvenanceType.Model: "Md",
+    schema.ProvenanceType.Plan: "Sp",
+    schema.ProvenanceType.Publication: "Pu",
+    schema.ProvenanceType.Intermediate: "In",
+    schema.ProvenanceType.SimulationRun: "Sr",
+    schema.ProvenanceType.Project: "Pr",
+    schema.ProvenanceType.ModelRevision: "Mr",
+    schema.ProvenanceType.Concept: "Cn",
+    schema.ProvenanceType.ModelParameter: "Mp",
+    schema.ProvenanceType.PlanParameter: "Pp",
 }

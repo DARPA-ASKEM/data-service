@@ -231,7 +231,6 @@ def update_model_parameters(
         session.commit()
 
     if settings.NEO4J_ENABLED:
-        print("hererer")
         with Session(rdb) as session:
 
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
@@ -243,10 +242,8 @@ def update_model_parameters(
                 ).filter(orm.ModelParameter.model_id == id)
 
             updated_parameters = orm_to_params(list(parameters))
-            print(updated_parameters)
             # add ModelParameter nodes
             for parameter in updated_parameters:
-                print(parameter)
                 payload = Provenance(
                     left=parameter.get("id"),
                     left_type="ModelParameter",
@@ -323,7 +320,7 @@ def create_model(
         session.commit()
 
     if settings.NEO4J_ENABLED:
-        print("Neo4j is set")
+        logger.info("Neo4j is set")
         provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
 
         # add ModelParameter nodes
@@ -347,10 +344,8 @@ def create_model(
             ).filter(orm.ModelParameter.model_id == id)
 
             created_parameters = orm_to_params(list(parameters))
-            print(created_parameters)
             # add ModelParameter nodes
             for parameter in created_parameters:
-                print(parameter)
                 payload = Provenance(
                     left=parameter.get("id"),
                     left_type="ModelParameter",
@@ -383,8 +378,6 @@ def model_opt(
     """
     with Session(rdb) as session:
         payload = payload.dict()
-        # query old model and old content
-        # print(payload)
         l_model = session.query(orm.ModelDescription).get(payload.get("left"))
         if payload.get("right", False):
             r_model = session.query(orm.ModelDescription).get(payload.get("right"))
@@ -399,7 +392,7 @@ def model_opt(
         elif model_operation in ("decompose", "glue"):
             state = orm.ModelState(content=payload.get("content"))
         else:
-            raise HTTPException(status_code=404, detail="Operation not supported")
+            raise HTTPException(status_code=400, detail="Operation not supported")
 
         session.add(state)
         session.commit()
@@ -479,10 +472,8 @@ def model_opt(
             ).filter(orm.ModelParameter.model_id == new_model.id)
 
             created_parameters = orm_to_params(list(parameters))
-            print(created_parameters)
             # add ModelParameter nodes
             for parameter in created_parameters:
-                print(parameter)
                 payload = Provenance(
                     left=parameter.get("id"),
                     left_type="ModelParameter",
@@ -534,7 +525,6 @@ def update_model(
             model.state_id = state.id
             session.commit()
             if settings.NEO4J_ENABLED:
-                print("here")
                 provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
 
                 provenance_payload = Provenance(
@@ -545,7 +535,6 @@ def update_model(
                     relation_type="EDITED_FROM",
                     user_id=model_payload.get("user_id", None),
                 )
-                print(provenance_payload)
                 provenance_handler.create_entry(provenance_payload)
 
     else:

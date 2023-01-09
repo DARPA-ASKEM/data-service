@@ -56,7 +56,6 @@ class SearchProvenance(ProvenanceHandler):
                 + "With DISTINCT n "
                 + "RETURN labels(n) as label, n.id as id"
             )
-            print(query)
             logging.info(query)
 
             response = session.run(query)
@@ -152,16 +151,12 @@ class SearchProvenance(ProvenanceHandler):
             ## if response is empty there is only one version of the model.
             # Return just that node.
             if len(response_data) == 0:
-                print("here")
                 query = f"{match_pattern}" + "RETURN labels(Mr) as label, Mr.id as id "
                 response = session.run(query)
                 response_data = [
                     {res.data().get("label")[0]: res.data().get("id")}
                     for res in response
                 ]
-
-            print(response_data)
-
             return sorted(response_data, key=lambda i: list(i.keys()))
 
     def parent_models(self, payload):
@@ -210,7 +205,7 @@ class SearchProvenance(ProvenanceHandler):
         """
         Which models relay on which primatives
         """
-        print(payload)
+        logging.info(payload)
         with self.graph_db.session() as session:
             match_node = match_node_builder(
                 node_type=schema.ProvenanceType.Intermediate
@@ -289,8 +284,6 @@ class SearchProvenance(ProvenanceHandler):
 
             counts = defaultdict(int)
             for response in response_data:
-                print(response)
-                print(counts)
                 for key in response:
                     counts[key] += 1
         return counts

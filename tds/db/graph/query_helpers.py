@@ -19,7 +19,7 @@ def dynamic_relationship_direction(direction, relationship_type):
     if direction == "parent":
         return f"-[{relationship_type}]->"
     raise HTTPException(
-        status_code=404, detail="Relationship direction is not allowed."
+        status_code=400, detail="Relationship direction is not allowed."
     )
 
 

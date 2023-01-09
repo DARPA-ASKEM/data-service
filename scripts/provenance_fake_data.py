@@ -354,19 +354,17 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                                         type="simulation_parameters",
                                     )
                                 ## add context concept as well ##
-                                try:
-                                    context = init_parameter_value.get(
-                                        "context", {}
-                                    ).get("property", None)
-                                    if context is not None:
-                                        print(f"adding concept context {context}")
-                                        add_concept(
-                                            concept=context,
-                                            object_id=parameter.get("id"),
-                                            type="simulation_parameters",
-                                        )
-                                except Exception as e:
-                                    print(e)
+
+                                context = init_parameter_value.get("context", {}).get(
+                                    "property", None
+                                )
+                                if context is not None:
+                                    print(f"adding concept context {context}")
+                                    add_concept(
+                                        concept=context,
+                                        object_id=parameter.get("id"),
+                                        type="simulation_parameters",
+                                    )
 
     # dataset extracted by
     if loop.get("dataset_relationship", None) is None:
