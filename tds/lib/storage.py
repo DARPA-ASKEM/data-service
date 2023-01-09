@@ -1,6 +1,5 @@
 """File storage library for functions related to getting and putting files.
 """
-import io
 import os
 import tempfile
 from urllib.parse import urlparse

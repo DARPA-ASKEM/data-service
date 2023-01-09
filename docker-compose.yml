@@ -27,11 +27,15 @@ services:
       - "8001:8000"
     env_file:
       - api.env
+    environment:
+      - NEO4J_ENABLED
     networks:
       - data-annotation-stack
       - data-api
     depends_on:
       - rdb
+      - graphdb
+      - minio
     volumes:
       - $PWD/tds:/api/tds
       - $PWD/data/datasets:/datasets
