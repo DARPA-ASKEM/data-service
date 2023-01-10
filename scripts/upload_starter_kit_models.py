@@ -30,7 +30,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
     # loop over models
     folders = glob.glob("experiments*/thin-thread-examples/starter-kit/*/")
 
-    for folder in sorted(folders):
+    for folder in sorted(folders)[2:3]:
 
         ## get concepts ##
 
@@ -48,6 +48,12 @@ def upload_starter_kit_models(person_id=1, project_id=1):
 
         for concept in model_concepts:
             add_concept(concept=concept, object_id=publication_id, type="publications")
+        add_provenance(
+            left={"id": project_id, "resource_type": "Project"},
+            right={"id": publication_id, "resource_type": "Publication"},
+            relation_type="CONTAINS",
+            user_id=person_id,
+        )
 
         ## intermediates ##
 
@@ -63,6 +69,13 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             asset_type="intermediates",
         )
 
+        add_provenance(
+            left={"id": project_id, "resource_type": "Project"},
+            right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
+            relation_type="CONTAINS",
+            user_id=person_id,
+        )
+
         for concept in model_concepts:
             add_concept(
                 concept=concept, object_id=intermediate_mmt_id, type="intermediates"
@@ -70,6 +83,24 @@ def upload_starter_kit_models(person_id=1, project_id=1):
         if publication_id:
             add_provenance(
                 left={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
+                right={"id": publication_id, "resource_type": "Publication"},
+                relation_type="EXTRACTED_FROM",
+                user_id=person_id,
+            )
+
+        for concept in model_concepts:
+            add_concept(
+                concept=concept, object_id=intermediate_mmt_id, type="intermediates"
+            )
+        if publication_id:
+            add_provenance(
+                left={"id": project_id, "resource_type": "Project"},
+                right={"id": intermediate_grom_id, "resource_type": "Intermediate"},
+                relation_type="CONTAINS",
+                user_id=person_id,
+            )
+            add_provenance(
+                left={"id": intermediate_grom_id, "resource_type": "Intermediate"},
                 right={"id": publication_id, "resource_type": "Publication"},
                 relation_type="EXTRACTED_FROM",
                 user_id=person_id,
@@ -113,7 +144,12 @@ def upload_starter_kit_models(person_id=1, project_id=1):
         )
 
         asset_to_project(project_id=1, asset_id=model_id, asset_type="models")
-
+        add_provenance(
+            left={"id": project_id, "resource_type": "Project"},
+            right={"id": model_id, "resource_type": "Model"},
+            relation_type="CONTAINS",
+            user_id=person_id,
+        )
         response = requests.request("GET", url + f"models/{model_id}")
         state_model_json = response.json()
         state_id = state_model_json.get("state_id")
@@ -253,6 +289,12 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 asset_id=simulation_run_id,
                 asset_type="simulation_runs",
             )
+            add_provenance(
+                left={"id": project_id, "resource_type": "Project"},
+                right={"id": simulation_plan_id, "resource_type": "Plan"},
+                relation_type="CONTAINS",
+                user_id=person_id,
+            )
 
             add_provenance(
                 left={"id": simulation_run_id, "resource_type": "SimulationRun"},
@@ -264,6 +306,12 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 right={"id": simulation_run_id, "resource_type": "SimulationRun"},
                 relation_type="REINTERPRETS",
                 left={"id": dataset_id, "resource_type": "Dataset"},
+                user_id=person_id,
+            )
+            add_provenance(
+                left={"id": project_id, "resource_type": "Project"},
+                right={"id": simulation_run_id, "resource_type": "SimulationRun"},
+                relation_type="CONTAINS",
                 user_id=person_id,
             )
 

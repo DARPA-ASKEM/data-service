@@ -15,11 +15,29 @@ Enum public.resource_type {
 Enum public.provenance_type {
    Dataset
    Model
+   ModelParameter
    Plan
+   PlanParameter
    ModelRevision
    Intermediate
    Publication
    SimulationRun
+   Project
+   Concept
+}
+
+Enum provenance_abbreviations{
+  Ds 
+  Md
+  Mp
+  Sp 
+  Pp
+  Mr
+  In
+  Pu
+  Sr
+  Pr
+  Cn
 }
 
 Enum provenance_search_types{
@@ -30,6 +48,8 @@ Enum provenance_search_types{
   parent_model_revisions
   model_to_primative
   artifacts_created_by_user
+  concept
+  concept_counts
 }
 
 Enum relation_type {
@@ -47,6 +67,9 @@ Enum relation_type {
   DECOMPOSED_FROM
   GLUED_FROM
   STRATIFIED_FROM
+  CONTAINS
+  IS_CONCEPT_OF
+  PARAMETER_OF
 }
 
 Enum model_operations{
@@ -279,6 +302,7 @@ Table provenance {
   right int [not null]
   right_type provenance_type [not null]
   user_id int [ref: > person.id]
+  concept varchar
 }
 
 Table person {

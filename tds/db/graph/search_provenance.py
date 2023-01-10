@@ -1,12 +1,22 @@
 """
 Import provenance handler
 """
+import logging
+from collections import defaultdict
+
+from fastapi import FastAPI, HTTPException
+
+from tds.autogen import schema
 from tds.db.graph.provenance_handler import ProvenanceHandler
 from tds.db.graph.query_helpers import (
     derived_models_query_generater,
     dynamic_relationship_direction,
+    match_node_builder,
+    node_builder,
     parent_model_query_generator,
+    relationships_array_as_str,
 )
+from tds.schema.provenance import provenance_type_to_abbr
 
 
 class SearchProvenance(ProvenanceHandler):
@@ -25,17 +35,31 @@ class SearchProvenance(ProvenanceHandler):
         Connect nodes
         """
         with self.graph_db.session() as session:
-            relation_direction = dynamic_relationship_direction(
-                direction=direction, relationship_type="*"
-            )
-            query = (
-                f"Match (n1: {payload.get('root_type')}) "
-                + f"{relation_direction}(n2)"
-                + "Where n1.id = $root_id "
-                + "RETURN labels(n2) as label, n2.id as id"
+            # return string of relationship excluding CONTAINS and IS_CONCEPT_OF
+            relationships_str = relationships_array_as_str(
+                exclude=["CONTAINS", "IS_CONCEPT_OF"]
             )
 
-            response = session.run(query, root_id=payload.get("root_id"))
+            # set the direction of the search dynamically
+            relation_direction = dynamic_relationship_direction(
+                direction=direction, relationship_type=f"r:{relationships_str} *1.."
+            )
+
+            # build the first match node
+            match_node = match_node_builder(
+                node_type=payload.get("root_type"), node_id=payload.get("root_id")
+            )
+
+            # build the query. n is an arbitrary node
+            query = (
+                f"{match_node}"
+                + f"{relation_direction}(n) "
+                + "RETURN labels(n) as label, n.id as id"
+            )
+            print(query)
+            logging.info(query)
+
+            response = session.run(query)
 
             response_data = [
                 {res.data().get("label")[0]: res.data().get("id")} for res in response
@@ -65,14 +89,19 @@ class SearchProvenance(ProvenanceHandler):
         """
         Return models derived from artifact (Publication or Intermediate)
         """
+        if payload.get("root_type") not in ("Publication", "Intermediate"):
+            raise HTTPException(
+                status_code=404,
+                detail="Derived models can only be found from root types of Publication or Intermediates",
+            )
+
         with self.graph_db.session() as session:
 
             query = (
-                f" {derived_models_query_generater(payload.get('root_type'))} "
-                + "Where n.id = $root_id "
-                + "RETURN labels(m) as label, m.id as id"
+                f" {derived_models_query_generater(root_type=payload.get('root_type'), root_id=payload.get('root_id'))} "
+                + "RETURN labels(Md) as label, Md.id as id"
             )
-            response = session.run(query, root_id=payload.get("root_id"))
+            response = session.run(query)
 
             response_data = [
                 {res.data().get("label")[0]: res.data().get("id")} for res in response
@@ -82,39 +111,34 @@ class SearchProvenance(ProvenanceHandler):
 
     def parent_model_revisions(self, payload):
         """
-        Which model revisions help create the latest model id
+        Which model revisions help create the latest model which was used to create the artifact
         """
         with self.graph_db.session() as session:
-            # if payload.get("root_type") != "Model":
-            #     raise Exception("This search only allows root_type of type model")
+
             match_pattern = parent_model_query_generator(
                 payload.get("root_type"), payload.get("root_id")
             )
-            print(match_pattern)
+            relationships_str = relationships_array_as_str(
+                exclude=["CONTAINS", "IS_CONCEPT_OF"]
+            )
 
             query = (
                 f"{match_pattern}"
-                + "Match (mr2:Model_revision)-[r2 *1.. ]->(mr) "
-                + "With collect(mr)+collect(mr2) as mrs "
-                + "Unwind mrs as both_rms "
-                + "With DISTINCT both_rms "
-                + "RETURN labels(both_rms) as label, both_rms.id as id "
+                + f"Match (Mr2:ModelRevision)"
+                + f"-[r2:{relationships_str} *1.. ]->(Mr) "
+                + f"With collect(Mr)+collect(Mr2) as Mrs "
+                + "Unwind Mrs as Both_rms "
+                + "With DISTINCT Both_rms "
+                + "RETURN labels(Both_rms) as label, Both_rms.id as id "
             )
+            print(query)
 
-            response = session.run(
-                query,
-                root_id=payload.get("root_id"),
-                root_type=payload.get("root_type"),
-            )
+            response = session.run(query)
 
             ## if response is empty there is only one version of the model. Return just that node.
             if len(response.data()) == 0:
-                query = f"{match_pattern}" + "RETURN labels(mr) as label, mr.id as id "
-                response = session.run(
-                    query,
-                    root_id=payload.get("root_id"),
-                    root_type=payload.get("root_type"),
-                )
+                query = f"{match_pattern}" + "RETURN labels(Mr) as label, Mr.id as id "
+                response = session.run(query)
 
             response_data = [
                 {res.data().get("label")[0]: res.data().get("id")} for res in response
@@ -127,9 +151,13 @@ class SearchProvenance(ProvenanceHandler):
         Which models relay on which primatives
         """
         with self.graph_db.session() as session:
+            match_node = match_node_builder(
+                node_type=schema.ProvenanceType.Intermediate
+            )
+
             query = (
-                "match(i:Intermediate)<-[r *1..]-(m:Model)"
-                "return i as Intermediate, r as relationship, m as Model"
+                f"{match_node}<-[r *1..]-{node_builder(node_type='Model')}"
+                "return In as Intermediate, r as relationship, Md as Model"
             )
             response = session.run(query)
 
@@ -146,8 +174,9 @@ class SearchProvenance(ProvenanceHandler):
         Which nodes were created by user with id of ...
         """
         with self.graph_db.session() as session:
+            match_node = match_node_builder()
             query = (
-                "match(n)-[r]->(n2) "
+                f"{match_node}-[r]->(n2) "
                 + f"where r.user_id={payload.get('user_id')} "
                 + "With collect(n)+collect(n2) as nodes "
                 + "Unwind nodes as both_nodes "
@@ -160,3 +189,47 @@ class SearchProvenance(ProvenanceHandler):
             ]
 
             return sorted(response_data, key=lambda i: list(i.keys()))
+
+    def concept(self, payload):
+        """
+        Which nodes are associated with a concept ...
+        """
+        with self.graph_db.session() as session:
+            match_node = match_node_builder(node_type="Concept")
+            query = (
+                match_node
+                + "-[r:IS_CONCEPT_OF]->(n) "
+                + f"Where Cn.concept='{payload.get('concept')}' "
+                + "return labels(n) as label, n.id as id"
+            )
+            response = session.run(query)
+            response_data = [
+                {res.data().get("label")[0]: res.data().get("id")} for res in response
+            ]
+
+            return sorted(response_data, key=lambda i: list(i.keys()))
+
+    def concept_counts(self, payload):
+        """
+        Counts of which nodes are associated with a concept
+        """
+        with self.graph_db.session() as session:
+            match_node = match_node_builder(node_type="Concept")
+            query = (
+                match_node
+                + "-[r:IS_CONCEPT_OF]->(n) "
+                + f"Where Cn.concept='{payload.get('concept')}' "
+                + "return labels(n) as label, n.id as id"
+            )
+            response = session.run(query)
+            response_data = [
+                {res.data().get("label")[0]: res.data().get("id")} for res in response
+            ]
+
+            counts = defaultdict(int)
+            for response in response_data:
+                print(response)
+                print(counts)
+                for key in response:
+                    counts[key] += 1
+        return counts

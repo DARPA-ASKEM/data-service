@@ -1,3 +1,9 @@
+from fastapi import FastAPI, HTTPException
+
+from tds.autogen import schema
+from tds.schema.provenance import provenance_type_to_abbr
+
+
 def dynamic_relationship_direction(direction, relationship_type):
     """
     return direction of relationship based on direction type.
@@ -9,39 +15,87 @@ def dynamic_relationship_direction(direction, relationship_type):
         return f"<-[{relationship_type}]-"
     if direction == "parent":
         return f"-[{relationship_type}]->"
-    raise Exception("relationship direction is not allowed.")
+    raise HTTPException(
+        status_code=404, detail="Relationship direction is not allowed."
+    )
 
 
-def derived_models_query_generater(root_type):
+def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
     """
     Return match query for models derived from a publication or intermediate
     """
+    root_node = node_builder(node_type=root_type, node_id=root_id)
+    match_node = match_node_builder(node_type=schema.ProvenanceType.Model)
     if root_type == "Publication":
+        In_node = node_builder(node_type="Intermediate")
         return (
-            "Match (m:Model)-[r *1..]->(i:Intermediate)-[r2:EXTRACTED_FROM]->"
-            + f"(n:{root_type})"
+            match_node
+            + f"-[r *1..]->"
+            + f"{In_node}-[r2:EXTRACTED_FROM]->"
+            + f"{root_node}"
         )
     if root_type == "Intermediate":
-        return (
-            "Match (m:Model)-[r *1..]->(md:Model_revision)-[r2:REINTERPRETS]->"
-            + f"(n:{root_type})"
-        )
-    raise Exception(f"Models can not be derived from this type: {root_type}")
+
+        Mr_node = node_builder(node_type="ModelRevision")
+        return match_node + f"-[r *1..]->{Mr_node}-[r2:REINTERPRETS]->" + f"{root_node}"
+    raise HTTPException(
+        status_code=404, detail=f"Models can not be derived from this type: {root_type}"
+    )
 
 
-def parent_model_query_generator(root_type, root_id):
+def parent_model_query_generator(root_type: schema.ProvenanceType, root_id):
     """
-    Return match query to Model_revision depending on root_type
+    Return match query to ModelRevision depending on root_type
     """
     try:
-        query_templates_index = {
-            "Model": f"Match(m: {root_type} {{id: {root_id}}})-[r:BEGINS_AT]->(mr:Model_revision) ",
-            "Plan": f"Match(m: {root_type} {{id: {root_id}}})-[r:USES]->(mr:Model_revision) ",
-            "Simulation_run": f"Match(m: {root_type}  {{id: {root_id}}})-[r *1..]->(mr:Model_revision) ",
-            "Dataset": f"Match(m: {root_type}  {{id: {root_id}}})-[r *1..]->(mr:Model_revision) ",
-        }
-        return query_templates_index[root_type]
-    except KeyError:
-        raise Exception(
-            f"Search for model revision is not available from this root type: {root_type}"
+        match_node = match_node_builder(node_type=root_type, node_id=root_id)
+        relationships_str = relationships_array_as_str(
+            exclude=["CONTAINS", "IS_CONCEPT_OF"]
         )
+        model_revision_node = node_builder(
+            node_type=schema.ProvenanceType.ModelRevision
+        )
+        query_templates_index = {
+            schema.ProvenanceType.Model: f"-[r:BEGINS_AT]->{model_revision_node} ",
+            schema.ProvenanceType.Plan: f"-[r:USES]->{model_revision_node} ",
+            schema.ProvenanceType.Simulation_run: f"-[r:{relationships_str} *1..]->{model_revision_node} ",
+            schema.ProvenanceType.Dataset: f"-[r:{relationships_str} *1..]->{model_revision_node} ",
+        }
+        return match_node + query_templates_index[root_type]
+    except KeyError:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Search for model revisions is not available from this root type: {root_type}",
+        )
+
+
+def match_node_builder(node_type: schema.ProvenanceType = None, node_id=None):
+    if node_type is None:
+        return f"Match(n) "
+    node_type_character = return_node_abbr(node_type)
+    if node_id is None:
+        return f"Match ({node_type_character}:{node_type})"
+    return f"Match ({node_type_character}:{node_type}  {{id: {node_id}}}) "
+
+
+def return_node_abbr(root_type: schema.ProvenanceType):
+    return provenance_type_to_abbr[root_type].value
+
+
+def relationships_array_as_str(exclude=[]):
+    relationship_str = ""
+    for type_ in schema.RelationType:
+        value = type_.value
+        if value in exclude:
+            continue
+        relationship_str += value + "|"
+    return relationship_str[:-1]
+
+
+def node_builder(node_type: schema.ProvenanceType = None, node_id=None):
+    if node_type is None:
+        return f"(n) "
+    node_type_abbr = return_node_abbr(node_type)
+    if node_id is None:
+        return f" ({node_type_abbr}:{node_type})"
+    return f"({node_type_abbr}:{node_type}  {{id: {node_id}}}) "
