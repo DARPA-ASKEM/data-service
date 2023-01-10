@@ -128,7 +128,6 @@ def node_builder(node_type: schema.ProvenanceType = None, node_id=None):
 def nodes_edges(response=None):
     data = {"edges": [], "nodes": []}
     for relationship in response.graph().relationships:
-        print(relationship)
         try:
             (start_label,) = relationship.__dict__.get("_start_node").__dict__.get(
                 "_labels"
@@ -162,7 +161,6 @@ def nodes_edges(response=None):
         )
 
     for node in response.graph().nodes:
-        print(node)
         try:
             (node_label,) = node.__dict__.get("_labels")
             node_id = node.__dict__.get("_properties").get("id")

@@ -61,7 +61,6 @@ class SearchProvenance(ProvenanceHandler):
                 + f"return {node_abbr}, r, n"
             )
             logging.info(query)
-            print(query)
             response = session.run(query)
 
             return nodes_edges(response=response)
@@ -144,7 +143,6 @@ class SearchProvenance(ProvenanceHandler):
                 + "Unwind r6 as r7 "
                 + " RETURN Both_rms,Md,r7"
             )
-            print(query)
 
             response = session.run(query)
             return nodes_edges(response=response)
@@ -219,7 +217,6 @@ class SearchProvenance(ProvenanceHandler):
                 "unwind r6 as r7 "
                 "return Both_Mrs,In , r7, Md "
             )
-            print(query)
             response = session.run(query)
 
             return nodes_edges(response=response)
