@@ -1,6 +1,7 @@
 """
 Import provenance handler
 """
+import json
 import logging
 from collections import defaultdict
 
@@ -13,9 +14,11 @@ from tds.db.graph.query_helpers import (
     dynamic_relationship_direction,
     match_node_builder,
     node_builder,
+    nodes_edges,
     parent_model_query_generator,
     relationships_array_as_str,
 )
+from tds.schema.provenance import provenance_type_to_abbr
 
 
 class SearchProvenance(ProvenanceHandler):
@@ -49,22 +52,19 @@ class SearchProvenance(ProvenanceHandler):
                 node_type=payload.get("root_type"), node_id=payload.get("root_id")
             )
 
-            # build the query. n is an arbitrary node
+            node_abbr = provenance_type_to_abbr[payload.get("root_type")]
+
             query = (
                 f"{match_node}"
                 + f"{relation_direction}(n) "
-                + "With DISTINCT n "
-                + "RETURN labels(n) as label, n.id as id"
+                # + "With DISTINCT n "
+                + f"return {node_abbr}, r, n"
             )
             logging.info(query)
-
+            print(query)
             response = session.run(query)
 
-            response_data = [
-                {res.data().get("label")[0]: res.data().get("id")} for res in response
-            ]
-
-            return sorted(response_data, key=lambda i: list(i.keys()))
+            return nodes_edges(response=response)
 
     def connected_nodes(self, payload):
         """
@@ -78,7 +78,7 @@ class SearchProvenance(ProvenanceHandler):
         """
         return self.connected_nodes_by_direction(payload=payload, direction="child")
 
-    def parent_nodes(self, payload):
+    def parent_nodes(self, payload, full_graph=True):
         """
         Return all parent nodes
         """
@@ -94,19 +94,17 @@ class SearchProvenance(ProvenanceHandler):
                 detail="Derived models can only be found from "
                 + "root types of Publication or Intermediates",
             )
-
         with self.graph_db.session() as session:
+
             generated_query = derived_models_query_generater(
                 root_type=payload.get("root_type"), root_id=payload.get("root_id")
             )
-            query = f" {generated_query} " + "RETURN labels(Md) as label, Md.id as id"
-            response = session.run(query)
 
-            response_data = [
-                {res.data().get("label")[0]: res.data().get("id")} for res in response
-            ]
+            print(generated_query)
 
-            return sorted(response_data, key=lambda i: list(i.keys()))
+            response = session.run(generated_query)
+
+            return nodes_edges(response)
 
     def parent_model_revisions(self, payload):
         """
@@ -135,29 +133,21 @@ class SearchProvenance(ProvenanceHandler):
 
             query = (
                 f"{match_pattern}"
-                + "Match (Mr2:ModelRevision)"
+                + "Optional Match (Mr2:ModelRevision)"
                 + f"-[r2:{relationships_str} *1.. ]->(Mr) "
-                + "With collect(Mr)+collect(Mr2) as Mrs "
+                + "With *,collect(r)+collect(r2) as r3,  collect(Mr)+collect(Mr2) as Mrs "
                 + "Unwind Mrs as Both_rms "
-                + "With DISTINCT Both_rms "
-                + "RETURN labels(Both_rms) as label, Both_rms.id as id "
+                + "Unwind r3 as r4 "
+                + " with * "
+                + "Optional Match(Both_rms)<-[r5:BEGINS_AT]-(Md:Model) "
+                + "With *,collect(r4)+collect(r5) as r6 "
+                + "Unwind r6 as r7 "
+                + " RETURN Both_rms,Md,r7"
             )
+            print(query)
 
             response = session.run(query)
-            response_data = [
-                {res.data().get("label")[0]: res.data().get("id")} for res in response
-            ]
-
-            ## if response is empty there is only one version of the model.
-            # Return just that node.
-            if len(response_data) == 0:
-                query = f"{match_pattern}" + "RETURN labels(Mr) as label, Mr.id as id "
-                response = session.run(query)
-                response_data = [
-                    {res.data().get("label")[0]: res.data().get("id")}
-                    for res in response
-                ]
-            return sorted(response_data, key=lambda i: list(i.keys()))
+            return nodes_edges(response=response)
 
     def parent_models(self, payload):
         """
@@ -207,23 +197,32 @@ class SearchProvenance(ProvenanceHandler):
         """
         logging.info(payload)
         with self.graph_db.session() as session:
+            relationships_str = relationships_array_as_str(
+                exclude=["CONTAINS", "IS_CONCEPT_OF"]
+            )
             match_node = match_node_builder(
                 node_type=schema.ProvenanceType.Intermediate
             )
 
             query = (
-                f"{match_node}<-[r *1..]-{node_builder(node_type='Model')}"
-                "return In as Intermediate, r as relationship, Md as Model"
+                f"{match_node}<-[r:{relationships_str} *1..]-{node_builder(node_type='Model')}"
+                "return In, r, Md "
             )
+            query = (
+                "Match (In:Intermediate)<-[r:REINTERPRETS]-(Mr:ModelRevision|Intermediate) "
+                "Optional Match(Mr)-[r2:EDITED_FROM|COPIED_FROM]->(Mr2:ModelRevision) "
+                "with *, collect(r)+collect(r2) as r3, collect(Mr)+collect(Mr2)as Mrs "
+                "Unwind r3 as r4 "
+                "Unwind Mrs as Both_Mrs "
+                "Optional Match(Both_Mrs)<-[r5:BEGINS_AT *1..]- (Md:Model) "
+                "with *, collect(r4)+collect(r5) as r6 "
+                "unwind r6 as r7 "
+                "return Both_Mrs,In , r7, Md "
+            )
+            print(query)
             response = session.run(query)
 
-            return [
-                {
-                    "Intermediate": res.data().get("Intermediate").get("id"),
-                    "Model": res.data().get("Model").get("id"),
-                }
-                for res in response
-            ]
+            return nodes_edges(response=response)
 
     def artifacts_created_by_user(self, payload):
         """

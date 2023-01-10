@@ -29,21 +29,6 @@ class ProvenanceType(str, Enum):
     SimulationRun = 'SimulationRun'
     
 
-class ProvenanceAbbreviations(str, Enum):
-
-    Cn = 'Cn'
-    Ds = 'Ds'
-    In = 'In'
-    Md = 'Md'
-    Mp = 'Mp'
-    Mr = 'Mr'
-    Pp = 'Pp'
-    Pr = 'Pr'
-    Pu = 'Pu'
-    Sp = 'Sp'
-    Sr = 'Sr'
-    
-
 class ProvenanceSearchTypes(str, Enum):
 
     artifacts_created_by_user = 'artifacts_created_by_user'

@@ -18,9 +18,7 @@ class ProvenancePayload:
     search_type: schema.ProvenanceSearchTypes
 
 
-provenance_type_to_abbr: Dict[
-    Type[schema.ProvenanceType], schema.ProvenanceAbbreviations
-] = {
+provenance_type_to_abbr: Dict[Type[schema.ProvenanceType], str] = {
     schema.ProvenanceType.Dataset: "Ds",
     schema.ProvenanceType.Model: "Md",
     schema.ProvenanceType.Plan: "Sp",

@@ -24,27 +24,31 @@ def dynamic_relationship_direction(direction, relationship_type):
 
 
 def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
-    """
-    Return match query for models derived from a publication or intermediate
-    """
-    root_node = node_builder(node_type=root_type, node_id=root_id)
-    match_node = match_node_builder(node_type=schema.ProvenanceType.Model)
+
     if root_type == "Publication":
-        interm_node = node_builder(node_type="Intermediate")
         return (
-            match_node
-            + "-[r *1..]->"
-            + f"{interm_node}-[r2:EXTRACTED_FROM]->"
-            + f"{root_node}"
+            f"Match(Pu:Publication {{id:{root_id}}})<-[r:EXTRACTED_FROM]-(In:Intermediate) "
+            "Optional Match (In)<-[r2:REINTERPRETS *1..]-(Mr:ModelRevision) "
+            "Optional Match(Mr)-[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-(Mr2:ModelRevision) "
+            "with *,collect(r)+collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms "
+            "unwind ms as mss "
+            "unwind r4 as r5 "
+            "Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) "
+            "with *, collect(r5)+collect(r6) as r7 "
+            "unwind r7 as r8 "
+            "return Pu, In, ms,Md, r8"
         )
     if root_type == "Intermediate":
-
-        modelr_node = node_builder(node_type="ModelRevision")
         return (
-            match_node
-            + f"-[r *1..]->{modelr_node}"
-            + "-[r2:REINTERPRETS]->"
-            + f"{root_node}"
+            f"Match (In:Intermediate {{id:{root_id}}})<-[r2:REINTERPRETS *1..]-(Mr:ModelRevision) "
+            "Optional Match(Mr)-[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-(Mr2:ModelRevision) "
+            "with *,collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms "
+            "unwind ms as mss "
+            "unwind r4 as r5 "
+            "Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) "
+            "with *, collect(r5)+collect(r6) as r7 "
+            "unwind r7 as r8 "
+            "return  In, ms,Md, r8"
         )
     raise HTTPException(
         status_code=404, detail=f"Models can not be derived from this type: {root_type}"
@@ -87,7 +91,7 @@ def return_node_abbr(root_type: schema.ProvenanceType):
     """
     Return node type abbr
     """
-    return provenance_type_to_abbr[root_type].value
+    return provenance_type_to_abbr[root_type]
 
 
 def relationships_array_as_str(exclude=None, include=None):
@@ -119,3 +123,69 @@ def node_builder(node_type: schema.ProvenanceType = None, node_id=None):
     if node_id is None:
         return f" ({node_type_abbr}:{node_type})"
     return f"({node_type_abbr}:{node_type}  {{id: {node_id}}}) "
+
+
+def nodes_edges(response=None):
+    data = {"edges": [], "nodes": []}
+    for relationship in response.graph().relationships:
+        print(relationship)
+        try:
+            (start_label,) = relationship.__dict__.get("_start_node").__dict__.get(
+                "_labels"
+            )
+            start_id = (
+                relationship.__dict__.get("_start_node")
+                .__dict__.get("_properties")
+                .get("id")
+            )
+        except ValueError as error:
+            continue
+
+        try:
+            (end_label,) = relationship.__dict__.get("_end_node").__dict__.get(
+                "_labels"
+            )
+            end_id = (
+                relationship.__dict__.get("_end_node")
+                .__dict__.get("_properties")
+                .get("id")
+            )
+
+        except ValueError as error:
+            continue
+        data["edges"].append(
+            {
+                "relationship": relationship.type,
+                "left": {"type": start_label, "id": start_id},
+                "right": {"type": end_label, "id": end_id},
+            }
+        )
+
+    for node in response.graph().nodes:
+        print(node)
+        try:
+            (node_label,) = node.__dict__.get("_labels")
+            node_id = node.__dict__.get("_properties").get("id")
+            uuid = build_uuid(node_label.lower(), str(node_id))
+
+        except ValueError as error:
+            continue
+        data["nodes"].append({"type": node_label, "id": node_id, "uuid": uuid})
+    return data
+
+
+def build_uuid(label, id):
+    label = label.lower()
+    if label == "intermediate":
+        return "model/" + label.lower() + "s/" + str(id)
+    if label == "modelparameter":
+        return "model/" + label.lower() + "s/" + str(id)
+    if label == "simulationrun":
+        return "simulations/" + "runs/" + str(id)
+    if label == "plan":
+        return "simulations/" + "plans/" + str(id)
+    if label == "simulationparameter":
+        return "simulations/" + "simulationparameters/" + str(id)
+    if label == "modelrevisions":
+        return None
+    return label.lower() + "s/" + str(id)
