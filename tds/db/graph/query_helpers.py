@@ -61,7 +61,7 @@ def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
             return  In, ms,Md, r8
             """
     raise HTTPException(
-        status_code=404, detail=f"Models can not be derived from this type: {root_type}"
+        status_code=400, detail=f"Models can not be derived from this type: {root_type}"
     )
 
 

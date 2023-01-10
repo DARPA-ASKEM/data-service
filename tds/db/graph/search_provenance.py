@@ -88,7 +88,7 @@ class SearchProvenance(ProvenanceHandler):
         """
         if payload.get("root_type") not in ("Publication", "Intermediate"):
             raise HTTPException(
-                status_code=404,
+                status_code=400,
                 detail="Derived models can only be found from "
                 + "root types of Publication or Intermediates",
             )
@@ -114,7 +114,7 @@ class SearchProvenance(ProvenanceHandler):
             "Dataset",
         ):
             raise HTTPException(
-                status_code=404,
+                status_code=400,
                 detail="Derived models can only be found "
                 + "from root types of Model, SimulationRun, Plan and Dataset",
             )
@@ -151,7 +151,7 @@ class SearchProvenance(ProvenanceHandler):
         """
         if payload.get("root_type") not in ("Model"):
             raise HTTPException(
-                status_code=404,
+                status_code=400,
                 detail="Parent models can only be found from root "
                 + "types of Model, Plan, SimulationRun, Dataset",
             )
