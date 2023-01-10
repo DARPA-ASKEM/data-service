@@ -251,7 +251,7 @@ class SearchProvenance(ProvenanceHandler):
             query = f"""
                 {match_node}
                 -[r:IS_CONCEPT_OF]->(n) 
-                Where Cn.concept='{payload.get('concept')}' 
+                Where Cn.concept='{payload.get('curie')}' 
                 return labels(n) as label, n.id as id
                 """
             response = session.run(query)
@@ -270,7 +270,7 @@ class SearchProvenance(ProvenanceHandler):
             query = f"""
                 {match_node} 
                 -[r:IS_CONCEPT_OF]->(n) 
-                Where Cn.concept='{payload.get('concept')}' 
+                Where Cn.concept='{payload.get('curie')}' 
                 return labels(n) as label, n.id as id 
                 """
             response = session.run(query)

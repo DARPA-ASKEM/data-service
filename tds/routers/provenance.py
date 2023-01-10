@@ -83,8 +83,27 @@ def search_provenance(
     * Requirements: “root_type”, “root_id”
     * Allowed root _types are Model *will be expanded.
 
-    Payload format:
-    The payload for searching needs to match this schema.
+    ## Payload format
+
+    The payload for searching needs to match the schema below.
+
+    Provenance Types are :
+    Dataset, Model, ModelParameter, Plan, PlanParameter, ModelRevision, Intermediate,
+    Publication, SimulationRun, Project, Concept.
+
+
+
+        {
+
+            root_id: Optional[int],
+
+            root_type: Optional[ProvenanceType],
+
+            user_id: Optional[int],
+
+            curie: Optional[str]
+
+        }
 
     """
     logger.info("Search provenance")

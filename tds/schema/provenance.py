@@ -18,7 +18,7 @@ class ProvenancePayload(BaseModel):
     root_id: Optional[int]
     root_type: Optional[schema.ProvenanceType]
     user_id: Optional[int]
-    concept: Optional[str]
+    curie: Optional[str]
 
 
 provenance_type_to_abbr: Dict[Type[schema.ProvenanceType], str] = {
