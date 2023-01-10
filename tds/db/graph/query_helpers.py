@@ -29,37 +29,37 @@ def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
     (sometimes intermediates) that were derived from a publication or intermediate
     """
     if root_type == "Publication":
-        return (
-            f"Match(Pu:Publication {{id:{root_id}}})"
-            "<-[r:EXTRACTED_FROM]-(In:Intermediate) "
-            "Optional Match (In)<-[r2:REINTERPRETS *1..]-(Mr:ModelRevision) "
-            "Optional Match(Mr)"
-            "-[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-"
-            "(Mr2:ModelRevision) "
-            "with *,collect(r)+collect(r2)+collect(r3) as r4, "
-            "collect(Mr)+collect(Mr2) as ms "
-            "unwind ms as mss "
-            "unwind r4 as r5 "
-            "Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) "
-            "with *, collect(r5)+collect(r6) as r7 "
-            "unwind r7 as r8 "
-            "return Pu, In, ms,Md, r8"
-        )
+        return f"""
+            Match(Pu:Publication {{id:{root_id}}})
+            <-[r:EXTRACTED_FROM]-(In:Intermediate) 
+            Optional Match (In)<-[r2:REINTERPRETS *1..]-(Mr:ModelRevision) 
+            Optional Match(Mr)
+            -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
+            (Mr2:ModelRevision) 
+            with *,collect(r)+collect(r2)+collect(r3) as r4, 
+            collect(Mr)+collect(Mr2) as ms 
+            unwind ms as mss 
+            unwind r4 as r5 
+            Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) 
+            with *, collect(r5)+collect(r6) as r7 
+            unwind r7 as r8 
+            return Pu, In, ms,Md, r8
+            """
     if root_type == "Intermediate":
-        return (
-            f"Match (In:Intermediate {{id:{root_id}}})<-[r2:REINTERPRETS *1..]"
-            "-(Mr:ModelRevision) "
-            "Optional Match(Mr)"
-            "-[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-"
-            "(Mr2:ModelRevision) "
-            "with *,collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms "
-            "unwind ms as mss "
-            "unwind r4 as r5 "
-            "Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) "
-            "with *, collect(r5)+collect(r6) as r7 "
-            "unwind r7 as r8 "
-            "return  In, ms,Md, r8"
-        )
+        return f"""
+            Match (In:Intermediate {{id:{root_id}}})<-[r2:REINTERPRETS *1..]
+            -(Mr:ModelRevision) 
+            Optional Match(Mr)
+            -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
+            (Mr2:ModelRevision) 
+            with *,collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms 
+            unwind ms as mss 
+            unwind r4 as r5 
+            Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) 
+            with *, collect(r5)+collect(r6) as r7 
+            unwind r7 as r8 
+            return  In, ms,Md, r8
+            """
     raise HTTPException(
         status_code=404, detail=f"Models can not be derived from this type: {root_type}"
     )

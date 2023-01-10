@@ -98,8 +98,6 @@ class SearchProvenance(ProvenanceHandler):
                 root_type=payload.get("root_type"), root_id=payload.get("root_id")
             )
 
-            print(generated_query)
-
             response = session.run(generated_query)
 
             return nodes_edges(response)
@@ -129,20 +127,20 @@ class SearchProvenance(ProvenanceHandler):
                 exclude=["CONTAINS", "IS_CONCEPT_OF"]
             )
 
-            query = (
-                f"{match_pattern}"
-                + "Optional Match (Mr2:ModelRevision)"
-                + f"-[r2:{relationships_str} *1.. ]->(Mr) "
-                + "With *,collect(r)+collect(r2) as r3,  "
-                + "collect(Mr)+collect(Mr2) as Mrs "
-                + "Unwind Mrs as Both_rms "
-                + "Unwind r3 as r4 "
-                + " with * "
-                + "Optional Match(Both_rms)<-[r5:BEGINS_AT]-(Md:Model) "
-                + "With *,collect(r4)+collect(r5) as r6 "
-                + "Unwind r6 as r7 "
-                + " RETURN Both_rms,Md,r7"
-            )
+            query = f"""
+                {match_pattern}
+                Optional Match (Mr2:ModelRevision)
+                -[r2:{relationships_str} *1.. ]->(Mr) 
+                With *,collect(r)+collect(r2) as r3,  
+                collect(Mr)+collect(Mr2) as Mrs 
+                Unwind Mrs as Both_rms 
+                Unwind r3 as r4 
+                with * 
+                Optional Match(Both_rms)<-[r5:BEGINS_AT]-(Md:Model) 
+                With *,collect(r4)+collect(r5) as r6 
+                Unwind r6 as r7 
+                RETURN Both_rms,Md,r7
+                """
 
             response = session.run(query)
             return nodes_edges(response=response)
@@ -173,15 +171,15 @@ class SearchProvenance(ProvenanceHandler):
                 ]
             )
 
-            query = (
-                match_pattern
-                + f"Match (Mr)-[:{model_relationships} *1..]->(Mr2:ModelRevision)"
-                + "With collect(Mr)+collect(Mr2) as Mrs "
-                + "Unwind Mrs as Both_rms "
-                + "With DISTINCT Both_rms "
-                + "Match (md2:Model)-[:BEGINS_AT]->(Both_rms) "
-                + "Return labels(md2) as label, md2.id as id"
-            )
+            query = f"""
+                {match_pattern} 
+                Match (Mr)-[:{model_relationships} *1..]->(Mr2:ModelRevision)
+                With collect(Mr)+collect(Mr2) as Mrs 
+                Unwind Mrs as Both_rms 
+                With DISTINCT Both_rms 
+                Match (md2:Model)-[:BEGINS_AT]->(Both_rms) 
+                Return labels(md2) as label, md2.id as id
+                """
             response = session.run(query)
             response_data = [
                 {res.data().get("label")[0]: res.data().get("id")} for res in response
@@ -207,18 +205,18 @@ class SearchProvenance(ProvenanceHandler):
                 f"{node_builder(node_type='Model')}"
                 "return In, r, Md "
             )
-            query = (
-                "Match (In:Intermediate)<-[r:REINTERPRETS]-"
-                "(Mr:ModelRevision|Intermediate) "
-                "Optional Match(Mr)-[r2:EDITED_FROM|COPIED_FROM]->(Mr2:ModelRevision) "
-                "with *, collect(r)+collect(r2) as r3, collect(Mr)+collect(Mr2)as Mrs "
-                "Unwind r3 as r4 "
-                "Unwind Mrs as Both_Mrs "
-                "Optional Match(Both_Mrs)<-[r5:BEGINS_AT *1..]- (Md:Model) "
-                "with *, collect(r4)+collect(r5) as r6 "
-                "unwind r6 as r7 "
-                "return Both_Mrs,In , r7, Md "
-            )
+            query = """
+                Match (In:Intermediate)<-[r:REINTERPRETS]-
+                (Mr:ModelRevision|Intermediate) 
+                Optional Match(Mr)-[r2:EDITED_FROM|COPIED_FROM]->(Mr2:ModelRevision) 
+                with *, collect(r)+collect(r2) as r3, collect(Mr)+collect(Mr2)as Mrs 
+                Unwind r3 as r4 
+                Unwind Mrs as Both_Mrs 
+                Optional Match(Both_Mrs)<-[r5:BEGINS_AT *1..]- (Md:Model) 
+                with *, collect(r4)+collect(r5) as r6 
+                unwind r6 as r7 
+                return Both_Mrs,In , r7, Md 
+                """
             response = session.run(query)
 
             return nodes_edges(response=response)
@@ -229,14 +227,14 @@ class SearchProvenance(ProvenanceHandler):
         """
         with self.graph_db.session() as session:
             match_node = match_node_builder()
-            query = (
-                f"{match_node}-[r]->(n2) "
-                + f"where r.user_id={payload.get('user_id')} "
-                + "With collect(n)+collect(n2) as nodes "
-                + "Unwind nodes as both_nodes "
-                + "With DISTINCT both_nodes "
-                + "RETURN labels(both_nodes) as label, both_nodes.id as id "
-            )
+            query = f"""
+                {match_node}-[r]->(n2) 
+                where r.user_id={payload.get('user_id')} 
+                With collect(n)+collect(n2) as nodes 
+                Unwind nodes as both_nodes 
+                With DISTINCT both_nodes 
+                RETURN labels(both_nodes) as label, both_nodes.id as id 
+                """
             response = session.run(query)
             response_data = [
                 {res.data().get("label")[0]: res.data().get("id")} for res in response
@@ -250,12 +248,12 @@ class SearchProvenance(ProvenanceHandler):
         """
         with self.graph_db.session() as session:
             match_node = match_node_builder(node_type="Concept")
-            query = (
-                match_node
-                + "-[r:IS_CONCEPT_OF]->(n) "
-                + f"Where Cn.concept='{payload.get('concept')}' "
-                + "return labels(n) as label, n.id as id"
-            )
+            query = f"""
+                {match_node}
+                -[r:IS_CONCEPT_OF]->(n) 
+                Where Cn.concept='{payload.get('concept')}' 
+                return labels(n) as label, n.id as id
+                """
             response = session.run(query)
             response_data = [
                 {res.data().get("label")[0]: res.data().get("id")} for res in response
@@ -269,12 +267,12 @@ class SearchProvenance(ProvenanceHandler):
         """
         with self.graph_db.session() as session:
             match_node = match_node_builder(node_type="Concept")
-            query = (
-                match_node
-                + "-[r:IS_CONCEPT_OF]->(n) "
-                + f"Where Cn.concept='{payload.get('concept')}' "
-                + "return labels(n) as label, n.id as id"
-            )
+            query = f"""
+                {match_node} 
+                -[r:IS_CONCEPT_OF]->(n) 
+                Where Cn.concept='{payload.get('concept')}' 
+                return labels(n) as label, n.id as id 
+                """
             response = session.run(query)
             response_data = [
                 {res.data().get("label")[0]: res.data().get("id")} for res in response

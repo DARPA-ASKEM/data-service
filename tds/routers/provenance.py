@@ -1,6 +1,6 @@
 """
 
-router.provenance - very basic crud operations for provenance
+Create, Delete and Search operations for Provenance
 
 """
 
@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from tds.autogen import orm, schema
 from tds.db import ProvenanceHandler, SearchProvenance, request_graph_db, request_rdb
 from tds.operation import create, delete, retrieve
-from tds.schema.provenance import Provenance
+from tds.schema.provenance import Provenance, ProvenancePayload
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -23,7 +23,7 @@ router = APIRouter()
 @router.get("", **retrieve.fastapi_endpoint_config)
 def get_provenance(id: int, rdb: Engine = Depends(request_rdb)):
     """
-    Searches within TDS for artifacts with this concept term associated with them
+    Searches for a provenance entry in TDS
     """
     with Session(rdb) as session:
         return Provenance.from_orm(session.query(orm.Provenance).get(id))
@@ -31,7 +31,7 @@ def get_provenance(id: int, rdb: Engine = Depends(request_rdb)):
 
 @router.post("/search")
 def search_provenance(
-    payload: dict,
+    payload: ProvenancePayload,
     search_type: schema.ProvenanceSearchTypes = Query(
         default=schema.ProvenanceSearchTypes.connected_nodes
     ),
@@ -40,9 +40,55 @@ def search_provenance(
 ) -> Response:
     """
     Search provenance of for all artifacts that helped derive this artifact.
+
+    ## Types of searches:
+
+    **artifacts_created_by_user** - Return all artifacts created by a user.
+    * Requirements: “user_id”
+
+    **model_to_primative** - Return all models and the intermediates
+     they are derived from.
+    * Requirements: None
+
+    **child_nodes** - Returns all child nodes of this artifact.
+    (In other words artifacts created after this artifact
+     that were dependent/derived from the root artifact).
+    * Requirements: “root_type”, “root_id”
+
+
+    **parent_nodes** - Return all parent nodes of this artifact.
+    (Artifacts created before this artifact that help
+    derive/create this root artifact).
+    * Requirements: “root_type”, “root_id”
+
+    **connected_nodes** - Return all parent and child nodes
+     of this artifact.
+    * Requirements: “root_type”, “root_id”
+
+
+    **derived_models** - Return all models that were derived
+        from a publication or intermediate.
+    * Requirements: “root_type”, “root_id”
+    * Allowed root _types are Publication and Intermediate
+
+
+    **parent_model_revisions** - Returns the model revisions
+    that helped create the model that was used to create the root artifact.
+    * Requirements: “root_type”, “root_id”
+    * Allowed root _types are Model, Plan, SimulationRun, and Dataset
+
+
+    **parent_models** - Returns the models that helped create
+     the model that was used to create the root artifact.
+    * Requirements: “root_type”, “root_id”
+    * Allowed root _types are Model *will be expanded.
+
+    Payload format:
+    The payload for searching needs to match this schema.
+
     """
     logger.info("Search provenance")
-
+    payload = payload.__dict__
     search_provenance_handler = SearchProvenance(rdb=rdb, graph_db=graph_db)
     search_function = search_provenance_handler[search_type]
     results = search_function(payload=payload)
@@ -107,7 +153,6 @@ def delete_provenance(
     """
     with Session(rdb) as session:
         if session.query(orm.Provenance).filter(orm.Provenance.id == id).count() == 1:
-
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             success = provenance_handler.delete(id=id)
 
