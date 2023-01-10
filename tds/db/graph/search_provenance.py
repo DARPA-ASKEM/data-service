@@ -1,7 +1,6 @@
 """
 Import provenance handler
 """
-import json
 import logging
 from collections import defaultdict
 
@@ -77,7 +76,7 @@ class SearchProvenance(ProvenanceHandler):
         """
         return self.connected_nodes_by_direction(payload=payload, direction="child")
 
-    def parent_nodes(self, payload, full_graph=True):
+    def parent_nodes(self, payload):
         """
         Return all parent nodes
         """
@@ -134,7 +133,8 @@ class SearchProvenance(ProvenanceHandler):
                 f"{match_pattern}"
                 + "Optional Match (Mr2:ModelRevision)"
                 + f"-[r2:{relationships_str} *1.. ]->(Mr) "
-                + "With *,collect(r)+collect(r2) as r3,  collect(Mr)+collect(Mr2) as Mrs "
+                + "With *,collect(r)+collect(r2) as r3,  "
+                + "collect(Mr)+collect(Mr2) as Mrs "
                 + "Unwind Mrs as Both_rms "
                 + "Unwind r3 as r4 "
                 + " with * "
@@ -203,11 +203,13 @@ class SearchProvenance(ProvenanceHandler):
             )
 
             query = (
-                f"{match_node}<-[r:{relationships_str} *1..]-{node_builder(node_type='Model')}"
+                f"{match_node}<-[r:{relationships_str} *1..]-"
+                f"{node_builder(node_type='Model')}"
                 "return In, r, Md "
             )
             query = (
-                "Match (In:Intermediate)<-[r:REINTERPRETS]-(Mr:ModelRevision|Intermediate) "
+                "Match (In:Intermediate)<-[r:REINTERPRETS]-"
+                "(Mr:ModelRevision|Intermediate) "
                 "Optional Match(Mr)-[r2:EDITED_FROM|COPIED_FROM]->(Mr2:ModelRevision) "
                 "with *, collect(r)+collect(r2) as r3, collect(Mr)+collect(Mr2)as Mrs "
                 "Unwind r3 as r4 "

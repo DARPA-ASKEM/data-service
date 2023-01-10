@@ -24,13 +24,20 @@ def dynamic_relationship_direction(direction, relationship_type):
 
 
 def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
-
+    """
+    return all models, model revisions
+    (sometimes intermediates) that were derived from a publication or intermediate
+    """
     if root_type == "Publication":
         return (
-            f"Match(Pu:Publication {{id:{root_id}}})<-[r:EXTRACTED_FROM]-(In:Intermediate) "
+            f"Match(Pu:Publication {{id:{root_id}}})"
+            "<-[r:EXTRACTED_FROM]-(In:Intermediate) "
             "Optional Match (In)<-[r2:REINTERPRETS *1..]-(Mr:ModelRevision) "
-            "Optional Match(Mr)-[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-(Mr2:ModelRevision) "
-            "with *,collect(r)+collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms "
+            "Optional Match(Mr)"
+            "-[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-"
+            "(Mr2:ModelRevision) "
+            "with *,collect(r)+collect(r2)+collect(r3) as r4, "
+            "collect(Mr)+collect(Mr2) as ms "
             "unwind ms as mss "
             "unwind r4 as r5 "
             "Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) "
@@ -40,8 +47,11 @@ def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
         )
     if root_type == "Intermediate":
         return (
-            f"Match (In:Intermediate {{id:{root_id}}})<-[r2:REINTERPRETS *1..]-(Mr:ModelRevision) "
-            "Optional Match(Mr)-[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-(Mr2:ModelRevision) "
+            f"Match (In:Intermediate {{id:{root_id}}})<-[r2:REINTERPRETS *1..]"
+            "-(Mr:ModelRevision) "
+            "Optional Match(Mr)"
+            "-[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-"
+            "(Mr2:ModelRevision) "
             "with *,collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms "
             "unwind ms as mss "
             "unwind r4 as r5 "
@@ -126,6 +136,9 @@ def node_builder(node_type: schema.ProvenanceType = None, node_id=None):
 
 
 def nodes_edges(response=None):
+    """
+    Return nodes and edges
+    """
     data = {"edges": [], "nodes": []}
     for relationship in response.graph().relationships:
         try:
@@ -137,7 +150,7 @@ def nodes_edges(response=None):
                 .__dict__.get("_properties")
                 .get("id")
             )
-        except ValueError as error:
+        except ValueError:
             continue
 
         try:
@@ -150,7 +163,7 @@ def nodes_edges(response=None):
                 .get("id")
             )
 
-        except ValueError as error:
+        except ValueError:
             continue
         data["edges"].append(
             {
@@ -166,24 +179,29 @@ def nodes_edges(response=None):
             node_id = node.__dict__.get("_properties").get("id")
             uuid = build_uuid(node_label.lower(), str(node_id))
 
-        except ValueError as error:
+        except ValueError:
             continue
         data["nodes"].append({"type": node_label, "id": node_id, "uuid": uuid})
     return data
 
 
 def build_uuid(label, id):
+    """
+    build uuid
+    """
     label = label.lower()
     if label == "intermediate":
-        return "model/" + label.lower() + "s/" + str(id)
+        path = "model/" + label.lower() + "s/" + str(id)
     if label == "modelparameter":
-        return "model/" + label.lower() + "s/" + str(id)
+        path = "model/" + label.lower() + "s/" + str(id)
     if label == "simulationrun":
-        return "simulations/" + "runs/" + str(id)
+        path = "simulations/" + "runs/" + str(id)
     if label == "plan":
-        return "simulations/" + "plans/" + str(id)
+        path = "simulations/" + "plans/" + str(id)
     if label == "simulationparameter":
-        return "simulations/" + "simulationparameters/" + str(id)
+        path = "simulations/" + "simulationparameters/" + str(id)
     if label == "modelrevisions":
-        return None
-    return label.lower() + "s/" + str(id)
+        path = None
+    else:
+        path = label.lower() + "s/" + str(id)
+    return path
