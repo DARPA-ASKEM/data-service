@@ -29,7 +29,7 @@ up:
 	
 .PHONY:populate
 populate:up
-	poetry run python3 scripts/upload_demo_data.py;
+	poetry run python3 scripts/upload_demo_data.py || (sleep 3; docker compose logs api; false);
 
 .PHONY:fake
 fake:up
@@ -48,14 +48,14 @@ db-clean:
 $(SCHEMA_SQL_FILE):$(SCHEMA_FILES)
 	if [ -n "$$(docker compose ps | grep rdb)" ]; then \
 		echo "Writing out file $(SCHEMA_SQL_FILE)"; \
-		docker compose exec -u postgres rdb /bin/bash -c 'pg_dump -s -h "localhost" -U "$$POSTGRES_USER" "$$POSTGRES_DB" > /tmp/001_schema.sql'; \
+		docker compose exec -u postgres rdb /bin/bash -c 'pg_dump -s -h "localhost" -U "$$POSTGRES_USER" "$$POSTGRES_DB" > /tmp/001_schema.sql' && \
 		docker compose cp rdb:/tmp/001_schema.sql ./data; \
 	fi
 
 $(DATA_SQL_FILE):$(DATA_FILES)
 	if [ -n "$$(docker compose ps | grep rdb)" ]; then \
 		echo "Writing out file $(DATA_SQL_FILE)"; \
-		docker compose exec -u postgres rdb /bin/bash -c 'pg_dump -a -h "localhost" -U "$$POSTGRES_USER" "$$POSTGRES_DB" > /tmp/002_data.sql'; \
+		docker compose exec -u postgres rdb /bin/bash -c 'pg_dump -a -h "localhost" -U "$$POSTGRES_USER" "$$POSTGRES_DB" > /tmp/002_data.sql' && \
 		docker compose cp rdb:/tmp/002_data.sql ./data; \
 	fi
 
@@ -75,7 +75,8 @@ repopulate-db:
 	if [ "$${modified_files}" != " " ]; then \
 		make down; \
 		make db-clean; \
-		make up; \
-		make populate; \
+		NEO4J_ENABLED=False make up && \
+		sleep 1 && \
+		NEO4J_ENABLED=False make populate && \
 		make db-full; \
 	fi

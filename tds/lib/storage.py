@@ -9,7 +9,15 @@ import botocore
 import pandas
 
 # S3 OBJECT
-s3 = boto3.client("s3")
+s3 = boto3.resource(
+    "s3",
+    endpoint_url=os.getenv("STORAGE_HOST"),
+    aws_access_key_id=os.getenv("S3_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("S3_SECRET_ACCESS_KEY"),
+    aws_session_token=None,
+    config=boto3.session.Config(signature_version="s3v4"),
+    verify=False,
+)
 
 
 def get_rawfile(path):
@@ -30,13 +38,11 @@ def get_rawfile(path):
 
     if location_info.scheme.lower() == "file":
         return open(location_info.path, "rb")
-    if location_info.scheme.lower() == "s3":
+    if location_info.scheme.lower() in ["s3", "minio"]:
         try:
             file_path = location_info.path.lstrip("/")
             raw_file = tempfile.TemporaryFile()
-            s3.download_fileobj(
-                Bucket=location_info.netloc, Key=file_path, Fileobj=raw_file
-            )
+            s3.Object(location_info.netloc, file_path).download_fileobj(raw_file)
             raw_file.seek(0)
         except botocore.exceptions.ClientError as error:
             raise FileNotFoundError() from error
@@ -57,6 +63,7 @@ def put_rawfile(path, fileobj):
         RuntimeError: If the path URI does not begin with 'file' or 's3'
         there is no handler for it yet.
     """
+
     location_info = urlparse(path)
 
     if location_info.scheme.lower() == "file":
@@ -64,9 +71,9 @@ def put_rawfile(path, fileobj):
             os.makedirs(os.path.dirname(location_info.path), exist_ok=True)
         with open(location_info.path, "wb") as output_file:
             output_file.write(fileobj.read())
-    elif location_info.scheme.lower() == "s3":
+    elif location_info.scheme.lower() in ["s3", "minio"]:
         output_path = location_info.path.lstrip("/")
-        s3.put_object(Bucket=location_info.netloc, Key=output_path, Body=fileobj)
+        s3.Object(location_info.netloc, output_path).put(Body=fileobj)
     else:
         raise RuntimeError("File storage format is unknown")
 
@@ -88,15 +95,11 @@ def list_files(path):
     location_info = urlparse(path)
     if location_info.scheme.lower() == "file":
         return os.listdir(location_info.path)
-    if location_info.scheme.lower() == "s3":
-        s3_list = s3.list_objects(
-            Bucket=location_info.netloc, Marker=location_info.path
-        )
-        s3_contents = s3_list["Contents"]
+    if location_info.scheme.lower() in ["s3", "minio"]:
+        bucket_to_list = s3.Bucket(location_info.netloc)
         final_file_list = []
-        for content in s3_contents:
-            filename = content["Key"]
-            final_file_list.append(f"{location_info.path}/{filename}")
+        for content in bucket_to_list.objects.all():
+            final_file_list.append(f"{content.bucket_name}/{content.key}")
 
         return final_file_list
     raise RuntimeError("File storage format is unknown")
