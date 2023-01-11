@@ -51,7 +51,6 @@ services:
     environment:
       - NEO4J_PLUGINS=["apoc"]
       - apoc.import.file.enabled=true
-      - apoc.initializer.cypher.1=CALL apoc.cypher.runSchemaFile("file:///populate-cache.cypher")
       - NEO4J_AUTH=neo4j/password
       - NEO4J_dbms_memory_pagecache_size=512M
     depends_on:

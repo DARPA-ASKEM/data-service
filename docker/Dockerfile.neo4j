@@ -4,7 +4,7 @@ RUN apt update 2> /dev/null
 RUN apt install -y postgresql postgresql-contrib
 
 COPY ./docker/scripts/start-neo4j.sh /entrypoint.sh
-COPY ./docker/scripts/populate-cache.cypher /var/lib/neo4j/import/populate-cache.cypher
+COPY ./docker/scripts/populate-cache.cypher /tmp/populate-cache.cypher
 
 ENTRYPOINT ["/entrypoint.sh"]
 
