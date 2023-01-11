@@ -47,6 +47,8 @@ services:
     environment:
       - NEO4J_AUTH=neo4j/password
       - NEO4J_dbms_memory_pagecache_size=512M
+    volumes:
+      - $PWD/data/graph_db:/var/lib/neo4j/data/databases
     networks:
       - data-api
   minio:
