@@ -72,11 +72,15 @@ ALTER TYPE public.ontologicalfield OWNER TO dev;
 --
 
 CREATE TYPE public.provenancetype AS ENUM (
+    'Concept',
     'Dataset',
     'Intermediate',
     'Model',
+    'ModelParameter',
     'ModelRevision',
     'Plan',
+    'PlanParameter',
+    'Project',
     'Publication',
     'SimulationRun'
 );
@@ -92,6 +96,7 @@ CREATE TYPE public.relationtype AS ENUM (
     'BEGINS_AT',
     'CITES',
     'COMBINED_FROM',
+    'CONTAINS',
     'COPIED_FROM',
     'DECOMPOSED_FROM',
     'DERIVED_FROM',
@@ -100,6 +105,8 @@ CREATE TYPE public.relationtype AS ENUM (
     'EXTRACTED_FROM',
     'GENERATED_BY',
     'GLUED_FROM',
+    'IS_CONCEPT_OF',
+    'PARAMETER_OF',
     'REINTERPRETS',
     'STRATIFIED_FROM',
     'USES'
@@ -706,7 +713,8 @@ CREATE TABLE public.provenance (
     left_type public.provenancetype NOT NULL,
     "right" integer NOT NULL,
     right_type public.provenancetype NOT NULL,
-    user_id integer
+    user_id integer,
+    concept character varying
 );
 
 

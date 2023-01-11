@@ -16,7 +16,8 @@ from tds.schema.resource import Resource, get_resource_type
 
 class ProvenanceHandler:
     """
-    The handler wraps crud operations and writes to both the relational and graph DBs
+    The handler wraps crud operations and writes to
+    both the relational and graph DBs
     """
 
     def __init__(self, rdb: Engine, graph_db: Optional[Driver] = None):
@@ -126,10 +127,19 @@ class ProvenanceHandler:
         with self.graph_db.session() as session:
 
             # if node 1 is not created yet create node
-            left_node_query = (
-                f"Merge (n: {provenance_payload.get('left_type')}"
-                + "{ id: $left_id } )"
-            )
+            if provenance_payload.get("concept") is not None:
+
+                left_node_query = (
+                    f"Merge (n: {provenance_payload.get('left_type')}"
+                    + f"{{id: {provenance_payload.get('left')} , "
+                    + f"concept:'{provenance_payload.get('concept')}'}} )"
+                )
+            else:
+                left_node_query = (
+                    f"Merge (n: {provenance_payload.get('left_type')}"
+                    + f"{{id: {provenance_payload.get('left')} }} )"
+                )
+
             session.run(left_node_query, left_id=provenance_payload.get("left"))
 
             # if node 2 is not created yet create node

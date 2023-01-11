@@ -285,6 +285,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                     dataset_id=dataset_id,
                     description=model_description,
                 )
+
                 print(f"simulation run id {simulation_plan_id} , {simulation_run_id}")
 
                 asset_to_project(
@@ -296,7 +297,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                 add_provenance(
                     left={
                         "id": simulation_run_id,
-                        "resource_type": "Simulation_run",
+                        "resource_type": "SimulationRun",
                     },
                     relation_type="GENERATED_BY",
                     right={"id": simulation_plan_id, "resource_type": "Plan"},
@@ -305,7 +306,7 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                 add_provenance(
                     right={
                         "id": simulation_run_id,
-                        "resource_type": "Simulation_run",
+                        "resource_type": "SimulationRun",
                     },
                     relation_type="REINTERPRETS",
                     left={"id": dataset_id, "resource_type": "Dataset"},
@@ -365,54 +366,51 @@ def upload_fake_provanence_data(person_id=1, project_id=1):
                                         type="simulation_parameters",
                                     )
 
-            # dataset extracted by
+    # dataset extracted by
+    if loop.get("dataset_relationship", None) is None:
+        raise
+    runs = glob.glob(folder + "runs/*/")
+    for run in runs[1:2]:
+        with open(run + "output.json", "r") as f:
+            sim_output = f.read()
+            sim_output = json.loads(sim_output)
 
-            if loop.get("dataset_relationship", None) is None:
-                raise
-            runs = glob.glob(folder + "runs/*/")
-            for run in runs[1:2]:
-                with open(run + "output.json", "r") as f:
-                    sim_output = f.read()
-                    sim_output = json.loads(sim_output)
+            dataset_response = sim_runs_dataset_generator.create_dataset(
+                maintainer_id=1,
+                dataset_object=sim_output,
+                biomodel_name="Dataset",
+                biomodel_description="Dataset description",
+                url=url,
+            )
+            dataset_id = dataset_response["id"]
+            # Convert the json to a CSV
+            convert_sim_runs_to_csv(
+                json_file_path=run + "output.json",
+                output_file_path=run + "sim_output.csv",
+            )
+            # Upload the CSV to TDS for full mock data
+            with open(run + "sim_output.csv", "rb") as sim_csv:
+                print(f"Uploading file to dataset_id {dataset_id}")
+                sim_runs_dataset_generator.upload_file_to_tds(
+                    id=dataset_id, file_object=sim_csv, url=url
+                )
+            # Finish populating dataset metadata: Features, Qualifiers
+            for feature_obj in list(sim_output.values()):
+                sim_runs_dataset_generator.create_feature(
+                    dataset_id, feature_obj, url=url
+                )
+            sim_runs_dataset_generator.create_qualifier(dataset_id, sim_output, url=url)
+            asset_to_project(project_id, dataset_id, "datasets")
 
-                    dataset_response = sim_runs_dataset_generator.create_dataset(
-                        maintainer_id=1,
-                        dataset_object=sim_output,
-                        biomodel_name="Dataset",
-                        biomodel_description="Dataset description",
-                        url=url,
-                    )
-                    dataset_id = dataset_response["id"]
-                    # Convert the json to a CSV
-                    convert_sim_runs_to_csv(
-                        json_file_path=run + "output.json",
-                        output_file_path=run + "sim_output.csv",
-                    )
-                    # Upload the CSV to TDS for full mock data
-                    with open(run + "sim_output.csv", "rb") as sim_csv:
-                        print(f"Uploading file to dataset_id {dataset_id}")
-                        sim_runs_dataset_generator.upload_file_to_tds(
-                            id=dataset_id, file_object=sim_csv, url=url
-                        )
-                    # Finish populating dataset metadata: Features, Qualifiers
-                    for feature_obj in list(sim_output.values()):
-                        sim_runs_dataset_generator.create_feature(
-                            dataset_id, feature_obj, url=url
-                        )
-                    sim_runs_dataset_generator.create_qualifier(
-                        dataset_id, sim_output, url=url
-                    )
-                    asset_to_project(project_id, dataset_id, "datasets")
-
-                    add_provenance(
-                        right={
-                            "id": loop.get("publication_id_to"),
-                            "resource_type": "Publication",
-                        },
-                        relation_type=loop.get("dataset_relationship"),
-                        left={"id": dataset_id, "resource_type": "Dataset"},
-                        user_id=person_id,
-                    )
+            add_provenance(
+                right={
+                    "id": loop.get("publication_id_to"),
+                    "resource_type": "Publication",
+                },
+                relation_type=loop.get("dataset_relationship"),
+                left={"id": dataset_id, "resource_type": "Dataset"},
+                user_id=person_id,
+            )
 
 
 if __name__ == "__main__":
