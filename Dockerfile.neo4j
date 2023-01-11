@@ -1,0 +1,8 @@
+FROM neo4j:latest 
+# TODO: Use the postgres image directly instead of stateful install
+RUN apt update 2> /dev/null
+RUN apt install -y postgresql postgresql-contrib
+
+COPY neo4j-start.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
