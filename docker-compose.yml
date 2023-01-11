@@ -22,7 +22,9 @@ services:
       - data-api
   api:
     container_name: data-service-api
-    build: ./
+    build: 
+      context: ./
+      dockerfile: docker/Dockerfile
     ports:
       - "8001:8000"
     env_file:
@@ -42,13 +44,14 @@ services:
   graphdb:
     build:
       context: ./
-      dockerfile: Dockerfile.neo4j
+      dockerfile: docker/Dockerfile.neo4j
     ports:
       - 7474:7474
       - 7687:7687
     environment:
       - NEO4J_PLUGINS=["apoc"]
       - apoc.import.file.enabled=true
+      - apoc.initializer.cypher.1=CALL apoc.cypher.runSchemaFile("file:///populate-cache.cypher")
       - NEO4J_AUTH=neo4j/password
       - NEO4J_dbms_memory_pagecache_size=512M
     depends_on:
@@ -58,7 +61,7 @@ services:
   minio:
     build:
       context: ./
-      dockerfile: Dockerfile.minio
+      dockerfile: docker/Dockerfile.minio
     environment:
       MINIO_ROOT_USER: miniouser
       MINIO_ROOT_PASSWORD: miniopass

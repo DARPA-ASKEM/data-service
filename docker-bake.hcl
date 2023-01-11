@@ -44,13 +44,13 @@ target "_platforms" {
 target "data-service-base" {
 	context = "."
 	tags = tag("data-service", "", "")
-	dockerfile = "Dockerfile"
+	dockerfile = "docker/Dockerfile"
 }
 
 target "data-service-dev-db-base" {
 	context = "."
 	tags = tag("data-service-dev-db", "", "")
-	dockerfile = "Dockerfile-dev-db"
+	dockerfile = "docker/Dockerfile-dev-db"
 }
 
 target "data-service" {
