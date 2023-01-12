@@ -400,7 +400,7 @@ def get_csv_from_dataset(
         output = prepare_csv(dataframe, wide_format, row_limit)
         response = StreamingResponse(
             iter([output]),
-            media_type="application/json",
+            media_type="text/csv",
         )
         response.headers["Content-Disposition"] = "attachment; filename=export.csv"
         return response
