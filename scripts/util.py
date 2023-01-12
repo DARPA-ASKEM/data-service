@@ -15,6 +15,12 @@ def download_and_unzip(url, extract_to="."):
 
 
 def asset_to_project(project_id, asset_id, asset_type):
+    if asset_id is None:
+        print(f"Unable to create member of {asset_type}")
+        return
+    else:
+        asset_id = int(asset_id)  # Note: Is this necessary?
+
     payload = json.dumps(
         {
             "project_id": project_id,
@@ -33,7 +39,7 @@ def asset_to_project(project_id, asset_id, asset_type):
     )
 
 
-def add_provenance(left, right, relation_type, user_id):
+def add_provenance(left, right, relation_type, user_id, concept=None):
     payload = json.dumps(
         {
             "left": left.get("id"),
@@ -42,6 +48,7 @@ def add_provenance(left, right, relation_type, user_id):
             "right_type": right.get("resource_type"),
             "relation_type": relation_type,
             "user_id": user_id,
+            "concept": concept,
         }
     )
     headers = {"Content-Type": "application/json"}
@@ -54,8 +61,22 @@ def add_provenance(left, right, relation_type, user_id):
     )
 
 
-def add_concept(concept, object_id, type):
+resource_provenance_mapping = {
+    "datasets": "Dataset",
+    "models": "Model",
+    "plans": "Plan",
+    "intermediates": "Intermediate",
+    "publications": "Publication",
+    "simulation_runs": "SimulationRun",
+    "simulation_parameters": "PlanParameter",
+    "model_parameters": "ModelParameter",
+}
 
+
+def add_concept(concept, object_id, type, user_id=1):
+    if object_id is None:
+        print("No object id is attached to the given concept")
+        return
     payload = json.dumps(
         {
             "curie": str(concept),
@@ -72,6 +93,15 @@ def add_concept(concept, object_id, type):
         headers=headers,
         data=payload,
     )
+    if type in resource_provenance_mapping:
+        # add concept node to neo4j and connect this object to it
+        add_provenance(
+            left={"id": user_id, "resource_type": "Concept"},
+            right={"id": object_id, "resource_type": resource_provenance_mapping[type]},
+            relation_type="IS_CONCEPT_OF",
+            user_id=user_id,
+            concept=concept,
+        )
 
 
 def get_model_concepts(folder):

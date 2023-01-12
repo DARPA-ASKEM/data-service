@@ -7,11 +7,43 @@ from sqlite3 import connect
 from typing import Generator, Tuple
 
 from fastapi.testclient import TestClient
+
+# from neo4j import GraphDatabase
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
 from tds.db import init_dev_content, request_graph_db, request_rdb
 from tds.server.build import build_api
+
+# from tds.settings import settings
+
+# rdb_engine = create_engine(
+#     "sqlite:///.sqlite",
+#     creator=lambda: connect(
+#         "file:.sqlite",
+#         uri=True,
+#         check_same_thread=False,
+#     ),
+# )
+
+
+# def demo_rdb_engine():
+#     """
+#     Provides postgres engine that can be used by FastAPI Dependencies
+#     """
+#     return rdb_engine
+
+
+# NEO_ENGINE = GraphDatabase.driver(
+#     "neo4j://localhost:7687", auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD)
+# )
+
+
+# def demo_neo_engine():
+#     """
+#     Provides graph driver that can be used by FastAPI Dependencies
+#     """
+#     return NEO_ENGINE
 
 
 @contextmanager

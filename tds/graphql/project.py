@@ -52,7 +52,9 @@ def list_assets(project_id: int, info: Info) -> List[Asset]:
             )
 
             assets = [
-                orm_enum_to_type[entry.resource_type].fetch_from_sql(entry.resource_id)
+                orm_enum_to_type[entry.resource_type].fetch_from_sql(
+                    session, entry.resource_id
+                )
                 for entry in assets_xref
             ]
 

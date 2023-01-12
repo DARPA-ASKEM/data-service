@@ -22,26 +22,52 @@ services:
       - data-api
   api:
     container_name: data-service-api
-    build: ./
+    build: 
+      context: ./
+      dockerfile: docker/Dockerfile
     ports:
       - "8001:8000"
     env_file:
       - api.env
+    environment:
+      - NEO4J_ENABLED
     networks:
       - data-annotation-stack
       - data-api
     depends_on:
       - rdb
+      - graphdb
+      - minio
     volumes:
       - $PWD/tds:/api/tds
       - $PWD/data/datasets:/datasets
   graphdb:
-    image: neo4j:latest
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile.neo4j
     ports:
       - 7474:7474
       - 7687:7687
     environment:
+      - NEO4J_PLUGINS=["apoc"]
+      - apoc.import.file.enabled=true
       - NEO4J_AUTH=neo4j/password
       - NEO4J_dbms_memory_pagecache_size=512M
+    depends_on:
+      - rdb
+    networks:
+      - data-api
+  minio:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile.minio
+    environment:
+      MINIO_ROOT_USER: miniouser
+      MINIO_ROOT_PASSWORD: miniopass
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - $PWD/data:/data
     networks:
       - data-api

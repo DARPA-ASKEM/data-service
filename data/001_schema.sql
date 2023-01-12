@@ -68,16 +68,48 @@ CREATE TYPE public.ontologicalfield AS ENUM (
 ALTER TYPE public.ontologicalfield OWNER TO dev;
 
 --
+-- Name: provenancetype; Type: TYPE; Schema: public; Owner: dev
+--
+
+CREATE TYPE public.provenancetype AS ENUM (
+    'Concept',
+    'Dataset',
+    'Intermediate',
+    'Model',
+    'ModelParameter',
+    'ModelRevision',
+    'Plan',
+    'PlanParameter',
+    'Project',
+    'Publication',
+    'SimulationRun'
+);
+
+
+ALTER TYPE public.provenancetype OWNER TO dev;
+
+--
 -- Name: relationtype; Type: TYPE; Schema: public; Owner: dev
 --
 
 CREATE TYPE public.relationtype AS ENUM (
-    'cites',
-    'copiedfrom',
-    'derivedfrom',
-    'editedFrom',
-    'gluedFrom',
-    'stratifiedFrom'
+    'BEGINS_AT',
+    'CITES',
+    'COMBINED_FROM',
+    'CONTAINS',
+    'COPIED_FROM',
+    'DECOMPOSED_FROM',
+    'DERIVED_FROM',
+    'EDITED_FROM',
+    'EQUIVALENT_OF',
+    'EXTRACTED_FROM',
+    'GENERATED_BY',
+    'GLUED_FROM',
+    'IS_CONCEPT_OF',
+    'PARAMETER_OF',
+    'REINTERPRETS',
+    'STRATIFIED_FROM',
+    'USES'
 );
 
 
@@ -89,7 +121,6 @@ ALTER TYPE public.relationtype OWNER TO dev;
 
 CREATE TYPE public.resourcetype AS ENUM (
     'datasets',
-    'extractions',
     'intermediates',
     'models',
     'plans',
@@ -679,10 +710,11 @@ CREATE TABLE public.provenance (
     "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
     relation_type public.relationtype NOT NULL,
     "left" integer NOT NULL,
-    left_type public.resourcetype NOT NULL,
+    left_type public.provenancetype NOT NULL,
     "right" integer NOT NULL,
-    right_type public.resourcetype NOT NULL,
-    user_id integer
+    right_type public.provenancetype NOT NULL,
+    user_id integer,
+    concept character varying
 );
 
 

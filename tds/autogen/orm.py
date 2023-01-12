@@ -11,7 +11,6 @@ Base = declarative_base()
 class ResourceType(str, Enum):
 
     datasets = 'datasets'
-    extractions = 'extractions'
     intermediates = 'intermediates'
     models = 'models'
     plans = 'plans'
@@ -19,14 +18,62 @@ class ResourceType(str, Enum):
     simulation_runs = 'simulation_runs'
     
 
+class ProvenanceType(str, Enum):
+
+    Concept = 'Concept'
+    Dataset = 'Dataset'
+    Intermediate = 'Intermediate'
+    Model = 'Model'
+    ModelParameter = 'ModelParameter'
+    ModelRevision = 'ModelRevision'
+    Plan = 'Plan'
+    PlanParameter = 'PlanParameter'
+    Project = 'Project'
+    Publication = 'Publication'
+    SimulationRun = 'SimulationRun'
+    
+
+class ProvenanceSearchTypes(str, Enum):
+
+    artifacts_created_by_user = 'artifacts_created_by_user'
+    child_nodes = 'child_nodes'
+    concept = 'concept'
+    concept_counts = 'concept_counts'
+    connected_nodes = 'connected_nodes'
+    derived_models = 'derived_models'
+    model_to_primitive = 'model_to_primitive'
+    parent_model_revisions = 'parent_model_revisions'
+    parent_models = 'parent_models'
+    parent_nodes = 'parent_nodes'
+    
+
 class RelationType(str, Enum):
 
-    cites = 'cites'
-    copiedfrom = 'copiedfrom'
-    derivedfrom = 'derivedfrom'
-    editedFrom = 'editedFrom'
-    gluedFrom = 'gluedFrom'
-    stratifiedFrom = 'stratifiedFrom'
+    BEGINS_AT = 'BEGINS_AT'
+    CITES = 'CITES'
+    COMBINED_FROM = 'COMBINED_FROM'
+    CONTAINS = 'CONTAINS'
+    COPIED_FROM = 'COPIED_FROM'
+    DECOMPOSED_FROM = 'DECOMPOSED_FROM'
+    DERIVED_FROM = 'DERIVED_FROM'
+    EDITED_FROM = 'EDITED_FROM'
+    EQUIVALENT_OF = 'EQUIVALENT_OF'
+    EXTRACTED_FROM = 'EXTRACTED_FROM'
+    GENERATED_BY = 'GENERATED_BY'
+    GLUED_FROM = 'GLUED_FROM'
+    IS_CONCEPT_OF = 'IS_CONCEPT_OF'
+    PARAMETER_OF = 'PARAMETER_OF'
+    REINTERPRETS = 'REINTERPRETS'
+    STRATIFIED_FROM = 'STRATIFIED_FROM'
+    USES = 'USES'
+    
+
+class ModelOperations(str, Enum):
+
+    copy = 'copy'
+    decompose = 'decompose'
+    glue = 'glue'
+    stratify = 'stratify'
     
 
 class TaggableType(str, Enum):
@@ -257,10 +304,11 @@ class Provenance(Base):
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     relation_type = sa.Column(sa.Enum(RelationType), nullable=False)
     left = sa.Column(sa.Integer(), nullable=False)
-    left_type = sa.Column(sa.Enum(ResourceType), nullable=False)
+    left_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
     right = sa.Column(sa.Integer(), nullable=False)
-    right_type = sa.Column(sa.Enum(ResourceType), nullable=False)
+    right_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
     user_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'))
+    concept = sa.Column(sa.String())
 
 
 class Association(Base):

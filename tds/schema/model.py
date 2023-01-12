@@ -37,6 +37,34 @@ class ModelDescription(schema.ModelDescription):
         orm_mode = True
 
 
+class ModelOptPayload(schema.ModelDescription):
+    left: int
+    right: Optional[int]
+    concept: Optional[Concept] = None
+    parameters: Optional[ModelParameters] = None
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "left": 1,
+                "right": None,
+                "name": "New model",
+                "description": "Copy model 1 to New model",
+                "content": "json-as-string",
+                "parameters": [
+                    {
+                        "name": "param_1",
+                        "type": "int",
+                        "default_value": "1",
+                        "state_variable": True,
+                    }
+                ],
+                "framework": "string",
+            }
+        }
+
+
 class ModelContent(schema.ModelState):
     @classmethod
     def from_orm(cls, body: orm.ModelState) -> "ModelContent":

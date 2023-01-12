@@ -88,7 +88,7 @@ def create_dataset(
 
     feature_array.append(time_step_qual)
 
-    data_path_string = f"file:///datasets/{dataset_id}/sim_output.csv"
+    data_path_string = f"s3://datasets/{dataset_id}/sim_output.csv"
 
     annotation = {
         "annotations": {

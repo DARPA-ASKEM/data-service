@@ -30,3 +30,5 @@ dist
 experiments-main
 api.env
 
+# Minio
+.minio.sys

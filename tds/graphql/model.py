@@ -26,6 +26,11 @@ class ModelParameterSchema(schema.ModelParameter):
         orm_mode = True
 
 
+class ModelFrameworkSchema(schema.ModelFramework):
+    class Config:
+        orm_mode = True
+
+
 @sqlalchemy_type(orm.ModelParameter)
 @strawberry.experimental.pydantic.type(model=ModelParameterSchema)
 class ModelParameter:
@@ -53,15 +58,35 @@ def list_parameters(model_id: int, info: Info) -> List[ModelParameter]:
     return [ModelParameter.from_orm(param) for param in parameters]
 
 
+@sqlalchemy_type(orm.ModelParameter)
+@strawberry.experimental.pydantic.type(model=ModelFrameworkSchema)
+class ModelFramework:
+    name: strawberry.auto
+    version: strawberry.auto
+    semantics: strawberry.auto
+
+
+def list_frameworks(info: Info) -> List[ModelParameter]:
+    with Session(info.context["rdb"]) as session:
+        frameworks: List[orm.ModelFramework] = session.query(orm.ModelFramework).all()
+    return [ModelFramework.from_orm(framework) for framework in frameworks]
+
+
 @sqlalchemy_type(orm.ModelDescription)
 @strawberry.experimental.pydantic.type(model=ModelDescription)
 class Model:
     id: strawberry.auto
     name: strawberry.auto
     description: strawberry.auto
-    framework: strawberry.auto
+    framework_name: str
     timestamp: strawberry.auto
     state_id: strawberry.auto
+
+    @strawberry.field
+    def framework(self, info: Info) -> ModelFramework:
+        with Session(info.context["rdb"]) as session:
+            framework = session.query(orm.ModelFramework).get(self.framework_name)
+            return ModelFramework.from_orm(framework)
 
     @strawberry.field
     def content(self, info: Info) -> str:
@@ -75,6 +100,7 @@ class Model:
     @staticmethod
     def from_pydantic(instance: ModelDescription) -> "Model":
         data = instance.dict()
+        data["framework_name"] = data.pop("framework")
         data.pop("concept")  # TODO: Include
         return Model(**data)
 
