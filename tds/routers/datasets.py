@@ -404,11 +404,11 @@ def get_csv_from_dataset(
         )
         response.headers["Content-Disposition"] = "attachment; filename=export.csv"
         return response
-    else:
-        file = get_rawfile(path)
-        dataframe = pandas.read_csv(file)
-        output = prepare_csv(dataframe, wide_format, row_limit)
-        return StreamingResponse(iter([output]), media_type="text/csv")
+
+    file = get_rawfile(path)
+    dataframe = pandas.read_csv(file)
+    output = prepare_csv(dataframe, wide_format, row_limit)
+    return StreamingResponse(iter([output]), media_type="text/csv")
 
 
 @router.post("/{id}/upload/file")
