@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from tds.autogen import orm, schema
 from tds.db import list_by_id, request_rdb
 from tds.lib.datasets import create_qualifier_xref
-from tds.lib.storage import get_rawfile, put_rawfile, stream_csv_from_data_paths
+from tds.lib.storage import get_rawfile, prepare_csv, put_rawfile
 
 logger = Logger(__file__)
 logger.setLevel(DEBUG)
@@ -374,6 +374,7 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
 def get_csv_from_dataset(
     id: int,
     wide_format: bool = False,
+    row_limit: Optional[int] = None,
     data_annotation_flag: bool = False,
     rdb: Engine = Depends(request_rdb),
 ):
@@ -396,20 +397,18 @@ def get_csv_from_dataset(
     if path.endswith(".parquet.gzip"):
         # Build single dataframe
         dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
-        print(dataframe)
-        output = stream_csv_from_data_paths(dataframe, wide_format)
+        output = prepare_csv(dataframe, wide_format, row_limit)
         response = StreamingResponse(
             iter([output]),
-            media_type="application/json",
+            media_type="text/csv",
         )
         response.headers["Content-Disposition"] = "attachment; filename=export.csv"
         return response
+
     file = get_rawfile(path)
-    if wide_format:
-        dataframe = pandas.read_csv(file)
-        output = stream_csv_from_data_paths(dataframe, wide_format)
-        return StreamingResponse(iter([output]), media_type="text/csv")
-    return StreamingResponse(file, media_type="text/csv")
+    dataframe = pandas.read_csv(file)
+    output = prepare_csv(dataframe, wide_format, row_limit)
+    return StreamingResponse(iter([output]), media_type="text/csv")
 
 
 @router.post("/{id}/upload/file")
