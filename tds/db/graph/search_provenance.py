@@ -99,7 +99,6 @@ class SearchProvenance(ProvenanceHandler):
             generated_query = derived_models_query_generater(
                 root_type=payload.get("root_type"), root_id=payload.get("root_id")
             )
-            print(generated_query)
 
             response = session.run(generated_query)
 
