@@ -3,11 +3,14 @@ LANG = en_US.utf-8
 PYTHON = $(shell which python3 || which python)
 export LANG
 
+SQL_HASH_FILE = data/.version
 SCHEMA_SQL_FILE = data/001_schema.sql
 DATA_SQL_FILE = data/002_data.sql
 
 SCHEMA_FILES = $(shell find tds/schema/ tds/autogen/ -type f -name '*.py')
-DATA_FILES = $(shell find scripts/ -type f -name '*.py') $(SCHEMA_SQL_FILE)
+DATA_PY_FILES = $(shell find scripts/ -type f -name '*.py') 
+DATA_FILES = $(DATA_PY_FILES) $(SCHEMA_SQL_FILE)
+SQL_HASH = $(shell md5sum $(SCHEMA_FILES) $(DATA_PY_FILES) | md5sum | cut -c -32)
 
 
 .PHONY:init
@@ -66,18 +69,12 @@ db-full: | $(SCHEMA_SQL_FILE) $(DATA_SQL_FILE)
 .PHONY:repopulate-db
 repopulate-db:
 	# Check if we need to rebuild the .sql files by checking if any prerequisite files are newer than the .sql files
-	[ -e "$(SCHEMA_SQL_FILE)" ] \
-		&& modified_files="$$(find $(SCHEMA_FILES) -newer $(SCHEMA_SQL_FILE))"  \
-		|| modified_files="missing"; \
-	[ -e "$(DATA_SQL_FILE)" ] \
-		&& modified_files="$$modified_files $$(find $(DATA_FILES) -newer $(DATA_SQL_FILE))" \
-		|| modified_files="$$modified_files missing"; \
-	echo $${modified_files}; \
-	if [ "$${modified_files}" != " " ]; then \
+	if [ "$(SQL_HASH)" != "$$(cat $(SQL_HASH_FILE))" ]; then \
 		make down; \
 		make db-clean; \
 		NEO4J_ENABLED=False make up && \
 		sleep 1 && \
 		NEO4J_ENABLED=False make populate && \
-		make db-full; \
+		make db-full && \
+		echo '$(SQL_HASH)' > $(SQL_HASH_FILE); \
 	fi
