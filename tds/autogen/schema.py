@@ -37,7 +37,7 @@ class ProvenanceSearchTypes(str, Enum):
     concept_counts = 'concept_counts'
     connected_nodes = 'connected_nodes'
     derived_models = 'derived_models'
-    model_to_primative = 'model_to_primative'
+    model_to_primitive = 'model_to_primitive'
     parent_model_revisions = 'parent_model_revisions'
     parent_models = 'parent_models'
     parent_nodes = 'parent_nodes'

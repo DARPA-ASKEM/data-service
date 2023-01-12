@@ -34,7 +34,7 @@ Enum provenance_search_types{
   derived_models
   parent_model_revisions
   parent_models
-  model_to_primative
+  model_to_primitive
   artifacts_created_by_user
   concept
   concept_counts

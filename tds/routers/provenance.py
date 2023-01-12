@@ -46,7 +46,7 @@ def search_provenance(
     **artifacts_created_by_user** - Return all artifacts created by a user.
     * Requirements: “user_id”
 
-    **model_to_primative** - Return all models and the intermediates
+    **model_to_primitive** - Return all models and the intermediates
      they are derived from.
     * Requirements: None
 

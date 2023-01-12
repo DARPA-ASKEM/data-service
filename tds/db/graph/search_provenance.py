@@ -201,9 +201,9 @@ class SearchProvenance(ProvenanceHandler):
 
             # return sorted(response_data, key=lambda i: list(i.keys()))
 
-    def model_to_primative(self, payload):
+    def model_to_primitive(self, payload):
         """
-        Which models relay on which primatives
+        Which models relay on which primitives
         """
         logging.info(payload)
         with self.graph_db.session() as session:
