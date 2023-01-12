@@ -59,6 +59,8 @@ class SearchProvenance(ProvenanceHandler):
                 # + "With DISTINCT n "
                 + f"return {node_abbr}, r, n"
             )
+            print(query)
+
             logging.info(query)
             response = session.run(query)
 
@@ -97,6 +99,7 @@ class SearchProvenance(ProvenanceHandler):
             generated_query = derived_models_query_generater(
                 root_type=payload.get("root_type"), root_id=payload.get("root_id")
             )
+            print(generated_query)
 
             response = session.run(generated_query)
 
@@ -141,7 +144,7 @@ class SearchProvenance(ProvenanceHandler):
                 Unwind r6 as r7 
                 RETURN Both_rms,Md,r7
                 """
-
+            print(query)
             response = session.run(query)
             return nodes_edges(response=response)
 
@@ -149,7 +152,12 @@ class SearchProvenance(ProvenanceHandler):
         """
         Which models help create the latest model
         """
-        if payload.get("root_type") not in ("Model"):
+        if payload.get("root_type") not in (
+            "Model",
+            "Dataset",
+            "SimulationRun",
+            "Plan",
+        ):
             raise HTTPException(
                 status_code=400,
                 detail="Parent models can only be found from root "
@@ -160,6 +168,7 @@ class SearchProvenance(ProvenanceHandler):
             match_pattern = parent_model_query_generator(
                 payload.get("root_type"), payload.get("root_id")
             )
+            node_abbr = provenance_type_to_abbr[payload.get("root_type")]
 
             model_relationships = relationships_array_as_str(
                 include=[
@@ -173,19 +182,24 @@ class SearchProvenance(ProvenanceHandler):
 
             query = f"""
                 {match_pattern} 
-                Match (Mr)-[:{model_relationships} *1..]->(Mr2:ModelRevision)
-                With collect(Mr)+collect(Mr2) as Mrs 
+                Optional Match (Mr)-[r2:{model_relationships} *1..]->(Mr2:ModelRevision)
+                With *, collect(Mr)+collect(Mr2) as Mrs,collect(r)+collect(r2) as r3
                 Unwind Mrs as Both_rms 
-                With DISTINCT Both_rms 
-                Match (md2:Model)-[:BEGINS_AT]->(Both_rms) 
-                Return labels(md2) as label, md2.id as id
+                with *
+                Optional Match (md2:Model)-[r4:BEGINS_AT]->(Both_rms) 
+                with *,  collect(r3)+collect(r4)as r5
+                Return {node_abbr},md2,Both_rms,r5
                 """
-            response = session.run(query)
-            response_data = [
-                {res.data().get("label")[0]: res.data().get("id")} for res in response
-            ]
+            print(query)
 
-            return sorted(response_data, key=lambda i: list(i.keys()))
+            response = session.run(query)
+            return nodes_edges(response=response)
+
+            # response_data = [
+            #     {res.data().get("label")[0]: res.data().get("id")} for res in response
+            # ]
+
+            # return sorted(response_data, key=lambda i: list(i.keys()))
 
     def model_to_primative(self, payload):
         """
@@ -217,6 +231,7 @@ class SearchProvenance(ProvenanceHandler):
                 unwind r6 as r7 
                 return Both_Mrs,In , r7, Md 
                 """
+            print(query)
             response = session.run(query)
 
             return nodes_edges(response=response)
@@ -230,17 +245,18 @@ class SearchProvenance(ProvenanceHandler):
             query = f"""
                 {match_node}-[r]->(n2) 
                 where r.user_id={payload.get('user_id')} 
-                With collect(n)+collect(n2) as nodes 
+                With *, collect(n)+collect(n2) as nodes 
                 Unwind nodes as both_nodes 
-                With DISTINCT both_nodes 
-                RETURN labels(both_nodes) as label, both_nodes.id as id 
+                With * 
+                RETURN  both_nodes
                 """
             response = session.run(query)
-            response_data = [
-                {res.data().get("label")[0]: res.data().get("id")} for res in response
-            ]
+            return nodes_edges(response=response)
+            # response_data = [
+            #     {res.data().get("label")[0]: res.data().get("id")} for res in response
+            # ]
 
-            return sorted(response_data, key=lambda i: list(i.keys()))
+            # return sorted(response_data, key=lambda i: list(i.keys()))
 
     def concept(self, payload):
         """
@@ -252,14 +268,15 @@ class SearchProvenance(ProvenanceHandler):
                 {match_node}
                 -[r:IS_CONCEPT_OF]->(n) 
                 Where Cn.concept='{payload.get('curie')}' 
-                return labels(n) as label, n.id as id
+                return n
                 """
             response = session.run(query)
-            response_data = [
-                {res.data().get("label")[0]: res.data().get("id")} for res in response
-            ]
+            return nodes_edges(response=response)
+            # response_data = [
+            #     {res.data().get("label")[0]: res.data().get("id")} for res in response
+            # ]
 
-            return sorted(response_data, key=lambda i: list(i.keys()))
+            # return sorted(response_data, key=lambda i: list(i.keys()))
 
     def concept_counts(self, payload):
         """

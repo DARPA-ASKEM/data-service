@@ -190,6 +190,7 @@ def build_uuid(label, id):
     build uuid
     """
     label = label.lower()
+    path = label.lower() + "s/" + str(id)
     if label == "intermediate":
         path = "model/" + label.lower() + "s/" + str(id)
     if label == "modelparameter":
@@ -202,6 +203,4 @@ def build_uuid(label, id):
         path = "simulations/" + "simulationparameters/" + str(id)
     if label == "modelrevisions":
         path = None
-    else:
-        path = label.lower() + "s/" + str(id)
     return path
