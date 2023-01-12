@@ -63,6 +63,7 @@ $(DATA_SQL_FILE):$(DATA_FILES)
 db-full: | $(SCHEMA_SQL_FILE) $(DATA_SQL_FILE)
 
 
+.PHONY:repopulate-db
 repopulate-db:
 	# Check if we need to rebuild the .sql files by checking if any prerequisite files are newer than the .sql files
 	[ -e "$(SCHEMA_SQL_FILE)" ] \
