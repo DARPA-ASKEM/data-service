@@ -9,7 +9,7 @@ set -m
 /startup/docker-entrypoint.sh neo4j &
 
 # TODO: run this using apoc.initialize
-sleep 8
+sleep 15
 cypher-shell -u neo4j -p password -f /tmp/populate-cache.cypher --non-interactive
 echo "Loaded all data"
 

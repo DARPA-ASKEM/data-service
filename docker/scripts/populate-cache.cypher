@@ -3,5 +3,6 @@ LOAD CSV WITH HEADERS FROM 'file:///provenance.csv' AS row
 CALL apoc.merge.node([row.left_type],{id: row.left}) yield node as l
 CALL apoc.merge.node([row.right_type],{id: row.right}) yield node as r
 // TODO: Include user_id
-CALL apoc.merge.relationship(l,row.relation_type, {user_id: row.user_id},{}, r) yield rel as relation
+with *, COALESCE(row.user_id,1) as userid
+CALL apoc.merge.relationship(l,row.relation_type, {user_id: userid},{}, r) yield rel as relation
 return relation, l, r;
