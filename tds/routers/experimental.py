@@ -57,6 +57,30 @@ valid_relations = {
     orm.RelationType.STRATIFIED_FROM: [
         (orm.ProvenanceType.ModelRevision, orm.ProvenanceType.ModelRevision)
     ],
+    orm.RelationType.CONTAINS: [
+        (orm.ProvenanceType.Project, orm.ProvenanceType.Publication),
+        (orm.ProvenanceType.Project, orm.ProvenanceType.Intermediate),
+        (orm.ProvenanceType.Project, orm.ProvenanceType.Model),
+        (orm.ProvenanceType.Project, orm.ProvenanceType.ModelRevision),
+        (orm.ProvenanceType.Project, orm.ProvenanceType.ModelParameter),
+        (orm.ProvenanceType.Project, orm.ProvenanceType.Plan),
+        (orm.ProvenanceType.Project, orm.ProvenanceType.SimulationRun),
+        (orm.ProvenanceType.Project, orm.ProvenanceType.Dataset),
+    ],
+    orm.RelationType.PARAMETER_OF: [
+        (orm.ProvenanceType.ModelParameter, orm.ProvenanceType.ModelRevision),
+        (orm.ProvenanceType.PlanParameter, orm.ProvenanceType.Plan),
+    ],
+    orm.RelationType.IS_CONCEPT_OF: [
+        (orm.ProvenanceType.Concept, orm.ProvenanceType.Publication),
+        (orm.ProvenanceType.Concept, orm.ProvenanceType.Intermediate),
+        (orm.ProvenanceType.Concept, orm.ProvenanceType.Model),
+        (orm.ProvenanceType.Concept, orm.ProvenanceType.ModelRevision),
+        (orm.ProvenanceType.Concept, orm.ProvenanceType.ModelParameter),
+        (orm.ProvenanceType.Concept, orm.ProvenanceType.Plan),
+        (orm.ProvenanceType.Concept, orm.ProvenanceType.SimulationRun),
+        (orm.ProvenanceType.Concept, orm.ProvenanceType.Dataset),
+    ],
 }
 
 DB_DESC = "Valid relations include:\n"

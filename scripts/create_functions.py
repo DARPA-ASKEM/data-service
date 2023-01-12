@@ -153,7 +153,6 @@ def create_model(path, name, description, framework, url=url):
         }
     )
     headers = {"Content-Type": "application/json"}
-
     response = requests.request("POST", url + "models", headers=headers, data=payload)
     model_json = response.json()
     model_id = model_json.get("id")
