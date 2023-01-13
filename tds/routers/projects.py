@@ -4,7 +4,7 @@ CRUD operations for projects
 
 import json
 from logging import Logger
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi import Query as FastAPIQuery
@@ -36,15 +36,14 @@ def list_projects(
 @router.get("/{id}/assets", **retrieve.fastapi_endpoint_config)
 def get_project_assets(
     id: int,
-    types: List[ResourceType] = FastAPIQuery(
+    types: Optional[List[ResourceType]] = FastAPIQuery(
         default=[
-            "publications",
-            "models",
-            "intermediates",
-            "datasets",
-            "extractions",
-            "plans",
-            "simulation_runs",
+            ResourceType.datasets,
+            ResourceType.intermediates,
+            ResourceType.models,
+            ResourceType.plans,
+            ResourceType.publications,
+            ResourceType.simulation_runs,
         ]
     ),
     rdb: Engine = Depends(request_rdb),
