@@ -1,5 +1,5 @@
 LOAD CSV WITH HEADERS FROM 'file:///provenance.csv' AS row
-with row, row.left as left, row.left_type as left_type
+with row
 CALL apoc.merge.node([coalesce(row.left_type, 'Default')], 
 {id :toInteger(row.left),concept:coalesce(row.concept,"")}) yield node as l
 with *
