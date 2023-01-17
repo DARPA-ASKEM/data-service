@@ -12,6 +12,7 @@ import pandas
 import requests
 from fastapi import APIRouter, Depends, File, Response, UploadFile, status
 from fastapi.responses import StreamingResponse
+from sqlalchemy import or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -210,6 +211,7 @@ def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 def get_datasets(
     page_size: int = 100,
     page: int = 0,
+    is_sim_run: Optional[bool] = None,
     rdb: Engine = Depends(request_rdb),
 ):
     """
@@ -218,6 +220,7 @@ def get_datasets(
     with Session(rdb) as session:
         datasets = (
             session.query(orm.Dataset)
+            .filter(or_(is_sim_run is None, orm.Dataset.simulation_run == is_sim_run))
             .order_by(orm.Dataset.id.asc())
             .limit(page_size)
             .offset(page)
