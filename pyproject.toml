@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tds"
-version = "0.3.5"
+version = "0.3.6"
 
 description = "The API that sits on top of the data store for the ASKEM program."
 authors = ["Five Grant <five@jataware.com>"]
