@@ -448,7 +448,7 @@ ALTER TABLE public.model_framework OWNER TO dev;
 
 CREATE TABLE public.model_parameter (
     id integer NOT NULL,
-    model_id integer NOT NULL,
+    model_id integer,
     name character varying NOT NULL,
     type public.valuetype NOT NULL,
     default_value character varying,
