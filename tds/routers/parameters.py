@@ -31,8 +31,10 @@ def create_parameters(
     with Session(rdb) as session:
         created_ids = []
         for parameter_payload in [parameter.dict() for parameter in payload]:
-            curie = parameter_payload["curie"]
+            curie = parameter_payload.pop("curie")
             param = orm.ModelParameter(**parameter_payload)
+            session.add(param)
+            session.commit()
             if curie is not None:
                 concept = orm.OntologyConcept(
                     curie=curie,
@@ -72,12 +74,15 @@ def get_parameters(
                     orm.OntologyConcept.type == orm.TaggableType.model_parameters,
                 ),
             )
+            .order_by(orm.ModelParameter.id.asc())
             .limit(page_size)
-            .offset(page)
+            .offset(page * page_size)
             .all()
         )
 
     return [
-        IndependentParameter(curie=concept.curie, **param.__dict__)
+        IndependentParameter(
+            curie=concept.curie if concept is not None else None, **param.__dict__
+        )
         for param, concept in query
     ]
