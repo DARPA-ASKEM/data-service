@@ -25,7 +25,7 @@ def create_parameters(
     payload: List[IndependentParameter], rdb: Engine = Depends(request_rdb)
 ) -> Response:
     """
-    Create parameters form a list
+    Create parameters from a list
     """
 
     with Session(rdb) as session:
