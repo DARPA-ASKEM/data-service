@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from tds.autogen import orm
 from tds.db import request_rdb
+from tds.lib.concepts import mark_concept_active
 from tds.operation import create, retrieve
 from tds.schema.parameter import IndependentParameter
 
@@ -36,6 +37,7 @@ def create_parameters(
             session.add(param)
             session.commit()
             if curie is not None:
+                mark_concept_active(session, curie)
                 concept = orm.OntologyConcept(
                     curie=curie,
                     type=orm.TaggableType.model_parameters,
