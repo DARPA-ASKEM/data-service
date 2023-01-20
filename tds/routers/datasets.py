@@ -254,7 +254,9 @@ def get_datasets(
             feature_index[feature.dataset_id].append(feature)
 
         for dataset in datasets:
-            dataset.annotations["annotations"]["feature"] = feature_index[dataset.id]
+            dataset.annotations["annotations"]["feature"] = feature_index.get(
+                dataset.id, None
+            )
         return datasets
 
 
@@ -387,19 +389,23 @@ def get_csv_from_dataset(
     """
     dataset = get_dataset(id=id, rdb=rdb)
     data_paths = dataset.annotations["data_paths"]
+    storage_options = {"client_kwargs": {"endpoint_url": os.getenv("STORAGE_HOST")}}
 
-    if data_annotation_flag:
-        response = requests.post(
-            "http://data-annotation-api:80/datasets/download/csv",
-            params={"data_path_list": data_paths},
-            stream=True,
-            timeout=15,
-        )
-        return StreamingResponse(response.raw, headers=response.headers)
+    # if data_annotation_flag:
+    #     response = requests.post(
+    #         "http://data-annotation-api:80/datasets/download/csv",
+    #         params={"data_path_list": data_paths},
+    #         stream=True,
+    #         timeout=15,
+    #     )
+    #     return StreamingResponse(response.raw, headers=response.headers)
     path = data_paths[0]
     if path.endswith(".parquet.gzip"):
         # Build single dataframe
-        dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
+        dataframe = pandas.concat(
+            pandas.read_parquet(file, storage_options=storage_options)
+            for file in data_paths
+        )
         output = prepare_csv(dataframe, wide_format, row_limit)
         response = StreamingResponse(
             iter([output]),
