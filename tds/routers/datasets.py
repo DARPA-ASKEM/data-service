@@ -9,7 +9,6 @@ from logging import DEBUG, Logger
 from typing import List, Optional
 
 import pandas
-import requests
 from fastapi import APIRouter, Depends, File, Response, UploadFile, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import or_
@@ -380,7 +379,6 @@ def get_csv_from_dataset(
     id: int,
     wide_format: bool = False,
     row_limit: Optional[int] = None,
-    data_annotation_flag: bool = False,
     rdb: Engine = Depends(request_rdb),
 ):
     """
@@ -390,15 +388,6 @@ def get_csv_from_dataset(
     dataset = get_dataset(id=id, rdb=rdb)
     data_paths = dataset.annotations["data_paths"]
     storage_options = {"client_kwargs": {"endpoint_url": os.getenv("STORAGE_HOST")}}
-
-    # if data_annotation_flag:
-    #     response = requests.post(
-    #         "http://data-annotation-api:80/datasets/download/csv",
-    #         params={"data_path_list": data_paths},
-    #         stream=True,
-    #         timeout=15,
-    #     )
-    #     return StreamingResponse(response.raw, headers=response.headers)
     path = data_paths[0]
     if path.endswith(".parquet.gzip"):
         # Build single dataframe
