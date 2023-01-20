@@ -68,16 +68,22 @@ def delete_software(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
 
 
 @router.get("/publications/{id}", **retrieve.fastapi_endpoint_config)
-def get_publication(id: int, rdb: Engine = Depends(request_rdb)) -> Publication:
+def get_publication(id: int | str, rdb: Engine = Depends(request_rdb)) -> Publication:
     """
     Retrieve model
     """
-    if entry_exists(rdb.connect(), orm.Publication, id):
-        with Session(rdb) as session:
+    with Session(rdb) as session:
+        publications = (
+            session.query(orm.Publication)
+            .filter(str(id) == orm.Publication.xdd_uri)
+            .all()
+        )
+        if len(publications) != 0:
+            publication = publications[0]
+        elif isinstance(id, int) and entry_exists(rdb.connect(), orm.Publication, id):
             publication = session.query(orm.Publication).get(id)
-
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Publication.from_orm(publication)
 
 
@@ -90,6 +96,19 @@ def create_publication(
     """
     with Session(rdb) as session:
         publication_payload = payload.dict()
+        publications = (
+            session.query(orm.Publication)
+            .filter(orm.Publication.xdd_uri == publication_payload["xdd_uri"])
+            .all()
+        )
+        if len(publications) != 0:
+            return Response(
+                status_code=status.HTTP_200_OK,
+                headers={
+                    "content-type": "application/json",
+                },
+                content=json.dumps({"id": publications[0].id}),
+            )
         # pylint: disable-next=unused-variable
         publication = orm.Publication(**publication_payload)
         session.add(publication)
