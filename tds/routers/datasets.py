@@ -9,7 +9,6 @@ from logging import DEBUG, Logger
 from typing import List, Optional
 
 import pandas
-import requests
 from fastapi import APIRouter, Depends, File, Response, UploadFile, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import or_
@@ -254,7 +253,9 @@ def get_datasets(
             feature_index[feature.dataset_id].append(feature)
 
         for dataset in datasets:
-            dataset.annotations["annotations"]["feature"] = feature_index[dataset.id]
+            dataset.annotations["annotations"]["feature"] = feature_index.get(
+                dataset.id, None
+            )
         return datasets
 
 
@@ -378,7 +379,6 @@ def get_csv_from_dataset(
     id: int,
     wide_format: bool = False,
     row_limit: Optional[int] = None,
-    data_annotation_flag: bool = False,
     rdb: Engine = Depends(request_rdb),
 ):
     """
@@ -387,19 +387,14 @@ def get_csv_from_dataset(
     """
     dataset = get_dataset(id=id, rdb=rdb)
     data_paths = dataset.annotations["data_paths"]
-
-    if data_annotation_flag:
-        response = requests.post(
-            "http://data-annotation-api:80/datasets/download/csv",
-            params={"data_path_list": data_paths},
-            stream=True,
-            timeout=15,
-        )
-        return StreamingResponse(response.raw, headers=response.headers)
+    storage_options = {"client_kwargs": {"endpoint_url": os.getenv("STORAGE_HOST")}}
     path = data_paths[0]
     if path.endswith(".parquet.gzip"):
         # Build single dataframe
-        dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
+        dataframe = pandas.concat(
+            pandas.read_parquet(file, storage_options=storage_options)
+            for file in data_paths
+        )
         output = prepare_csv(dataframe, wide_format, row_limit)
         response = StreamingResponse(
             iter([output]),
