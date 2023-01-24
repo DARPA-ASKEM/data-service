@@ -263,7 +263,7 @@ Table project {
   description varchar [not null]
   timestamp datetime [default: `now()`]
   active bool [not null]
-  person_id int [ref: > public.person.id]
+  username varchar
 }
 
 Table project_asset {
