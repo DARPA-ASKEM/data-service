@@ -1,6 +1,6 @@
 Project askem {
   database_type: 'PostgreSQL'
-  Note: 'v7'
+  Note: 'v8'
 }
 
 Enum public.resource_type {
@@ -228,7 +228,7 @@ Table simulation_run {
 
 Table model_parameter {
   id int [pk]
-  model_id int [ref: > model_description.id, not null]
+  model_id int [ref: > model_description.id]
   name varchar [not null]
   type value_type [not null]
   default_value varchar
@@ -263,6 +263,7 @@ Table project {
   description varchar [not null]
   timestamp datetime [default: `now()`]
   active bool [not null]
+  username varchar
 }
 
 Table project_asset {

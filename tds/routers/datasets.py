@@ -9,16 +9,16 @@ from logging import DEBUG, Logger
 from typing import List, Optional
 
 import pandas
-import requests
 from fastapi import APIRouter, Depends, File, Response, UploadFile, status
 from fastapi.responses import StreamingResponse
+from sqlalchemy import or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
 from tds.db import list_by_id, request_rdb
 from tds.lib.datasets import create_qualifier_xref
-from tds.lib.storage import get_rawfile, put_rawfile, stream_csv_from_data_paths
+from tds.lib.storage import get_rawfile, prepare_csv, put_rawfile
 
 logger = Logger(__file__)
 logger.setLevel(DEBUG)
@@ -210,6 +210,7 @@ def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 def get_datasets(
     page_size: int = 100,
     page: int = 0,
+    is_sim_run: Optional[bool] = None,
     rdb: Engine = Depends(request_rdb),
 ):
     """
@@ -218,6 +219,7 @@ def get_datasets(
     with Session(rdb) as session:
         datasets = (
             session.query(orm.Dataset)
+            .filter(or_(is_sim_run is None, orm.Dataset.simulation_run == is_sim_run))
             .order_by(orm.Dataset.id.asc())
             .limit(page_size)
             .offset(page)
@@ -251,7 +253,9 @@ def get_datasets(
             feature_index[feature.dataset_id].append(feature)
 
         for dataset in datasets:
-            dataset.annotations["annotations"]["feature"] = feature_index[dataset.id]
+            dataset.annotations["annotations"]["feature"] = feature_index.get(
+                dataset.id, None
+            )
         return datasets
 
 
@@ -374,7 +378,7 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
 def get_csv_from_dataset(
     id: int,
     wide_format: bool = False,
-    data_annotation_flag: bool = False,
+    row_limit: Optional[int] = None,
     rdb: Engine = Depends(request_rdb),
 ):
     """
@@ -383,33 +387,26 @@ def get_csv_from_dataset(
     """
     dataset = get_dataset(id=id, rdb=rdb)
     data_paths = dataset.annotations["data_paths"]
-
-    if data_annotation_flag:
-        response = requests.post(
-            "http://data-annotation-api:80/datasets/download/csv",
-            params={"data_path_list": data_paths},
-            stream=True,
-            timeout=15,
-        )
-        return StreamingResponse(response.raw, headers=response.headers)
+    storage_options = {"client_kwargs": {"endpoint_url": os.getenv("STORAGE_HOST")}}
     path = data_paths[0]
     if path.endswith(".parquet.gzip"):
         # Build single dataframe
-        dataframe = pandas.concat(pandas.read_parquet(file) for file in data_paths)
-        print(dataframe)
-        output = stream_csv_from_data_paths(dataframe, wide_format)
+        dataframe = pandas.concat(
+            pandas.read_parquet(file, storage_options=storage_options)
+            for file in data_paths
+        )
+        output = prepare_csv(dataframe, wide_format, row_limit)
         response = StreamingResponse(
             iter([output]),
-            media_type="application/json",
+            media_type="text/csv",
         )
         response.headers["Content-Disposition"] = "attachment; filename=export.csv"
         return response
+
     file = get_rawfile(path)
-    if wide_format:
-        dataframe = pandas.read_csv(file)
-        output = stream_csv_from_data_paths(dataframe, wide_format)
-        return StreamingResponse(iter([output]), media_type="text/csv")
-    return StreamingResponse(file, media_type="text/csv")
+    dataframe = pandas.read_csv(file)
+    output = prepare_csv(dataframe, wide_format, row_limit)
+    return StreamingResponse(iter([output]), media_type="text/csv")
 
 
 @router.post("/{id}/upload/file")

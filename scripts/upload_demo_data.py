@@ -61,7 +61,7 @@ download_and_unzip(
 
 person = create_person()
 person_id = person.get("id")
-project = create_project()
+project = create_project(user_id=person_id)
 project_id = project.get("id")
 create_framework()
 

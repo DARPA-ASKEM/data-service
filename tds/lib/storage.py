@@ -2,6 +2,7 @@
 """
 import os
 import tempfile
+from typing import Optional
 from urllib.parse import urlparse
 
 import boto3
@@ -12,8 +13,8 @@ import pandas
 s3 = boto3.resource(
     "s3",
     endpoint_url=os.getenv("STORAGE_HOST"),
-    aws_access_key_id=os.getenv("S3_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("S3_SECRET_ACCESS_KEY"),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
     aws_session_token=None,
     config=boto3.session.Config(signature_version="s3v4"),
     verify=False,
@@ -105,7 +106,7 @@ def list_files(path):
     raise RuntimeError("File storage format is unknown")
 
 
-def stream_csv_from_data_paths(dataframe, wide_format=False):
+def prepare_csv(dataframe, wide_format=False, row_limit: Optional[int] = None):
     """Function to asynchronously stream parquet + csv files from
     a datapaths list
 
@@ -128,18 +129,17 @@ def stream_csv_from_data_paths(dataframe, wide_format=False):
         # Note: This links it to the previous `dataframe` so not a full copy
         copy=False,
     )
+    resulting_dataframe = dataframe
     if wide_format:
         index_cols = list(dataframe.columns)
         del index_cols[7:9]
-        dataframe_wide = pandas.pivot_table(
+        resulting_dataframe = pandas.pivot_table(
             dataframe,
             index=index_cols,
             columns="feature",
             values="value",
             aggfunc="first",
         ).reset_index()
-
-        output = dataframe_wide.to_csv(index=False)
-    else:
-        output = dataframe.to_csv(index=False)
-    return output
+    if row_limit is not None:
+        resulting_dataframe = resulting_dataframe.head(row_limit)
+    return resulting_dataframe.to_csv(index=False)

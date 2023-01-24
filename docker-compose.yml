@@ -71,3 +71,4 @@ services:
       - $PWD/data:/data
     networks:
       - data-api
+      - data-annotation-stack

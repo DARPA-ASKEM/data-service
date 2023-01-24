@@ -223,7 +223,7 @@ class SimulationRun(BaseModel):
 class ModelParameter(BaseModel):
 
     id: Optional[int] = None
-    model_id: Optional[int] = None
+    model_id: Optional[int]
     name: str
     type: ValueType
     default_value: Optional[str]
@@ -333,6 +333,7 @@ class Project(BaseModel):
     description: str
     timestamp: Optional[datetime.datetime] = datetime.datetime.now()
     active: bool
+    username: Optional[str]
 
 
 class Person(BaseModel):

@@ -448,7 +448,7 @@ ALTER TABLE public.model_framework OWNER TO dev;
 
 CREATE TABLE public.model_parameter (
     id integer NOT NULL,
-    model_id integer NOT NULL,
+    model_id integer,
     name character varying NOT NULL,
     type public.valuetype NOT NULL,
     default_value character varying,
@@ -636,7 +636,8 @@ CREATE TABLE public.project (
     name character varying NOT NULL,
     description character varying NOT NULL,
     "timestamp" timestamp without time zone DEFAULT now(),
-    active boolean NOT NULL
+    active boolean NOT NULL,
+    username character varying
 );
 
 

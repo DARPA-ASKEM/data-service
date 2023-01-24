@@ -70,7 +70,28 @@ class SearchProvenance(ProvenanceHandler):
         """
         Return all connected nodes
         """
-        return self.connected_nodes_by_direction(payload=payload, direction="all")
+        with self.graph_db.session() as session:
+
+            match_node = match_node_builder(
+                payload.get("root_type"), payload.get("root_id")
+            )
+            node_abbr = provenance_type_to_abbr[payload.get("root_type")]
+
+            query = (
+                f"{match_node} CALL apoc.path.subgraphAll({node_abbr}, "
+                + """
+                {
+                relationshipFilter: ":BEGINS_AT|CITES|COMBINED_FROM|COPIED_FROM|DECOMPOSED_FROM|DERIVED_FROM|EDITED_FROM|EQUIVALENT_OF|EXTRACTED_FROM|GENERATED_BY|GLUED_FROM|PARAMETER_OF|REINTERPRETS|STRATIFIED_FROM|USES",
+                minLevel: 1,
+                whitelistNodes: []
+                })
+                YIELD nodes, relationships
+                RETURN nodes, relationships
+                """
+            )
+            response = session.run(query)
+
+            return nodes_edges(response=response)
 
     def child_nodes(self, payload):
         """

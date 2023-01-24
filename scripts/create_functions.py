@@ -29,7 +29,7 @@ def create_person(url=url):
 #### Project ####
 
 
-def create_project(url=url):
+def create_project(user_id=1, url=url):
     path = "projects"
 
     payload = json.dumps(
@@ -38,13 +38,13 @@ def create_project(url=url):
             "description": "First project in TDS",
             "assets": {},
             "status": "active",
+            "person_id": user_id,
         }
     )
     headers = {"Content-Type": "application/json"}
 
     # return project id (p1)
     response = requests.request("POST", url + path, headers=headers, data=payload)
-
     return response.json()
 
 
