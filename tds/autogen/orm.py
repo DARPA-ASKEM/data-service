@@ -274,6 +274,18 @@ class Extraction(Base):
     img = sa.Column(sa.LargeBinary(), nullable=False)
 
 
+class Project(Base):
+
+    __tablename__ = 'project'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    name = sa.Column(sa.String(), nullable=False)
+    description = sa.Column(sa.String(), nullable=False)
+    timestamp = sa.Column(sa.DateTime(), server_default=func.now())
+    active = sa.Column(sa.Boolean(), nullable=False)
+    person_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'))
+
+
 class ProjectAsset(Base):
 
     __tablename__ = 'project_asset'
@@ -368,17 +380,6 @@ class Publication(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     xdd_uri = sa.Column(sa.String(), nullable=False)
     title = sa.Column(sa.String(), nullable=False)
-
-
-class Project(Base):
-
-    __tablename__ = 'project'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.String(), nullable=False)
-    timestamp = sa.Column(sa.DateTime(), server_default=func.now())
-    active = sa.Column(sa.Boolean(), nullable=False)
 
 
 class Person(Base):

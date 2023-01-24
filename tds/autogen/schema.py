@@ -248,6 +248,16 @@ class Extraction(BaseModel):
     img: bytes
 
 
+class Project(BaseModel):
+
+    id: Optional[int] = None
+    name: str
+    description: str
+    timestamp: Optional[datetime.datetime] = datetime.datetime.now()
+    active: bool
+    person_id: Optional[int]
+
+
 class ProjectAsset(BaseModel):
 
     id: Optional[int] = None
@@ -324,15 +334,6 @@ class Publication(BaseModel):
     id: Optional[int] = None
     xdd_uri: str
     title: str
-
-
-class Project(BaseModel):
-
-    id: Optional[int] = None
-    name: str
-    description: str
-    timestamp: Optional[datetime.datetime] = datetime.datetime.now()
-    active: bool
 
 
 class Person(BaseModel):
