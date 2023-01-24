@@ -263,6 +263,7 @@ Table project {
   description varchar [not null]
   timestamp datetime [default: `now()`]
   active bool [not null]
+  username varchar
 }
 
 Table project_asset {

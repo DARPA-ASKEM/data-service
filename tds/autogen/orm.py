@@ -379,6 +379,7 @@ class Project(Base):
     description = sa.Column(sa.String(), nullable=False)
     timestamp = sa.Column(sa.DateTime(), server_default=func.now())
     active = sa.Column(sa.Boolean(), nullable=False)
+    username = sa.Column(sa.String())
 
 
 class Person(Base):

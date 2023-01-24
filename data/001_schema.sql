@@ -636,7 +636,8 @@ CREATE TABLE public.project (
     name character varying NOT NULL,
     description character varying NOT NULL,
     "timestamp" timestamp without time zone DEFAULT now(),
-    active boolean NOT NULL
+    active boolean NOT NULL,
+    username character varying
 );
 
 

@@ -333,6 +333,7 @@ class Project(BaseModel):
     description: str
     timestamp: Optional[datetime.datetime] = datetime.datetime.now()
     active: bool
+    username: Optional[str]
 
 
 class Person(BaseModel):
