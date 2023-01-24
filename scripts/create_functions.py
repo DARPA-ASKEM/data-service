@@ -41,12 +41,10 @@ def create_project(user_id=1, url=url):
             "person_id": user_id,
         }
     )
-    print(payload)
     headers = {"Content-Type": "application/json"}
 
     # return project id (p1)
     response = requests.request("POST", url + path, headers=headers, data=payload)
-    print(response.text)
     return response.json()
 
 
