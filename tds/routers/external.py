@@ -6,11 +6,12 @@ import json
 from logging import Logger
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy import or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.db import entry_exists, request_rdb
+from tds.db import request_rdb
 from tds.operation import create, delete, retrieve
 from tds.schema.resource import Publication, Software
 
@@ -75,13 +76,16 @@ def get_publication(id: int | str, rdb: Engine = Depends(request_rdb)) -> Public
     with Session(rdb) as session:
         publications = (
             session.query(orm.Publication)
-            .filter(str(id) == orm.Publication.xdd_uri)
+            .filter(
+                or_(
+                    str(id) == orm.Publication.xdd_uri,
+                    (str(id).isdigit()) and (int(id) == orm.Publication.id),
+                )
+            )
             .all()
         )
         if len(publications) != 0:
             publication = publications[0]
-        elif isinstance(id, int) and entry_exists(rdb.connect(), orm.Publication, id):
-            publication = session.query(orm.Publication).get(id)
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return Publication.from_orm(publication)
