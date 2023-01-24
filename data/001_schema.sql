@@ -637,7 +637,7 @@ CREATE TABLE public.project (
     description character varying NOT NULL,
     "timestamp" timestamp without time zone DEFAULT now(),
     active boolean NOT NULL,
-    person_id integer
+    username character varying
 );
 
 
@@ -1417,14 +1417,6 @@ ALTER TABLE ONLY public.ontology_concept
 
 ALTER TABLE ONLY public.project_asset
     ADD CONSTRAINT project_asset_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.project(id);
-
-
---
--- Name: project project_person_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.project
-    ADD CONSTRAINT project_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id);
 
 
 --
