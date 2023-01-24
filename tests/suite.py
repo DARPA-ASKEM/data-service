@@ -76,6 +76,9 @@ class ASKEMEntityTestSuite(ABC):
                 )
                 return None, response.status_code
 
+        if response.status_code > 300:
+            return None, response.status_code
+
         return response.json(), response.status_code
 
     def teardown_method(self):

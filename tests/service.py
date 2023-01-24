@@ -509,7 +509,7 @@ class TestPublication(AETS):
         # Assert
         assert create_status_new == expected_status[AllowedMethod.POST]
         assert create_response_new["id"] != 1
-        assert create_status_not_new == 200
+        assert create_status_not_new == 409
         assert retrieve_status == expected_status[AllowedMethod.GET]
 
     def test_rest_retrieve(self):
