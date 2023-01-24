@@ -487,20 +487,29 @@ class TestPublication(AETS):
 
     def test_rest_create(self):
         # Arrange
-        payload = {
+        payload_new = {
             "title": "created_test",
+            "xdd_uri": "fake2",
+        }
+
+        payload_not_new = {
+            "title": "not_new_test",
             "xdd_uri": "fake",
         }
 
         # Act
-        create_response, create_status = self.fetch(
-            "/external/publications", AllowedMethod.POST, payload
+        create_response_new, create_status_new = self.fetch(
+            "/external/publications", AllowedMethod.POST, payload_new
+        )
+        _, create_status_not_new = self.fetch(
+            "/external/publications", AllowedMethod.POST, payload_not_new
         )
         _, retrieve_status = self.fetch("/external/publications/2")
 
         # Assert
-        assert create_status == expected_status[AllowedMethod.POST]
-        assert create_response["id"] != 1
+        assert create_status_new == expected_status[AllowedMethod.POST]
+        assert create_response_new["id"] != 1
+        assert create_status_not_new == 409
         assert retrieve_status == expected_status[AllowedMethod.GET]
 
     def test_rest_retrieve(self):
