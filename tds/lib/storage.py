@@ -79,7 +79,6 @@ def put_rawfile(path, fileobj):
     """
 
     location_info = urlparse(path)
-    print(location_info)
     if location_info.scheme.lower() == "file":
         if not os.path.isdir(os.path.dirname(location_info.path)):
             os.makedirs(os.path.dirname(location_info.path), exist_ok=True)
