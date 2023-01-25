@@ -11,7 +11,7 @@ import pandas
 
 # S3 OBJECT
 
-storage_host = os.getenv("STORAGE_HOST")
+storage_host = os.getenv("STORAGE_HOST", default="")
 if "minio" in storage_host:
     s3 = boto3.resource(
         "s3",
