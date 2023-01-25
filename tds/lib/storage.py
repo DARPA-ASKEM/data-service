@@ -10,15 +10,27 @@ import botocore
 import pandas
 
 # S3 OBJECT
-s3 = boto3.resource(
-    "s3",
-    endpoint_url=os.getenv("STORAGE_HOST"),
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    aws_session_token=None,
-    config=boto3.session.Config(signature_version="s3v4"),
-    verify=False,
-)
+
+storage_host = os.getenv("STORAGE_HOST")
+if "minio" in storage_host:
+    s3 = boto3.resource(
+        "s3",
+        endpoint_url=os.getenv("STORAGE_HOST"),
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        aws_session_token=None,
+        config=boto3.session.Config(signature_version="s3v4"),
+        verify=False,
+    )
+else:
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        aws_session_token=None,
+        config=boto3.session.Config(signature_version="s3v4"),
+        verify=False,
+    )
 
 
 def get_rawfile(path):
@@ -47,6 +59,7 @@ def get_rawfile(path):
             raw_file.seek(0)
         except botocore.exceptions.ClientError as error:
             raise FileNotFoundError() from error
+
     else:
         raise RuntimeError("File storage format is unknown")
 
@@ -66,7 +79,7 @@ def put_rawfile(path, fileobj):
     """
 
     location_info = urlparse(path)
-
+    print(location_info)
     if location_info.scheme.lower() == "file":
         if not os.path.isdir(os.path.dirname(location_info.path)):
             os.makedirs(os.path.dirname(location_info.path), exist_ok=True)
