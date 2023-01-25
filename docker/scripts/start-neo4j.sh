@@ -4,8 +4,13 @@ echo Waiting for rdb to be available
 while ! nc -z rdb 5432; do
     sleep 0.2
 done
+PG_HOST = ${PG_HOST:-rdb}
+PG_USER = ${PG_USER:-dev}
+PG_PASSWORD = ${PG_PASSWORD:-dev}
+PG_PORT = ${PG_PORT:-5432}
+PG_DB = ${PG_DB:-askem}
 echo rdb is now available. Continuing.
-psql --command="\COPY provenance TO '/var/lib/neo4j/import/provenance.csv' WITH (FORMAT CSV, HEADER);" postgresql://dev:dev@rdb:5432/askem
+psql --command="\COPY provenance TO '/var/lib/neo4j/import/provenance.csv' WITH (FORMAT CSV, HEADER);" postgresql://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DB}
 
 set -m
 /startup/docker-entrypoint.sh neo4j &
