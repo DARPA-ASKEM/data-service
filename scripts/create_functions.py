@@ -95,12 +95,10 @@ def create_publication(path, url=url, title="xdd_mapping") -> Optional[int]:
     headers = {"Content-Type": "application/json"}
 
     # return resource_id (a1)
-    try:
-        response = requests.request(
-            "POST", url + "external/publications", headers=headers, data=payload
-        )
-    except Exception as e:
-        print(e)
+    response = requests.request(
+        "POST", url + "external/publications", headers=headers, data=payload
+    )
+
     publication_json = response.json()
     publication_id = publication_json.get("id")
     return publication_id
