@@ -106,7 +106,13 @@ def create_publication(
             .all()
         )
         if len(publications) != 0:
-            return Response(status_code=status.HTTP_409_CONFLICT)
+            return Response(
+                status_code=status.HTTP_409_CONFLICT,
+                headers={
+                    "content-type": "application/json",
+                },
+                content=json.dumps({"id": publications[0].id}),
+            )
         # pylint: disable-next=unused-variable
         publication = orm.Publication(**publication_payload)
         session.add(publication)
