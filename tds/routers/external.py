@@ -107,7 +107,7 @@ def create_publication(
         )
         if len(publications) != 0:
             return Response(
-                status_code=status.HTTP_409_CONFLICT,
+                status_code=status.HTTP_208_ALREADY_REPORTED,
                 headers={
                     "content-type": "application/json",
                 },
