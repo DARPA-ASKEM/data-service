@@ -103,10 +103,7 @@ def create_publication(
         publications = (
             session.query(orm.Publication)
             .filter(
-                and_(
-                    str(publication_payload["xdd_uri"]) == orm.Publication.xdd_uri,
-                    str(publication_payload["title"]) == orm.Publication.title,
-                )
+                str(publication_payload["xdd_uri"]) == orm.Publication.xdd_uri,
             )
             .all()
         )
