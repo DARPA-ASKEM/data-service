@@ -112,7 +112,7 @@ def create_publication(
         )
 
         if len(publications) != 0:
-            publication = publications[0].__dict__
+            publication = publications[0].__dict__.copy()
             publication.pop("_sa_instance_state")
             return Response(
                 status_code=status.HTTP_201_CREATED,
