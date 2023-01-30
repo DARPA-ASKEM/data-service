@@ -6,7 +6,7 @@ import json
 from logging import Logger
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -102,16 +102,24 @@ def create_publication(
         publication_payload = payload.dict()
         publications = (
             session.query(orm.Publication)
-            .filter(orm.Publication.xdd_uri == publication_payload["xdd_uri"])
+            .filter(
+                and_(
+                    str(publication_payload["xdd_uri"]) == orm.Publication.xdd_uri,
+                    str(publication_payload["title"]) == orm.Publication.title,
+                )
+            )
             .all()
         )
+
         if len(publications) != 0:
+            publication = publications[0].__dict__
+            publication.pop("_sa_instance_state")
             return Response(
-                status_code=status.HTTP_208_ALREADY_REPORTED,
+                status_code=status.HTTP_201_CREATED,
                 headers={
                     "content-type": "application/json",
                 },
-                content=json.dumps({"id": publications[0].id}),
+                content=json.dumps(publication),
             )
         # pylint: disable-next=unused-variable
         publication = orm.Publication(**publication_payload)
