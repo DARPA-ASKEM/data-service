@@ -6,7 +6,7 @@ import json
 from logging import Logger
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from sqlalchemy import and_, or_
+from sqlalchemy import or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -112,7 +112,7 @@ def create_publication(
             publication = publications[0].__dict__.copy()
             publication.pop("_sa_instance_state")
             return Response(
-                status_code=status.HTTP_201_CREATED,
+                status_code=status.HTTP_200_OK,
                 headers={
                     "content-type": "application/json",
                 },
