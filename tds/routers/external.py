@@ -102,11 +102,22 @@ def create_publication(
         publication_payload = payload.dict()
         publications = (
             session.query(orm.Publication)
-            .filter(orm.Publication.xdd_uri == publication_payload["xdd_uri"])
+            .filter(
+                str(publication_payload["xdd_uri"]) == orm.Publication.xdd_uri,
+            )
             .all()
         )
+
         if len(publications) != 0:
-            return Response(status_code=status.HTTP_409_CONFLICT)
+            publication = publications[0].__dict__.copy()
+            publication.pop("_sa_instance_state")
+            return Response(
+                status_code=status.HTTP_200_OK,
+                headers={
+                    "content-type": "application/json",
+                },
+                content=json.dumps(publication),
+            )
         # pylint: disable-next=unused-variable
         publication = orm.Publication(**publication_payload)
         session.add(publication)

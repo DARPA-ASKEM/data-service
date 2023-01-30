@@ -38,7 +38,7 @@ def create_project(user_id=1, url=url):
             "description": "First project in TDS",
             "assets": {},
             "status": "active",
-            "person_id": user_id,
+            "username": "Adam Smith",
         }
     )
     headers = {"Content-Type": "application/json"}
@@ -98,6 +98,7 @@ def create_publication(path, url=url, title="xdd_mapping") -> Optional[int]:
     response = requests.request(
         "POST", url + "external/publications", headers=headers, data=payload
     )
+
     publication_json = response.json()
     publication_id = publication_json.get("id")
     return publication_id
