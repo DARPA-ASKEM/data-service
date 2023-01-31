@@ -140,8 +140,7 @@ class ProvenanceHandler:
 
             right_node_query = (
                 f"Merge (n: {provenance_payload.get('right_type')}"
-                + f"{{id: {provenance_payload.get('right')} , "
-                + f"concept:'.'}} )"
+                + f"{{id: {provenance_payload.get('right')} , concept:'.'}} )"
             )
 
             session.run(right_node_query)
