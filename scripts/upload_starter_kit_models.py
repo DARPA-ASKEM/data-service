@@ -53,6 +53,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             right={"id": publication_id, "resource_type": "Publication"},
             relation_type="CONTAINS",
             user_id=person_id,
+            concept=".",
         )
 
         ## intermediates ##
@@ -74,6 +75,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
             relation_type="CONTAINS",
             user_id=person_id,
+            concept=".",
         )
 
         for concept in model_concepts:
@@ -106,6 +108,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             right={"id": intermediate_grom_id, "resource_type": "Intermediate"},
             relation_type="CONTAINS",
             user_id=person_id,
+            concept=".",
         )
 
         if publication_id:
@@ -115,6 +118,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 right={"id": publication_id, "resource_type": "Publication"},
                 relation_type="EXTRACTED_FROM",
                 user_id=person_id,
+                concept=".",
             )
 
         for concept in model_concepts:
@@ -146,6 +150,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             right={"id": model_id, "resource_type": "Model"},
             relation_type="CONTAINS",
             user_id=person_id,
+            concept=".",
         )
         response = requests.request("GET", url + f"models/{model_id}")
         state_model_json = response.json()
@@ -156,6 +161,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             right={"id": intermediate_grom_id, "resource_type": "Intermediate"},
             relation_type="REINTERPRETS",
             user_id=person_id,
+            concept=".",
         )
         for concept in model_concepts:
             add_concept(concept=concept, object_id=model_id, type="models")
@@ -213,6 +219,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
             relation_type="USES",
             right={"id": state_id, "resource_type": "ModelRevision"},
             user_id=person_id,
+            concept=".",
         )
 
         ## create dataset from simulation run * backwards from how this would normally happen but we want dataset id to add to request
@@ -291,6 +298,7 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 right={"id": simulation_plan_id, "resource_type": "Plan"},
                 relation_type="CONTAINS",
                 user_id=person_id,
+                concept=".",
             )
 
             add_provenance(
@@ -298,18 +306,21 @@ def upload_starter_kit_models(person_id=1, project_id=1):
                 relation_type="GENERATED_BY",
                 right={"id": simulation_plan_id, "resource_type": "Plan"},
                 user_id=person_id,
+                concept=".",
             )
             add_provenance(
                 right={"id": simulation_run_id, "resource_type": "SimulationRun"},
                 relation_type="REINTERPRETS",
                 left={"id": dataset_id, "resource_type": "Dataset"},
                 user_id=person_id,
+                concept=".",
             )
             add_provenance(
                 left={"id": project_id, "resource_type": "Project"},
                 right={"id": simulation_run_id, "resource_type": "SimulationRun"},
                 relation_type="CONTAINS",
                 user_id=person_id,
+                concept=".",
             )
 
             ## add simulation parameters ##

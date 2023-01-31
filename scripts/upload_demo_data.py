@@ -162,6 +162,7 @@ for folder in folders:
         right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
         relation_type="REINTERPRETS",
         user_id=person_id,
+        concept=".",
     )
     for concept in model_concepts:
         add_concept(concept=concept, object_id=model_id, type="models")
@@ -218,6 +219,7 @@ for folder in folders:
         relation_type="USES",
         right={"id": state_id, "resource_type": "ModelRevision"},
         user_id=person_id,
+        concept=".",
     )
 
     ### upload simulation run datasets ####
@@ -293,12 +295,14 @@ for folder in folders:
                 relation_type="GENERATED_BY",
                 right={"id": simulation_plan_id, "resource_type": "Plan"},
                 user_id=person_id,
+                concept=".",
             )
             add_provenance(
                 right={"id": simulation_run_id, "resource_type": "SimulationRun"},
                 relation_type="REINTERPRETS",
                 left={"id": dataset_id, "resource_type": "Dataset"},
                 user_id=person_id,
+                concept=".",
             )
 
             # how to sync branches of git submodules

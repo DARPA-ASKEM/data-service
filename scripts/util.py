@@ -39,7 +39,7 @@ def asset_to_project(project_id, asset_id, asset_type, url=url):
     )
 
 
-def add_provenance(left, right, relation_type, user_id, concept="", url=url):
+def add_provenance(left, right, relation_type, user_id, concept=".", url=url):
     payload = json.dumps(
         {
             "left": left.get("id"),

@@ -131,18 +131,21 @@ class ProvenanceHandler:
             left_node_query = (
                 f"Merge (n: {provenance_payload.get('left_type')}"
                 + f"{{id: {provenance_payload.get('left')} , "
-                + f"concept:'{provenance_payload.get('concept')}'}} )"
+                + f"concept:'{provenance_payload.get('concept','.')}'}} )"
             )
 
-            session.run(left_node_query, left_id=provenance_payload.get("left"))
+            session.run(left_node_query)
 
             # if node 2 is not created yet create node
+
             right_node_query = (
                 f"Merge (n: {provenance_payload.get('right_type')}"
-                + "{ id: $right_id  ,"
-                f"concept:'{provenance_payload.get('concept')} " + "})"
+                + f"{{id: {provenance_payload.get('right')} , "
+                + f"concept:'.'}} )"
             )
-            session.run(right_node_query, right_id=provenance_payload.get("right"))
+
+            print(right_node_query)
+            session.run(right_node_query)
 
             def user_id_str(user_id):
                 if user_id is not None:
