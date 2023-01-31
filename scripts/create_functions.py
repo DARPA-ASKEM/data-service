@@ -20,9 +20,7 @@ def create_person(url=url):
         }
     )
     headers = {"Content-Type": "application/json"}
-
     response = requests.request("POST", url + path, headers=headers, data=payload)
-
     return response.json()
 
 
@@ -282,6 +280,12 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
             else:
                 type_ = str(type(parameter_value.get("value")).__name__)
                 default_value = str(parameter_value.get("value"))
+                if type_ == "dict":
+                    type_ = str(
+                        type(parameter_value.get("value", {}).get("value")).__name__
+                    )
+                    default_value = str(parameter_value.get("value", {}).get("value"))
+
             param = {
                 "model_id": model_id,
                 "name": parameter_name,
@@ -290,7 +294,6 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
                 "state_variable": True,
             }
             parameter_types.append(param)
-
     payload = json.dumps(parameter_types)
     headers = {"Content-Type": "application/json"}
     response = requests.request(
