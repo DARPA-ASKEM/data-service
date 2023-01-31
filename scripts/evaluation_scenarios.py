@@ -34,7 +34,9 @@ parser.add_argument(
 args = parser.parse_args()
 print(args)
 
-
+download_and_unzip(
+    "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"
+)
 folders = sorted(
     glob.glob("experiments*/thin-thread-examples/milestone_6month/evaluation/indra/*")
 )
