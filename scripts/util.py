@@ -14,7 +14,7 @@ def download_and_unzip(url, extract_to="."):
     zipfile.extractall(path=extract_to)
 
 
-def asset_to_project(project_id, asset_id, asset_type):
+def asset_to_project(project_id, asset_id, asset_type, url=url):
     if asset_id is None:
         print(f"Unable to create member of {asset_type}")
         return
@@ -39,7 +39,7 @@ def asset_to_project(project_id, asset_id, asset_type):
     )
 
 
-def add_provenance(left, right, relation_type, user_id, concept=None):
+def add_provenance(left, right, relation_type, user_id, concept=None, url=url):
     payload = json.dumps(
         {
             "left": left.get("id"),
@@ -73,7 +73,7 @@ resource_provenance_mapping = {
 }
 
 
-def add_concept(concept, object_id, type, user_id=1):
+def add_concept(concept, object_id, type, user_id=1, url=url):
     if object_id is None:
         print("No object id is attached to the given concept")
         return

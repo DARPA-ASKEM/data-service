@@ -53,10 +53,15 @@ for ind, scenario in scenario_tuples:
     situation = scenario.split("/")[-1]
 
     model_concepts = get_model_concepts(scenario, file="/model_mmt.json")
-    publication_id = create_publication(path=scenario + "/document_xdd_gddid.txt")
+    publication_id = create_publication(
+        path=scenario + "/document_xdd_gddid.txt", url=args.url
+    )
 
     asset_to_project(
-        project_id=1, asset_id=int(publication_id), asset_type="publications"
+        project_id=1,
+        asset_id=int(publication_id),
+        asset_type="publications",
+        url=args.url,
     )
 
     # intermediate
@@ -64,20 +69,28 @@ for ind, scenario in scenario_tuples:
         path=scenario + "/model_mmt.json",
         type="bilayer",
         source="mrepresentationa",
+        url=args.url,
     )
 
     asset_to_project(
-        project_id=1, asset_id=int(intermediate_mmt_id), asset_type="intermediates"
+        project_id=1,
+        asset_id=int(intermediate_mmt_id),
+        asset_type="intermediates",
+        url=args.url,
     )
     add_provenance(
         left={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
         right={"id": publication_id, "resource_type": "Publication"},
         relation_type="EXTRACTED_FROM",
         user_id=1,
+        url=args.url,
     )
     for concept in model_concepts:
         add_concept(
-            concept=concept, object_id=intermediate_mmt_id, type="intermediates"
+            concept=concept,
+            object_id=intermediate_mmt_id,
+            type="intermediates",
+            url=args.url,
         )
 
     model_id = create_model(
@@ -85,11 +98,14 @@ for ind, scenario in scenario_tuples:
         framework="Petri Net",
         description=f"DARPA-ASKEM Evaluation Scenario {ind}",
         name=situation,
+        url=args.url,
     )
 
-    asset_to_project(project_id=1, asset_id=int(model_id), asset_type="models")
+    asset_to_project(
+        project_id=1, asset_id=int(model_id), asset_type="models", url=args.url
+    )
 
-    response = requests.request("GET", url + f"models/{model_id}")
+    response = requests.request("GET", args.url + f"models/{model_id}")
     state_model_json = response.json()
     state_id = state_model_json.get("state_id")
 
@@ -98,10 +114,11 @@ for ind, scenario in scenario_tuples:
         right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
         relation_type="REINTERPRETS",
         user_id=1,
+        url=args.url,
     )
 
     for concept in model_concepts:
-        add_concept(concept=concept, object_id=model_id, type="models")
+        add_concept(concept=concept, object_id=model_id, type="models", url=args.url)
 
     ### upload model parameters ###
     print("Model Parameters")
@@ -110,11 +127,12 @@ for ind, scenario in scenario_tuples:
         path_parameters=f"{scenario}/model_mmt_parameters.json",
         path_initials=f"{scenario}/model_mmt_initials.json",
         model_id=model_id,
+        url=args.url,
     )
 
     # ## set concept to inital model parameters
     # get parameters
-    response = requests.request("GET", url + f"models/{model_id}/parameters")
+    response = requests.request("GET", args.url + f"models/{model_id}/parameters")
     parameters_model_json = response.json()
     with open(f"{scenario}/model_mmt_initials.json", "r") as f:
         init_params = json.load(f)
@@ -130,12 +148,14 @@ for ind, scenario in scenario_tuples:
                             concept=f"ncit:{ncit}",
                             object_id=parameter.get("id"),
                             type="model_parameters",
+                            url=args.url,
                         )
                     if ido is not None:
                         add_concept(
                             concept=f"ido:{ido}",
                             object_id=parameter.get("id"),
                             type="model_parameters",
+                            url=args.url,
                         )
 
     # model
@@ -150,10 +170,14 @@ for scenario in scenario_1:
         path=scenario + "/model_mmt.json",
         type="bilayer",
         source="mrepresentationa",
+        url=args.url,
     )
 
     asset_to_project(
-        project_id=1, asset_id=int(intermediate_mmt_id), asset_type="intermediates"
+        project_id=1,
+        asset_id=int(intermediate_mmt_id),
+        asset_type="intermediates",
+        url=args.url,
     )
     ## create model
     if situation == "sir":
@@ -166,11 +190,14 @@ for scenario in scenario_1:
         framework="Petri Net",
         description=f"DARPA-ASKEM Evaluation Scenario 1",
         name=name,
+        url=args.url,
     )
 
-    asset_to_project(project_id=1, asset_id=int(model_id), asset_type="models")
+    asset_to_project(
+        project_id=1, asset_id=int(model_id), asset_type="models", url=args.url
+    )
 
-    response = requests.request("GET", url + f"models/{model_id}")
+    response = requests.request("GET", args.url + f"models/{model_id}")
     state_model_json = response.json()
     state_id = state_model_json.get("state_id")
 
@@ -179,10 +206,11 @@ for scenario in scenario_1:
         right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
         relation_type="REINTERPRETS",
         user_id=1,
+        url=args.url,
     )
 
     for concept in model_concepts:
-        add_concept(concept=concept, object_id=model_id, type="models")
+        add_concept(concept=concept, object_id=model_id, type="models", url=args.url)
 
     ### upload model parameters ###
     print("Model Parameters")
@@ -191,11 +219,12 @@ for scenario in scenario_1:
         path_parameters=f"{scenario}/model_mmt_parameters.json",
         path_initials=f"{scenario}/model_mmt_initials.json",
         model_id=model_id,
+        url=args.url,
     )
 
     # ## set concept to inital model parameters
     # # get parameters
-    response = requests.request("GET", url + f"models/{model_id}/parameters")
+    response = requests.request("GET", args.url + f"models/{model_id}/parameters")
     parameters_model_json = response.json()
 
     with open(f"{scenario}/model_mmt_initials.json", "r") as f:
@@ -212,10 +241,12 @@ for scenario in scenario_1:
                             concept=f"ncit:{ncit}",
                             object_id=parameter.get("id"),
                             type="model_parameters",
+                            url=args.url,
                         )
                     if ido is not None:
                         add_concept(
                             concept=f"ido:{ido}",
                             object_id=parameter.get("id"),
                             type="model_parameters",
+                            url=args.url,
                         )
