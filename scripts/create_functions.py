@@ -256,7 +256,6 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
     parameter_types = []
     with open(path_parameters, "r") as f:
         parameters = json.load(f)
-        print(parameters)
         for parameter_name, parameter_value in parameters.get("parameters").items():
             if parameter_value.get("value") == None:
                 type_ = "float"
