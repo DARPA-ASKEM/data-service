@@ -28,6 +28,8 @@ for folder in folders:
         gddid = f.read()
         mapping[gddid] = get_xdd_title(gddid)
 
+# how to add an xdd id manually.
+mapping["636cbb6a74bed2df5c1bc9f7"] = get_xdd_title("636cbb6a74bed2df5c1bc9f7")
 
 with open("scripts/xdd_mapping.json", "w") as f:
     f.write(json.dumps(mapping))

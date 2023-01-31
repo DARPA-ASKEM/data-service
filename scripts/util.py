@@ -104,9 +104,9 @@ def add_concept(concept, object_id, type, user_id=1):
         )
 
 
-def get_model_concepts(folder):
+def get_model_concepts(folder, file="/model_mmt_templates.json"):
     model_concepts = []
-    with open(folder + "/model_mmt_templates.json", "r") as f:
+    with open(folder + file, "r") as f:
         mmt_template = json.load(f)
 
     for template in mmt_template.get("templates"):

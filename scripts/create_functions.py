@@ -256,6 +256,7 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
     parameter_types = []
     with open(path_parameters, "r") as f:
         parameters = json.load(f)
+        print(parameters)
         for parameter_name, parameter_value in parameters.get("parameters").items():
             if parameter_value.get("value") == None:
                 type_ = "float"
@@ -282,6 +283,12 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
             else:
                 type_ = str(type(parameter_value.get("value")).__name__)
                 default_value = str(parameter_value.get("value"))
+                if type_ == "dict":
+                    type_ = str(
+                        type(parameter_value.get("value", {}).get("value")).__name__
+                    )
+                    default_value = str(parameter_value.get("value", {}).get("value"))
+
             param = {
                 "model_id": model_id,
                 "name": parameter_name,
@@ -290,7 +297,6 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
                 "state_variable": True,
             }
             parameter_types.append(param)
-
     payload = json.dumps(parameter_types)
     headers = {"Content-Type": "application/json"}
     response = requests.request(
