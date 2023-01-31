@@ -291,7 +291,7 @@ Table provenance {
   right int [not null]
   right_type provenance_type [not null]
   user_id int [ref: > person.id]
-  concept varchar
+  concept varchar 
 }
 
 Table person {

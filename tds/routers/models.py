@@ -251,6 +251,7 @@ def update_model_parameters(
                     right_type="ModelRevision",
                     relation_type="PARAMETER_OF",
                     user_id=None,
+                    concept=".",
                 )
                 provenance_handler.create_entry(payload)
     return Response(
@@ -335,6 +336,7 @@ def create_model(
                 right_type="ModelRevision",
                 relation_type="BEGINS_AT",
                 user_id=model_payload.get("user_id", None),
+                concept=".",
             )
 
             provenance_handler.create_entry(payload)
@@ -353,6 +355,7 @@ def create_model(
                     right_type="ModelRevision",
                     relation_type="PARAMETER_OF",
                     user_id=None,
+                    concept=".",
                 )
                 provenance_handler.create_entry(payload)
 
@@ -440,6 +443,7 @@ def model_opt(
                 right_type="ModelRevision",
                 relation_type=model_opt_relationship_mapping[model_operation],
                 user_id=payload.get("user_id", None),
+                concept=".",
             )
             provenance_handler.create_entry(prov_payload)
 
@@ -452,6 +456,7 @@ def model_opt(
                     right_type="ModelRevision",
                     relation_type=model_opt_relationship_mapping[model_operation],
                     user_id=payload.get("user_id", None),
+                    concept=".",
                 )
                 provenance_handler.create_entry(prov_payload)
 
@@ -463,6 +468,7 @@ def model_opt(
                 right_type="ModelRevision",
                 relation_type="BEGINS_AT",
                 user_id=payload.get("user_id", None),
+                concept=".",
             )
             provenance_handler.create_entry(prov_payload)
 
@@ -481,6 +487,7 @@ def model_opt(
                     right_type="ModelRevision",
                     relation_type="PARAMETER_OF",
                     user_id=None,
+                    concept=".",
                 )
                 provenance_handler.create_entry(payload)
 
@@ -534,6 +541,7 @@ def update_model(
                     right_type="ModelRevision",
                     relation_type="EDITED_FROM",
                     user_id=model_payload.get("user_id", None),
+                    concept=".",
                 )
                 provenance_handler.create_entry(provenance_payload)
 

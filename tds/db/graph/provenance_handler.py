@@ -127,27 +127,23 @@ class ProvenanceHandler:
         with self.graph_db.session() as session:
 
             # if node 1 is not created yet create node
-            if provenance_payload.get("concept") is not None:
 
-                left_node_query = (
-                    f"Merge (n: {provenance_payload.get('left_type')}"
-                    + f"{{id: {provenance_payload.get('left')} , "
-                    + f"concept:'{provenance_payload.get('concept')}'}} )"
-                )
-            else:
-                left_node_query = (
-                    f"Merge (n: {provenance_payload.get('left_type')}"
-                    + f"{{id: {provenance_payload.get('left')} }} )"
-                )
+            left_node_query = (
+                f"Merge (n: {provenance_payload.get('left_type')}"
+                + f"{{id: {provenance_payload.get('left')} , "
+                + f"concept:'{provenance_payload.get('concept','.')}'}} )"
+            )
 
-            session.run(left_node_query, left_id=provenance_payload.get("left"))
+            session.run(left_node_query)
 
             # if node 2 is not created yet create node
+
             right_node_query = (
                 f"Merge (n: {provenance_payload.get('right_type')}"
-                + "{ id: $right_id } )"
+                + f"{{id: {provenance_payload.get('right')} , concept:'.'}} )"
             )
-            session.run(right_node_query, right_id=provenance_payload.get("right"))
+
+            session.run(right_node_query)
 
             def user_id_str(user_id):
                 if user_id is not None:
