@@ -294,6 +294,7 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
                 "state_variable": True,
             }
             parameter_types.append(param)
+    print(parameter_types)
     payload = json.dumps(parameter_types)
     headers = {"Content-Type": "application/json"}
     response = requests.request(
