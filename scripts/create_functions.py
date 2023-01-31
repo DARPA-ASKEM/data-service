@@ -20,9 +20,7 @@ def create_person(url=url):
         }
     )
     headers = {"Content-Type": "application/json"}
-    print(url)
     response = requests.request("POST", url + path, headers=headers, data=payload)
-    print(response.text)
     return response.json()
 
 
@@ -296,7 +294,6 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
                 "state_variable": True,
             }
             parameter_types.append(param)
-    print(parameter_types)
     payload = json.dumps(parameter_types)
     headers = {"Content-Type": "application/json"}
     response = requests.request(
