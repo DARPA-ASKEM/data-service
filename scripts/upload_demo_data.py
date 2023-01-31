@@ -114,6 +114,7 @@ for folder in folders:
         right={"id": publication_id, "resource_type": "Publication"},
         relation_type="EXTRACTED_FROM",
         user_id=person_id,
+        concept=".",
     )
     for concept in model_concepts:
         add_concept(
@@ -132,6 +133,7 @@ for folder in folders:
         right={"id": publication_id, "resource_type": "Publication"},
         relation_type="EXTRACTED_FROM",
         user_id=person_id,
+        concept=".",
     )
     for concept in model_concepts:
         add_concept(

@@ -144,7 +144,6 @@ class ProvenanceHandler:
                 + f"concept:'.'}} )"
             )
 
-            print(right_node_query)
             session.run(right_node_query)
 
             def user_id_str(user_id):
