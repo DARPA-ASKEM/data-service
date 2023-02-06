@@ -96,14 +96,19 @@ def search_provenance(
 
     ***nodes*** set to false nodes will not be returned
 
-    ***types*** will filter what nodes you want returned. *This does not work for relationship response yet just nodes.
+    ***types*** will filter what nodes you want returned.
+    *This does not work for relationship response yet just nodes.
 
-    ***hops*** can be set to limit the number of relationships away from the root node you want to search.
+    ***hops*** can be set to limit the number of relationships away from
+    the root node you want to search.
 
-    ***limit*** will limit the number of nodes returned for relationship and nodes. The closest n number of nodes will be returned.
+    ***limit*** will limit the number of nodes returned for relationship and nodes.
+      The closest n number of nodes will be returned.
 
-    ***verbose*** set to true will return model revisions in edges. Verbose set to false will squash all model revisions to the
-     Model node they are associated with along with all the relationships connected to model revisions
+    ***verbose*** set to true will return model revisions in edges. Verbose set to
+     false will squash all model revisions to the
+     Model node they are associated with along with all the relationships connected
+     to model revisions
 
 
 

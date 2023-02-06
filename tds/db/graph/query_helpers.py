@@ -137,6 +137,91 @@ def node_builder(node_type: schema.ProvenanceType = None, node_id=None):
     return f"({node_type_abbr}:{node_type}  {{id: {node_id}}}) "
 
 
+def formated_edges(relationships):
+    """
+    format edges
+    """
+    edges = []
+    for relationship in relationships:
+        try:
+            (start_label,) = relationship.__dict__.get("_start_node").__dict__.get(
+                "_labels"
+            )
+            start_id = (
+                relationship.__dict__.get("_start_node")
+                .__dict__.get("_properties")
+                .get("id")
+            )
+        except ValueError:
+            continue
+
+        try:
+            (end_label,) = relationship.__dict__.get("_end_node").__dict__.get(
+                "_labels"
+            )
+            end_id = (
+                relationship.__dict__.get("_end_node")
+                .__dict__.get("_properties")
+                .get("id")
+            )
+
+        except ValueError:
+            continue
+
+        edges.append(
+            {
+                "relationship": relationship.type,
+                "left": {"type": start_label, "id": start_id},
+                "right": {"type": end_label, "id": end_id},
+            }
+        )
+    return edges
+
+
+def filter_relationship_types(relationships, included_types):
+    """
+    remove relationship pointing from a node to itself
+    and node types not in included types
+    """
+    index_for_delete = []
+    for index, relation in enumerate(relationships):
+        if (
+            relation.get("left") == relation.get("right")
+            or relation.get("left").get("type") not in included_types
+            or relation.get("right").get("type") not in included_types
+        ):
+            index_for_delete.append(index)
+    # remove indexes
+    clipped = [i for j, i in enumerate(relationships) if j not in index_for_delete]
+    return clipped
+
+
+def parse_node(node):
+    """
+    parse a node from neo4j so we have label and id
+    """
+    (node_label,) = node.__dict__.get("_labels")
+    node_id = node.__dict__.get("_properties").get("id")
+    uuid = build_uuid(node_label.lower(), str(node_id))
+    return node_label, node_id, uuid
+
+
+def filter_node_types(nodes, included_types):
+    """
+    filter node types.
+    """
+    node_array = []
+    for node in nodes:
+        try:
+            node_label, node_id, uuid = parse_node(node)
+        except ValueError:
+            continue
+
+        if node_label in included_types:
+            node_array.append({"type": node_label, "id": node_id, "uuid": uuid})
+    return node_array
+
+
 def nodes_edges(
     response=None,
     nodes=True,
@@ -147,57 +232,19 @@ def nodes_edges(
     """
     Return connected nodes and edges
     """
-    print(types)
     prep_data = {}
     data = {}
-
     # check if response should have edges
     if edges:
-        prep_data["edges"] = []
-        for relationship in response.graph().relationships:
-            try:
-                (start_label,) = relationship.__dict__.get("_start_node").__dict__.get(
-                    "_labels"
-                )
-                start_id = (
-                    relationship.__dict__.get("_start_node")
-                    .__dict__.get("_properties")
-                    .get("id")
-                )
-            except ValueError:
-                continue
-
-            try:
-                (end_label,) = relationship.__dict__.get("_end_node").__dict__.get(
-                    "_labels"
-                )
-                end_id = (
-                    relationship.__dict__.get("_end_node")
-                    .__dict__.get("_properties")
-                    .get("id")
-                )
-
-            except ValueError:
-                continue
-
-            prep_data["edges"].append(
-                {
-                    "relationship": relationship.type,
-                    "left": {"type": start_label, "id": start_id},
-                    "right": {"type": end_label, "id": end_id},
-                }
-            )
-
-        # prepare return object
-
-        data["edges"] = prep_data["edges"]
+        prep_data["edges"] = formated_edges(response.graph().relationships)
 
         # default is verbose = False so ModelRevision will not be returned
         if not verbose:
             clipped_relations = prep_data["edges"].copy()
 
-            # loop over relationship and convert ModelRevision nodes to the appropriate Model node
-            for i, relation in enumerate(clipped_relations):
+            # loop over relationship and convert
+            # ModelRevision nodes to the appropriate Model node
+            for relation in clipped_relations:
 
                 if relation.get("relationship") == "BEGINS_AT":
                     model = relation.get("left")
@@ -208,42 +255,24 @@ def nodes_edges(
                         edges=clipped_relations,
                     )
 
-            # Where a node is relating to itself delete relationship
-
-            index_for_delete = []
-            for i, relation in enumerate(clipped_relations):
-                if relation.get("left") == relation.get("right"):
-                    index_for_delete.append(i)
-
-            clipped = [
-                i for j, i in enumerate(clipped_relations) if j not in index_for_delete
-            ]
-            data["edges"] = clipped
+            data["edges"] = filter_relationship_types(
+                clipped_relations, included_types=types
+            )
 
     # add nodes
     if nodes:
-        data["nodes"] = []
-        for node in response.graph().nodes:
-            try:
-                (node_label,) = node.__dict__.get("_labels")
-                node_id = node.__dict__.get("_properties").get("id")
-                uuid = build_uuid(node_label.lower(), str(node_id))
-
-            except ValueError:
-                continue
-
-            # filter nodes based on type
-            if node_label in types:
-
-                data["nodes"].append({"type": node_label, "id": node_id, "uuid": uuid})
-
+        data["nodes"] = filter_node_types(
+            nodes=response.graph().nodes, included_types=types
+        )
     return data
 
 
 # convert all movel revision nodes to the appropriate model node
 def modelrevisions_to_model(model, modelrevision, edges):
+    """
+    convert modelrevision to model nodes
+    """
     for edge in edges:
-
         if edge.get("right") == modelrevision:
             edge["right"] = model
             if (
