@@ -308,7 +308,7 @@ class Provenance(Base):
     right = sa.Column(sa.Integer(), nullable=False)
     right_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
     user_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'))
-    concept = sa.Column(sa.String(), nullable=False)
+    concept = sa.Column(sa.String())
 
 
 class Association(Base):
