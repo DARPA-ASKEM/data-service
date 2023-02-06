@@ -168,7 +168,7 @@ class Dataset(BaseModel):
     id: Optional[int] = None
     name: str
     url: str
-    description: str
+    description: Optional[str]
     timestamp: datetime.datetime = datetime.datetime.now()
     deprecated: Optional[bool]
     sensitivity: Optional[str]

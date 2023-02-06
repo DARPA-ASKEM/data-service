@@ -1,6 +1,8 @@
 """
 Helper functions
 """
+from typing import List
+
 from fastapi import HTTPException
 
 from tds.autogen import schema
@@ -135,54 +137,132 @@ def node_builder(node_type: schema.ProvenanceType = None, node_id=None):
     return f"({node_type_abbr}:{node_type}  {{id: {node_id}}}) "
 
 
-def nodes_edges(response=None):
+def nodes_edges(
+    response=None,
+    nodes=True,
+    edges=False,
+    verbose=False,
+    types=List[schema.ProvenanceType],
+):
     """
-    Return nodes and edges
+    Return connected nodes and edges
     """
-    data = {"edges": [], "nodes": []}
-    for relationship in response.graph().relationships:
-        try:
-            (start_label,) = relationship.__dict__.get("_start_node").__dict__.get(
-                "_labels"
-            )
-            start_id = (
-                relationship.__dict__.get("_start_node")
-                .__dict__.get("_properties")
-                .get("id")
-            )
-        except ValueError:
-            continue
+    print(types)
+    prep_data = {}
+    data = {}
 
-        try:
-            (end_label,) = relationship.__dict__.get("_end_node").__dict__.get(
-                "_labels"
+    # check if response should have edges
+    if edges:
+        prep_data["edges"] = []
+        for relationship in response.graph().relationships:
+            try:
+                (start_label,) = relationship.__dict__.get("_start_node").__dict__.get(
+                    "_labels"
+                )
+                start_id = (
+                    relationship.__dict__.get("_start_node")
+                    .__dict__.get("_properties")
+                    .get("id")
+                )
+            except ValueError:
+                continue
+
+            try:
+                (end_label,) = relationship.__dict__.get("_end_node").__dict__.get(
+                    "_labels"
+                )
+                end_id = (
+                    relationship.__dict__.get("_end_node")
+                    .__dict__.get("_properties")
+                    .get("id")
+                )
+
+            except ValueError:
+                continue
+
+            prep_data["edges"].append(
+                {
+                    "relationship": relationship.type,
+                    "left": {"type": start_label, "id": start_id},
+                    "right": {"type": end_label, "id": end_id},
+                }
             )
-            end_id = (
-                relationship.__dict__.get("_end_node")
-                .__dict__.get("_properties")
-                .get("id")
-            )
 
-        except ValueError:
-            continue
-        data["edges"].append(
-            {
-                "relationship": relationship.type,
-                "left": {"type": start_label, "id": start_id},
-                "right": {"type": end_label, "id": end_id},
-            }
-        )
+        # prepare return object
 
-    for node in response.graph().nodes:
-        try:
-            (node_label,) = node.__dict__.get("_labels")
-            node_id = node.__dict__.get("_properties").get("id")
-            uuid = build_uuid(node_label.lower(), str(node_id))
+        data["edges"] = prep_data["edges"]
 
-        except ValueError:
-            continue
-        data["nodes"].append({"type": node_label, "id": node_id, "uuid": uuid})
+        # default is verbose = False so ModelRevision will not be returned
+        if not verbose:
+            clipped_relations = prep_data["edges"].copy()
+
+            # loop over relationship and convert ModelRevision nodes to the appropriate Model node
+            for i, relation in enumerate(clipped_relations):
+
+                if relation.get("relationship") == "BEGINS_AT":
+                    model = relation.get("left")
+                    modelrevision = relation.get("right")
+                    modelrevisions_to_model(
+                        model=model,
+                        modelrevision=modelrevision,
+                        edges=clipped_relations,
+                    )
+
+            # Where a node is relating to itself delete relationship
+
+            index_for_delete = []
+            for i, relation in enumerate(clipped_relations):
+                if relation.get("left") == relation.get("right"):
+                    index_for_delete.append(i)
+
+            clipped = [
+                i for j, i in enumerate(clipped_relations) if j not in index_for_delete
+            ]
+            data["edges"] = clipped
+
+    # add nodes
+    if nodes:
+        data["nodes"] = []
+        for node in response.graph().nodes:
+            try:
+                (node_label,) = node.__dict__.get("_labels")
+                node_id = node.__dict__.get("_properties").get("id")
+                uuid = build_uuid(node_label.lower(), str(node_id))
+
+            except ValueError:
+                continue
+
+            # filter nodes based on type
+            if node_label in types:
+
+                data["nodes"].append({"type": node_label, "id": node_id, "uuid": uuid})
+
     return data
+
+
+# convert all movel revision nodes to the appropriate model node
+def modelrevisions_to_model(model, modelrevision, edges):
+    for edge in edges:
+
+        if edge.get("right") == modelrevision:
+            edge["right"] = model
+            if (
+                edge.get("left").get("type") == "ModelRevision"
+                and edge.get("relationship") == "EDITED_FROM"
+            ):
+                modelrevisions_to_model(
+                    model=model, modelrevision=edge.get("left"), edges=edges
+                )
+
+        if edge.get("left") == modelrevision:
+            edge["left"] = model
+            if (
+                edge.get("right").get("type") == "ModelRevision"
+                and edge.get("relationship") == "EDITED_FROM"
+            ):
+                modelrevisions_to_model(
+                    model=model, modelrevision=edge.get("right"), edges=edges
+                )
 
 
 def build_uuid(label, id):
