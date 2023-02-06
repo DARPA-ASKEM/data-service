@@ -5,18 +5,15 @@ Concept Schema
 # pylint: disable=missing-class-docstring, no-member, missing-function-docstring
 
 from logging import Logger
-from typing import List, Optional
+from typing import List
 
 import strawberry
 from sqlalchemy.orm import Session
 from strawberry.types import Info
 
 from tds.autogen.schema import ProvenanceType
-from tds.db import list_by_id
 from tds.db.graph.search_provenance import SearchProvenance
-from tds.graphql.dataset import Dataset, Feature, Qualifier
-from tds.graphql.enum import OntologicalField, TaggableType
-from tds.graphql.helper import sqlalchemy_type
+from tds.graphql.dataset import Dataset
 from tds.graphql.model import Intermediate, Model, ModelParameter
 from tds.graphql.project import Project
 from tds.graphql.publication import Publication
@@ -64,8 +61,6 @@ class Provenance:
 
 
 def list_nodes(info: Info, root_type: str, root_id: int) -> List[Provenance]:
-    if root_id is None or root_type is None:
-        raise
 
     search_provenance_handler = SearchProvenance(
         rdb=info.context["rdb"], graph_db=info.context["graph_db"]
