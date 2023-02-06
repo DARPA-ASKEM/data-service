@@ -92,17 +92,40 @@ def search_provenance(
     Publication, SimulationRun, Project, Concept.
 
 
+    ***edges*** set to false edges will not be returned
+
+    ***nodes*** set to false nodes will not be returned
+
+    ***types*** will filter what nodes you want returned. *This does not work for relationship response yet just nodes.
+
+    ***hops*** can be set to limit the number of relationships away from the root node you want to search.
+
+    ***limit*** will limit the number of nodes returned for relationship and nodes. The closest n number of nodes will be returned.
+
+    ***verbose*** set to true will return model revisions in edges. Verbose set to false will squash all model revisions to the
+     Model node they are associated with along with all the relationships connected to model revisions
+
+
 
         {
-
-            root_id: Optional[int],
-
-            root_type: Optional[ProvenanceType],
-
-            user_id: Optional[int],
-
-            curie: Optional[str]
-
+            "root_id": 1,
+            "root_type": "Publication",
+            "curie": "string",
+            "edges": false,
+            "nodes": true,
+            "types": [
+                "Dataset",
+                "Intermediate",
+                "Model",
+                "ModelParameter",
+                "Plan",
+                "PlanParameter",
+                "Publication",
+                "SimulationRun"
+            ],
+            "hops": 15,
+            "limit": 1000,
+            "verbose": false
         }
 
     """

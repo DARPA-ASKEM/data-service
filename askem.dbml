@@ -128,7 +128,7 @@ Table dataset {
   id int [pk]
   name varchar [not null]
   url varchar [not null]
-  description text [not null]
+  description text 
   timestamp datetime [default: `now()`, not null]
   deprecated bool
   sensitivity text
