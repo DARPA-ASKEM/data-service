@@ -276,7 +276,7 @@ class Provenance(BaseModel):
     right: int
     right_type: ProvenanceType
     user_id: Optional[int]
-    concept: str
+    concept: Optional[str]
 
 
 class Association(BaseModel):
