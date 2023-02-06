@@ -105,7 +105,7 @@ def search_provenance(
     ***limit*** will limit the number of nodes returned for relationship and nodes.
       The closest n number of nodes will be returned.
 
-    ***verbose*** set to true will return model revisions in edges. Verbose set to
+    ***versions*** set to true will return model revisions in edges. versions set to
      false will squash all model revisions to the
      Model node they are associated with along with all the relationships connected
      to model revisions
@@ -130,7 +130,7 @@ def search_provenance(
             ],
             "hops": 15,
             "limit": 1000,
-            "verbose": false
+            "versions": false
         }
 
     """

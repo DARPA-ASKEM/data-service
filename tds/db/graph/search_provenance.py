@@ -114,7 +114,7 @@ class SearchProvenance:
                 nodes=payload.get("nodes", True),
                 edges=payload.get("edges", False),
                 types=payload.get("types"),
-                verbose=payload.get("verbose"),
+                versions=payload.get("versions"),
             )
 
     def child_nodes(self, payload):

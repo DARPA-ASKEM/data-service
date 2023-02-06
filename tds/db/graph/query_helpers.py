@@ -226,7 +226,7 @@ def nodes_edges(
     response=None,
     nodes=True,
     edges=False,
-    verbose=False,
+    versions=False,
     types=List[schema.ProvenanceType],
 ):
     """
@@ -238,8 +238,8 @@ def nodes_edges(
     if edges:
         prep_data["edges"] = formated_edges(response.graph().relationships)
 
-        # default is verbose = False so ModelRevision will not be returned
-        if not verbose:
+        # default is versions = False so ModelRevision will not be returned
+        if not versions:
             clipped_relations = prep_data["edges"].copy()
 
             # loop over relationship and convert
