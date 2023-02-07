@@ -65,16 +65,10 @@ def list_nodes(
     root_type: str,
     root_id: int,
     types: Optional[List[str]] = [
-        "Model",
-        "Dataset",
-        "Intermediate",
-        "SimulationRun",
-        "Plan",
-        "Publication",
-        "PlanParameter",
-        "ModelParameter",
+        type
+        for type in ProvenanceType
+        if type not in ["Concept", "ModelRevision", "Project"]
     ],
-    hops: Optional[int] = 15,
     limit: Optional[int] = 1000,
 ) -> List[Provenance]:
 
@@ -89,7 +83,7 @@ def list_nodes(
         "edges": False,
         "nodes": True,
         "types": types,
-        "hops": hops,
+        "hops": 20,
         "limit": limit,
         "verbose": False,
     }
