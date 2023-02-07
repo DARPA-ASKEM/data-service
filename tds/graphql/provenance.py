@@ -5,7 +5,7 @@ Concept Schema
 # pylint: disable=missing-class-docstring, no-member, missing-function-docstring
 
 from logging import Logger
-from typing import List
+from typing import List, Optional
 
 import strawberry
 from sqlalchemy.orm import Session
@@ -60,7 +60,23 @@ class Provenance:
             return orm_enum_to_type[self.type].fetch_from_sql(session, self.id)
 
 
-def list_nodes(info: Info, root_type: str, root_id: int) -> List[Provenance]:
+def list_nodes(
+    info: Info,
+    root_type: str,
+    root_id: int,
+    types: Optional[List[str]] = [
+        "Model",
+        "Dataset",
+        "Intermediate",
+        "SimulationRun",
+        "Plan",
+        "Publication",
+        "PlanParameter",
+        "ModelParameter",
+    ],
+    hops: Optional[int] = 15,
+    limit: Optional[int] = 1000,
+) -> List[Provenance]:
 
     search_provenance_handler = SearchProvenance(
         rdb=info.context["rdb"], graph_db=info.context["graph_db"]
@@ -72,17 +88,9 @@ def list_nodes(info: Info, root_type: str, root_id: int) -> List[Provenance]:
         "curie": "string",
         "edges": False,
         "nodes": True,
-        "types": [
-            "Dataset",
-            "Model",
-            "ModelParameter",
-            "Plan",
-            "PlanParameter",
-            "Publication",
-            "SimulationRun",
-        ],
-        "hops": 15,
-        "limit": 1000,
+        "types": types,
+        "hops": hops,
+        "limit": limit,
         "verbose": False,
     }
     results = search_function(payload=payload)
