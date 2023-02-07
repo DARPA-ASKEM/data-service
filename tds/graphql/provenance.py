@@ -60,6 +60,7 @@ class Provenance:
             return orm_enum_to_type[self.type].fetch_from_sql(session, self.id)
 
 
+# pylint: disable=too-many-arguments
 def list_nodes(
     info: Info,
     root_type: str,
@@ -69,6 +70,7 @@ def list_nodes(
         for type in ProvenanceType
         if type not in ["Concept", "ModelRevision", "Project"]
     ],
+    hops: Optional[int] = 15,
     limit: Optional[int] = 1000,
 ) -> List[Provenance]:
 
@@ -83,7 +85,7 @@ def list_nodes(
         "edges": False,
         "nodes": True,
         "types": types,
-        "hops": 20,
+        "hops": hops,
         "limit": limit,
         "verbose": False,
     }
