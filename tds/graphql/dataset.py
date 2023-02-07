@@ -48,7 +48,7 @@ class DatasetSchema(schema.Dataset):
 class Qualifier:
     id: strawberry.auto
     dataset_id: strawberry.auto
-    description: strawberry.auto
+    description: Optional[str]
     name: strawberry.auto
     value_type: ValueType
 
@@ -64,7 +64,7 @@ class Qualifier:
 class Feature:
     id: strawberry.auto
     dataset_id: strawberry.auto
-    description: strawberry.auto
+    description: Optional[str]
     display_name: strawberry.auto
     name: strawberry.auto
     value_type: ValueType
@@ -94,7 +94,7 @@ class Dataset:
     id: strawberry.auto
     name: strawberry.auto
     url: strawberry.auto
-    description: strawberry.auto
+    description: Optional[str]
     timestamp: strawberry.auto
     deprecated: strawberry.auto
     sensitivity: strawberry.auto
