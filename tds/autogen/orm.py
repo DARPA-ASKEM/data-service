@@ -180,7 +180,7 @@ class Dataset(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     name = sa.Column(sa.String(), nullable=False)
     url = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.Text())
+    description = sa.Column(sa.Text(), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     deprecated = sa.Column(sa.Boolean())
     sensitivity = sa.Column(sa.Text())
