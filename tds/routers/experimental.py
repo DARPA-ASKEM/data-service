@@ -22,7 +22,7 @@ valid_relations = return_graph_validations()
 
 DB_DESC = "Valid relations include:\n"
 # NOTE: Should we make these sentences more natural language related?
-for relation, mapping in valid_relations.items():
+for relation, mapping in valid_relations.get("relations").items():
     for (dom, codom) in mapping:
         DB_DESC += f"{dom}-[relation]->{codom}\n"
 

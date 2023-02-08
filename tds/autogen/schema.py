@@ -14,56 +14,6 @@ class ResourceType(str, Enum):
     simulation_runs = 'simulation_runs'
     
 
-class ProvenanceType(str, Enum):
-
-    Concept = 'Concept'
-    Dataset = 'Dataset'
-    Intermediate = 'Intermediate'
-    Model = 'Model'
-    ModelParameter = 'ModelParameter'
-    ModelRevision = 'ModelRevision'
-    Plan = 'Plan'
-    PlanParameter = 'PlanParameter'
-    Project = 'Project'
-    Publication = 'Publication'
-    SimulationRun = 'SimulationRun'
-    
-
-class ProvenanceSearchTypes(str, Enum):
-
-    artifacts_created_by_user = 'artifacts_created_by_user'
-    child_nodes = 'child_nodes'
-    concept = 'concept'
-    concept_counts = 'concept_counts'
-    connected_nodes = 'connected_nodes'
-    derived_models = 'derived_models'
-    model_to_primitive = 'model_to_primitive'
-    parent_model_revisions = 'parent_model_revisions'
-    parent_models = 'parent_models'
-    parent_nodes = 'parent_nodes'
-    
-
-class RelationType(str, Enum):
-
-    BEGINS_AT = 'BEGINS_AT'
-    CITES = 'CITES'
-    COMBINED_FROM = 'COMBINED_FROM'
-    CONTAINS = 'CONTAINS'
-    COPIED_FROM = 'COPIED_FROM'
-    DECOMPOSED_FROM = 'DECOMPOSED_FROM'
-    DERIVED_FROM = 'DERIVED_FROM'
-    EDITED_FROM = 'EDITED_FROM'
-    EQUIVALENT_OF = 'EQUIVALENT_OF'
-    EXTRACTED_FROM = 'EXTRACTED_FROM'
-    GENERATED_BY = 'GENERATED_BY'
-    GLUED_FROM = 'GLUED_FROM'
-    IS_CONCEPT_OF = 'IS_CONCEPT_OF'
-    PARAMETER_OF = 'PARAMETER_OF'
-    REINTERPRETS = 'REINTERPRETS'
-    STRATIFIED_FROM = 'STRATIFIED_FROM'
-    USES = 'USES'
-    
-
 class ModelOperations(str, Enum):
 
     copy = 'copy'
@@ -270,11 +220,11 @@ class Provenance(BaseModel):
 
     id: Optional[int] = None
     timestamp: datetime.datetime = datetime.datetime.now()
-    relation_type: RelationType
+    relation_type: str
     left: int
-    left_type: ProvenanceType
+    left_type: str
     right: int
-    right_type: ProvenanceType
+    right_type: str
     user_id: Optional[int]
     concept: Optional[str]
 

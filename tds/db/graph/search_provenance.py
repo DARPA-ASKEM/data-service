@@ -49,7 +49,9 @@ class SearchProvenance:
 
             response = session.run(query)
             results = list(response.data())
-            return results[0]["Pu"]
+            if len(results) > 0:
+                return results[0]["Pu"]
+            return None
 
     def connected_nodes_by_direction(self, payload, direction):
         """
@@ -95,6 +97,7 @@ class SearchProvenance:
             match_node = match_node_builder(
                 payload.get("root_type"), payload.get("root_id")
             )
+
             node_abbr = provenance_type_to_abbr[payload.get("root_type")]
 
             def set_max_level(hops):
@@ -105,15 +108,14 @@ class SearchProvenance:
             def set_limit_level(limit):
                 return f"limit: {limit} "
 
+            relationships_str = relationships_array_as_str(
+                exclude=["CONTAINS", "IS_CONCEPT_OF"]
+            )
             query = (
                 f"{match_node} CALL apoc.path.subgraphAll({node_abbr}, "
-                + """
-                {
-                relationshipFilter: ":BEGINS_AT|CITES|COMBINED_FROM|
-                COPIED_FROM|DECOMPOSED_FROM|DERIVED_FROM|EDITED_FROM|EQUIVALENT_OF|
-                EXTRACTED_FROM|GENERATED_BY|GLUED_FROM|PARAMETER_OF|REINTERPRETS|STRATIFIED_FROM|USES",
-                minLevel: 0,
-                """
+                + "{"
+                + f'relationshipFilter: "{relationships_str}",'
+                + "minLevel: 0, "
                 + f"{set_limit_level(payload.get('limit',-1))}, "
                 f"{set_max_level(payload.get('hops',None))}"
                 + """
@@ -125,7 +127,6 @@ class SearchProvenance:
             )
             print(query)
             response = session.run(query)
-
             return nodes_edges(
                 response=response,
                 nodes=payload.get("nodes", True),
@@ -271,9 +272,7 @@ class SearchProvenance:
             relationships_str = relationships_array_as_str(
                 exclude=["CONTAINS", "IS_CONCEPT_OF"]
             )
-            match_node = match_node_builder(
-                node_type=schema.ProvenanceType.Intermediate
-            )
+            match_node = match_node_builder(node_type="Intermediate")
 
             query = (
                 f"{match_node}<-[r:{relationships_str} *1..]-"

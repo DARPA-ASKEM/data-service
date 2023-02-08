@@ -19,6 +19,38 @@ def return_graph_validations():
     return validation
 
 
+def return_graph_types():
+    """
+    return node types
+    """
+    validation = return_graph_validations()
+    types = []
+    for nodes in validation.get("relations").values():
+        for node_pair in nodes:
+            if (node_pair[0], node_pair[0]) not in types:
+                types.append((node_pair[0], node_pair[0]))
+            if (node_pair[1], node_pair[1]) not in types:
+                types.append((node_pair[1], node_pair[1]))
+    return types
+
+
+def return_graph_relations():
+    """
+    return relations
+    """
+    validation = return_graph_validations()
+    relations = []
+    for relation in validation.get("relations").keys():
+        if relation not in relations:
+            relations.append(relation)
+    return relations
+
+
+def graph_appreviations():
+    validation = return_graph_validations()
+    return validation.get("node_abbreviations")
+
+
 def validate_relationship(left, right, relation_type):
     """
     validate a relationship for provenance

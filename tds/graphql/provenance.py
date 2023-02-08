@@ -11,27 +11,26 @@ import strawberry
 from sqlalchemy.orm import Session
 from strawberry.types import Info
 
-from tds.autogen.schema import ProvenanceType
 from tds.db.graph.search_provenance import SearchProvenance
 from tds.graphql.dataset import Dataset
 from tds.graphql.model import Intermediate, Model, ModelParameter
 from tds.graphql.project import Project
 from tds.graphql.publication import Publication
 from tds.graphql.simulation import Plan, Run, RunParameter
-from tds.schema.provenance import NodeSchema
+from tds.schema.provenance import NodeSchema, return_graph_types
 
 logger = Logger(__name__)
 
 orm_enum_to_type = {
-    ProvenanceType.Plan: Plan,
-    ProvenanceType.Model: Model,
-    ProvenanceType.SimulationRun: Run,
-    ProvenanceType.Dataset: Dataset,
-    ProvenanceType.Intermediate: Intermediate,
-    ProvenanceType.Publication: Publication,
-    ProvenanceType.Project: Project,
-    ProvenanceType.PlanParameter: RunParameter,
-    ProvenanceType.ModelParameter: ModelParameter,
+    "Plan": Plan,
+    "Model": Model,
+    "SimulationRun": Run,
+    "Dataset": Dataset,
+    "Intermediate": Intermediate,
+    "Publication": Publication,
+    "Project": Project,
+    "PlanParameter": RunParameter,
+    "ModelParameter": ModelParameter,
 }
 
 Object = (
@@ -67,7 +66,7 @@ def list_nodes(
     root_id: int,
     types: Optional[List[str]] = [
         type
-        for type in ProvenanceType
+        for type in return_graph_types()
         if type not in ["Concept", "ModelRevision", "Project"]
     ],
     hops: Optional[int] = 15,

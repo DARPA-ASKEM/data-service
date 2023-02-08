@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from tds.autogen import orm, schema
 from tds.db import ProvenanceHandler, SearchProvenance, request_graph_db, request_rdb
 from tds.operation import create, delete, retrieve
-from tds.schema.provenance import Provenance, ProvenancePayload
+from tds.schema.provenance import Provenance, ProvenancePayload, ProvenanceSearchTypes
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -32,8 +32,8 @@ def get_provenance(id: int, rdb: Engine = Depends(request_rdb)):
 @router.post("/search")
 def search_provenance(
     payload: ProvenancePayload,
-    search_type: schema.ProvenanceSearchTypes = Query(
-        default=schema.ProvenanceSearchTypes.connected_nodes
+    search_type: ProvenanceSearchTypes = Query(
+        default=ProvenanceSearchTypes.connected_nodes
     ),
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
@@ -135,6 +135,7 @@ def search_provenance(
     """
     logger.info("Search provenance")
     payload = payload.__dict__
+    print(payload)
     search_provenance_handler = SearchProvenance(rdb=rdb, graph_db=graph_db)
     search_function = search_provenance_handler[search_type]
     results = search_function(payload=payload)

@@ -6,135 +6,7 @@ from typing import List
 from fastapi import HTTPException
 
 from tds.autogen import schema
-from tds.schema.provenance import provenance_type_to_abbr
-
-
-def dynamic_relationship_direction(direction, relationship_type):
-    """
-    return direction of relationship based on direction type.
-    allow for different relationship types
-    """
-    if direction == "all":
-        return f"-[{relationship_type}]-"
-    if direction == "child":
-        return f"<-[{relationship_type}]-"
-    if direction == "parent":
-        return f"-[{relationship_type}]->"
-    raise HTTPException(
-        status_code=400, detail="Relationship direction is not allowed."
-    )
-
-
-def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
-    """
-    return all models, model revisions
-    (sometimes intermediates) that were derived from a publication or intermediate
-    """
-    if root_type == "Publication":
-        return f"""
-            Match(Pu:Publication {{id:{root_id}}})
-            <-[r:EXTRACTED_FROM]-(In:Intermediate) 
-            Optional Match (In)<-[r2:REINTERPRETS *1..]-(Mr:ModelRevision) 
-            Optional Match(Mr)
-            -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
-            (Mr2:ModelRevision) 
-            with *,collect(r)+collect(r2)+collect(r3) as r4, 
-            collect(Mr)+collect(Mr2) as ms 
-            unwind ms as mss 
-            unwind r4 as r5 
-            Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) 
-            with *, collect(r5)+collect(r6) as r7 
-            unwind r7 as r8 
-            return Pu, In, ms,Md, r8
-            """
-    if root_type == "Intermediate":
-        return f"""
-            Match (In:Intermediate {{id:{root_id}}})<-[r2:REINTERPRETS *1..]
-            -(Mr:ModelRevision) 
-            Optional Match(Mr)
-            -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
-            (Mr2:ModelRevision) 
-            with *,collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms 
-            unwind ms as mss 
-            unwind r4 as r5 
-            Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) 
-            with *, collect(r5)+collect(r6) as r7 
-            unwind r7 as r8 
-            return  In, ms,Md, r8
-            """
-    raise HTTPException(
-        status_code=400, detail=f"Models can not be derived from this type: {root_type}"
-    )
-
-
-def parent_model_query_generator(root_type: schema.ProvenanceType, root_id):
-    """
-    Return match query to ModelRevision depending on root_type
-    """
-    match_node = match_node_builder(node_type=root_type, node_id=root_id)
-    relationships_str = relationships_array_as_str(
-        exclude=["CONTAINS", "IS_CONCEPT_OF"]
-    )
-    model_revision_node = node_builder(node_type=schema.ProvenanceType.ModelRevision)
-    query_templates_index = {
-        schema.ProvenanceType.Model: f"-[r:BEGINS_AT]->{model_revision_node} ",
-        schema.ProvenanceType.Plan: f"-[r:USES]->{model_revision_node} ",
-        schema.ProvenanceType.SimulationRun: ""
-        + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
-        schema.ProvenanceType.Dataset: ""
-        + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
-    }
-    return match_node + query_templates_index[root_type]
-
-
-def match_node_builder(node_type: schema.ProvenanceType = None, node_id=None):
-    """
-    return node with match statement
-    """
-    if node_type is None:
-        return "Match(n) "
-    node_type_character = return_node_abbr(node_type)
-    if node_id is None:
-        return f"Match ({node_type_character}:{node_type})"
-    return f"Match ({node_type_character}:{node_type}  {{id: {node_id}}}) "
-
-
-def return_node_abbr(root_type: schema.ProvenanceType):
-    """
-    Return node type abbr
-    """
-    return provenance_type_to_abbr[root_type]
-
-
-def relationships_array_as_str(exclude=None, include=None):
-    """
-    Return relationships as pipe string
-    """
-    relationship_str = ""
-    if exclude is not None:
-        for type_ in schema.RelationType:
-            value = type_.value
-            if value in exclude:
-                continue
-            relationship_str += value + "|"
-        return relationship_str[:-1]
-    for type_ in schema.RelationType:
-        value = type_.value
-        if value in include:
-            relationship_str += value + "|"
-    return relationship_str[:-1]
-
-
-def node_builder(node_type: schema.ProvenanceType = None, node_id=None):
-    """
-    Return node
-    """
-    if node_type is None:
-        return "(n) "
-    node_type_abbr = return_node_abbr(node_type)
-    if node_id is None:
-        return f" ({node_type_abbr}:{node_type})"
-    return f"({node_type_abbr}:{node_type}  {{id: {node_id}}}) "
+from tds.schema.provenance import provenance_type_to_abbr, return_graph_relations
 
 
 def formated_edges(relationships):
@@ -184,7 +56,9 @@ def filter_relationship_types(relationships, included_types):
     and node types not in included types
     """
     index_for_delete = []
+    print(included_types)
     for index, relation in enumerate(relationships):
+        print(relation)
         if (
             relation.get("left") == relation.get("right")
             or relation.get("left").get("type") not in included_types
@@ -216,7 +90,8 @@ def filter_node_types(nodes, included_types):
             node_label, node_id, uuid = parse_node(node)
         except ValueError:
             continue
-
+        print(included_types)
+        print(node_label)
         if node_label in included_types:
             node_array.append({"type": node_label, "id": node_id, "uuid": uuid})
     return node_array
@@ -227,7 +102,7 @@ def nodes_edges(
     nodes=True,
     edges=False,
     versions=False,
-    types=List[schema.ProvenanceType],
+    types=List[str],
 ):
     """
     Return connected nodes and edges
@@ -237,7 +112,7 @@ def nodes_edges(
     # check if response should have edges
     if edges:
         prep_data["edges"] = formated_edges(response.graph().relationships)
-
+        print(prep_data)
         # default is versions = False so ModelRevision will not be returned
         if not versions:
             clipped_relations = prep_data["edges"].copy()
@@ -256,14 +131,16 @@ def nodes_edges(
                     )
 
             data["edges"] = filter_relationship_types(
-                clipped_relations, included_types=types
+                clipped_relations, included_types=[type for type in types]
             )
 
     # add nodes
     if nodes:
+
         data["nodes"] = filter_node_types(
-            nodes=response.graph().nodes, included_types=types
+            nodes=response.graph().nodes, included_types=[type for type in types]
         )
+        print(data)
     return data
 
 
@@ -313,3 +190,130 @@ def build_uuid(label, id):
     if label == "modelrevisions":
         path = None
     return path
+
+
+def dynamic_relationship_direction(direction, relationship_type):
+    """
+    return direction of relationship based on direction type.
+    allow for different relationship types
+    """
+    if direction == "all":
+        return f"-[{relationship_type}]-"
+    if direction == "child":
+        return f"<-[{relationship_type}]-"
+    if direction == "parent":
+        return f"-[{relationship_type}]->"
+    raise HTTPException(
+        status_code=400, detail="Relationship direction is not allowed."
+    )
+
+
+def derived_models_query_generater(root_type: str, root_id):
+    """
+    return all models, model revisions
+    (sometimes intermediates) that were derived from a publication or intermediate
+    """
+    if root_type == "Publication":
+        return f"""
+            Match(Pu:Publication {{id:{root_id}}})
+            <-[r:EXTRACTED_FROM]-(In:Intermediate) 
+            Optional Match (In)<-[r2:REINTERPRETS *1..]-(Mr:ModelRevision) 
+            Optional Match(Mr)
+            -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
+            (Mr2:ModelRevision) 
+            with *,collect(r)+collect(r2)+collect(r3) as r4, 
+            collect(Mr)+collect(Mr2) as ms 
+            unwind ms as mss 
+            unwind r4 as r5 
+            Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) 
+            with *, collect(r5)+collect(r6) as r7 
+            unwind r7 as r8 
+            return Pu, In, ms,Md, r8
+            """
+    if root_type == "Intermediate":
+        return f"""
+            Match (In:Intermediate {{id:{root_id}}})<-[r2:REINTERPRETS *1..]
+            -(Mr:ModelRevision) 
+            Optional Match(Mr)
+            -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
+            (Mr2:ModelRevision) 
+            with *,collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms 
+            unwind ms as mss 
+            unwind r4 as r5 
+            Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) 
+            with *, collect(r5)+collect(r6) as r7 
+            unwind r7 as r8 
+            return  In, ms,Md, r8
+            """
+    raise HTTPException(
+        status_code=400, detail=f"Models can not be derived from this type: {root_type}"
+    )
+
+
+def parent_model_query_generator(root_type: str, root_id):
+    """
+    Return match query to ModelRevision depending on root_type
+    """
+    match_node = match_node_builder(node_type=root_type, node_id=root_id)
+    relationships_str = relationships_array_as_str(
+        exclude=["CONTAINS", "IS_CONCEPT_OF"]
+    )
+    model_revision_node = node_builder(node_type="Model")
+    query_templates_index = {
+        "Model": f"-[r:BEGINS_AT]->{model_revision_node} ",
+        "Plan": f"-[r:USES]->{model_revision_node} ",
+        "SimulationRun": "" + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
+        "Dataset": "" + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
+    }
+    return match_node + query_templates_index[root_type]
+
+
+def match_node_builder(node_type: str = None, node_id=None):
+    """
+    return node with match statement
+    """
+    if node_type is None:
+        return "Match(n) "
+    node_type_character = return_node_abbr(node_type)
+    if node_id is None:
+        return f"Match ({node_type_character}:{node_type})"
+    return f"Match ({node_type_character}:{node_type}  {{id: {node_id}}}) "
+
+
+def return_node_abbr(root_type: str):
+    """
+    Return node type abbr
+    """
+    return provenance_type_to_abbr[root_type]
+
+
+def relationships_array_as_str(exclude=None, include=None):
+    """
+    Return relationships as pipe string
+    """
+    relationship_str = ""
+    relations = return_graph_relations()
+    if exclude is not None:
+        for type_ in relations:
+            value = type_
+            if value in exclude:
+                continue
+            relationship_str += value + "|"
+        return relationship_str[:-1]
+    for type_ in relations:
+        value = type_
+        if value in include:
+            relationship_str += value + "|"
+    return relationship_str[:-1]
+
+
+def node_builder(node_type: str, node_id=None):
+    """
+    Return node
+    """
+    if node_type is None:
+        return "(n) "
+    node_type_abbr = return_node_abbr(node_type)
+    if node_id is None:
+        return f" ({node_type_abbr}:{node_type})"
+    return f"({node_type_abbr}:{node_type}  {{id: {node_id}}}) "

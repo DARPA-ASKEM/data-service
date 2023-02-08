@@ -12,54 +12,6 @@ Enum public.resource_type {
    simulation_runs
 }
 
-Enum public.provenance_type {
-   Dataset
-   Model
-   ModelParameter
-   Plan
-   PlanParameter
-   ModelRevision
-   Intermediate
-   Publication
-   SimulationRun
-   Project
-   Concept
-}
-
-
-Enum provenance_search_types{
-  connected_nodes
-  child_nodes
-  parent_nodes
-  derived_models
-  parent_model_revisions
-  parent_models
-  model_to_primitive
-  artifacts_created_by_user
-  concept
-  concept_counts
-}
-
-Enum relation_type {
-  DERIVED_FROM
-  COPIED_FROM
-  CITES
-  COMBINED_FROM
-  EDITED_FROM
-  USES
-  EQUIVALENT_OF
-  EXTRACTED_FROM
-  REINTERPRETS
-  GENERATED_BY
-  BEGINS_AT
-  DECOMPOSED_FROM
-  GLUED_FROM
-  STRATIFIED_FROM
-  CONTAINS
-  IS_CONCEPT_OF
-  PARAMETER_OF
-}
-
 Enum model_operations{
   copy
   stratify
@@ -285,11 +237,11 @@ Table ontology_concept {
 Table provenance {
   id int [pk]
   timestamp datetime [default: `now()`, not null]
-  relation_type relation_type [not null]
+  relation_type str [not null]
   left int [not null]
-  left_type provenance_type [not null]
+  left_type str [not null]
   right int [not null]
-  right_type provenance_type [not null]
+  right_type str [not null]
   user_id int [ref: > person.id]
   concept varchar 
 }
