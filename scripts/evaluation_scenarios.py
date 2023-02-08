@@ -112,7 +112,7 @@ for ind, scenario in scenario_tuples:
     state_id = state_model_json.get("state_id")
 
     add_provenance(
-        left={"id": state_id, "resource_type": "ModelRevision"},
+        left={"id": model_id, "resource_type": "Model"},
         right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
         relation_type="REINTERPRETS",
         user_id=1,
@@ -204,7 +204,7 @@ for scenario in scenario_1:
     state_id = state_model_json.get("state_id")
 
     add_provenance(
-        left={"id": state_id, "resource_type": "ModelRevision"},
+        left={"id": model_id, "resource_type": "Model"},
         right={"id": intermediate_mmt_id, "resource_type": "Intermediate"},
         relation_type="REINTERPRETS",
         user_id=1,

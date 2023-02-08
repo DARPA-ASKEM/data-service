@@ -36,6 +36,17 @@ class SearchProvenance:
     def __getitem__(self, key):
         return self.__getattribute__(key)
 
+    def model_publication(self, payload):
+        """
+        find publication that was extracted to create model
+        """
+        with self.graph_db.session() as session:
+            query = f"Match (Md:Model {{id:{payload.get('root_id')}}})<-[r:REINTERPRETS|EXTRACTED_FROM|BEGINS_AT *1..]->(Pu:Publication) return Pu"
+
+            response = session.run(query)
+            results = [record for record in response.data()]
+            return results[0]["Pu"]
+
     def connected_nodes_by_direction(self, payload, direction):
         """
         Connect nodes
