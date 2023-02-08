@@ -41,10 +41,14 @@ class SearchProvenance:
         find publication that was extracted to create model
         """
         with self.graph_db.session() as session:
-            query = f"Match (Md:Model {{id:{payload.get('root_id')}}})<-[r:REINTERPRETS|EXTRACTED_FROM|BEGINS_AT *1..]->(Pu:Publication) return Pu"
+            query = (
+                f"Match (Md:Model {{id:{payload.get('root_id')}}})"
+                "<-[r:REINTERPRETS|EXTRACTED_FROM|BEGINS_AT *1..]->"
+                "(Pu:Publication) return Pu"
+            )
 
             response = session.run(query)
-            results = [record for record in response.data()]
+            results = list(response.data())
             return results[0]["Pu"]
 
     def connected_nodes_by_direction(self, payload, direction):
@@ -105,7 +109,9 @@ class SearchProvenance:
                 f"{match_node} CALL apoc.path.subgraphAll({node_abbr}, "
                 + """
                 {
-                relationshipFilter: ":BEGINS_AT|CITES|COMBINED_FROM|COPIED_FROM|DECOMPOSED_FROM|DERIVED_FROM|EDITED_FROM|EQUIVALENT_OF|EXTRACTED_FROM|GENERATED_BY|GLUED_FROM|PARAMETER_OF|REINTERPRETS|STRATIFIED_FROM|USES",
+                relationshipFilter: ":BEGINS_AT|CITES|COMBINED_FROM|
+                COPIED_FROM|DECOMPOSED_FROM|DERIVED_FROM|EDITED_FROM|EQUIVALENT_OF|
+                EXTRACTED_FROM|GENERATED_BY|GLUED_FROM|PARAMETER_OF|REINTERPRETS|STRATIFIED_FROM|USES",
                 minLevel: 0,
                 """
                 + f"{set_limit_level(payload.get('limit',-1))}, "
