@@ -100,16 +100,18 @@ class Model:
         return list_parameters(self.id, info)
 
     @strawberry.field
-    def publication(self, info: Info) -> Publication:
+    def publication(self, info: Info) -> Optional[Publication]:
         search_provenance_handler = SearchProvenance(
             rdb=info.context["rdb"], graph_db=info.context["graph_db"]
         )
         search_function = search_provenance_handler["model_publication"]
         payload = {"root_id": self.id, "root_type": "Model"}
         result = search_function(payload=payload)
-        with Session(info.context["rdb"]) as session:
-            publication = session.query(orm.Publication).get(result.get("id"))
-            return Publication.from_orm(publication)
+        print(result)
+        if result:
+            with Session(info.context["rdb"]) as session:
+                publication = session.query(orm.Publication).get(result.get("id"))
+                return Publication.from_orm(publication)
 
     @staticmethod
     def from_pydantic(instance: ModelDescription) -> "Model":

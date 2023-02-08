@@ -49,6 +49,8 @@ class SearchProvenance:
 
             response = session.run(query)
             results = list(response.data())
+            if len(results) == 0:
+                return None
             return results[0]["Pu"]
 
     def connected_nodes_by_direction(self, payload, direction):
@@ -105,15 +107,14 @@ class SearchProvenance:
             def set_limit_level(limit):
                 return f"limit: {limit} "
 
+            relationships_str = relationships_array_as_str(
+                exclude=["CONTAINS", "IS_CONCEPT_OF"]
+            )
             query = (
                 f"{match_node} CALL apoc.path.subgraphAll({node_abbr}, "
-                + """
-                {
-                relationshipFilter: ":BEGINS_AT|CITES|COMBINED_FROM|
-                COPIED_FROM|DECOMPOSED_FROM|DERIVED_FROM|EDITED_FROM|EQUIVALENT_OF|
-                EXTRACTED_FROM|GENERATED_BY|GLUED_FROM|PARAMETER_OF|REINTERPRETS|STRATIFIED_FROM|USES",
-                minLevel: 0,
-                """
+                + "{"
+                + f'relationshipFilter: "{relationships_str}",'
+                + "minLevel: 0, "
                 + f"{set_limit_level(payload.get('limit',-1))}, "
                 f"{set_max_level(payload.get('hops',None))}"
                 + """
