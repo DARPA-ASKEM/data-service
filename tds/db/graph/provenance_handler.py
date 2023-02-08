@@ -4,14 +4,14 @@ Handler for object relations
 
 from typing import Optional
 
+from fastapi import HTTPException
 from neo4j import Driver
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.autogen.schema import RelationType
+from tds.db.helpers import validate_relationship
 from tds.schema.provenance import Provenance
-from tds.schema.resource import Resource, get_resource_type
 
 
 class ProvenanceHandler:
@@ -34,49 +34,58 @@ class ProvenanceHandler:
         """
         Draws a relation between two resources
         """
+        # validate entry
+        entry_dict = entry.dict()
+        if not validate_relationship(
+            left=entry_dict.get("left_type"),
+            right=entry_dict.get("right_type"),
+            relation_type=entry_dict.get("relation_type"),
+        ):
+            raise HTTPException(status_code=400, detail="Relationship not supported")
+
         with Session(self.__connection__) as session:
-            provenance = orm.Provenance(**entry.dict())
+            provenance = orm.Provenance(**entry_dict)
             session.add(provenance)
             session.commit()
             id: int = provenance.id
 
         if self.cache_enabled():
-            self.create_node_relationship(entry.dict())
+            self.create_node_relationship(entry_dict)
 
         return id
 
-    def create(self, left: Resource, right: Resource, label: RelationType) -> int:
-        """
-        Draws a relation between two resources
-        """
-        left_type = get_resource_type(left)
-        right_type = get_resource_type(right)
-        if left_type is not None and right_type is not None:
-            entry = Provenance(
-                left=left.id,
-                left_type=left_type,
-                right=right.id,
-                right_type=right_type,
-                relation_type=label,
-                user_id=None,
-            )
-            id = self.create_entry(entry)
+    # def create(self, left: Resource, right: Resource, label: RelationType) -> int:
+    #     """
+    #     Draws a relation between two resources
+    #     """
+    #     left_type = get_resource_type(left)
+    #     right_type = get_resource_type(right)
+    #     if left_type is not None and right_type is not None:
+    #         entry = Provenance(
+    #             left=left.id,
+    #             left_type=left_type,
+    #             right=right.id,
+    #             right_type=right_type,
+    #             relation_type=label,
+    #             user_id=None,
+    #         )
+    #         id = self.create_entry(entry)
 
-            return id
-        raise Exception("Invalid object in relation")
+    #         return id
+    #     raise Exception("Invalid object in relation")
 
-    def retrieve(self, id: int) -> Optional[Provenance]:
-        """
-        Retrieves a relation between two resources
-        """
-        with Session(self.__connection__) as session:
-            if (
-                session.query(orm.Provenance).filter(orm.Provenance.id == id).count()
-                == 1
-            ):
-                provenance = session.query(orm.Provenance).get(id)
-                return Provenance.from_orm(provenance)
-            return None
+    # def retrieve(self, id: int) -> Optional[Provenance]:
+    #     """
+    #     Retrieves a relation between two resources
+    #     """
+    #     with Session(self.__connection__) as session:
+    #         if (
+    #             session.query(orm.Provenance).filter(orm.Provenance.id == id).count()
+    #             == 1
+    #         ):
+    #             provenance = session.query(orm.Provenance).get(id)
+    #             return Provenance.from_orm(provenance)
+    #         return None
 
     def delete(self, id: int) -> bool:
         """
@@ -98,27 +107,6 @@ class ProvenanceHandler:
                 return True
 
             return False
-
-    def create_node(self, id, label):
-        """
-        Create node
-        """
-        with self.graph_db.session() as session:
-            query_label = f"{label.capitalize()}"
-            session.run("Create (n:" + query_label + ")" + "SET n.id = $id_", id_=id)
-
-    def delete_node(self, id):
-        """
-        Delete individual node
-        """
-        with self.graph_db.session() as session:
-            # query_label = f"{label.capitalize()}"
-            session.run(
-                "Match (n) \
-                Where n.id = $id_ \
-                Delete n",
-                id_=id,
-            )
 
     def create_node_relationship(self, provenance_payload):
         """
@@ -200,25 +188,6 @@ class ProvenanceHandler:
             query = "match (n) where not (n)--() delete (n)"
             session.run(query)
         return True
-
-    def search_derivedfrom(self, artifact_id, artifact_type):
-        """
-        Search for ancestors
-        """
-        with self.graph_db.session() as session:
-
-            query = (
-                f"Match (n1: {artifact_type} ) -[:derivedfrom *1..]->(n2)"
-                + "Where n1.id = $artifact_id_ "
-                + "RETURN labels(n2) as label, n2.id as id"
-            )
-
-            response = session.run(query, artifact_id_=artifact_id)
-
-            return [
-                {"label": res.data().get("label")[0], "id": res.data().get("id")}
-                for res in response
-            ]
 
     def add_properties(self):
         """
