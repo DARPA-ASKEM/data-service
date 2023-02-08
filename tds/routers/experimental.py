@@ -9,7 +9,6 @@ import openai
 from fastapi import APIRouter, Depends
 from sqlalchemy.engine.base import Engine
 
-from tds.autogen import orm
 from tds.db import ProvenanceHandler, request_graph_db, request_rdb
 from tds.db.helpers import return_graph_validations
 from tds.settings import settings

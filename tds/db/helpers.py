@@ -46,7 +46,10 @@ def return_graph_relations():
     return relations
 
 
-def graph_appreviations():
+def graph_abbreviations():
+    """
+    return abbreviations
+    """
     validation = return_graph_validations()
     return validation.get("node_abbreviations")
 
@@ -56,7 +59,7 @@ def validate_relationship(left, right, relation_type):
     validate a relationship for provenance
     """
     validations = return_graph_validations()
-    relationship_allowed_types = validations[relation_type]
+    relationship_allowed_types = validations.get("relations")[relation_type]
     for relation in relationship_allowed_types:
         if left == relation[0] and right == relation[1]:
             return True

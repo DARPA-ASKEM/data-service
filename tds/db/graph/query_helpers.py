@@ -5,8 +5,8 @@ from typing import List
 
 from fastapi import HTTPException
 
-from tds.autogen import schema
-from tds.schema.provenance import provenance_type_to_abbr, return_graph_relations
+from tds.db.helpers import return_graph_relations
+from tds.schema.provenance import provenance_type_to_abbr
 
 
 def formated_edges(relationships):
@@ -131,14 +131,14 @@ def nodes_edges(
                     )
 
             data["edges"] = filter_relationship_types(
-                clipped_relations, included_types=[type for type in types]
+                clipped_relations, included_types=types
             )
 
     # add nodes
     if nodes:
 
         data["nodes"] = filter_node_types(
-            nodes=response.graph().nodes, included_types=[type for type in types]
+            nodes=response.graph().nodes, included_types=types
         )
         print(data)
     return data

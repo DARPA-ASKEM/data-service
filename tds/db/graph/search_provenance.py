@@ -9,8 +9,6 @@ from fastapi import HTTPException
 from neo4j import Driver
 from sqlalchemy.engine.base import Engine
 
-from tds.autogen import schema
-
 # from tds.db.graph.provenance_handler import ProvenanceHandler
 from tds.db.graph.query_helpers import (
     derived_models_query_generater,
@@ -49,9 +47,9 @@ class SearchProvenance:
 
             response = session.run(query)
             results = list(response.data())
-            if len(results) > 0:
-                return results[0]["Pu"]
-            return None
+            if len(results) == 0:
+                return None
+            return results[0]["Pu"]
 
     def connected_nodes_by_direction(self, payload, direction):
         """

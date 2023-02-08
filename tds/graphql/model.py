@@ -99,6 +99,7 @@ class Model:
     def parameters(self, info: Info) -> List[ModelParameter]:
         return list_parameters(self.id, info)
 
+    # pylint:disable=inconsistent-return-statements
     @strawberry.field
     def publication(self, info: Info) -> Optional[Publication]:
         search_provenance_handler = SearchProvenance(

@@ -3,16 +3,12 @@ tds.schema.provenance - API facing provenance schema
 """
 import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Type
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
 # pylint: disable=missing-class-docstring
-from tds.db.helpers import (
-    graph_appreviations,
-    return_graph_relations,
-    return_graph_types,
-)
+from tds.db.helpers import graph_abbreviations, return_graph_types
 
 # graph_types=return_graph_types()
 
@@ -58,18 +54,9 @@ class ProvenancePayload(BaseModel):
     verbose: Optional[bool] = Field(default=False)
 
 
-provenance_type_to_abbr = graph_appreviations()
+provenance_type_to_abbr = graph_abbreviations()
 
-
+# pylint:disable=invalid-name
 class ProvenanceSearchTypes(str, Enum):
 
-    artifacts_created_by_user = "artifacts_created_by_user"
-    child_nodes = "child_nodes"
-    concept = "concept"
-    concept_counts = "concept_counts"
     connected_nodes = "connected_nodes"
-    derived_models = "derived_models"
-    model_to_primitive = "model_to_primitive"
-    parent_model_revisions = "parent_model_revisions"
-    parent_models = "parent_models"
-    parent_nodes = "parent_nodes"
