@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from tds.autogen import orm
 
 
-def read_graph_validations():
+def return_graph_validations():
     """
     read in graph relation file
     """
@@ -23,7 +23,7 @@ def validate_relationship(left, right, relation_type):
     """
     validate a relationship for provenance
     """
-    validations = read_graph_validations()
+    validations = return_graph_validations()
     relationship_allowed_types = validations[relation_type]
     for relation in relationship_allowed_types:
         if left == relation[0] and right == relation[1]:
