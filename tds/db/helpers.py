@@ -27,10 +27,10 @@ def return_graph_types():
     types = []
     for nodes in validation.get("relations").values():
         for node_pair in nodes:
-            if (node_pair[0], node_pair[0]) not in types:
-                types.append((node_pair[0], node_pair[0]))
-            if (node_pair[1], node_pair[1]) not in types:
-                types.append((node_pair[1], node_pair[1]))
+            if node_pair[0] not in types:
+                types.append(node_pair[0])
+            if node_pair[1] not in types:
+                types.append(node_pair[1])
     return types
 
 

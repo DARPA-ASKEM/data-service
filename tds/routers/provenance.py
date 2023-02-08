@@ -135,7 +135,6 @@ def search_provenance(
     """
     logger.info("Search provenance")
     payload = payload.__dict__
-    print(payload)
     search_provenance_handler = SearchProvenance(rdb=rdb, graph_db=graph_db)
     search_function = search_provenance_handler[search_type]
     results = search_function(payload=payload)
