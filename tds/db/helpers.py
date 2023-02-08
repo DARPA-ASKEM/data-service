@@ -11,12 +11,18 @@ from tds.autogen import orm
 
 
 def read_graph_validations():
-    with open("/api/graph_relations.json") as f:
-        validation = json.load(f)
+    """
+    read in graph relation file
+    """
+    with open("graph_relations.json", "r", encoding="utf-8") as file:
+        validation = json.load(file)
     return validation
 
 
 def validate_relationship(left, right, relation_type):
+    """
+    validate a relationship for provenance
+    """
     validations = read_graph_validations()
     relationship_allowed_types = validations[relation_type]
     for relation in relationship_allowed_types:
