@@ -99,6 +99,7 @@ class Model:
     def parameters(self, info: Info) -> List[ModelParameter]:
         return list_parameters(self.id, info)
 
+    # pylint:disable=inconsistent-return-statements
     @strawberry.field
     def publication(self, info: Info) -> Optional[Publication]:
         search_provenance_handler = SearchProvenance(
@@ -107,7 +108,6 @@ class Model:
         search_function = search_provenance_handler["model_publication"]
         payload = {"root_id": self.id, "root_type": "Model"}
         result = search_function(payload=payload)
-        print(result)
         if result:
             with Session(info.context["rdb"]) as session:
                 publication = session.query(orm.Publication).get(result.get("id"))
