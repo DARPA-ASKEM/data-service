@@ -18,7 +18,7 @@ jobs:
   formatting:
     uses: ./.github/workflows/formatting.yaml
 
-    # Call the Tag Generator to generate an image tag to use
+  # Call the Tag Generator to generate an image tag to use
   tag-generator:
     uses: darpa-askem/.github/.github/workflows/tag-generator.yaml@main
     with:
