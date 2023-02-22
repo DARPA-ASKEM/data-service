@@ -5,7 +5,7 @@ version = "0.3.8"
 description = "The API that sits on top of the data store for the ASKEM program."
 authors = ["Five Grant <five@jataware.com>"]
 readme = "README.md"
-packages = [{include = "tds"}, {include="tests"}, {include="migrate"}]
+packages = [{include = "tds"}, {include="tests"}]
 license = "MIT"
 
 [tool.poetry.urls]
