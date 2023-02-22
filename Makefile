@@ -32,6 +32,10 @@ tidy:
 up:
 	docker compose up --build -d;
 	
+.PHONY: gen-migration
+gen-migration:
+	poetry run alembic -c migrate/alembic.ini revision --autogenerate -m "$(message)"
+
 .PHONY:populate
 populate:up
 	poetry run python3 scripts/upload_demo_data.py || (sleep 3; docker compose logs api; false);
