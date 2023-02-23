@@ -10,7 +10,7 @@ from dbml_builder import verify
 from sqlalchemy.exc import OperationalError
 from uvicorn import run as uvicorn_run
 
-from tds.db import init_dev_content, rdb
+from tds.db import init_dev_content, rdb, stamp, upgrade
 from tds.settings import settings
 
 
@@ -40,7 +40,14 @@ def cli(host: str, port: int, dev: bool, server_config: str) -> None:
             echo("FAILED: DB NOT CONNECTED")
         else:
             echo("SUCCESS")
-            init_dev_content(connection)
+            if len(rdb.table_names()) == 0:
+                init_dev_content(connection)
+                stamp()
+                echo("STAMPED WITH CURRENT DB VERSION")
+            else:
+                upgrade()
+                echo("DB IS UP TO DATE")
+
     uvicorn_run(f"tds.server.configs:{server_config}", host=host, port=port, reload=dev)
 
 

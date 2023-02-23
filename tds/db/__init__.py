@@ -2,6 +2,7 @@
 tds.db - DB handling
 """
 
+from tds.db.alembic import stamp, upgrade
 from tds.db.graph.neo4j import request_engine as request_graph_db
 from tds.db.graph.provenance_handler import ProvenanceHandler
 from tds.db.graph.search_provenance import SearchProvenance
