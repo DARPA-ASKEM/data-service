@@ -44,6 +44,9 @@ pylint = "^2.15.5"
 pytest = "^7.2.0"
 pre-commit = "^2.20.0"
 strawberry-graphql = {extras = ["debug"], version = "^0.142.3"}
+pytest-alembic = "^0.10.0"
+pytest-mock-resources = "^2.6.8"
+python-on-whales = "^0.59.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -61,7 +64,7 @@ force-exclude = "autogen"
 
 [tool.pytest.ini_options]
 addopts = "--ignore-glob=*utils.py"
-python_files = ["tests/service.py", "tests/unittest.py", "tests/search.py"]
+python_files = ["tests/service.py", "tests/unittest.py", "tests/search.py", "tests/migrations.py"]
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.pylint.master]
