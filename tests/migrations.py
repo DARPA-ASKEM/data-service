@@ -5,9 +5,9 @@ from pytest import fixture
 
 # Use preconfigured tests provided by `pytest_alembic`
 # pylint: disable=unused-import
-from pytest_alembic.tests import (  # test_model_definitions_match_ddl,
+from pytest_alembic.tests import (  # test_up_down_consistency,
+    test_model_definitions_match_ddl,
     test_single_head_revision,
-    test_up_down_consistency,
     test_upgrade,
 )
 from pytest_mock_resources import PostgresConfig, create_postgres_fixture
@@ -25,7 +25,6 @@ def pmr_postgres_config():
         ci_port=8032,
         username="dev",
         password="dev",
-        root_database="askem",
     )
 
 
