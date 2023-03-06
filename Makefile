@@ -34,7 +34,14 @@ up:
 	
 .PHONY: gen-migration
 gen-migration:
-	poetry run alembic -c migrate/alembic.ini revision --autogenerate -m "$(message)"
+	poetry run model-build generate ./askem.dbml ./tds/autogen
+	poetry run alembic -c migrate/alembic.ini check && ( \
+	    echo "No migration needed" \
+	) || ( \
+		poetry run alembic -c migrate/alembic.ini revision --autogenerate -m "$$(date -u +'%Y%m%d%H%M%S')"; \
+		poetry run alembic -c migrate/alembic.ini upgrade head; \
+		make repopulate-db; \
+	)
 
 .PHONY:populate
 populate:up
