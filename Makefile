@@ -23,6 +23,7 @@ init:
 tidy: 
 	poetry run pre-commit run;
 	poetry run pylint ./tds
+	poetry run pylint ./migrate ./migrate/versions
 	poetry run pylint ./tests
 	poetry run pytest
 
@@ -30,6 +31,17 @@ tidy:
 up:
 	docker compose up --build -d;
 	
+.PHONY: gen-migration
+gen-migration:
+	poetry run model-build generate ./askem.dbml ./tds/autogen
+	poetry run alembic -c migrate/alembic.ini check && ( \
+	    echo "No migration needed" \
+	) || ( \
+		poetry run alembic -c migrate/alembic.ini revision --autogenerate -m "$$(date -u +'%Y%m%d%H%M%S')"; \
+		poetry run alembic -c migrate/alembic.ini upgrade head; \
+		make repopulate-db; \
+	)
+
 .PHONY:populate
 populate:up
 	poetry run python3 scripts/upload_demo_data.py || (sleep 3; docker compose logs api; false);

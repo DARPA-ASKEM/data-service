@@ -198,6 +198,17 @@ CREATE TABLE public.active_concept (
 ALTER TABLE public.active_concept OWNER TO dev;
 
 --
+-- Name: alembic_version; Type: TABLE; Schema: public; Owner: dev
+--
+
+CREATE TABLE public.alembic_version (
+    version_num character varying(32) NOT NULL
+);
+
+
+ALTER TABLE public.alembic_version OWNER TO dev;
+
+--
 -- Name: association; Type: TABLE; Schema: public; Owner: dev
 --
 
@@ -1153,6 +1164,14 @@ ALTER TABLE ONLY public.software ALTER COLUMN id SET DEFAULT nextval('public.sof
 
 ALTER TABLE ONLY public.active_concept
     ADD CONSTRAINT active_concept_pkey PRIMARY KEY (curie);
+
+
+--
+-- Name: alembic_version alembic_version_pkc; Type: CONSTRAINT; Schema: public; Owner: dev
+--
+
+ALTER TABLE ONLY public.alembic_version
+    ADD CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num);
 
 
 --
