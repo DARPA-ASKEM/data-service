@@ -17,10 +17,97 @@ branch_labels = None
 depends_on = None
 
 
+# Alembic 1.9.4 does not support dropping enums on downgrade on autogen. So,
+# ... we separate enum declarations from upgrade.
+def drop_enums(*enums: sa.Enum):
+    """
+    Drop a list of enums
+    """
+    for enum in enums:
+        enum.drop(op.get_bind(), checkfirst=True)
+
+
+intermediate_source = sa.Enum("mrepresentationa", "skema", name="intermediatesource")
+intermediate_format = sa.Enum(
+    "bilayer", "gromet", "other", "sbml", name="intermediateformat"
+)
+resource_type = sa.Enum(
+    "datasets",
+    "intermediates",
+    "models",
+    "plans",
+    "publications",
+    "simulation_runs",
+    name="resourcetype",
+)
+extracted_type = sa.Enum("equation", "figure", "table", name="extractedtype")
+taggable_type = sa.Enum(
+    "datasets",
+    "features",
+    "intermediates",
+    "model_parameters",
+    "models",
+    "projects",
+    "publications",
+    "qualifiers",
+    "simulation_parameters",
+    "simulation_plans",
+    "simulation_runs",
+    name="taggabletype",
+)
+role = sa.Enum("author", "contributor", "maintainer", "other", name="role")
+ontological_field = sa.Enum("obj", "unit", name="ontologicalfield")
+resource_type = sa.Enum(
+    "datasets",
+    "intermediates",
+    "models",
+    "plans",
+    "publications",
+    "simulation_runs",
+    name="resourcetype",
+)
+relation_type = sa.Enum(
+    "BEGINS_AT",
+    "CITES",
+    "COMBINED_FROM",
+    "CONTAINS",
+    "COPIED_FROM",
+    "DECOMPOSED_FROM",
+    "DERIVED_FROM",
+    "EDITED_FROM",
+    "EQUIVALENT_OF",
+    "EXTRACTED_FROM",
+    "GENERATED_BY",
+    "GLUED_FROM",
+    "IS_CONCEPT_OF",
+    "PARAMETER_OF",
+    "REINTERPRETS",
+    "STRATIFIED_FROM",
+    "USES",
+    name="relationtype",
+)
+provenance_type = sa.Enum(
+    "Concept",
+    "Dataset",
+    "Intermediate",
+    "Model",
+    "ModelParameter",
+    "ModelRevision",
+    "Plan",
+    "PlanParameter",
+    "Project",
+    "Publication",
+    "SimulationRun",
+    name="provenancetype",
+)
+value_type = sa.Enum("binary", "bool", "float", "int", "str", name="valuetype")
+
+
 def upgrade() -> None:
     """
     Initialize tables as they were in v0.3.8
     """
+
     op.create_table(
         "active_concept",
         sa.Column("curie", sa.String(), nullable=False),
@@ -35,12 +122,12 @@ def upgrade() -> None:
         ),
         sa.Column(
             "source",
-            sa.Enum("mrepresentationa", "skema", name="intermediatesource"),
+            intermediate_source,
             nullable=False,
         ),
         sa.Column(
             "type",
-            sa.Enum("bilayer", "gromet", "other", "sbml", name="intermediateformat"),
+            intermediate_format,
             nullable=False,
         ),
         sa.Column("content", sa.LargeBinary(), nullable=False),
@@ -108,20 +195,12 @@ def upgrade() -> None:
         sa.Column("resource_id", sa.Integer(), nullable=False),
         sa.Column(
             "resource_type",
-            sa.Enum(
-                "datasets",
-                "intermediates",
-                "models",
-                "plans",
-                "publications",
-                "simulation_runs",
-                name="resourcetype",
-            ),
+            resource_type,
             nullable=True,
         ),
         sa.Column(
             "role",
-            sa.Enum("author", "contributor", "maintainer", "other", name="role"),
+            role,
             nullable=True,
         ),
         sa.ForeignKeyConstraint(
@@ -161,7 +240,7 @@ def upgrade() -> None:
         sa.Column("publication_id", sa.Integer(), nullable=False),
         sa.Column(
             "type",
-            sa.Enum("equation", "figure", "table", name="extractedtype"),
+            extracted_type,
             nullable=False,
         ),
         sa.Column("data", sa.LargeBinary(), nullable=False),
@@ -217,26 +296,11 @@ def upgrade() -> None:
         sa.Column("curie", sa.String(), nullable=False),
         sa.Column(
             "type",
-            sa.Enum(
-                "datasets",
-                "features",
-                "intermediates",
-                "model_parameters",
-                "models",
-                "projects",
-                "publications",
-                "qualifiers",
-                "simulation_parameters",
-                "simulation_plans",
-                "simulation_runs",
-                name="taggabletype",
-            ),
+            taggable_type,
             nullable=False,
         ),
         sa.Column("object_id", sa.Integer(), nullable=False),
-        sa.Column(
-            "status", sa.Enum("obj", "unit", name="ontologicalfield"), nullable=False
-        ),
+        sa.Column("status", ontological_field, nullable=False),
         sa.ForeignKeyConstraint(
             ["curie"],
             ["active_concept.curie"],
@@ -250,15 +314,7 @@ def upgrade() -> None:
         sa.Column("resource_id", sa.Integer(), nullable=False),
         sa.Column(
             "resource_type",
-            sa.Enum(
-                "datasets",
-                "intermediates",
-                "models",
-                "plans",
-                "publications",
-                "simulation_runs",
-                name="resourcetype",
-            ),
+            resource_type,
             nullable=False,
         ),
         sa.Column("external_ref", sa.String(), nullable=True),
@@ -276,64 +332,19 @@ def upgrade() -> None:
         ),
         sa.Column(
             "relation_type",
-            sa.Enum(
-                "BEGINS_AT",
-                "CITES",
-                "COMBINED_FROM",
-                "CONTAINS",
-                "COPIED_FROM",
-                "DECOMPOSED_FROM",
-                "DERIVED_FROM",
-                "EDITED_FROM",
-                "EQUIVALENT_OF",
-                "EXTRACTED_FROM",
-                "GENERATED_BY",
-                "GLUED_FROM",
-                "IS_CONCEPT_OF",
-                "PARAMETER_OF",
-                "REINTERPRETS",
-                "STRATIFIED_FROM",
-                "USES",
-                name="relationtype",
-            ),
+            relation_type,
             nullable=False,
         ),
         sa.Column("left", sa.Integer(), nullable=False),
         sa.Column(
             "left_type",
-            sa.Enum(
-                "Concept",
-                "Dataset",
-                "Intermediate",
-                "Model",
-                "ModelParameter",
-                "ModelRevision",
-                "Plan",
-                "PlanParameter",
-                "Project",
-                "Publication",
-                "SimulationRun",
-                name="provenancetype",
-            ),
+            provenance_type,
             nullable=False,
         ),
         sa.Column("right", sa.Integer(), nullable=False),
         sa.Column(
             "right_type",
-            sa.Enum(
-                "Concept",
-                "Dataset",
-                "Intermediate",
-                "Model",
-                "ModelParameter",
-                "ModelRevision",
-                "Plan",
-                "PlanParameter",
-                "Project",
-                "Publication",
-                "SimulationRun",
-                name="provenancetype",
-            ),
+            provenance_type,
             nullable=False,
         ),
         sa.Column("user_id", sa.Integer(), nullable=True),
@@ -353,7 +364,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column(
             "value_type",
-            sa.Enum("binary", "bool", "float", "int", "str", name="valuetype"),
+            value_type,
             nullable=False,
         ),
         sa.ForeignKeyConstraint(
@@ -369,7 +380,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column(
             "type",
-            sa.Enum("binary", "bool", "float", "int", "str", name="valuetype"),
+            value_type,
             nullable=False,
         ),
         sa.Column("default_value", sa.String(), nullable=True),
@@ -388,7 +399,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column(
             "value_type",
-            sa.Enum("binary", "bool", "float", "int", "str", name="valuetype"),
+            value_type,
             nullable=False,
         ),
         sa.ForeignKeyConstraint(
@@ -451,7 +462,7 @@ def upgrade() -> None:
         sa.Column("value", sa.String(), nullable=False),
         sa.Column(
             "type",
-            sa.Enum("binary", "bool", "float", "int", "str", name="valuetype"),
+            value_type,
             nullable=False,
         ),
         sa.ForeignKeyConstraint(
@@ -464,7 +475,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """
-    Drop all tables (LOSSY)
+    Drop all tables and enums (LOSSY)
     """
     op.drop_table("simulation_parameter")
     op.drop_table("simulation_run")
@@ -489,3 +500,16 @@ def downgrade() -> None:
     op.drop_table("model_framework")
     op.drop_table("intermediate")
     op.drop_table("active_concept")
+    drop_enums(
+        intermediate_source,
+        intermediate_format,
+        resource_type,
+        extracted_type,
+        taggable_type,
+        role,
+        ontological_field,
+        resource_type,
+        relation_type,
+        provenance_type,
+        value_type,
+    )
