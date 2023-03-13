@@ -6,6 +6,8 @@ Create Date: 2023-02-22 14:12:14.238575
 
 """
 # pylint: disable=no-member, invalid-name
+from typing import Iterator
+
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
@@ -19,7 +21,7 @@ depends_on = None
 
 # Alembic 1.9.4 does not support dropping enums on downgrade on autogen. So,
 # ... we separate enum declarations from upgrade.
-def drop_enums(*enums: sa.Enum):
+def drop_enums(enums: Iterator[sa.Enum]):
     """
     Drop a list of enums
     """
@@ -500,16 +502,19 @@ def downgrade() -> None:
     op.drop_table("model_framework")
     op.drop_table("intermediate")
     op.drop_table("active_concept")
-    drop_enums(
-        intermediate_source,
-        intermediate_format,
-        resource_type,
-        extracted_type,
-        taggable_type,
-        role,
-        ontological_field,
-        resource_type,
-        relation_type,
-        provenance_type,
-        value_type,
+    new_enums = iter(
+        (
+            intermediate_source,
+            intermediate_format,
+            resource_type,
+            extracted_type,
+            taggable_type,
+            role,
+            ontological_field,
+            resource_type,
+            relation_type,
+            provenance_type,
+            value_type,
+        )
     )
+    drop_enums(new_enums)

@@ -24,9 +24,7 @@ jobs:
       - name: Pylint source
         run: poetry run pylint ./tds
       - name: Pylint alembic
-        run: poetry run pylint ./migrate
-      - name: Pylint alembic versions
-        run: poetry run pylint ./migrate/versions
+        run: poetry run pylint ./migrate ./migrate/versions
       - name: Pylint tests
         run: poetry run pylint ./tests
       - name: Pytest
