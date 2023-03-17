@@ -3,7 +3,7 @@ name: Build-SQL
 on:
   workflow_call:
   pull_request:
-    branches: [ 'dev' ]
+    branches: [ 'main' ]
     paths:
       - 'tds/autogen/**.py'
       - 'tds/schema/**.py'

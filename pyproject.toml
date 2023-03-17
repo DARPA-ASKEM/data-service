@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tds"
-version = "0.3.8"
+version = "0.3.9"
 
 description = "The API that sits on top of the data store for the ASKEM program."
 authors = ["Five Grant <five@jataware.com>"]
@@ -42,7 +42,7 @@ isort = "^5.10.1"
 black = "^22.10.0"
 pylint = "^2.15.5"
 pytest = "^7.2.0"
-pre-commit = "^2.20.0"
+pre-commit = "^3.1.1"
 strawberry-graphql = {extras = ["debug"], version = "^0.142.3"}
 pytest-alembic = "^0.10.0"
 pytest-mock-resources = "^2.6.8"
