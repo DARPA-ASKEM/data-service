@@ -27,43 +27,18 @@ def upgrade() -> None:
     with Session(bind=op.get_bind()) as session:
         statement = text(
             """
-        update provenance p set left_type="Model" and left=(
-            select sum(right) from provenance 
-            where left_type="Model"
-            and relation_type="BEGINS_AT"
-            and right_type="ModelRevision"
-            and right=p.left
+        update provenance p set p.left_type="Model", 
+        p.left=( select sum(sub.right) from provenance as sub
+            where sub.left_type="Model"
+            and sub.relation_type="BEGINS_AT"
+            and sub.right_type="ModelRevision"
+            and sub.right=p.left
             limit 1
         ) 
-        where left_type="ModelRevision" and relation_type="BEGINS_AT" and right_type="Intermediate";
+        where p.left_type="ModelRevision" and p.relation_type="BEGINS_AT" and p.right_type="Intermediate";
         """
         )
         session.execute(statement)
-        # This solution is not optimized for SQL; could be done in bulk
-        # rev_to_model = {
-        #     entry.right: entry.left
-        #     for entry in session.query(Provenance)
-        #     .filter(
-        #         Provenance.left_type == "Model",
-        #         Provenance.relation_type == "BEGINS_AT",
-        #         Provenance.right_type == "ModelRevision",
-        #     )
-        #     .all()
-        # }
-
-        # entries = (
-        #     session.query(Provenance)
-        #     .filter(
-        #         Provenance.left_type == "ModelRevision",
-        #         Provenance.relation_type == "REINTERPRETS",
-        #         Provenance.right_type == "Intermediate",
-        #     )
-        #     .all()
-        # )
-
-        # for entry in entries:
-        #     entry.left_type = "Model"
-        #     entry.left =  rev_to_model[entry.left],
         session.commit()
 
 
