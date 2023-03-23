@@ -27,15 +27,15 @@ def upgrade() -> None:
     with Session(bind=op.get_bind()) as session:
         statement = text(
             """
-        update provenance p set p.left_type="Model", 
-        p.left=( select sum(sub.right) from provenance as sub
-            where sub.left_type="Model"
-            and sub.relation_type="BEGINS_AT"
-            and sub.right_type="ModelRevision"
+        update provenance p set left_type='Model', 
+        "left"=( select sub.right from provenance as sub
+            where sub.left_type='Model'
+            and sub.relation_type='BEGINS_AT'
+            and sub.right_type='ModelRevision'
             and sub.right=p.left
             limit 1
         ) 
-        where p.left_type="ModelRevision" and p.relation_type="BEGINS_AT" and p.right_type="Intermediate";
+        where p.left_type='ModelRevision' and p.relation_type='BEGINS_AT' and p.right_type='Intermediate';
         """
         )
         session.execute(statement)
