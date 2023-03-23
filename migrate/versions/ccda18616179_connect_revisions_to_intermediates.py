@@ -11,8 +11,6 @@ from alembic import op
 from sqlalchemy import text
 from sqlalchemy.orm.session import Session
 
-from tds.autogen.orm import Provenance
-
 # revision identifiers, used by Alembic.
 revision = "ccda18616179"
 down_revision = "1f5853959c65"
@@ -35,7 +33,8 @@ def upgrade() -> None:
             and sub.right=p.left
             limit 1
         ) 
-        where left_type='ModelRevision' and relation_type='REINTERPRETS' and right_type='Intermediate';
+        where left_type='ModelRevision' 
+        and relation_type='REINTERPRETS' and right_type='Intermediate';
         """
         )
         session.execute(statement)
