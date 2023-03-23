@@ -8,6 +8,7 @@ Create Date: 2023-03-22 15:26:05.133860
 # pylint: disable=no-member, invalid-name
 
 from alembic import op
+from sqlalchemy import text
 from sqlalchemy.orm.session import Session
 
 from tds.autogen.orm import Provenance
@@ -24,35 +25,45 @@ def upgrade() -> None:
     Attach Models to intermediates instead of ModelRevisions
     """
     with Session(bind=op.get_bind()) as session:
-        # This solution is not optimized for SQL; could be done in bulk
-        rev_to_model = {
-            entry.right: entry.left
-            for entry in session.query(Provenance)
-            .filter(
-                Provenance.left_type == "Model",
-                Provenance.relation_type == "BEGINS_AT",
-                Provenance.right_type == "ModelRevision",
-            )
-            .all()
-        }
-
-        entries = (
-            session.query(Provenance)
-            .filter(
-                Provenance.left_type == "ModelRevision",
-                Provenance.relation_type == "REINTERPRETS",
-                Provenance.right_type == "Intermediate",
-            )
-            .all()
+        statement = text(
+            """
+        update provenance p set left_type="Model" and left=(
+            select sum(right) from provenance 
+            where left_type="Model"
+            and relation_type="BEGINS_AT"
+            and right_type="ModelRevision"
+            and right=p.left
+            limit 1
+        ) 
+        where left_type="ModelRevision" and relation_type="BEGINS_AT" and right_type="Intermediate";
+        """
         )
+        session.execute(statement)
+        # This solution is not optimized for SQL; could be done in bulk
+        # rev_to_model = {
+        #     entry.right: entry.left
+        #     for entry in session.query(Provenance)
+        #     .filter(
+        #         Provenance.left_type == "Model",
+        #         Provenance.relation_type == "BEGINS_AT",
+        #         Provenance.right_type == "ModelRevision",
+        #     )
+        #     .all()
+        # }
 
-        for entry in entries:
-            entry.update(
-                {
-                    Provenance.left_type: "Model",
-                    Provenance.left: rev_to_model[entry.left],
-                }
-            )
+        # entries = (
+        #     session.query(Provenance)
+        #     .filter(
+        #         Provenance.left_type == "ModelRevision",
+        #         Provenance.relation_type == "REINTERPRETS",
+        #         Provenance.right_type == "Intermediate",
+        #     )
+        #     .all()
+        # )
+
+        # for entry in entries:
+        #     entry.left_type = "Model"
+        #     entry.left =  rev_to_model[entry.left],
         session.commit()
 
 
