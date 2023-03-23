@@ -35,7 +35,7 @@ def upgrade() -> None:
             and sub.right=p.left
             limit 1
         ) 
-        where p.left_type='ModelRevision' and p.relation_type='BEGINS_AT' and p.right_type='Intermediate';
+        where left_type='ModelRevision' and relation_type='REINTERPRETS' and right_type='Intermediate';
         """
         )
         session.execute(statement)
