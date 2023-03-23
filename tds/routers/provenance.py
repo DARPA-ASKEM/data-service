@@ -92,17 +92,44 @@ def search_provenance(
     Publication, SimulationRun, Project, Concept.
 
 
+    ***edges*** set to true: edges will be returned if found
+
+    ***nodes*** set to true: nodes will not be returned if found
+
+    ***types*** filters node types you want returned.
+
+    ***hops*** limits the number of relationships away from
+    the root node the search will traverse.
+
+    ***limit*** will limit the number of nodes returned for relationship and nodes.
+      The closest n number of nodes to the root node will be returned. There might
+      not be the exact the number of nodes returned as requested due to filtering
+      out node types.
+
+    ***versions*** set to true will return model revisions in edges. Versions set to
+     false will squash all model revisions to the
+     Model node they are associated with along with all the relationships connected
+     to model revisions
 
         {
-
-            root_id: Optional[int],
-
-            root_type: Optional[ProvenanceType],
-
-            user_id: Optional[int],
-
-            curie: Optional[str]
-
+            "root_id": 1,
+            "root_type": "Publication",
+            "curie": "string",
+            "edges": false,
+            "nodes": true,
+            "types": [
+                "Dataset",
+                "Intermediate",
+                "Model",
+                "ModelParameter",
+                "Plan",
+                "PlanParameter",
+                "Publication",
+                "SimulationRun"
+            ],
+            "hops": 15,
+            "limit": 1000,
+            "versions": false
         }
 
     """

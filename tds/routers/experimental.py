@@ -9,79 +9,15 @@ import openai
 from fastapi import APIRouter, Depends
 from sqlalchemy.engine.base import Engine
 
-from tds.autogen import orm
 from tds.db import ProvenanceHandler, request_graph_db, request_rdb
+from tds.db.helpers import return_graph_validations
 from tds.settings import settings
 
 logger = Logger(__name__)
 router = APIRouter()
 
 
-valid_relations = {
-    orm.RelationType.COPIED_FROM: [
-        (orm.ProvenanceType.ModelRevision, orm.ProvenanceType.ModelRevision)
-    ],
-    orm.RelationType.CITES: [
-        (orm.ProvenanceType.Publication, orm.ProvenanceType.Publication)
-    ],
-    orm.RelationType.COMBINED_FROM: [
-        (orm.ProvenanceType.ModelRevision, orm.ProvenanceType.ModelRevision)
-    ],
-    orm.RelationType.EDITED_FROM: [
-        (orm.ProvenanceType.ModelRevision, orm.ProvenanceType.ModelRevision)
-    ],
-    orm.RelationType.USES: [
-        (orm.ProvenanceType.Plan, orm.ProvenanceType.ModelRevision)
-    ],
-    orm.RelationType.EXTRACTED_FROM: [
-        (orm.ProvenanceType.Intermediate, orm.ProvenanceType.Publication),
-        (orm.ProvenanceType.Dataset, orm.ProvenanceType.Publication),
-    ],
-    orm.RelationType.REINTERPRETS: [
-        (orm.ProvenanceType.Dataset, orm.ProvenanceType.SimulationRun),
-        (orm.ProvenanceType.Intermediate, orm.ProvenanceType.Intermediate),
-        (orm.ProvenanceType.Model, orm.ProvenanceType.Intermediate),
-    ],
-    orm.RelationType.GENERATED_BY: [
-        (orm.ProvenanceType.SimulationRun, orm.ProvenanceType.Plan)
-    ],
-    orm.RelationType.BEGINS_AT: [
-        (orm.ProvenanceType.Model, orm.ProvenanceType.ModelRevision)
-    ],
-    orm.RelationType.DECOMPOSED_FROM: [
-        (orm.ProvenanceType.ModelRevision, orm.ProvenanceType.ModelRevision)
-    ],
-    orm.RelationType.GLUED_FROM: [
-        (orm.ProvenanceType.ModelRevision, orm.ProvenanceType.ModelRevision)
-    ],
-    orm.RelationType.STRATIFIED_FROM: [
-        (orm.ProvenanceType.ModelRevision, orm.ProvenanceType.ModelRevision)
-    ],
-    orm.RelationType.CONTAINS: [
-        (orm.ProvenanceType.Project, orm.ProvenanceType.Publication),
-        (orm.ProvenanceType.Project, orm.ProvenanceType.Intermediate),
-        (orm.ProvenanceType.Project, orm.ProvenanceType.Model),
-        (orm.ProvenanceType.Project, orm.ProvenanceType.ModelRevision),
-        (orm.ProvenanceType.Project, orm.ProvenanceType.ModelParameter),
-        (orm.ProvenanceType.Project, orm.ProvenanceType.Plan),
-        (orm.ProvenanceType.Project, orm.ProvenanceType.SimulationRun),
-        (orm.ProvenanceType.Project, orm.ProvenanceType.Dataset),
-    ],
-    orm.RelationType.PARAMETER_OF: [
-        (orm.ProvenanceType.ModelParameter, orm.ProvenanceType.ModelRevision),
-        (orm.ProvenanceType.PlanParameter, orm.ProvenanceType.Plan),
-    ],
-    orm.RelationType.IS_CONCEPT_OF: [
-        (orm.ProvenanceType.Concept, orm.ProvenanceType.Publication),
-        (orm.ProvenanceType.Concept, orm.ProvenanceType.Intermediate),
-        (orm.ProvenanceType.Concept, orm.ProvenanceType.Model),
-        (orm.ProvenanceType.Concept, orm.ProvenanceType.ModelRevision),
-        (orm.ProvenanceType.Concept, orm.ProvenanceType.ModelParameter),
-        (orm.ProvenanceType.Concept, orm.ProvenanceType.Plan),
-        (orm.ProvenanceType.Concept, orm.ProvenanceType.SimulationRun),
-        (orm.ProvenanceType.Concept, orm.ProvenanceType.Dataset),
-    ],
-}
+valid_relations = return_graph_validations()
 
 DB_DESC = "Valid relations include:\n"
 # NOTE: Should we make these sentences more natural language related?

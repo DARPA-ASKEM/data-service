@@ -77,6 +77,9 @@ $(DATA_SQL_FILE):$(DATA_FILES)
 .PHONY:db-full
 db-full: | $(SCHEMA_SQL_FILE) $(DATA_SQL_FILE)
 
+.PHONY:db-tag
+db-tag: 
+	echo '$(SQL_HASH)' > $(SQL_HASH_FILE);
 
 .PHONY:repopulate-db
 repopulate-db:

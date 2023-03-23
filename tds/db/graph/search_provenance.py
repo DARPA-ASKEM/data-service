@@ -3,11 +3,15 @@ Import provenance handler
 """
 import logging
 from collections import defaultdict
+from typing import Optional
 
 from fastapi import HTTPException
+from neo4j import Driver
+from sqlalchemy.engine.base import Engine
 
 from tds.autogen import schema
-from tds.db.graph.provenance_handler import ProvenanceHandler
+
+# from tds.db.graph.provenance_handler import ProvenanceHandler
 from tds.db.graph.query_helpers import (
     derived_models_query_generater,
     dynamic_relationship_direction,
@@ -20,16 +24,34 @@ from tds.db.graph.query_helpers import (
 from tds.schema.provenance import provenance_type_to_abbr
 
 
-class SearchProvenance(ProvenanceHandler):
+class SearchProvenance:
     """
     Search Provenance
     """
 
-    def __init__(self, rdb, graph_db):
-        super().__init__(rdb=rdb, graph_db=graph_db)
+    def __init__(self, rdb: Engine, graph_db: Optional[Driver] = None):
+        self.__connection__ = rdb.connect()
+        self.graph_db = graph_db
 
     def __getitem__(self, key):
         return self.__getattribute__(key)
+
+    def model_publication(self, payload):
+        """
+        find publication that was extracted to create model
+        """
+        with self.graph_db.session() as session:
+            query = (
+                f"Match (Md:Model {{id:{payload.get('root_id')}}})"
+                "<-[r:REINTERPRETS|EXTRACTED_FROM|BEGINS_AT *1..]->"
+                "(Pu:Publication) return Pu"
+            )
+
+            response = session.run(query)
+            results = list(response.data())
+            if len(results) == 0:
+                return None
+            return results[0]["Pu"]
 
     def connected_nodes_by_direction(self, payload, direction):
         """
@@ -77,21 +99,41 @@ class SearchProvenance(ProvenanceHandler):
             )
             node_abbr = provenance_type_to_abbr[payload.get("root_type")]
 
+            def set_max_level(hops):
+                if hops is not None:
+                    return f"maxLevel: {hops}, "
+                return ""
+
+            def set_limit_level(limit):
+                return f"limit: {limit} "
+
+            relationships_str = relationships_array_as_str(
+                exclude=["CONTAINS", "IS_CONCEPT_OF"]
+            )
             query = (
                 f"{match_node} CALL apoc.path.subgraphAll({node_abbr}, "
+                + "{"
+                + f'relationshipFilter: "{relationships_str}",'
+                + "minLevel: 0, "
+                + f"{set_limit_level(payload.get('limit',-1))}, "
+                f"{set_max_level(payload.get('hops',None))}"
                 + """
-                {
-                relationshipFilter: ":BEGINS_AT|CITES|COMBINED_FROM|COPIED_FROM|DECOMPOSED_FROM|DERIVED_FROM|EDITED_FROM|EQUIVALENT_OF|EXTRACTED_FROM|GENERATED_BY|GLUED_FROM|PARAMETER_OF|REINTERPRETS|STRATIFIED_FROM|USES",
-                minLevel: 1,
                 whitelistNodes: []
                 })
                 YIELD nodes, relationships
                 RETURN nodes, relationships
                 """
             )
+            print(query)
             response = session.run(query)
 
-            return nodes_edges(response=response)
+            return nodes_edges(
+                response=response,
+                nodes=payload.get("nodes", True),
+                edges=payload.get("edges", False),
+                types=payload.get("types"),
+                versions=payload.get("versions"),
+            )
 
     def child_nodes(self, payload):
         """

@@ -14,8 +14,10 @@ from strawberry.types import Info
 
 from tds.autogen import orm, schema
 from tds.db import list_by_id
+from tds.db.graph.search_provenance import SearchProvenance
 from tds.graphql.enum import ValueType
 from tds.graphql.helper import MultipleOptionsError, fetch_by_curie, sqlalchemy_type
+from tds.graphql.publication import Publication
 from tds.schema.model import ModelDescription
 
 logger = Logger(__name__)
@@ -96,6 +98,20 @@ class Model:
     @strawberry.field
     def parameters(self, info: Info) -> List[ModelParameter]:
         return list_parameters(self.id, info)
+
+    # pylint:disable=inconsistent-return-statements
+    @strawberry.field
+    def publication(self, info: Info) -> Optional[Publication]:
+        search_provenance_handler = SearchProvenance(
+            rdb=info.context["rdb"], graph_db=info.context["graph_db"]
+        )
+        search_function = search_provenance_handler["model_publication"]
+        payload = {"root_id": self.id, "root_type": "Model"}
+        result = search_function(payload=payload)
+        if result:
+            with Session(info.context["rdb"]) as session:
+                publication = session.query(orm.Publication).get(result.get("id"))
+                return Publication.from_orm(publication)
 
     @staticmethod
     def from_pydantic(instance: ModelDescription) -> "Model":
