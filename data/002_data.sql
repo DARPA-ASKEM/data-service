@@ -520,6 +520,7 @@ COPY public.model_state (id, "timestamp", content) FROM stdin;
 2	2023-03-22 22:26:30.457306	{"S": [{"sname": "S", "mira_ids": "[('identity', 'ido:0000514')]", "mira_context": "[]"}, {"sname": "I", "mira_ids": "[('identity', 'ido:0000511')]", "mira_context": "[]"}, {"sname": "R", "mira_ids": "[('identity', 'ido:0000592')]", "mira_context": "[]"}], "T": [{"tname": "t1", "template_type": "ControlledConversion", "parameter_name": "beta", "parameter_value": 1.0}, {"tname": "t2", "template_type": "NaturalConversion", "parameter_name": "gamma", "parameter_value": 1.0}], "I": [{"is": 2, "it": 1}, {"is": 1, "it": 1}, {"is": 2, "it": 2}], "O": [{"os": 2, "ot": 1}, {"os": 2, "ot": 1}, {"os": 3, "ot": 2}]}
 3	2023-03-22 22:26:46.635982	{"S": [{"sname": "S", "mira_ids": "[('identity', 'ido:0000514')]", "mira_context": "[('vaccination_status', 'vo:0001377')]"}, {"sname": "I", "mira_ids": "[('identity', 'ido:0000511')]", "mira_context": "[]"}, {"sname": "I_v", "mira_ids": "[('identity', 'ido:0000511')]", "mira_context": "[('vaccination_status', 'ncit:C28385')]"}, {"sname": "V", "mira_ids": "[('identity', 'ido:0000514')]", "mira_context": "[('vaccination_status', 'vo:0001376')]"}, {"sname": "R", "mira_ids": "[('identity', 'ido:0000592')]", "mira_context": "[]"}], "T": [{"tname": "t1", "template_type": "ControlledConversion", "parameter_name": "beta_1", "parameter_value": 1.0}, {"tname": "t2", "template_type": "ControlledConversion", "parameter_name": "beta_2", "parameter_value": 1.0}, {"tname": "t3", "template_type": "NaturalConversion", "parameter_name": "v_r", "parameter_value": 1.0}, {"tname": "t4", "template_type": "ControlledConversion", "parameter_name": "v_s1", "parameter_value": 1.0}, {"tname": "t5", "template_type": "ControlledConversion", "parameter_name": "v_s2", "parameter_value": 1.0}, {"tname": "t6", "template_type": "NaturalConversion", "parameter_name": "gamma_1", "parameter_value": 1.0}, {"tname": "t7", "template_type": "NaturalConversion", "parameter_name": "gamma_2", "parameter_value": 1.0}], "I": [{"is": 2, "it": 1}, {"is": 1, "it": 1}, {"is": 3, "it": 2}, {"is": 1, "it": 2}, {"is": 1, "it": 3}, {"is": 2, "it": 4}, {"is": 4, "it": 4}, {"is": 3, "it": 5}, {"is": 4, "it": 5}, {"is": 2, "it": 6}, {"is": 3, "it": 7}], "O": [{"os": 2, "ot": 1}, {"os": 2, "ot": 1}, {"os": 3, "ot": 2}, {"os": 2, "ot": 2}, {"os": 4, "ot": 3}, {"os": 2, "ot": 4}, {"os": 3, "ot": 4}, {"os": 3, "ot": 5}, {"os": 3, "ot": 5}, {"os": 5, "ot": 6}, {"os": 5, "ot": 7}]}
 4	2023-03-22 22:27:03.256817	{"S": [{"sname": "Susceptible", "mira_ids": "[('identity', 'ido:0000514')]", "mira_context": "[('property', 'ido:0000468')]", "mira_initial_value": "0.9999963"}, {"sname": "Infected", "mira_ids": "[('identity', 'ido:0000511')]", "mira_context": "[('property', 'ncit:C113725')]", "mira_initial_value": "3.33333333e-06"}, {"sname": "Diagnosed", "mira_ids": "[('identity', 'ido:0000511')]", "mira_context": "[('property', 'ncit:C15220')]", "mira_initial_value": "3.33333333e-07"}, {"sname": "Ailing", "mira_ids": "[('identity', 'ido:0000573')]", "mira_context": "[('property', 'ncit:C113725')]", "mira_initial_value": "1.66666666e-08"}, {"sname": "Recognized", "mira_ids": "[('identity', 'ido:0000511')]", "mira_context": "[('property', 'ncit:C25587')]", "mira_initial_value": "3.33333333e-08"}, {"sname": "Healed", "mira_ids": "[]", "mira_context": "[('property', 'ido:0000621')]", "mira_initial_value": "0.0"}, {"sname": "Threatened", "mira_ids": "[('identity', 'ido:0000573')]", "mira_context": "[('property', 'ncit:C15220')]", "mira_initial_value": "0.0"}, {"sname": "Extinct", "mira_ids": "[('identity', 'ncit:C28554')]", "mira_context": "[]", "mira_initial_value": "0.0"}], "T": [{"tname": "t1", "template_type": "ControlledConversion", "parameter_name": "alpha", "parameter_value": "0.57"}, {"tname": "t2", "template_type": "ControlledConversion", "parameter_name": "beta", "parameter_value": "0.011"}, {"tname": "t3", "template_type": "ControlledConversion", "parameter_name": "gamma", "parameter_value": "0.456"}, {"tname": "t4", "template_type": "ControlledConversion", "parameter_name": "delta", "parameter_value": "0.011"}, {"tname": "t5", "template_type": "NaturalConversion", "parameter_name": "epsilon", "parameter_value": "0.171"}, {"tname": "t6", "template_type": "NaturalConversion", "parameter_name": "zeta", "parameter_value": "0.125"}, {"tname": "t7", "template_type": "NaturalConversion", "parameter_name": "lambda", "parameter_value": "0.034"}, {"tname": "t8", "template_type": "NaturalConversion", "parameter_name": "eta", "parameter_value": "0.125"}, {"tname": "t9", "template_type": "NaturalConversion", "parameter_name": "rho", "parameter_value": "0.034"}, {"tname": "t10", "template_type": "NaturalConversion", "parameter_name": "theta", "parameter_value": "0.371"}, {"tname": "t11", "template_type": "NaturalConversion", "parameter_name": "kappa", "parameter_value": "0.017"}, {"tname": "t12", "template_type": "NaturalConversion", "parameter_name": "mu", "parameter_value": "0.017"}, {"tname": "t13", "template_type": "NaturalConversion", "parameter_name": "nu", "parameter_value": "0.027"}, {"tname": "t14", "template_type": "NaturalConversion", "parameter_name": "xi", "parameter_value": "0.017"}, {"tname": "t15", "template_type": "NaturalConversion", "parameter_name": "tau", "parameter_value": "0.01"}, {"tname": "t16", "template_type": "NaturalConversion", "parameter_name": "sigma", "parameter_value": "0.017"}], "I": [{"is": 2, "it": 1}, {"is": 1, "it": 1}, {"is": 3, "it": 2}, {"is": 1, "it": 2}, {"is": 4, "it": 3}, {"is": 1, "it": 3}, {"is": 5, "it": 4}, {"is": 1, "it": 4}, {"is": 2, "it": 5}, {"is": 2, "it": 6}, {"is": 2, "it": 7}, {"is": 3, "it": 8}, {"is": 3, "it": 9}, {"is": 4, "it": 10}, {"is": 4, "it": 11}, {"is": 4, "it": 12}, {"is": 5, "it": 13}, {"is": 5, "it": 14}, {"is": 7, "it": 15}, {"is": 7, "it": 16}], "O": [{"os": 2, "ot": 1}, {"os": 2, "ot": 1}, {"os": 3, "ot": 2}, {"os": 2, "ot": 2}, {"os": 4, "ot": 3}, {"os": 2, "ot": 3}, {"os": 5, "ot": 4}, {"os": 2, "ot": 4}, {"os": 3, "ot": 5}, {"os": 4, "ot": 6}, {"os": 6, "ot": 7}, {"os": 5, "ot": 8}, {"os": 6, "ot": 9}, {"os": 5, "ot": 10}, {"os": 6, "ot": 11}, {"os": 7, "ot": 12}, {"os": 7, "ot": 13}, {"os": 6, "ot": 14}, {"os": 8, "ot": 15}, {"os": 6, "ot": 16}]}
+5	2023-04-07 14:06:21.675167	{"S": [{"sname": "Susceptible", "mira_ids": "[('identity', 'ido:0000514')]", "mira_context": "[('property', 'ido:0000468')]", "mira_initial_value": "0.9999963"}, {"sname": "Infected", "mira_ids": "[('identity', 'ido:0000511')]", "mira_context": "[('property', 'ncit:C113725')]", "mira_initial_value": "3.33333333e-06"}, {"sname": "Diagnosed", "mira_ids": "[('identity', 'ido:0000511')]", "mira_context": "[('property', 'ncit:C15220')]", "mira_initial_value": "3.33333333e-07"}, {"sname": "Ailing", "mira_ids": "[('identity', 'ido:0000573')]", "mira_context": "[('property', 'ncit:C113725')]", "mira_initial_value": "1.66666666e-08"}, {"sname": "Recognized", "mira_ids": "[('identity', 'ido:0000511')]", "mira_context": "[('property', 'ncit:C25587')]", "mira_initial_value": "3.33333333e-08"}, {"sname": "Healed", "mira_ids": "[]", "mira_context": "[('property', 'ido:0000621')]", "mira_initial_value": "0.0"}, {"sname": "Threatened", "mira_ids": "[('identity', 'ido:0000573')]", "mira_context": "[('property', 'ncit:C15220')]", "mira_initial_value": "0.0"}, {"sname": "Extinct", "mira_ids": "[('identity', 'ncit:C28554')]", "mira_context": "[]", "mira_initial_value": "0.0"}], "T": [{"tname": "alpha", "template_type": "ControlledConversion", "parameter_name": "alpha", "parameter_value": "0.57"}, {"tname": "beta", "template_type": "ControlledConversion", "parameter_name": "beta", "parameter_value": "0.011"}, {"tname": "gamma", "template_type": "ControlledConversion", "parameter_name": "gamma", "parameter_value": "0.456"}, {"tname": "delta", "template_type": "ControlledConversion", "parameter_name": "delta", "parameter_value": "0.011"}, {"tname": "epsilon", "template_type": "NaturalConversion", "parameter_name": "epsilon", "parameter_value": "0.171"}, {"tname": "zeta", "template_type": "NaturalConversion", "parameter_name": "zeta", "parameter_value": "0.125"}, {"tname": "lambda", "template_type": "NaturalConversion", "parameter_name": "lambda", "parameter_value": "0.034"}, {"tname": "eta", "template_type": "NaturalConversion", "parameter_name": "eta", "parameter_value": "0.125"}, {"tname": "rho", "template_type": "NaturalConversion", "parameter_name": "rho", "parameter_value": "0.034"}, {"tname": "theta", "template_type": "NaturalConversion", "parameter_name": "theta", "parameter_value": "0.371"}, {"tname": "kappa", "template_type": "NaturalConversion", "parameter_name": "kappa", "parameter_value": "0.017"}, {"tname": "mu", "template_type": "NaturalConversion", "parameter_name": "mu", "parameter_value": "0.017"}, {"tname": "nu", "template_type": "NaturalConversion", "parameter_name": "nu", "parameter_value": "0.027"}, {"tname": "xi", "template_type": "NaturalConversion", "parameter_name": "xi", "parameter_value": "0.017"}, {"tname": "tau", "template_type": "NaturalConversion", "parameter_name": "tau", "parameter_value": "0.01"}, {"tname": "sigma", "template_type": "NaturalConversion", "parameter_name": "sigma", "parameter_value": "0.017"}], "I": [{"is": 2, "it": 1}, {"is": 1, "it": 1}, {"is": 3, "it": 2}, {"is": 1, "it": 2}, {"is": 4, "it": 3}, {"is": 1, "it": 3}, {"is": 5, "it": 4}, {"is": 1, "it": 4}, {"is": 2, "it": 5}, {"is": 2, "it": 6}, {"is": 2, "it": 7}, {"is": 3, "it": 8}, {"is": 3, "it": 9}, {"is": 4, "it": 10}, {"is": 4, "it": 11}, {"is": 4, "it": 12}, {"is": 5, "it": 13}, {"is": 5, "it": 14}, {"is": 7, "it": 15}, {"is": 7, "it": 16}], "O": [{"os": 2, "ot": 1}, {"os": 2, "ot": 1}, {"os": 3, "ot": 2}, {"os": 2, "ot": 2}, {"os": 4, "ot": 3}, {"os": 2, "ot": 3}, {"os": 5, "ot": 4}, {"os": 2, "ot": 4}, {"os": 3, "ot": 5}, {"os": 4, "ot": 6}, {"os": 6, "ot": 7}, {"os": 5, "ot": 8}, {"os": 6, "ot": 9}, {"os": 5, "ot": 10}, {"os": 6, "ot": 11}, {"os": 7, "ot": 12}, {"os": 7, "ot": 13}, {"os": 6, "ot": 14}, {"os": 8, "ot": 15}, {"os": 6, "ot": 16}]}
 \.
 
 
@@ -531,7 +532,8 @@ COPY public.model_description (id, name, description, framework, "timestamp", st
 1	Bucky	The JHUAPL-Bucky model is a COVID-19 metapopulation compartment model initially designed to estimate medium-term (on the order of weeks) case incidence and healthcare usage at the second administrative (admin-2, ADM2) level (counties in the United States; cities or districts in various countries). It is documented at https://docs.buckymodel.com/en/latest/.	Petri Net	2023-03-22 22:26:00.93147	1
 2	CHIME-SIR	The CHIME (COVID-19 Hospital Impact Model for Epidemics) App is designed to assist hospitals and public health officials understand hospital capacity needs as they relate to the COVID-19 pandemic. CHIME enables capacity planning by providing estimates of total daily (i.e. new) and running totals of (i.e. census) inpatient hospitalizations, ICU admissions, and patients requiring ventilation. These estimates are generated using a SIR (Susceptible, Infected, Recovered) model, a standard epidemiological modeling technique.	Petri Net	2023-03-22 22:26:00.93147	2
 3	CHIME-SVIIvR	The CHIME (COVID-19 Hospital Impact Model for Epidemics) App is designed to assist hospitals and public health officials understand hospital capacity needs as they relate to the COVID-19 pandemic. CHIME enables capacity planning by providing estimates of total daily (i.e. new) and running totals of (i.e. census) inpatient hospitalizations, ICU admissions, and patients requiring ventilation. These estimates are generated using a SIR (Susceptible, Infected, Recovered) model, a standard epidemiological modeling technique.	Petri Net	2023-03-22 22:26:00.93147	3
-4	Giordano2020 - SIDARTHE model of COVID-19 spread in Italy	This is a model created on COPASI 4.27 (Build 217) which reproduces the Figures 2b, 2d, 3b, 3d, 4b, 4d in the article - https://www.nature.com/articles/s41591-020-0883-7\n\nTo reproduce Fig 2b and 2d, set Event_trigger_Fig3b = 0, Event_trigger_Fig3d = 0, Event_trigger_Fig4b = 0, Event_trigger_Fig4d = 0, epsilon_modifer = 1, alpha_modifer = 1 and run for t = 45 d (for Fig 2b) and t = 350 days (for Fig 2d).\nSet alpha_modifier = 0 for the remaining 4 cases\nTo reproduce Fig 3b, set Event_trigger_Fig3b = 1, Event_trigger_Fig3d = 0, Event_trigger_Fig4b = 0, Event_trigger_Fig4d = 0, epsilon_modifer = 1 and run for t = 350 days.\nTo reproduce Fig 3d, set Event_trigger_Fig3b = 0, Event_trigger_Fig3d = 1, Event_trigger_Fig4b = 0, Event_trigger_Fig4d = 0, epsilon_modifer = 1 and run for t = 350 days.\nTo reproduce Fig 4b, set Event_trigger_Fig3b = 0, Event_trigger_Fig3d = 0, Event_trigger_Fig4b = 1, Event_trigger_Fig4d = 0, epsilon_modifer = 0 and run for t = 350 days.\nTo reproduce Fig 4d, set Event_trigger_Fig3b = 0, Event_trigger_Fig3d = 0, Event_trigger_Fig4b = 0, Event_trigger_Fig4d = 1, epsilon_modifer = 0 and run for t = 350 days.\n\n\n\nModelling the COVID-19 epidemic and implementation of population-wide interventions in Italy\nGiulia Giordano, Franco Blanchini, Raffaele Bruno, Patrizio Colaneri, Alessandro Di Filippo, Angela Di Matteo and Marta Colaneri\nJournal - Nature Medicine\nDOI - 10.1038/s41591-020-0883-7\n\nIn Italy, 128,948 confirmed cases and 15,887 deaths of people who tested positive for SARS-CoV-2 were registered as of 5 April 2020. Ending the global SARS-CoV-2 pandemic requires implementation of multiple population-wide strategies, including social distancing, testing and contact tracing. We propose a new model that predicts the course of the epidemic to help plan an effective control strategy. The model considers eight stages of infection: susceptible (S), infected (I), diagnosed (D), ailing (A), recognized (R), threatened (T), healed (H) and extinct (E), collectively termed SIDARTHE. Our SIDARTHE model discriminates between infected individuals depending on whether they have been diagnosed and on the severity of their symptoms. The distinction between diagnosed and non-diagnosed individuals is important because the former are typically isolated and hence less likely to spread the infection. This delineation also helps to explain misperceptions of the case fatality rate and of the epidemic spread. We compare simulation results with real data on the COVID-19 epidemic in Italy, and we model possible scenarios of implementation of countermeasures. Our results demonstrate that restrictive social-distancing measures will need to be combined with widespread testing and contact tracing to end the ongoing COVID-19 pandemic.	Petri Net	2023-03-22 22:26:00.93147	4
+4	depr	deprecated model	Petri Net	2023-03-22 22:26:00.93147	4
+5	SIDARTHE - Giordano2020	This is a model created on COPASI 4.27 (Build 217) which reproduces the Figures 2b, 2d, 3b, 3d, 4b, 4d in the article - https://www.nature.com/articles/s41591-020-0883-7\n\nTo reproduce Fig 2b and 2d, set Event_trigger_Fig3b = 0, Event_trigger_Fig3d = 0, Event_trigger_Fig4b = 0, Event_trigger_Fig4d = 0, epsilon_modifer = 1, alpha_modifer = 1 and run for t = 45 d (for Fig 2b) and t = 350 days (for Fig 2d).\nSet alpha_modifier = 0 for the remaining 4 cases\nTo reproduce Fig 3b, set Event_trigger_Fig3b = 1, Event_trigger_Fig3d = 0, Event_trigger_Fig4b = 0, Event_trigger_Fig4d = 0, epsilon_modifer = 1 and run for t = 350 days.\nTo reproduce Fig 3d, set Event_trigger_Fig3b = 0, Event_trigger_Fig3d = 1, Event_trigger_Fig4b = 0, Event_trigger_Fig4d = 0, epsilon_modifer = 1 and run for t = 350 days.\nTo reproduce Fig 4b, set Event_trigger_Fig3b = 0, Event_trigger_Fig3d = 0, Event_trigger_Fig4b = 1, Event_trigger_Fig4d = 0, epsilon_modifer = 0 and run for t = 350 days.\nTo reproduce Fig 4d, set Event_trigger_Fig3b = 0, Event_trigger_Fig3d = 0, Event_trigger_Fig4b = 0, Event_trigger_Fig4d = 1, epsilon_modifer = 0 and run for t = 350 days.\n\n\n\nModelling the COVID-19 epidemic and implementation of population-wide interventions in Italy\nGiulia Giordano, Franco Blanchini, Raffaele Bruno, Patrizio Colaneri, Alessandro Di Filippo, Angela Di Matteo and Marta Colaneri\nJournal - Nature Medicine\nDOI - 10.1038/s41591-020-0883-7\n\nIn Italy, 128,948 confirmed cases and 15,887 deaths of people who tested positive for SARS-CoV-2 were registered as of 5 April 2020. Ending the global SARS-CoV-2 pandemic requires implementation of multiple population-wide strategies, including social distancing, testing and contact tracing. We propose a new model that predicts the course of the epidemic to help plan an effective control strategy. The model considers eight stages of infection: susceptible (S), infected (I), diagnosed (D), ailing (A), recognized (R), threatened (T), healed (H) and extinct (E), collectively termed SIDARTHE. Our SIDARTHE model discriminates between infected individuals depending on whether they have been diagnosed and on the severity of their symptoms. The distinction between diagnosed and non-diagnosed individuals is important because the former are typically isolated and hence less likely to spread the infection. This delineation also helps to explain misperceptions of the case fatality rate and of the epidemic spread. We compare simulation results with real data on the COVID-19 epidemic in Italy, and we model possible scenarios of implementation of countermeasures. Our results demonstrate that restrictive social-distancing measures will need to be combined with widespread testing and contact tracing to end the ongoing COVID-19 pandemic.	Petri Net	2023-03-22 22:26:00.93147	5
 \.
 
 
@@ -574,43 +576,30 @@ COPY public.model_parameter (id, model_id, name, type, default_value, state_vari
 32	3	I	float	\N	t
 33	3	I_v	float	\N	t
 34	3	R	float	\N	t
-35	4	alpha	float	0.57	f
-36	4	beta	float	0.011	f
-37	4	gamma	float	0.456	f
-38	4	delta	float	0.011	f
-39	4	epsilon	float	0.171	f
-40	4	theta	float	0.371	f
-41	4	zeta	float	0.125	f
-42	4	eta	float	0.125	f
-43	4	mu	float	0.017	f
-44	4	nu	float	0.027	f
-45	4	tau	float	0.01	f
-46	4	kappa	float	0.017	f
-47	4	rho	float	0.034	f
-48	4	sigma	float	0.017	f
-49	4	xi	float	0.017	f
-50	4	Event_trigger_Fig3b	float	0.0	f
-51	4	Event_trigger_Fig3d	float	0.0	f
-52	4	Event_trigger_Fig4b	float	0.0	f
-53	4	Event_trigger_Fig4d	float	0.0	f
-54	4	epsilon_modifier	float	1.0	f
-55	4	alpha_modifier	float	1.0	f
-56	4	ModelValue_16	float	0.0	f
-57	4	ModelValue_17	float	0.0	f
-58	4	ModelValue_18	float	0.0	f
-59	4	ModelValue_19	float	0.0	f
-60	4	ModelValue_21	float	1.0	f
-61	4	ModelValue_20	float	1.0	f
-62	4	Italy	float	1.0	f
-63	4	XXlambdaXX	float	0.034	f
-64	4	Susceptible	float	0.9999963	t
-65	4	Infected	float	3.33333333e-06	t
-66	4	Diagnosed	float	3.33333333e-07	t
-67	4	Ailing	float	1.66666666e-08	t
-68	4	Recognized	float	3.33333333e-08	t
-69	4	Threatened	float	0.0	t
-70	4	Healed	float	0.0	t
-71	4	Extinct	float	0.0	t
+72	5	lambda	float	0.034	f
+73	5	alpha	float	0.57	f
+74	5	beta	float	0.011	f
+75	5	gamma	float	0.456	f
+76	5	delta	float	0.011	f
+77	5	epsilon	float	0.171	f
+78	5	theta	float	0.371	f
+79	5	zeta	float	0.125	f
+80	5	eta	float	0.125	f
+81	5	mu	float	0.017	f
+82	5	nu	float	0.027	f
+83	5	tau	float	0.01	f
+84	5	kappa	float	0.017	f
+85	5	rho	float	0.034	f
+86	5	sigma	float	0.017	f
+87	5	xi	float	0.017	f
+88	5	Susceptible	float	0.9999963	t
+89	5	Infected	float	3.33333333e-06	t
+90	5	Diagnosed	float	3.33333333e-07	t
+91	5	Ailing	float	1.66666666e-08	t
+92	5	Recognized	float	3.33333333e-08	t
+93	5	Threatened	float	0.0	t
+94	5	Healed	float	0.0	t
+95	5	Extinct	float	0.0	t
 \.
 
 
@@ -1782,6 +1771,31 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 391	2023-03-22 22:26:00.944614	REINTERPRETS	42	Dataset	42	SimulationRun	1	.
 388	2023-03-22 22:26:00.944614	IS_CONCEPT_OF	1	Concept	42	Dataset	1	ido:0000514
 390	2023-03-22 22:26:00.944614	GENERATED_BY	42	SimulationRun	4	Plan	1	.
+392	2023-04-07 13:57:33.361204	BEGINS_AT	5	Model	5	ModelRevision	\N	.
+393	2023-04-07 13:57:33.361204	PARAMETER_OF	72	ModelParameter	5	ModelRevision	\N	.
+394	2023-04-07 13:57:33.361204	PARAMETER_OF	73	ModelParameter	5	ModelRevision	\N	.
+395	2023-04-07 13:57:33.361204	PARAMETER_OF	74	ModelParameter	5	ModelRevision	\N	.
+396	2023-04-07 13:57:33.361204	PARAMETER_OF	75	ModelParameter	5	ModelRevision	\N	.
+397	2023-04-07 13:57:33.361204	PARAMETER_OF	76	ModelParameter	5	ModelRevision	\N	.
+398	2023-04-07 13:57:33.361204	PARAMETER_OF	77	ModelParameter	5	ModelRevision	\N	.
+399	2023-04-07 13:57:33.361204	PARAMETER_OF	78	ModelParameter	5	ModelRevision	\N	.
+400	2023-04-07 13:57:33.361204	PARAMETER_OF	79	ModelParameter	5	ModelRevision	\N	.
+401	2023-04-07 13:57:33.361204	PARAMETER_OF	80	ModelParameter	5	ModelRevision	\N	.
+402	2023-04-07 13:57:33.361204	PARAMETER_OF	81	ModelParameter	5	ModelRevision	\N	.
+403	2023-04-07 13:57:33.361204	PARAMETER_OF	82	ModelParameter	5	ModelRevision	\N	.
+404	2023-04-07 13:57:33.361204	PARAMETER_OF	83	ModelParameter	5	ModelRevision	\N	.
+405	2023-04-07 13:57:33.361204	PARAMETER_OF	84	ModelParameter	5	ModelRevision	\N	.
+406	2023-04-07 13:57:33.361204	PARAMETER_OF	85	ModelParameter	5	ModelRevision	\N	.
+407	2023-04-07 13:57:33.361204	PARAMETER_OF	86	ModelParameter	5	ModelRevision	\N	.
+408	2023-04-07 13:57:33.361204	PARAMETER_OF	87	ModelParameter	5	ModelRevision	\N	.
+409	2023-04-07 13:57:33.361204	PARAMETER_OF	88	ModelParameter	5	ModelRevision	\N	.
+410	2023-04-07 13:57:33.361204	PARAMETER_OF	89	ModelParameter	5	ModelRevision	\N	.
+411	2023-04-07 13:57:33.361204	PARAMETER_OF	90	ModelParameter	5	ModelRevision	\N	.
+412	2023-04-07 13:57:33.361204	PARAMETER_OF	91	ModelParameter	5	ModelRevision	\N	.
+413	2023-04-07 13:57:33.361204	PARAMETER_OF	92	ModelParameter	5	ModelRevision	\N	.
+414	2023-04-07 13:57:33.361204	PARAMETER_OF	93	ModelParameter	5	ModelRevision	\N	.
+415	2023-04-07 13:57:33.361204	PARAMETER_OF	94	ModelParameter	5	ModelRevision	\N	.
+416	2023-04-07 13:57:33.361204	PARAMETER_OF	95	ModelParameter	5	ModelRevision	\N	.
 \.
 
 
@@ -3152,14 +3166,14 @@ SELECT pg_catalog.setval('public.intermediate_id_seq', 7, true);
 -- Name: model_description_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dev
 --
 
-SELECT pg_catalog.setval('public.model_description_id_seq', 4, true);
+SELECT pg_catalog.setval('public.model_description_id_seq', 5, true);
 
 
 --
 -- Name: model_parameter_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dev
 --
 
-SELECT pg_catalog.setval('public.model_parameter_id_seq', 71, true);
+SELECT pg_catalog.setval('public.model_parameter_id_seq', 95, true);
 
 
 --
@@ -3173,7 +3187,7 @@ SELECT pg_catalog.setval('public.model_runtime_id_seq', 1, false);
 -- Name: model_state_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dev
 --
 
-SELECT pg_catalog.setval('public.model_state_id_seq', 4, true);
+SELECT pg_catalog.setval('public.model_state_id_seq', 5, true);
 
 
 --
@@ -3208,7 +3222,7 @@ SELECT pg_catalog.setval('public.project_id_seq', 1, true);
 -- Name: provenance_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dev
 --
 
-SELECT pg_catalog.setval('public.provenance_id_seq', 391, true);
+SELECT pg_catalog.setval('public.provenance_id_seq', 416, true);
 
 
 --
