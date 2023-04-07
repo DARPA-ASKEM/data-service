@@ -85,8 +85,9 @@ repopulate-db:
 		make down; \
 		make db-clean; \
 		NEO4J_ENABLED=False make up && \
-		sleep 1 && \
+		sleep 10 && \
 		NEO4J_ENABLED=False make populate && \
+		sleep 10 && \
 		make db-full && \
 		echo '$(SQL_HASH)' > $(SQL_HASH_FILE); \
 	fi

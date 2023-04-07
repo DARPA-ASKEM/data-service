@@ -143,6 +143,10 @@ def create_model(path, name, description, framework, url=url):
 
     with open(path, "r") as f:
         model_content = json.load(f)
+    for param in model_content.get("T", []):
+        param_name = param.get("parameter_name", None)
+        if param_name:
+            param["tname"] = param_name
     payload = json.dumps(
         {
             "name": name,
@@ -250,11 +254,21 @@ def create_run(path, plan_id, success, description=None, dataset_id=None, url=ur
 
 def create_model_parameters(path_parameters, path_initials, model_id, url=url):
     print("uploading model parameters")
+    headers = {"Content-Type": "application/json"}
+    model_req = requests.request("GET", url + f"models/{model_id}", headers=headers)
+    model_json = model_req.json()
+    valid_params = set([t['tname'] for t in model_json.get("content", {}).get("T", [])])
+    valid_params |= set([t['sname'] for t in model_json.get("content", {}).get("S", [])])
+    print(f"Valid params:\n")
+    print("\n".join(valid_params))
 
     parameter_types = []
     with open(path_parameters, "r") as f:
         parameters = json.load(f)
         for parameter_name, parameter_value in parameters.get("parameters").items():
+            if parameter_name not in valid_params:
+                print(f"Skipping param named: '{parameter_name}'")
+                continue
             if parameter_value.get("value") == None:
                 type_ = "float"
                 default_value = None
@@ -274,6 +288,9 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
     with open(path_initials, "r") as f:
         parameters = json.load(f)
         for parameter_name, parameter_value in parameters.get("initials").items():
+            if parameter_name not in valid_params:
+                print(f"Skipping param named: '{parameter_name}'")
+                continue
             if parameter_value.get("value") == None:
                 type_ = "float"
                 default_value = None
@@ -295,7 +312,6 @@ def create_model_parameters(path_parameters, path_initials, model_id, url=url):
             }
             parameter_types.append(param)
     payload = json.dumps(parameter_types)
-    headers = {"Content-Type": "application/json"}
     response = requests.request(
         "PUT", url + f"models/{model_id}/parameters", headers=headers, data=payload
     )

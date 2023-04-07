@@ -67,7 +67,7 @@ create_framework()
 
 # loop over models
 folders = sorted(
-    glob.glob("experiments*/thin-thread-examples/biomodels/BIOMD*/")
+    glob.glob("experiments*/thin-thread-examples/mira_v1/biomodels/BIOMD*/")
     + glob.glob("experiments*/thin-thread-examples/demo/BIOMD*/")
 )
 
@@ -370,4 +370,4 @@ populate_exemplar_datasets()
 
 
 ## now delete the repo
-shutil.rmtree("experiments-main")
+# shutil.rmtree("experiments-main")
