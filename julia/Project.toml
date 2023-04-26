@@ -1,4 +1,4 @@
-name = "TerariumDataService"
+name = "APIClient"
 uuid = "d84ad9ee-b5d5-4c5c-84c0-a6d1b137609a"
 authors = ["Five Grant <5@fivegrant.com>"]
 version = "0.1.0"
