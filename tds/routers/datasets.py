@@ -9,14 +9,22 @@ from logging import DEBUG, Logger
 from typing import List, Optional
 
 import pandas
-from fastapi import APIRouter, Depends, File, Response, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Response,
+    UploadFile,
+    status,
+)
 from fastapi.responses import StreamingResponse
 from sqlalchemy import or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
-from tds.db import list_by_id, request_rdb
+from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.datasets import create_qualifier_xref
 from tds.lib.storage import get_rawfile, prepare_csv, put_rawfile
 
@@ -305,7 +313,6 @@ def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
     """
 
     with Session(rdb) as session:
-
         datasetp = payload.dict()
         del datasetp["id"]
         dataset = orm.Dataset(**datasetp)
@@ -374,8 +381,9 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
         session.commit()
 
 
-@router.get("/{id}/download/rawfile")
-def get_csv_from_dataset(
+# TODO: DELETE THIS DEPRECATED ENDPOINT
+@router.get("/{id}/download/rawfile", deprecated=True)
+def get_csv_from_dataset_depr(
     id: int,
     wide_format: bool = False,
     row_limit: Optional[int] = None,
@@ -409,8 +417,9 @@ def get_csv_from_dataset(
     return StreamingResponse(iter([output]), media_type="text/csv")
 
 
-@router.post("/{id}/upload/file")
-def upload_file(
+# TODO: DELETE THIS DEPRECATED ENDPOINT
+@router.post("/{id}/upload/file", deprecated=True)
+def upload_file_depr(
     id: int,
     file: UploadFile = File(...),
     filename: Optional[str] = None,
@@ -435,6 +444,88 @@ def upload_file(
     # Upload file
     dest_path = os.path.join(base_uri, str(id), filename)
     put_rawfile(path=dest_path, fileobj=file.file)
+
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id, "filename": filename}),
+    )
+
+
+@router.get("/{id}/file")
+def get_csv_from_dataset(
+    id: int,
+    wide_format: bool = False,
+    row_limit: Optional[int] = None,
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Gets the csv of an annotated dataset that is registered
+    via the data-annotation tool.
+    """
+    dataset = get_dataset(id=id, rdb=rdb)
+    uses_annotations = dataset.annotations is not None
+    path = dataset.annotations["data_paths"][0] if uses_annotations else dataset.url
+    storage_options = {"client_kwargs": {"endpoint_url": os.getenv("STORAGE_HOST")}}
+    if uses_annotations and path.endswith(".parquet.gzip"):
+        # Build single dataframe
+        dataframe = pandas.concat(
+            pandas.read_parquet(file, storage_options=storage_options)
+            for file in dataset.annotations["data_paths"]
+        )
+        output = prepare_csv(dataframe, wide_format, row_limit)
+        response = StreamingResponse(
+            iter([output]),
+            media_type="text/csv",
+        )
+        response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+        return response
+
+    file = get_rawfile(path)
+    dataframe = pandas.read_csv(file)
+    output = prepare_csv(dataframe, wide_format, row_limit)
+    return StreamingResponse(iter([output]), media_type="text/csv")
+
+
+@router.post("/{id}/file")
+def upload_file(
+    id: int,
+    file: UploadFile = File(...),
+    filename: Optional[str] = None,
+    rdb: Engine = Depends(request_rdb),
+):
+    """Upload a file to the DATASET_BASE_STORAGE_URL
+
+    Args:
+        id (int): Dataset ID.
+        file (UploadFile, optional): Upload of file-like object.
+        filename (Optional[str], optional): Allows the specification of
+        a particular filename at upload. Defaults to None.
+
+    Returns:
+        Reponse: FastAPI Response object containing
+        information about the uploaded file.
+    """
+
+    if not entry_exists(rdb.connect(), orm.Dataset, id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    base_uri = os.getenv("DATASET_STORAGE_BASE_URL")
+
+    if filename is None:
+        filename = file.filename
+
+    # Upload file
+    dest_path = os.path.join(base_uri, str(id), filename)
+    put_rawfile(path=dest_path, fileobj=file.file)
+
+    with Session(rdb) as session:
+        dataset = session.query(orm.Dataset).get(id)
+        if dataset.annotations is None:
+            dataset.url = dest_path
+            session.commit()
 
     return Response(
         status_code=status.HTTP_201_CREATED,

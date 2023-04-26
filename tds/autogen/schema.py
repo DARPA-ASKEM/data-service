@@ -170,13 +170,13 @@ class Dataset(BaseModel):
     url: str
     description: str
     timestamp: datetime.datetime = datetime.datetime.now()
-    deprecated: Optional[bool]
+    deprecated: Optional[bool] = False
     sensitivity: Optional[str]
     quality: Optional[str]
     temporal_resolution: Optional[str]
     geospatial_resolution: Optional[str]
     annotations: Optional[Json]
-    maintainer: int
+    maintainer: Optional[int]
     simulation_run: Optional[bool] = False
 
 

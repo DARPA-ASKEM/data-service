@@ -130,13 +130,13 @@ Table dataset {
   url varchar [not null]
   description text [not null]
   timestamp datetime [default: `now()`, not null]
-  deprecated bool
+  deprecated bool [default: false]
   sensitivity text
   quality text
   temporal_resolution varchar
   geospatial_resolution varchar
   annotations json
-  maintainer int [not null, ref: > public.person.id]
+  maintainer int [ref: > public.person.id]
   simulation_run bool [default: false]
 }
 

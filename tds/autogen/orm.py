@@ -182,13 +182,13 @@ class Dataset(Base):
     url = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.Text(), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    deprecated = sa.Column(sa.Boolean())
+    deprecated = sa.Column(sa.Boolean(), server_default='False')
     sensitivity = sa.Column(sa.Text())
     quality = sa.Column(sa.Text())
     temporal_resolution = sa.Column(sa.String())
     geospatial_resolution = sa.Column(sa.String())
     annotations = sa.Column(JSON())
-    maintainer = sa.Column(sa.Integer(), sa.ForeignKey('person.id'), nullable=False)
+    maintainer = sa.Column(sa.Integer(), sa.ForeignKey('person.id'))
     simulation_run = sa.Column(sa.Boolean(), server_default='False')
 
 
