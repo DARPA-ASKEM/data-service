@@ -27,6 +27,7 @@ from tds.autogen import orm, schema
 from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.datasets import create_qualifier_xref
 from tds.lib.storage import get_rawfile, prepare_csv, put_rawfile
+from tds.operation import create, delete, retrieve, update
 
 logger = Logger(__file__)
 logger.setLevel(DEBUG)
@@ -43,7 +44,7 @@ def get_features(
     return list_by_id(rdb.connect(), orm.Feature, page_size, page)
 
 
-@router.get("/features/{id}")
+@router.get("/features/{id}", **retrieve.fastapi_endpoint_config)
 def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific feature by ID
@@ -53,7 +54,7 @@ def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("/features")
+@router.post("/features", **create.fastapi_endpoint_config)
 def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
     """
     Create a feature
@@ -85,7 +86,7 @@ def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
         )
 
 
-@router.patch("/features/{id}")
+@router.patch("/features/{id}", **update.fastapi_endpoint_config)
 def update_feature(
     payload: schema.Feature, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
@@ -103,8 +104,8 @@ def update_feature(
     return "Updated Feature"
 
 
-@router.delete("/features/{id}")
-def delete_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+@router.delete("/features/{id}", **update.fastapi_endpoint_config)
+def delete_feature(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Delete a feature by ID
     """
@@ -123,7 +124,7 @@ def get_qualifiers(
     return list_by_id(rdb.connect(), orm.Qualifier, page_size, page)
 
 
-@router.get("/qualifiers/{id}")
+@router.get("/qualifiers/{id}", **retrieve.fastapi_endpoint_config)
 def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific qualifier by ID
@@ -133,7 +134,7 @@ def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("/qualifiers")
+@router.post("/qualifiers", **create.fastapi_endpoint_config)
 def create_qualifier(
     payload: schema.Qualifier,
     qualifies_array: List[str],
@@ -186,7 +187,7 @@ def create_qualifier(
         )
 
 
-@router.patch("/qualifiers/{id}")
+@router.patch("/qualifiers/{id}", **update.fastapi_endpoint_config)
 def update_qualifier(
     payload: schema.Qualifier, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
@@ -204,7 +205,7 @@ def update_qualifier(
     return "Updated Qualifier"
 
 
-@router.delete("/qualifiers/{id}")
+@router.delete("/qualifiers/{id}", **delete.fastapi_endpoint_config)
 def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Delete a qualifier by ID
@@ -267,7 +268,7 @@ def get_datasets(
         return datasets
 
 
-@router.get("/{id}")
+@router.get("/{id}", **retrieve.fastapi_endpoint_config)
 def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific dataset by ID
@@ -306,7 +307,7 @@ def search_feature(
         return dataset
 
 
-@router.post("")
+@router.post("", **retrieve.fastapi_endpoint_config)
 def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
     """
     Create a dataset
@@ -330,7 +331,7 @@ def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
         )
 
 
-@router.patch("/{id}")
+@router.patch("/{id}", **update.fastapi_endpoint_config)
 def update_dataset(
     payload: schema.Dataset, id: int, rdb: Engine = Depends(request_rdb)
 ) -> Response:
@@ -371,7 +372,7 @@ def deprecate_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 # Not working because of lack of cascade settings in ORM?
 # Features foreign key blocks the delete.
-@router.delete("/{id}")
+@router.delete("/{id}", **delete.fastapi_endpoint_config)
 def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Delete a dataset by ID
