@@ -13,7 +13,7 @@ basepath(::Type{ ParametersApi }) = "http://localhost"
 
 const _returntypes_create_parameters_parameters_post_ParametersApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
-    Regex("^" * replace("201", "x"=>".") * "\$") => CreateSoftwareExternalSoftwarePost201Response,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 

@@ -13,7 +13,7 @@ basepath(::Type{ ProjectsApi }) = "http://localhost"
 
 const _returntypes_create_asset_projects_project_id_assets_resource_type_resource_id_post_ProjectsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
-    Regex("^" * replace("201", "x"=>".") * "\$") => CreateSoftwareExternalSoftwarePost201Response,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 
@@ -50,7 +50,7 @@ end
 
 const _returntypes_create_project_projects_post_ProjectsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
-    Regex("^" * replace("201", "x"=>".") * "\$") => CreateSoftwareExternalSoftwarePost201Response,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 

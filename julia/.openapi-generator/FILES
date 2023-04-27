@@ -3,7 +3,7 @@ docs/Association.md
 docs/BodyCreateQualifierDatasetsQualifiersPost.md
 docs/Concept.md
 docs/ConceptsApi.md
-docs/CreateSoftwareExternalSoftwarePost201Response.md
+docs/CreateFeatureDatasetsFeaturesPost201Response.md
 docs/Dataset.md
 docs/DatasetsApi.md
 docs/ExperimentalApi.md
@@ -64,7 +64,7 @@ src/modelincludes.jl
 src/models/model_Association.jl
 src/models/model_BodyCreateQualifierDatasetsQualifiersPost.jl
 src/models/model_Concept.jl
-src/models/model_CreateSoftwareExternalSoftwarePost201Response.jl
+src/models/model_CreateFeatureDatasetsFeaturesPost201Response.jl
 src/models/model_Dataset.jl
 src/models/model_Feature.jl
 src/models/model_HTTPValidationError.jl

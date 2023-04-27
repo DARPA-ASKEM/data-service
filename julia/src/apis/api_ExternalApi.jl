@@ -13,7 +13,7 @@ basepath(::Type{ ExternalApi }) = "http://localhost"
 
 const _returntypes_create_publication_external_publications_post_ExternalApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
-    Regex("^" * replace("201", "x"=>".") * "\$") => CreateSoftwareExternalSoftwarePost201Response,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 
@@ -45,7 +45,7 @@ end
 
 const _returntypes_create_software_external_software_post_ExternalApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
-    Regex("^" * replace("201", "x"=>".") * "\$") => CreateSoftwareExternalSoftwarePost201Response,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 

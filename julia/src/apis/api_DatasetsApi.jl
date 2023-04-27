@@ -13,6 +13,7 @@ basepath(::Type{ DatasetsApi }) = "http://localhost"
 
 const _returntypes_create_dataset_datasets_post_DatasetsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 
@@ -44,6 +45,7 @@ end
 
 const _returntypes_create_feature_datasets_features_post_DatasetsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 
@@ -75,6 +77,7 @@ end
 
 const _returntypes_create_qualifier_datasets_qualifiers_post_DatasetsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 
@@ -106,6 +109,8 @@ end
 
 const _returntypes_delete_dataset_datasets_id_delete_DatasetsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
+    Regex("^" * replace("404", "x"=>".") * "\$") => String,
+    Regex("^" * replace("204", "x"=>".") * "\$") => Nothing,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 
@@ -170,6 +175,8 @@ end
 
 const _returntypes_delete_qualifier_datasets_qualifiers_id_delete_DatasetsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
+    Regex("^" * replace("404", "x"=>".") * "\$") => String,
+    Regex("^" * replace("204", "x"=>".") * "\$") => Nothing,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 

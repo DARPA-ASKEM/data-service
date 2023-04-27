@@ -13,7 +13,7 @@ basepath(::Type{ SimulationsApi }) = "http://localhost"
 
 const _returntypes_create_plan_simulations_plans_post_SimulationsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
-    Regex("^" * replace("201", "x"=>".") * "\$") => CreateSoftwareExternalSoftwarePost201Response,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 
@@ -45,7 +45,7 @@ end
 
 const _returntypes_create_run_from_description_simulations_runs_descriptions_post_SimulationsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
-    Regex("^" * replace("201", "x"=>".") * "\$") => CreateSoftwareExternalSoftwarePost201Response,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 
@@ -77,7 +77,7 @@ end
 
 const _returntypes_create_run_simulations_runs_post_SimulationsApi = Dict{Regex,Type}(
     Regex("^" * replace("200", "x"=>".") * "\$") => Any,
-    Regex("^" * replace("201", "x"=>".") * "\$") => CreateSoftwareExternalSoftwarePost201Response,
+    Regex("^" * replace("201", "x"=>".") * "\$") => CreateFeatureDatasetsFeaturesPost201Response,
     Regex("^" * replace("422", "x"=>".") * "\$") => HTTPValidationError,
 )
 
