@@ -307,7 +307,7 @@ def search_feature(
         return dataset
 
 
-@router.post("", **retrieve.fastapi_endpoint_config)
+@router.post("", **create.fastapi_endpoint_config)
 def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
     """
     Create a dataset
