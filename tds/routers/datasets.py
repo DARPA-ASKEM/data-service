@@ -104,7 +104,7 @@ def update_feature(
     return "Updated Feature"
 
 
-@router.delete("/features/{id}", **update.fastapi_endpoint_config)
+@router.delete("/features/{id}", **delete.fastapi_endpoint_config)
 def delete_feature(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Delete a feature by ID
@@ -455,7 +455,7 @@ def upload_file_depr(
     )
 
 
-@router.get("/{id}/file")
+@router.get("/{id}/files")
 def get_csv_from_dataset(
     id: int,
     wide_format: bool = False,
@@ -490,7 +490,7 @@ def get_csv_from_dataset(
     return StreamingResponse(iter([output]), media_type="text/csv")
 
 
-@router.post("/{id}/file")
+@router.post("/{id}/files")
 def upload_file(
     id: int,
     file: UploadFile = File(...),
