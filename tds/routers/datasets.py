@@ -9,16 +9,25 @@ from logging import DEBUG, Logger
 from typing import List, Optional
 
 import pandas
-from fastapi import APIRouter, Depends, File, Response, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Response,
+    UploadFile,
+    status,
+)
 from fastapi.responses import StreamingResponse
 from sqlalchemy import or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
-from tds.db import list_by_id, request_rdb
+from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.datasets import create_qualifier_xref
 from tds.lib.storage import get_rawfile, prepare_csv, put_rawfile
+from tds.operation import create, delete, retrieve, update
 
 logger = Logger(__file__)
 logger.setLevel(DEBUG)
@@ -35,7 +44,7 @@ def get_features(
     return list_by_id(rdb.connect(), orm.Feature, page_size, page)
 
 
-@router.get("/features/{id}")
+@router.get("/features/{id}", **retrieve.fastapi_endpoint_config)
 def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific feature by ID
@@ -45,7 +54,7 @@ def get_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("/features")
+@router.post("/features", **create.fastapi_endpoint_config)
 def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
     """
     Create a feature
@@ -77,7 +86,7 @@ def create_feature(payload: schema.Feature, rdb: Engine = Depends(request_rdb)):
         )
 
 
-@router.patch("/features/{id}")
+@router.patch("/features/{id}", **update.fastapi_endpoint_config)
 def update_feature(
     payload: schema.Feature, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
@@ -95,8 +104,8 @@ def update_feature(
     return "Updated Feature"
 
 
-@router.delete("/features/{id}")
-def delete_feature(id: int, rdb: Engine = Depends(request_rdb)) -> str:
+@router.delete("/features/{id}", **delete.fastapi_endpoint_config)
+def delete_feature(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Delete a feature by ID
     """
@@ -115,7 +124,7 @@ def get_qualifiers(
     return list_by_id(rdb.connect(), orm.Qualifier, page_size, page)
 
 
-@router.get("/qualifiers/{id}")
+@router.get("/qualifiers/{id}", **retrieve.fastapi_endpoint_config)
 def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific qualifier by ID
@@ -125,7 +134,7 @@ def get_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
         return result
 
 
-@router.post("/qualifiers")
+@router.post("/qualifiers", **create.fastapi_endpoint_config)
 def create_qualifier(
     payload: schema.Qualifier,
     qualifies_array: List[str],
@@ -178,7 +187,7 @@ def create_qualifier(
         )
 
 
-@router.patch("/qualifiers/{id}")
+@router.patch("/qualifiers/{id}", **update.fastapi_endpoint_config)
 def update_qualifier(
     payload: schema.Qualifier, id: int, rdb: Engine = Depends(request_rdb)
 ) -> str:
@@ -196,7 +205,7 @@ def update_qualifier(
     return "Updated Qualifier"
 
 
-@router.delete("/qualifiers/{id}")
+@router.delete("/qualifiers/{id}", **delete.fastapi_endpoint_config)
 def delete_qualifier(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Delete a qualifier by ID
@@ -259,7 +268,7 @@ def get_datasets(
         return datasets
 
 
-@router.get("/{id}")
+@router.get("/{id}", **retrieve.fastapi_endpoint_config)
 def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific dataset by ID
@@ -298,14 +307,13 @@ def search_feature(
         return dataset
 
 
-@router.post("")
+@router.post("", **create.fastapi_endpoint_config)
 def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
     """
     Create a dataset
     """
 
     with Session(rdb) as session:
-
         datasetp = payload.dict()
         del datasetp["id"]
         dataset = orm.Dataset(**datasetp)
@@ -323,7 +331,7 @@ def create_dataset(payload: schema.Dataset, rdb: Engine = Depends(request_rdb)):
         )
 
 
-@router.patch("/{id}")
+@router.patch("/{id}", **update.fastapi_endpoint_config)
 def update_dataset(
     payload: schema.Dataset, id: int, rdb: Engine = Depends(request_rdb)
 ) -> Response:
@@ -364,7 +372,7 @@ def deprecate_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
 
 # Not working because of lack of cascade settings in ORM?
 # Features foreign key blocks the delete.
-@router.delete("/{id}")
+@router.delete("/{id}", **delete.fastapi_endpoint_config)
 def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Delete a dataset by ID
@@ -374,8 +382,9 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
         session.commit()
 
 
-@router.get("/{id}/download/rawfile")
-def get_csv_from_dataset(
+# TODO: DELETE THIS DEPRECATED ENDPOINT
+@router.get("/{id}/download/rawfile", deprecated=True)
+def get_csv_from_dataset_depr(
     id: int,
     wide_format: bool = False,
     row_limit: Optional[int] = None,
@@ -409,8 +418,9 @@ def get_csv_from_dataset(
     return StreamingResponse(iter([output]), media_type="text/csv")
 
 
-@router.post("/{id}/upload/file")
-def upload_file(
+# TODO: DELETE THIS DEPRECATED ENDPOINT
+@router.post("/{id}/upload/file", deprecated=True)
+def upload_file_depr(
     id: int,
     file: UploadFile = File(...),
     filename: Optional[str] = None,
@@ -435,6 +445,88 @@ def upload_file(
     # Upload file
     dest_path = os.path.join(base_uri, str(id), filename)
     put_rawfile(path=dest_path, fileobj=file.file)
+
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id, "filename": filename}),
+    )
+
+
+@router.get("/{id}/files")
+def get_csv_from_dataset(
+    id: int,
+    wide_format: bool = False,
+    row_limit: Optional[int] = None,
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Gets the csv of an annotated dataset that is registered
+    via the data-annotation tool.
+    """
+    dataset = get_dataset(id=id, rdb=rdb)
+    uses_annotations = dataset.annotations is not None
+    path = dataset.annotations["data_paths"][0] if uses_annotations else dataset.url
+    storage_options = {"client_kwargs": {"endpoint_url": os.getenv("STORAGE_HOST")}}
+    if uses_annotations and path.endswith(".parquet.gzip"):
+        # Build single dataframe
+        dataframe = pandas.concat(
+            pandas.read_parquet(file, storage_options=storage_options)
+            for file in dataset.annotations["data_paths"]
+        )
+        output = prepare_csv(dataframe, wide_format, row_limit)
+        response = StreamingResponse(
+            iter([output]),
+            media_type="text/csv",
+        )
+        response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+        return response
+
+    file = get_rawfile(path)
+    dataframe = pandas.read_csv(file)
+    output = prepare_csv(dataframe, wide_format, row_limit)
+    return StreamingResponse(iter([output]), media_type="text/csv")
+
+
+@router.post("/{id}/files")
+def upload_file(
+    id: int,
+    file: UploadFile = File(...),
+    filename: Optional[str] = None,
+    rdb: Engine = Depends(request_rdb),
+):
+    """Upload a file to the DATASET_BASE_STORAGE_URL
+
+    Args:
+        id (int): Dataset ID.
+        file (UploadFile, optional): Upload of file-like object.
+        filename (Optional[str], optional): Allows the specification of
+        a particular filename at upload. Defaults to None.
+
+    Returns:
+        Reponse: FastAPI Response object containing
+        information about the uploaded file.
+    """
+
+    if not entry_exists(rdb.connect(), orm.Dataset, id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    base_uri = os.getenv("DATASET_STORAGE_BASE_URL")
+
+    if filename is None:
+        filename = file.filename
+
+    # Upload file
+    dest_path = os.path.join(base_uri, str(id), filename)
+    put_rawfile(path=dest_path, fileobj=file.file)
+
+    with Session(rdb) as session:
+        dataset = session.query(orm.Dataset).get(id)
+        if dataset.annotations is None:
+            dataset.url = dest_path
+            session.commit()
 
     return Response(
         status_code=status.HTTP_201_CREATED,

@@ -255,13 +255,13 @@ CREATE TABLE public.dataset (
     url character varying NOT NULL,
     description text NOT NULL,
     "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
-    deprecated boolean,
+    deprecated boolean DEFAULT false,
     sensitivity text,
     quality text,
     temporal_resolution character varying,
     geospatial_resolution character varying,
     annotations json,
-    maintainer integer NOT NULL,
+    maintainer integer,
     simulation_run boolean DEFAULT false
 );
 
