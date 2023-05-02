@@ -104,7 +104,7 @@ def update_feature(
     return "Updated Feature"
 
 
-@router.delete("/features/{id}", **update.fastapi_endpoint_config)
+@router.delete("/features/{id}", **delete.fastapi_endpoint_config)
 def delete_feature(id: int, rdb: Engine = Depends(request_rdb)):
     """
     Delete a feature by ID
