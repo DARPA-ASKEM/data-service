@@ -455,7 +455,7 @@ def upload_file_depr(
     )
 
 
-@router.get("/{id}/file")
+@router.get("/{id}/files")
 def get_csv_from_dataset(
     id: int,
     wide_format: bool = False,
@@ -490,7 +490,7 @@ def get_csv_from_dataset(
     return StreamingResponse(iter([output]), media_type="text/csv")
 
 
-@router.post("/{id}/file")
+@router.post("/{id}/files")
 def upload_file(
     id: int,
     file: UploadFile = File(...),
