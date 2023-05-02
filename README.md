@@ -2,7 +2,8 @@
 
 ## Usage
 
-The API can be started by simply calling
+The API can be started by simply calling the following commands with Python 3.10 as your python or python3 command
+and poetry installed.
 
 ```
 make init
