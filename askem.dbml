@@ -230,6 +230,7 @@ Table model_parameter {
 Table simulation_parameter {
   id int [pk]
   run_id int [ref: > simulation_run.id, not null]
+  model_parameter_id int [ref: > model_parameter.id]
   name varchar [not null]
   value varchar [not null]
   type value_type [not null]
