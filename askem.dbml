@@ -71,7 +71,7 @@ Enum taggable_type {
    features
    qualifiers
    datasets
-   simulation_plans
+   model_configurations
    models
    model_parameters
    projects
