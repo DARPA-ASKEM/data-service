@@ -199,17 +199,16 @@ Table model_runtime {
   right varchar [ref: > model_framework.name, not null]
 }
 
-Table simulation_plan {
+Table model_configuration {
   id int [pk]
   model_id int [ref: > model_description.id, not null]
-  simulator varchar [not null]
-  query varchar [not null]
+  name varchar [not null]
   content json [not null]
 }
 
 Table simulation_run {
   id int [pk]
-  simulator_id int [ref: > simulation_plan.id, not null]
+  simulator_id int [ref: > model_configuration.id, not null]
   timestamp datetime [default: `now()`, not null]
   completed_at datetime
   success bool
