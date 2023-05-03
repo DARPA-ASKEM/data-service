@@ -42,7 +42,7 @@ class TaggableType(Enum):
     publications = schema.TaggableType.publications.name
     qualifiers = schema.TaggableType.qualifiers.name
     simulation_parameters = schema.TaggableType.simulation_parameters.name
-    simulation_plans = schema.TaggableType.simulation_plans.name
+    model_configurations = schema.TaggableType.model_configurations.name
     simulation_runs = schema.TaggableType.simulation_runs.name
 
 
