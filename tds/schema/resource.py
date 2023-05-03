@@ -28,9 +28,8 @@ Resource = Dataset | Model | Plan | Publication | Intermediate | Run
 ORMResource = (
     orm.Dataset
     | orm.ModelDescription
-    | orm.SimulationPlan
+    | orm.ModelConfiguration
     | orm.Publication
-    | orm.Intermediate
     | orm.SimulationRun
 )
 
@@ -85,9 +84,8 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
         {
             ResourceType.datasets: orm.Dataset,
             ResourceType.models: orm.ModelDescription,
-            ResourceType.plans: orm.SimulationPlan,
+            ResourceType.plans: orm.ModelConfiguration,
             ResourceType.publications: orm.Publication,
-            ResourceType.intermediates: orm.Intermediate,
             ResourceType.simulation_runs: orm.SimulationRun,
         },
     )
