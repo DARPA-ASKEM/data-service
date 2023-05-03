@@ -23,7 +23,7 @@ class Software(schema.Software):
         orm_mode = True
 
 
-Resource = Dataset | Model | Plan | Publication | Intermediate | Run
+Resource = Dataset | Model | Plan | Publication | Run
 
 ORMResource = (
     orm.Dataset
@@ -38,7 +38,6 @@ obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Model: ResourceType.models,
     Plan: ResourceType.plans,
     Publication: ResourceType.publications,
-    Intermediate: ResourceType.intermediates,
     Run: ResourceType.simulation_runs,
 }
 
@@ -47,7 +46,6 @@ obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
     ModelDescription: ResourceType.models,
     Plan: ResourceType.plans,
     Publication: ResourceType.publications,
-    Intermediate: ResourceType.intermediates,
     RunDescription: ResourceType.simulation_runs,
 }
 
