@@ -77,13 +77,13 @@ class TaggableType(str, Enum):
     datasets = 'datasets'
     features = 'features'
     intermediates = 'intermediates'
+    model_configurations = 'model_configurations'
     model_parameters = 'model_parameters'
     models = 'models'
     projects = 'projects'
     publications = 'publications'
     qualifiers = 'qualifiers'
     simulation_parameters = 'simulation_parameters'
-    simulation_plans = 'simulation_plans'
     simulation_runs = 'simulation_runs'
     
 
@@ -163,6 +163,16 @@ class ModelRuntime(BaseModel):
     right: str
 
 
+class SimulationParameter(BaseModel):
+
+    id: Optional[int] = None
+    run_id: Optional[int] = None
+    model_parameter_id: Optional[int]
+    name: str
+    value: str
+    type: ValueType
+
+
 class Dataset(BaseModel):
 
     id: Optional[int] = None
@@ -199,12 +209,11 @@ class Qualifier(BaseModel):
     value_type: ValueType
 
 
-class SimulationPlan(BaseModel):
+class ModelConfiguration(BaseModel):
 
     id: Optional[int] = None
     model_id: Optional[int] = None
-    simulator: str
-    query: str
+    name: str
     content: Json
 
 
@@ -228,15 +237,6 @@ class ModelParameter(BaseModel):
     type: ValueType
     default_value: Optional[str]
     state_variable: bool
-
-
-class SimulationParameter(BaseModel):
-
-    id: Optional[int] = None
-    run_id: Optional[int] = None
-    name: str
-    value: str
-    type: ValueType
 
 
 class Extraction(BaseModel):
@@ -300,15 +300,6 @@ class ModelState(BaseModel):
     id: Optional[int] = None
     timestamp: datetime.datetime = datetime.datetime.now()
     content: Optional[Json]
-
-
-class Intermediate(BaseModel):
-
-    id: Optional[int] = None
-    timestamp: datetime.datetime = datetime.datetime.now()
-    source: IntermediateSource
-    type: IntermediateFormat
-    content: bytes
 
 
 class Software(BaseModel):
