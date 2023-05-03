@@ -7,7 +7,7 @@ from json import dumps
 from typing import List, Optional
 
 from tds.autogen import orm
-from tds.autogen.schema import SimulationRun
+from tds.autogen.schema import ModelConfiguration, SimulationRun
 from tds.schema.concept import Concept
 
 SimulationParameters = List[dict]
@@ -23,7 +23,7 @@ def orm_to_params(parameters: List[orm.SimulationParameter]) -> SimulationParame
     ]
 
 
-class Plan(SimulationPlan):
+class Plan(ModelConfiguration):
     concept: Optional[Concept] = None
 
     @classmethod
