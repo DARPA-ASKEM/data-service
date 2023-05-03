@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"version": "v8", "schema_hash": "efdf518b52bcefe9d7d692f82bcbadabbc878d73", "orm_hash": "82384df9cd4640bbfe4f7b6db6eac596cee39e08"}
+=======
+{"version": "v8", "schema_hash": "b3958a56643277e254ee92f5a6e53a06fa72144d", "orm_hash": "67cade320e8ff5e6d6c170fb108c6538f56446f9"}
+>>>>>>> db18790 (Updated autogen info.)
