@@ -184,14 +184,6 @@ Table model_state {
   content json
 }
 
-Table intermediate {
-  id int [pk]
-  timestamp datetime [default: `now()`, not null]
-  source intermediate_source [not null]
-  type intermediate_format [not null]
-  content blob [not null]
-}
-
 Table software {
   id int [pk]
   timestamp datetime [default:`now()`, not null]
