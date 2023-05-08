@@ -33,6 +33,7 @@ botocore = "1.27.59"
 boto3 = "1.24"
 psycopg2 = "^2.9.5"
 alembic = "^1.9.4"
+elasticsearch = {extras = ["async"], version = "^8.7.0"}
 
 [tool.poetry.scripts]
 tds = "tds.main:cli"
