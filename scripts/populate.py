@@ -1,3 +1,5 @@
+import os
+from glob import glob
 from io import BytesIO
 from json import dumps
 from tempfile import TemporaryDirectory
@@ -6,22 +8,71 @@ from zipfile import ZipFile
 
 import requests
 
+REPO = "https://github.com/DARPA-ASKEM/experiments"  # TODO(five): Incorrect link
+MODELS_SUBDIR_PATH = "thin-thread-examples/mira_v2/biomodels"
+URL = "http://localhost:8001"
 
-def create(route, payload, url) -> int | None:
+
+def create_asset(route, payload, url) -> int | None:
     headers = {"Content-Type": "application/json"}
-
-    # return resource_id (a1)
     response = requests.request("POST", f"{url}{route}", headers=headers, data=payload)
-
     response_data = response.json()
     if "id" in response_data:
-        publication_id = response_data.get("id")
-        return publication_id
+        asset_id = response_data.get("id")
+        return asset_id
     else:
         return
 
 
-def create_dependency_entities(dir, url) -> dict[str, int | None]:
+def attach_to_project(asset_id, asset_type, project_id, url):
+    payload = dumps(
+        {
+            "project_id": project_id,
+            "resource_id": asset_id,
+            "resource_type": asset_type,
+            "external_ref": "string",
+        }
+    )
+    create_asset(f"projects/{project_id}/assets/{asset_type}", payload, url)
+
+
+def connect_through_provenance(
+    left_id,
+    left_type,
+    right_id,
+    right_type,
+    relation_type,
+    user_id,
+    concept=".",
+    url=URL,
+):
+    payload = dumps(
+        {
+            "left": left_id,
+            "left_type": left_type,
+            "right": right_id,
+            "right_type": right_type,
+            "relation_type": relation_type,
+            "user_id": user_id,
+            "concept": concept,  # NOTE: this seems to be for caching, making searches easier later
+        }
+    )
+    create_asset(f"provenance", payload, url)
+
+
+def attach_to_concept(concept, object_id, object_type, url):
+    payload = dumps(
+        {
+            "curie": concept,
+            "type": object_type,
+            "object_id": object_id,
+            "status": "obj",
+        }
+    )
+    create_asset(f"concepts", payload, url)
+
+
+def create_dependency_entities(url) -> dict[str, int | None]:
     """
     Create entities that are necessary to create other entities. This
     data does NOT come from upstream, it's just placeholder data
@@ -54,26 +105,24 @@ def create_dependency_entities(dir, url) -> dict[str, int | None]:
             }
         ),
     }
-    return {route: create(route, payload, url) for route, payload in payloads.items()}
+    return {
+        route: create_asset(route, payload, url) for route, payload in payloads.items()
+    }
 
 
-def create_models(dir, url):
+def create_models(path, url):
     """
     Create all the datasets listed in the directory
     """
+    full_model_path = os.path.join(path, MODELS_SUBDIR_PATH)
+    model_dirs = sorted(glob(full_model_path + "/*/"))
+
     # TODO(five): Iterate over every directory
     # TODO(five): Upload paper
     # TODO(five): Upload model
 
 
-def attach_concepts(dir, url):
-    """
-    Attach concepts to datasets, models, parameters, etc
-    """
-    # TODO(five): Attach a concept to each entity
-
-
-def create_datasets(dir, url):
+def create_datasets(path, url):
     """
     Create all the models listed in the directory
     """
@@ -81,19 +130,20 @@ def create_datasets(dir, url):
     # TODO(five): Upload dataset
 
 
-def populate():
+def populate(url=URL):
     """
     Populate TDS using data from the experiments repo
     """
-    url = "http://localhost:8000/"
     http_response = urlopen(url)
-    with TemporaryDirectory() as temp_dir:
+    with TemporaryDirectory() as tmp_dir:
+        tmp_path = str(tmp_dir)
         # Download and extract experiments repo
         zipfile = ZipFile(BytesIO(http_response.read()))
-        zipfile.extractall(str(temp_dir))
+        zipfile.extractall(tmp_path)
 
-        # Populate data
-        create_dependency_entities(temp_dir, url)
-        create_models(temp_dir, url)
-        create_datasets(temp_dir, url)
-    print("Population is complete")
+        dependencies = create_dependency_entities(url)
+        print("Placeholder data created.")
+
+        create_models(tmp_path, url)
+        create_datasets(tmp_path, url)
+    print("Population is complete!")
