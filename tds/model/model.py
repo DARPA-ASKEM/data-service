@@ -1,8 +1,9 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class Model(BaseModel):
-    id: int
-
-    def __init__(self):
-        pass
+    id: Optional[int]
+    name: str
+    description: str
