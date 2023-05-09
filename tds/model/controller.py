@@ -1,5 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+import json
+from pprint import pprint
 
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy.engine.base import Engine
+from sqlalchemy.orm import Query, Session
+
+from tds.db import es
 from tds.model.model import Model
 from tds.operation import create
 
@@ -12,11 +18,12 @@ def model_post(payload: Model) -> Response:
     """
     Create model and return its ID
     """
-    print(payload)
+    res = es.index(index="model", body=payload.dict())
+
     return Response(
         status_code=status.HTTP_201_CREATED,
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps({"id": 1}),
+        content=json.dumps({"id": res["_id"]}),
     )
