@@ -1,6 +1,8 @@
 """
 Configures data store using environment variables
 """
+import os
+
 from pydantic import BaseSettings
 
 
@@ -24,6 +26,9 @@ class Settings(BaseSettings):
     NEO4J_PASSWORD = "password"
     NEO4J_USER = "neo4j"
     OPENAI_KEY = "sk-.."
+    ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD")
+    ES_PORT: int = os.getenv("ES_PORT")
+    ES_HOST: str = os.getenv("ES_HOST")
 
 
 settings = Settings()
