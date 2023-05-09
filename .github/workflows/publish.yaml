@@ -22,7 +22,7 @@ jobs:
   tag-generator:
     uses: darpa-askem/.github/.github/workflows/tag-generator.yaml@main
     with:
-      branch: 'dev'
+      branch: 'main'
 
   # Build and Publish all targets associated with specified group
   bake:
