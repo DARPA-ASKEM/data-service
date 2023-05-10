@@ -12,7 +12,7 @@ class Model(TdsModel):
     description: str
     model: dict
     model_schema: str = Field(alias="schema")
-    model_version: float
+    model_version: str
 
     _index = "model"
     concepts: Optional[List] = []
