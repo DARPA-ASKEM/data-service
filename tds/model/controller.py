@@ -10,7 +10,7 @@ from sqlalchemy.orm import Query, Session
 
 from tds.db import es
 from tds.model.model import Model
-from tds.operation import create, retrieve, update
+from tds.operation import create, delete, retrieve, update
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -22,8 +22,8 @@ def model_post(payload: Model) -> Response:
     """
     Create model and return its ID
     """
-    res = es.index(index="model", body=payload.dict())
-    logger.info("new model created: %i", id)
+    res = payload.save()
+    logger.info(f"new model created: {id}")
     return Response(
         status_code=200,
         headers={
@@ -40,7 +40,7 @@ def model_get(id: str | int) -> Response:
     """
     try:
         res = es.get(index="model", id=id)
-        logger.info("model retrieved: %i", id)
+        logger.info(f"model retrieved: {id}")
 
         return Response(
             status_code=status.HTTP_200_OK,
@@ -63,7 +63,7 @@ def model_put(id: str | int, payload: Model) -> Response:
     """
     Update a model in ElasticSearch
     """
-    res = es.index(index="model", body=payload.dict(), id=id)
+    res = payload.save(id)
     logger.info("model updated: %i", id)
     return Response(
         status_code=status.HTTP_200_OK,
@@ -72,3 +72,30 @@ def model_put(id: str | int, payload: Model) -> Response:
         },
         content=json.dumps({"id": res["_id"]}),
     )
+
+
+@router.delete("/{id}", **delete.fastapi_endpoint_config)
+def model_delete(id: str | int) -> Response:
+    try:
+        res = es.delete(index="model", id=id)
+
+        if res["result"] != "deleted":
+            logger.error(f"Failed to delete model: {id}")
+            raise Exception(
+                f"Failed to delete model. ElasticSearch Response: {res['result']}"
+            )
+
+        logger.info(f"Model successfully deleted: {id}")
+        return Response(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+        )
+    except NotFoundError:
+        return Response(
+            status_code=status.HTTP_404_NOT_FOUND,
+            headers={
+                "content-type": "application/json",
+            },
+        )
