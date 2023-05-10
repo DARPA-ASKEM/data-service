@@ -13,6 +13,7 @@ class Model(TdsModel):
     model: dict
 
     _index = "model"
+    concepts: Optional[List] = []
 
     # def __init__(self, **kwargs):
     #     for kwarg in kwargs:
@@ -32,7 +33,19 @@ class Model(TdsModel):
 
     def save(self, id: Optional[None | str | int] = None):
         self._extract_concepts()
-        super(Model, self).save(id)
+        return super(Model, self).save(id)
 
     def _extract_concepts(self):
-        pass
+        states = self.model["states"]
+
+        for state in states:
+            if (
+                "grounding" in state
+                and "identifiers" in state["grounding"]
+                and bool(state["grounding"]["identifiers"])
+            ):
+                for key in state["grounding"]["identifiers"]:
+                    value = state["grounding"]["identifiers"][key]
+                    curie = f"{key}:{value}"
+                    if curie not in self.concepts:
+                        self.concepts.append(curie)
