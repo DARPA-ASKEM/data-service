@@ -9,7 +9,7 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.db import es
-from tds.model.model import Model
+from tds.modules.model.model import Model
 from tds.operation import create, delete, retrieve, update
 
 model_router = APIRouter()
