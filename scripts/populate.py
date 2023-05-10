@@ -9,39 +9,16 @@ from zipfile import ZipFile
 import requests
 
 REPO = "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"  # TODO(five): Pin rev
-MODELS_SUBDIR_PATH = "thin-thread-examples/mira_v2/biomodels"
 URL = "http://localhost:8001/"  # TODO(five): Handle non-leading `/` case
-XDD_MAPPINGS = "scripts/xdd_mapping.json"
-DOCUMENT_ID = "document_xdd_gddid.txt"
+MODELS_SUBDIR_PATH = "experiments-main/thin-thread-examples/mira_v2/biomodels/"
+MODEL_DIR_PATTERN = "BIO*"
 MODEL_CONCEPTS = "model_mmt_templates.json"
+DOCUMENT_ID = "document_xdd_gddid.txt"
 MODEL = "model_askenet.json"
-
-
-def collect_model_concepts(model_dir, filename=MODEL_CONCEPTS):
-    model_concepts = []
-    with open(os.path.join(model_dir, filename), "r") as f:
-        mmt_template = json.load(f)
-
-    for template in mmt_template.get("templates"):
-        for key in template:
-            if key == "subject" or key == "outcome":
-                for identifier in template[key].get("identifiers"):
-                    if not "biomodels" in identifier:
-                        model_concepts.append(
-                            f"{identifier}:{template[key].get('identifiers').get(identifier)}"
-                        )
-            elif key == "controllers":
-                for controller in template[key]:
-                    for identifier in controller.get("identifiers"):
-                        if "biomodels" not in identifier:
-                            model_concepts.append(
-                                f"{identifier}:{controller.get('identifiers').get(identifier)}"
-                            )
-                    for identifier in controller.get("context"):
-                        model_concepts.append(
-                            f"{identifier}:{controller.get('identifiers').get(identifier)}"
-                        )
-    return [*set(model_concepts)]
+XDD_MAPPINGS = "scripts/xdd_mapping.json"
+DATASETS_SUBDIR_PATH = "experiments-main/thin-thread-examples/exemplar_datasets/"
+DATASET_DIR_PATTERN = "*"
+DATASET_METADATA = "meta.json"
 
 
 def create_asset(route, payload, url) -> int | None:
@@ -57,13 +34,10 @@ def create_asset(route, payload, url) -> int | None:
 
 
 def attach_to_project(asset_id, asset_type, project_id, url):
-    payload = {
-        "project_id": project_id,
-        "resource_id": asset_id,
-        "resource_type": asset_type,
-        "external_ref": "string",
-    }
-    create_asset(f"projects/{project_id}/assets/{asset_type}", payload, url)
+    response = requests.post(
+        f"{url}projects/{project_id}/assets/{asset_type}/{asset_id}"
+    )
+    response.raise_for_status()
 
 
 def connect_through_provenance(
@@ -97,6 +71,11 @@ def attach_to_concept(concept, object_id, object_type, url):
     }
     create_asset(f"concepts", payload, url)
     # TODO(five): Do we want to add provenance manually??
+
+
+def list_asset_dirs(root_path, subdir, pattern) -> list[str]:
+    full_path = os.path.join(root_path, subdir)
+    return sorted(glob(full_path + pattern))
 
 
 def create_dependency_entities(url) -> dict[str, int | None]:
@@ -135,19 +114,18 @@ def create_models(
     root_path,
     url,
     necessary_entities,
-    xdd_mappings_filepath=XDD_MAPPINGS,
     models_subdir=MODELS_SUBDIR_PATH,
-    document_id_path=DOCUMENT_ID,
+    model_dir_pattern=MODEL_DIR_PATTERN,
     model_file=MODEL,
+    document_id_path=DOCUMENT_ID,
+    xdd_mappings_filepath=XDD_MAPPINGS,
 ):
     """
     Create all the datasets listed in the directory
     """
-    full_model_path = os.path.join(root_path, models_subdir)
-    model_dirs = sorted(glob(full_model_path + "/*/"))
     with open(xdd_mappings_filepath, "r") as file:
         uri_to_title_mappings = json.load(file)
-    for model_dir in model_dirs:
+    for model_dir in list_asset_dirs(root_path, models_subdir, model_dir_pattern):
         print(f"Working on {model_dir}..")
         with open(os.path.join(model_dir, document_id_path), "r") as file:
             xdd_uri = file.read()
@@ -155,8 +133,11 @@ def create_models(
             "xdd_uri": xdd_uri,
             "title": uri_to_title_mappings.get(xdd_uri, "Unknown"),
         }
-        publication_id = create_asset("/publications", publication_payload, url)
-        print(f"\tCreated publication with id: {id}")
+        publication_id = create_asset("external/publications", publication_payload, url)
+        attach_to_project(
+            publication_id, "publications", necessary_entities["projects"], url
+        )
+        print(f"\tCreated publication with id: {publication_id}")
         with open(os.path.join(model_dir, model_file), "r") as file:
             raw_model = file.read()
         model = json.loads(raw_model)
@@ -164,11 +145,14 @@ def create_models(
             "name": model["name"],
             "description": model["description"],
             "content": raw_model,
-            "framework": necessary_entities["models/frameworks"],
+            "framework": "petrinet",  # TODO(five): Dynamically select framework in the future OR have tds figure it out
+            "parameters": [],
         }
-        model_id = create_asset("/models", model_payload, url)
-        print(f"\tCreated model with id: {id}")
+        model_id = create_asset("models", model_payload, url)
+        attach_to_project(model_id, "models", necessary_entities["projects"], url)
+        print(f"\tCreated model with id: {model_id}")
         # TODO(five): Add optional `publication` parameter to model post endpoint itself that handles provenance
+        # TODO(five): This is broken because intermediates have been removed and models don't connect to publications
         connect_through_provenance(
             model_id,
             "Model",
@@ -178,17 +162,58 @@ def create_models(
             necessary_entities["persons"],
             url=url,
         )
-        # TODO(five): Attach parameters
-        # TODO(five): Attach concepts
+        # TODO(five): Attach parameters? should be included in content
+        # TODO(five): Attach concepts? should be included in content
 
 
-def create_datasets(path, url):
+def create_datasets(
+    root_path,
+    url,
+    necessary_entities,
+    dataset_subdir=DATASETS_SUBDIR_PATH,
+    dataset_dir_pattern=DATASET_DIR_PATTERN,
+    metadata_file=DATASET_METADATA,
+):
     """
     Create all the models listed in the directory
     """
-    # TODO(five): Iterate over every directory
-    # TODO(five): Upload dataset
-    # TODO(five): Attch concepts
+    for dataset_dir in list_asset_dirs(root_path, dataset_subdir, dataset_dir_pattern):
+        with open(os.path.join(dataset_dir, metadata_file), "r") as file:
+            metadata = json.load(file)
+
+        dataset_metadata_payload = {
+            "name": metadata["name"],
+            "url": metadata["maintainer"]["website"],
+            "description": metadata["description"],
+            "maintainer": necessary_entities["persons"],
+            "annotations": json.dumps({"data_paths": []}),
+        }
+        dataset_id = create_asset("datasets", dataset_metadata_payload, url)
+        attach_to_project(dataset_id, "datasets", necessary_entities["projects"], url)
+
+        # TODO(five): Edit datapaths on file upload (Data Annotations used to handle this)
+        with open(glob(os.path.join(dataset_dir, "*.parquet.gzip"))[0], "rb") as file:
+            upload_response = requests.post(
+                URL + f"datasets/{dataset_id}/file",
+                files={"file": file},
+                timeout=100,
+            )
+
+        curies = set()
+        for feature in metadata["outputs"]:
+            if feature["primaryOntologyId"]:
+                curies.add(feature["primaryOntologyId"])
+        for curie in curies:
+            concept_payload = {
+                "curie": curie,
+                "type": "datasets",
+                "object_id": dataset_id,
+                "status": "obj",
+            }
+            create_asset("concepts", concept_payload, url)
+        print(f"Created dataset with id: {dataset_id}")
+        # TODO(five): Do we actually want to update the path in the annotations object or just get rid of it
+        # TODO(five): Upload features and qualifiers. Do we still want features??
 
 
 def populate(repo=REPO, tds_url=URL):
@@ -203,8 +228,8 @@ def populate(repo=REPO, tds_url=URL):
 
         dependencies = create_dependency_entities(tds_url)
         print("Placeholder data created.")
-        create_models(tmp_path, dependencies, tds_url)
-        create_datasets(tmp_path, tds_url)
+        # create_models(tmp_path, tds_url, dependencies)
+        create_datasets(tmp_path, tds_url, dependencies)
     print("Population is complete!")
 
 
