@@ -1,16 +1,18 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from tds.autogen import orm
 from tds.db.base import TdsModel
-from tds.model import orm_to_params
+from tds.model.utils import orm_to_params
 
 
 class Model(TdsModel):
     name: str
     description: str
     model: dict
+    model_schema: str = Field(alias="schema")
+    model_version: float
 
     _index = "model"
     concepts: Optional[List] = []

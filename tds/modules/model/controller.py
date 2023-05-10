@@ -12,12 +12,11 @@ from tds.db import es
 from tds.model.model import Model
 from tds.operation import create, delete, retrieve, update
 
+model_router = APIRouter()
 logger = Logger(__name__)
-router = APIRouter()
-route_prefix = "mdl"
 
 
-@router.post("", **create.fastapi_endpoint_config)
+@model_router.post("", **create.fastapi_endpoint_config)
 def model_post(payload: Model) -> Response:
     """
     Create model and return its ID
@@ -33,13 +32,14 @@ def model_post(payload: Model) -> Response:
     )
 
 
-@router.get("/{id}", **retrieve.fastapi_endpoint_config)
+@model_router.get("/{id}", **retrieve.fastapi_endpoint_config)
 def model_get(id: str | int) -> Response:
     """
     Retrieve a model from ElasticSearch
     """
     try:
         res = es.get(index="model", id=id)
+        pprint(res)
         logger.info(f"model retrieved: {id}")
 
         return Response(
@@ -58,7 +58,7 @@ def model_get(id: str | int) -> Response:
         )
 
 
-@router.put("/{id}", **update.fastapi_endpoint_config)
+@model_router.put("/{id}", **update.fastapi_endpoint_config)
 def model_put(id: str | int, payload: Model) -> Response:
     """
     Update a model in ElasticSearch
@@ -74,7 +74,7 @@ def model_put(id: str | int, payload: Model) -> Response:
     )
 
 
-@router.delete("/{id}", **delete.fastapi_endpoint_config)
+@model_router.delete("/{id}", **delete.fastapi_endpoint_config)
 def model_delete(id: str | int) -> Response:
     try:
         res = es.delete(index="model", id=id)
