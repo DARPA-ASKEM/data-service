@@ -10,7 +10,7 @@ import requests
 
 REPO = "https://github.com/DARPA-ASKEM/experiments/archive/refs/heads/main.zip"  # TODO(five): Pin rev
 MODELS_SUBDIR_PATH = "thin-thread-examples/mira_v2/biomodels"
-URL = "http://localhost:8001"
+URL = "http://localhost:8001/"  # TODO(five): Handle non-leading `/` case
 XDD_MAPPINGS = "scripts/xdd_mapping.json"
 DOCUMENT_ID = "document_xdd_gddid.txt"
 MODEL_CONCEPTS = "model_mmt_templates.json"
@@ -49,6 +49,7 @@ def create_asset(route, payload, url) -> int | None:
     response = requests.request(
         "POST", f"{url}{route}", headers=headers, data=json.dumps(payload)
     )
+    response.raise_for_status()
     response_data = response.json()
     if "id" in response_data:
         asset_id = response_data.get("id")
@@ -130,25 +131,33 @@ def create_dependency_entities(url) -> dict[str, int | None]:
     }
 
 
-def create_models(path, url, necessary_entities, xdd_mappings_filepath=XDD_MAPPINGS):
+def create_models(
+    root_path,
+    url,
+    necessary_entities,
+    xdd_mappings_filepath=XDD_MAPPINGS,
+    models_subdir=MODELS_SUBDIR_PATH,
+    document_id_path=DOCUMENT_ID,
+    model_file=MODEL,
+):
     """
     Create all the datasets listed in the directory
     """
-    full_model_path = os.path.join(path, MODELS_SUBDIR_PATH)
+    full_model_path = os.path.join(root_path, models_subdir)
     model_dirs = sorted(glob(full_model_path + "/*/"))
     with open(xdd_mappings_filepath, "r") as file:
         uri_to_title_mappings = json.load(file)
     for model_dir in model_dirs:
-        print(f"Working on {model_dir}")
-        with open(os.path.join(model_dir, DOCUMENT_ID), "r") as file:
+        print(f"Working on {model_dir}..")
+        with open(os.path.join(model_dir, document_id_path), "r") as file:
             xdd_uri = file.read()
         publication_payload = {
             "xdd_uri": xdd_uri,
             "title": uri_to_title_mappings.get(xdd_uri, "Unknown"),
         }
         publication_id = create_asset("/publications", publication_payload, url)
-        print(f"Created publication with id: {id}")
-        with open(os.path.join(model_dir, MODEL), "r") as file:
+        print(f"\tCreated publication with id: {id}")
+        with open(os.path.join(model_dir, model_file), "r") as file:
             raw_model = file.read()
         model = json.loads(raw_model)
         model_payload = {
@@ -158,8 +167,8 @@ def create_models(path, url, necessary_entities, xdd_mappings_filepath=XDD_MAPPI
             "framework": necessary_entities["models/frameworks"],
         }
         model_id = create_asset("/models", model_payload, url)
-        print(f"Created model with id: {id}")
-        # TODO(five): Add optional `publication` parameter to model post that handles provenance
+        print(f"\tCreated model with id: {id}")
+        # TODO(five): Add optional `publication` parameter to model post endpoint itself that handles provenance
         connect_through_provenance(
             model_id,
             "Model",
@@ -182,18 +191,22 @@ def create_datasets(path, url):
     # TODO(five): Attch concepts
 
 
-def populate(url=URL):
+def populate(repo=REPO, tds_url=URL):
     """
     Populate TDS using data from the experiments repo
     """
-    http_response = urlopen(url)
+    http_response = urlopen(repo)
     with TemporaryDirectory() as tmp_dir:
         tmp_path = str(tmp_dir)
         zipfile = ZipFile(BytesIO(http_response.read()))
         zipfile.extractall(tmp_path)
 
-        dependencies = create_dependency_entities(url)
+        dependencies = create_dependency_entities(tds_url)
         print("Placeholder data created.")
-        create_models(tmp_path, dependencies, url)
-        create_datasets(tmp_path, url)
+        create_models(tmp_path, dependencies, tds_url)
+        create_datasets(tmp_path, tds_url)
     print("Population is complete!")
+
+
+if __name__ == "__main__":
+    populate()
