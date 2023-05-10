@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 from tds.autogen import orm
 from tds.db.base import TdsModel
-from tds.model.utils import orm_to_params
+from tds.modules.model.utils import orm_to_params
 
 
 class Model(TdsModel):
