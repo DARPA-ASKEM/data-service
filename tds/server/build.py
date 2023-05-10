@@ -64,8 +64,7 @@ def build_api(*args: str) -> FastAPI:
     for router_name in args if len(args) != 0 else find_valid_routers():
         attach_router(api, router_name)
 
-    model_pkg = import_module("tds.model.controller")
-
+    model_pkg = import_module("tds.modules.model")
     api.include_router(
         model_pkg.router, tags=["TDS Model"], prefix="/" + model_pkg.route_prefix
     )
