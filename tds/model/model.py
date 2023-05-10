@@ -29,3 +29,10 @@ class Model(TdsModel):
         body.__dict__["content"] = dumps(ModelContent.from_orm(state).content)
         body.__dict__["parameters"] = orm_to_params(parameters)
         return super().from_orm(body)
+
+    def save(self, id: Optional[None | str | int] = None):
+        self._extract_concepts()
+        super(Model, self).save(id)
+
+    def _extract_concepts(self):
+        pass
