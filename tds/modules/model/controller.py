@@ -10,6 +10,7 @@ from sqlalchemy.orm import Query, Session
 
 from tds.db import es
 from tds.modules.model.model import Model
+from tds.modules.model.utils import model_response
 from tds.operation import create, delete, retrieve, update
 
 model_router = APIRouter()
@@ -47,7 +48,7 @@ def model_get(id: str | int) -> Response:
             headers={
                 "content-type": "application/json",
             },
-            content=json.dumps(res["_source"]),
+            content=json.dumps(model_response(res)),
         )
     except NotFoundError:
         return Response(
