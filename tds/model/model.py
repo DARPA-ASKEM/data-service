@@ -15,10 +15,6 @@ class Model(TdsModel):
     _index = "model"
     concepts: Optional[List] = []
 
-    # def __init__(self, **kwargs):
-    #     for kwarg in kwargs:
-    #         setattr(self, kwarg, kwargs[kwarg])
-
     @classmethod
     def from_orm(
         cls,
