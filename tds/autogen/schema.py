@@ -176,6 +176,7 @@ class Dataset(BaseModel):
     temporal_resolution: Optional[str]
     geospatial_resolution: Optional[str]
     annotations: Optional[Json]
+    data_path: Optional[str]
     maintainer: Optional[int]
     simulation_run: Optional[bool] = False
 
