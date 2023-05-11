@@ -1,13 +1,1 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-{"version": "v8", "schema_hash": "efdf518b52bcefe9d7d692f82bcbadabbc878d73", "orm_hash": "82384df9cd4640bbfe4f7b6db6eac596cee39e08"}
-=======
-{"version": "v8", "schema_hash": "b3958a56643277e254ee92f5a6e53a06fa72144d", "orm_hash": "67cade320e8ff5e6d6c170fb108c6538f56446f9"}
->>>>>>> db18790 (Updated autogen info.)
-=======
-{"version": "v8", "schema_hash": "3f19908ac1fe18bb50b573ec31457ec6ebd8461f", "orm_hash": "bb23295d6effaca1e4a2901e1da78875aa476ade"}
->>>>>>> 5a3a084 (Regen `autogen` to exclude intermediate relation changes)
-=======
-{"version": "v8", "schema_hash": "1baab5b66e1d733d5875f2f298b7b942bf08d52e", "orm_hash": "08c3122609d759c31ae6349cd0303a1c10ef4145"}
->>>>>>> a027dc4 (Remove `model_to_primitive` in the autogen)
+{"version": "v8", "schema_hash": "94c587a6c6bc8495247949d3966d61e36d0c695d", "orm_hash": "486439785e19b7a594828b87a4341746964541e3"}
