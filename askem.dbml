@@ -278,7 +278,7 @@ Table ontology_concept {
   id int [pk]
   curie varchar [ref: > active_concept.curie, not null]
   type taggable_type [not null]
-  object_id int [not null]
+  object_id varchar [not null]
   status ontological_field [not null]
 }
 
