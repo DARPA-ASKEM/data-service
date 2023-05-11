@@ -21,7 +21,6 @@ from tds.db import (
 from tds.lib.models import adjust_model_params, model_opt_relationship_mapping
 from tds.operation import create, delete, retrieve, update
 from tds.schema.model import (
-    Intermediate,
     Model,
     ModelDescription,
     ModelFramework,
@@ -98,67 +97,10 @@ def delete_framework(name: str, rdb: Engine = Depends(request_rdb)) -> Response:
     )
 
 
-@router.get("/intermediates/{id}", **retrieve.fastapi_endpoint_config)
-def get_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Intermediate:
-    """
-    Retrieve model
-    """
-    if entry_exists(rdb.connect(), orm.Intermediate, id):
-        with Session(rdb) as session:
-            intermediate = session.query(orm.Intermediate).get(id)
-
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Intermediate.from_orm(intermediate)
-
-
-@router.post("/intermediates", **create.fastapi_endpoint_config)
-def create_intermediate(
-    payload: Intermediate, rdb: Engine = Depends(request_rdb)
-) -> Response:
-    """
-    Create intermediate and return its ID
-    """
-    with Session(rdb) as session:
-        intermediate_payload = payload.dict()
-        # pylint: disable-next=unused-variable
-        intermediate = orm.Intermediate(**intermediate_payload)
-        session.add(intermediate)
-        session.commit()
-        id: int = intermediate.id
-
-    logger.info("new model created: %i", id)
-    return Response(
-        status_code=status.HTTP_201_CREATED,
-        headers={
-            "content-type": "application/json",
-        },
-        content=json.dumps({"id": id}),
-    )
-
-
-@router.delete("/intermediates/{id}", **delete.fastapi_endpoint_config)
-def delete_intermediate(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
-    """
-    Delete framework metadata
-    """
-    with Session(rdb) as session:
-        if entry_exists(rdb.connect(), orm.Intermediate, id):
-            intermediate = session.query(orm.Intermediate).get(id)
-            session.delete(intermediate)
-            session.commit()
-        else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Response(
-        status_code=status.HTTP_204_NO_CONTENT,
-    )
-
-
 @router.get("/descriptions")
 def list_model_descriptions(
     page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
 ) -> List[Model]:
-
     """
     Retrieve all models
 
@@ -232,7 +174,6 @@ def update_model_parameters(
 
     if settings.NEO4J_ENABLED:
         with Session(rdb) as session:
-
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
 
             with Session(rdb) as session:
@@ -434,7 +375,6 @@ def model_opt(
         session.commit()
 
         if settings.NEO4J_ENABLED:
-
             provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
             prov_payload = Provenance(
                 left=state.id,
@@ -448,7 +388,6 @@ def model_opt(
             provenance_handler.create_entry(prov_payload)
 
             if model_operation == "glue" and payload.get("right", False):
-
                 prov_payload = Provenance(
                     left=state.id,
                     left_type="ModelRevision",

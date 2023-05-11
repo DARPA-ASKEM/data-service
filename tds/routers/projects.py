@@ -39,7 +39,6 @@ def get_project_assets(
     types: Optional[List[ResourceType]] = FastAPIQuery(
         default=[
             ResourceType.datasets,
-            ResourceType.intermediates,
             ResourceType.models,
             ResourceType.plans,
             ResourceType.publications,
