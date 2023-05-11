@@ -1,7 +1,7 @@
 import json
 from logging import Logger
 from pprint import pprint
-from typing import Optional
+from typing import List, Optional
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -10,11 +10,34 @@ from sqlalchemy.orm import Query, Session
 
 from tds.db import es
 from tds.modules.model.model import Model
-from tds.modules.model.utils import model_response
+from tds.modules.model.utils import model_list_response, model_response
 from tds.operation import create, delete, retrieve, update
 
 model_router = APIRouter()
 logger = Logger(__name__)
+
+
+@model_router.get("/descriptions", **retrieve.fastapi_endpoint_config)
+def list_models(page_size: int = 100, page: int = 0) -> List:
+    """
+    Retrieve the list of models from ES.
+    """
+    list_body = {
+        "size": page_size,
+        "fields": ["name", "description", "model_schema", "model_version"],
+        "_source": False,
+    }
+    if page != 0:
+        list_body["from"] = page
+    res = es.search(index="model", body=list_body)
+
+    return Response(
+        status_code=status.HTTP_200_OK,
+        headers={
+            "content-type": "application/json",
+        },
+        content=model_list_response(res["hits"]["hits"]),
+    )
 
 
 @model_router.post("", **create.fastapi_endpoint_config)
