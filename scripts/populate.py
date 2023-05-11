@@ -181,23 +181,27 @@ def create_datasets(
         with open(os.path.join(dataset_dir, metadata_file), "r") as file:
             metadata = json.load(file)
 
+        # TODO(five): Use URL and remove annotations object in TDS
         dataset_metadata_payload = {
             "name": metadata["name"],
-            "url": metadata["maintainer"]["website"],
+            "url": "",  # metadata["maintainer"]["website"],
             "description": metadata["description"],
             "maintainer": necessary_entities["persons"],
-            "annotations": json.dumps({"data_paths": []}),
+            "annotations": None,
+            # "annotations": json.dumps({"data_paths": []})
         }
         dataset_id = create_asset("datasets", dataset_metadata_payload, url)
         attach_to_project(dataset_id, "datasets", necessary_entities["projects"], url)
 
         # TODO(five): Edit datapaths on file upload (Data Annotations used to handle this)
+        # NOTE: This does not work when trying to download because it's being read as a csv when no annotations exist
         with open(glob(os.path.join(dataset_dir, "*.parquet.gzip"))[0], "rb") as file:
             upload_response = requests.post(
-                URL + f"datasets/{dataset_id}/file",
+                URL + f"datasets/{dataset_id}/files",
                 files={"file": file},
                 timeout=100,
             )
+            upload_response.raise_for_status()
 
         curies = set()
         for feature in metadata["outputs"]:
