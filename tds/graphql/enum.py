@@ -35,7 +35,6 @@ class TaggableType(Enum):
 
     datasets = schema.TaggableType.datasets.name
     features = schema.TaggableType.features.name
-    intermediates = schema.TaggableType.intermediates.name
     model_parameters = schema.TaggableType.model_parameters.name
     models = schema.TaggableType.models.name
     projects = schema.TaggableType.projects.name
