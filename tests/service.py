@@ -151,7 +151,7 @@ class TestRun(AETS):
             session.commit()
 
             # Arrange Sim
-            plan = orm.SimulationPlan(
+            plan = orm.ModelConfiguration(
                 model_id=model.id, simulator="unknown", query="some query", content=""
             )
             session.add(plan)
@@ -240,7 +240,7 @@ class TestPlan(AETS):
             session.commit()
 
             # Arrange Sim
-            plan = orm.SimulationPlan(
+            plan = orm.ModelConfiguration(
                 model_id=model.id, simulator="unknown", query="some query", content=""
             )
             session.add(plan)
