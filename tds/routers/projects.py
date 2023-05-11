@@ -40,7 +40,7 @@ def get_project_assets(
         default=[
             ResourceType.datasets,
             ResourceType.models,
-            ResourceType.plans,
+            ResourceType.model_configs,
             ResourceType.publications,
             ResourceType.simulation_runs,
         ]

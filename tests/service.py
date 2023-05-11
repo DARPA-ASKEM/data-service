@@ -151,14 +151,12 @@ class TestRun(AETS):
             session.commit()
 
             # Arrange Sim
-            plan = orm.ModelConfiguration(
-                model_id=model.id, simulator="unknown", query="some query", content=""
-            )
-            session.add(plan)
+            config = orm.ModelConfiguration(model_id=model.id, content="")
+            session.add(config)
             session.commit()
 
             run = orm.SimulationRun(
-                simulator_id=plan.id,
+                simulator_id=config.id,
                 success=None,
                 completed_at=None,
                 response=b"sample",
@@ -209,7 +207,7 @@ class TestRun(AETS):
         assert response["parameters"][0]["name"] == "x"
 
 
-class TestPlan(AETS):
+class TestModelConfig(AETS):
     enabled_routers = ["models", "simulations"]
 
     def init_test_data(self):
@@ -240,22 +238,18 @@ class TestPlan(AETS):
             session.commit()
 
             # Arrange Sim
-            plan = orm.ModelConfiguration(
-                model_id=model.id, simulator="unknown", query="some query", content=""
-            )
-            session.add(plan)
+            config = orm.ModelConfiguration(model_id=model.id, content="")
+            session.add(config)
             session.commit()
 
-    @mark.skip(reason="TODO: Add update functionality to simulation plan")
+    @mark.skip(reason="TODO: Add update functionality to model configuration")
     def test_rest_update(self):
-        raise Exception("Plan updates needs to be implemented")
+        raise Exception("Configuration updates needs to be implemented")
 
     def test_rest_create(self):
         # Arrange
         payload = {
             "model_id": 1,
-            "simulator": "still unknown",
-            "query": "new query",
             "content": "{}",
         }
 
@@ -276,8 +270,6 @@ class TestPlan(AETS):
 
         # Assert
         assert status == expected_status[AllowedMethod.GET]
-        assert response["simulator"] == "unknown"
-        assert response["query"] == "some query"
         assert response["content"] == ""
 
 
