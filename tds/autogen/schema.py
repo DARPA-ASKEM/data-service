@@ -35,7 +35,6 @@ class ProvenanceSearchTypes(str, Enum):
     concept_counts = 'concept_counts'
     connected_nodes = 'connected_nodes'
     derived_models = 'derived_models'
-    model_to_primitive = 'model_to_primitive'
     parent_model_revisions = 'parent_model_revisions'
     parent_models = 'parent_models'
     parent_nodes = 'parent_nodes'
@@ -74,7 +73,6 @@ class TaggableType(str, Enum):
 
     datasets = 'datasets'
     features = 'features'
-    intermediates = 'intermediates'
     model_configurations = 'model_configurations'
     model_parameters = 'model_parameters'
     models = 'models'
@@ -98,20 +96,6 @@ class OntologicalField(str, Enum):
 
     obj = 'obj'
     unit = 'unit'
-    
-
-class IntermediateSource(str, Enum):
-
-    mrepresentationa = 'mrepresentationa'
-    skema = 'skema'
-    
-
-class IntermediateFormat(str, Enum):
-
-    bilayer = 'bilayer'
-    gromet = 'gromet'
-    other = 'other'
-    sbml = 'sbml'
     
 
 class Role(str, Enum):
