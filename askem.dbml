@@ -32,7 +32,6 @@ Enum provenance_search_types{
   derived_models
   parent_model_revisions
   parent_models
-  model_to_primitive
   artifacts_created_by_user
   concept
   concept_counts
@@ -75,7 +74,6 @@ Enum taggable_type {
    projects
    publications
    simulation_runs
-   intermediates
    simulation_parameters
 }
 
@@ -90,18 +88,6 @@ Enum value_type {
 Enum ontological_field {
    unit
    obj
-}
-
-Enum intermediate_source {
-  mrepresentationa
-  skema
-}
-
-Enum intermediate_format {
-  gromet
-  bilayer
-  sbml
-  other
 }
 
 Enum public.role {

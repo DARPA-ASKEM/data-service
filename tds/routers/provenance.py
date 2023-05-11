@@ -46,10 +46,6 @@ def search_provenance(
     **artifacts_created_by_user** - Return all artifacts created by a user.
     * Requirements: “user_id”
 
-    **model_to_primitive** - Return all models and the intermediates
-     they are derived from.
-    * Requirements: None
-
     **child_nodes** - Returns all child nodes of this artifact.
     (In other words artifacts created after this artifact
      that were dependent/derived from the root artifact).

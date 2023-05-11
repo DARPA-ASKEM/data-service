@@ -10,8 +10,6 @@ from neo4j import Driver
 from sqlalchemy.engine.base import Engine
 
 from tds.autogen import schema
-
-# from tds.db.graph.provenance_handler import ProvenanceHandler
 from tds.db.graph.query_helpers import (
     derived_models_query_generater,
     dynamic_relationship_direction,
@@ -93,7 +91,6 @@ class SearchProvenance:
         Return all connected nodes
         """
         with self.graph_db.session() as session:
-
             match_node = match_node_builder(
                 payload.get("root_type"), payload.get("root_id")
             )
@@ -158,7 +155,6 @@ class SearchProvenance:
                 + "root types of Publication or Intermediates",
             )
         with self.graph_db.session() as session:
-
             generated_query = derived_models_query_generater(
                 root_type=payload.get("root_type"), root_id=payload.get("root_id")
             )
@@ -184,7 +180,6 @@ class SearchProvenance:
                 + "from root types of Model, SimulationRun, Plan and Dataset",
             )
         with self.graph_db.session() as session:
-
             match_pattern = parent_model_query_generator(
                 payload.get("root_type"), payload.get("root_id")
             )
@@ -226,7 +221,6 @@ class SearchProvenance:
                 + "types of Model, Plan, SimulationRun, Dataset",
             )
         with self.graph_db.session() as session:
-
             match_pattern = parent_model_query_generator(
                 payload.get("root_type"), payload.get("root_id")
             )
@@ -262,41 +256,6 @@ class SearchProvenance:
             # ]
 
             # return sorted(response_data, key=lambda i: list(i.keys()))
-
-    def model_to_primitive(self, payload):
-        """
-        Which models relay on which primitives
-        """
-        logging.info(payload)
-        with self.graph_db.session() as session:
-            relationships_str = relationships_array_as_str(
-                exclude=["CONTAINS", "IS_CONCEPT_OF"]
-            )
-            match_node = match_node_builder(
-                node_type=schema.ProvenanceType.Intermediate
-            )
-
-            query = (
-                f"{match_node}<-[r:{relationships_str} *1..]-"
-                f"{node_builder(node_type='Model')}"
-                "return In, r, Md "
-            )
-            query = """
-                Match (In:Intermediate)<-[r:REINTERPRETS]-
-                (Mr:ModelRevision|Intermediate) 
-                Optional Match(Mr)-[r2:EDITED_FROM|COPIED_FROM]->(Mr2:ModelRevision) 
-                with *, collect(r)+collect(r2) as r3, collect(Mr)+collect(Mr2)as Mrs 
-                Unwind r3 as r4 
-                Unwind Mrs as Both_Mrs 
-                Optional Match(Both_Mrs)<-[r5:BEGINS_AT *1..]- (Md:Model) 
-                with *, collect(r4)+collect(r5) as r6 
-                unwind r6 as r7 
-                return Both_Mrs,In , r7, Md 
-                """
-            print(query)
-            response = session.run(query)
-
-            return nodes_edges(response=response)
 
     def artifacts_created_by_user(self, payload):
         """
