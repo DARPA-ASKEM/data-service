@@ -6,7 +6,7 @@ Project askem {
 Enum public.resource_type {
    datasets
    models
-   plans
+   model_configs
    publications
    simulation_runs
 }
@@ -15,8 +15,8 @@ Enum public.provenance_type {
    Dataset
    Model
    ModelParameter
-   Plan
-   PlanParameter
+   ModelConfig
+   SimParameter
    ModelRevision
    Publication
    SimulationRun
