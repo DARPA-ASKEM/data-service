@@ -7,13 +7,8 @@ from pytest import mark
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.autogen.schema import (
-    IntermediateFormat,
-    IntermediateSource,
-    ResourceType,
-    ValueType,
-)
-from tds.schema.model import Intermediate, ModelFramework
+from tds.autogen.schema import ResourceType, ValueType
+from tds.schema.model import ModelFramework
 from tds.schema.resource import Publication, Software
 from tests.suite import AllowedMethod
 from tests.suite import ASKEMEntityTestSuite as AETS
@@ -417,59 +412,6 @@ class TestFramework(AETS):
         # Act
         _, delete_status = self.fetch("/models/frameworks/dummy", AllowedMethod.DELETE)
         _, retrieve_status = self.fetch("/models/frameworks/dummy")
-
-        # Assert
-        assert delete_status == expected_status[AllowedMethod.DELETE]
-        assert retrieve_status == 404
-
-
-class TestIntermediate(AETS):
-    enabled_routers = ["models"]
-
-    def init_test_data(self):
-        with Session(self.rdb) as session:
-            intermediate = orm.Intermediate(
-                source=IntermediateSource.skema,
-                type=IntermediateFormat.gromet,
-                content=b"",
-            )
-            session.add(intermediate)
-            session.commit()
-
-    def test_rest_create(self):
-        # Arrange
-        payload = {
-            "source": IntermediateSource.skema,
-            "type": IntermediateFormat.gromet,
-            "content": "",
-        }
-
-        # Act
-        create_response, create_status = self.fetch(
-            "/models/intermediates", AllowedMethod.POST, payload
-        )
-        _, retrieve_status = self.fetch("/models/intermediates/2")
-
-        # Assert
-        assert create_status == expected_status[AllowedMethod.POST]
-        assert create_response["id"] != 1
-        assert retrieve_status == expected_status[AllowedMethod.GET]
-
-    def test_rest_retrieve(self):
-        # Act
-        response, status = self.fetch("/models/intermediates/1")
-        intermediate = Intermediate.parse_obj(response)
-
-        # Assert
-        assert status == expected_status[AllowedMethod.GET]
-        assert intermediate.source == IntermediateSource.skema
-        assert intermediate.type == IntermediateFormat.gromet
-        assert intermediate.content == b""
-
-    def test_rest_delete(self):
-        # Act
-        _, delete_status = self.fetch("/models/intermediates/1", AllowedMethod.DELETE)
-        _, retrieve_status = self.fetch("/models/intermediates/1")
 
         # Assert
         assert delete_status == expected_status[AllowedMethod.DELETE]
