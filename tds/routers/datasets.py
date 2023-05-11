@@ -273,6 +273,8 @@ def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific dataset by ID
     """
+    if not entry_exists(rdb.connect(), orm.Dataset, id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     with Session(rdb) as session:
         result = session.query(orm.Dataset).get(id)
         return result
@@ -394,6 +396,8 @@ def get_csv_from_dataset(
     via the data-annotation tool.
     """
     dataset = get_dataset(id=id, rdb=rdb)
+    if dataset.data_path is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     file = get_rawfile(dataset.data_path)
     if dataset.data_path.endswith(".parquet.gzip"):
         dataframe = pandas.read_parquet(file)
