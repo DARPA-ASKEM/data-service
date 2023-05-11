@@ -384,6 +384,79 @@ def delete_dataset(id: int, rdb: Engine = Depends(request_rdb)):
         session.commit()
 
 
+# TODO: DELETE THIS DEPRECATED ENDPOINT
+@router.get("/{id}/download/rawfile", deprecated=True)
+def get_csv_from_dataset_depr(
+    id: int,
+    wide_format: bool = False,
+    row_limit: Optional[int] = None,
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Gets the csv of an annotated dataset that is registered
+    via the data-annotation tool.
+    """
+    dataset = get_dataset(id=id, rdb=rdb)
+    data_paths = dataset.annotations["data_paths"]
+    storage_options = {"client_kwargs": {"endpoint_url": os.getenv("STORAGE_HOST")}}
+    path = data_paths[0]
+    if path.endswith(".parquet.gzip"):
+        # Build single dataframe
+        dataframe = pandas.concat(
+            pandas.read_parquet(file, storage_options=storage_options)
+            for file in data_paths
+        )
+        output = prepare_csv(dataframe, wide_format, row_limit)
+        response = StreamingResponse(
+            iter([output]),
+            media_type="text/csv",
+        )
+        response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+        return response
+
+    file = get_rawfile(path)
+    dataframe = pandas.read_csv(file)
+    output = prepare_csv(dataframe, wide_format, row_limit)
+    return StreamingResponse(iter([output]), media_type="text/csv")
+
+
+# TODO: DELETE THIS DEPRECATED ENDPOINT
+@router.post("/{id}/upload/file", deprecated=True)
+def upload_file_depr(
+    id: int,
+    file: UploadFile = File(...),
+    filename: Optional[str] = None,
+):
+    """Upload a file to the DATASET_BASE_STORAGE_URL
+
+    Args:
+        id (int): Dataset ID.
+        file (UploadFile, optional): Upload of file-like object.
+        filename (Optional[str], optional): Allows the specification of
+        a particular filename at upload. Defaults to None.
+
+    Returns:
+        Reponse: FastAPI Response object containing
+        information about the uploaded file.
+    """
+    base_uri = os.getenv("DATASET_STORAGE_BASE_URL")
+
+    if filename is None:
+        filename = file.filename
+
+    # Upload file
+    dest_path = os.path.join(base_uri, str(id), filename)
+    put_rawfile(path=dest_path, fileobj=file.file)
+
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        headers={
+            "content-type": "application/json",
+        },
+        content=json.dumps({"id": id, "filename": filename}),
+    )
+
+
 @router.get("/{id}/file")
 def get_csv_from_dataset(
     id: int,
