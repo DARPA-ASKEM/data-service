@@ -9,12 +9,10 @@ from fastapi import HTTPException
 from neo4j import Driver
 from sqlalchemy.engine.base import Engine
 
-from tds.autogen import schema
 from tds.db.graph.query_helpers import (
     derived_models_query_generater,
     dynamic_relationship_direction,
     match_node_builder,
-    node_builder,
     nodes_edges,
     parent_model_query_generator,
     relationships_array_as_str,
