@@ -7,7 +7,6 @@ from pydantic import BaseModel, Json
 class ResourceType(str, Enum):
 
     datasets = 'datasets'
-    intermediates = 'intermediates'
     models = 'models'
     plans = 'plans'
     publications = 'publications'
@@ -18,7 +17,6 @@ class ProvenanceType(str, Enum):
 
     Concept = 'Concept'
     Dataset = 'Dataset'
-    Intermediate = 'Intermediate'
     Model = 'Model'
     ModelParameter = 'ModelParameter'
     ModelRevision = 'ModelRevision'
