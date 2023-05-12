@@ -262,7 +262,7 @@ class OntologyConcept(BaseModel):
     id: Optional[int] = None
     curie: str
     type: TaggableType
-    object_id: Optional[int] = None
+    object_id: str
     status: OntologicalField
 
 
@@ -293,6 +293,7 @@ class ModelFramework(BaseModel):
     name: str
     version: str
     semantics: str
+    schema_url: str
 
 
 class ModelState(BaseModel):
