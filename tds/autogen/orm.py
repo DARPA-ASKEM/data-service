@@ -292,7 +292,7 @@ class OntologyConcept(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     curie = sa.Column(sa.String(), sa.ForeignKey('active_concept.curie'), nullable=False)
     type = sa.Column(sa.Enum(TaggableType), nullable=False)
-    object_id = sa.Column(sa.Integer(), nullable=False)
+    object_id = sa.Column(sa.String(), nullable=False)
     status = sa.Column(sa.Enum(OntologicalField), nullable=False)
 
 
@@ -329,6 +329,7 @@ class ModelFramework(Base):
     name = sa.Column(sa.String(), primary_key=True)
     version = sa.Column(sa.String(), nullable=False)
     semantics = sa.Column(sa.String(), nullable=False)
+    schema_url = sa.Column(sa.String(), nullable=False)
 
 
 class ModelState(Base):
