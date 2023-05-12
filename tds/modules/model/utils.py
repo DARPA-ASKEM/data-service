@@ -23,7 +23,7 @@ def orm_to_params(parameters: List):
     ]
 
 
-def model_response(model_from_es, delete_fields=[]):
+def model_response(model_from_es, delete_fields=[]) -> dict:
     """
     Function builds model response object from an ElasticSearch model.
     """
@@ -44,7 +44,7 @@ def model_response(model_from_es, delete_fields=[]):
     return model
 
 
-def model_list_response(model_list_from_es):
+def model_list_response(model_list_from_es) -> list:
     """
     Function builds model response object from an ElasticSearch model.
     """
@@ -61,7 +61,7 @@ def model_list_response(model_list_from_es):
     return fields.to_json(orient="records")
 
 
-def get_frameworks():
+def get_frameworks() -> dict:
     with Session(pg_engine) as pg_db:
         frameworks = pg_db.query(orm.ModelFramework).all()
         framework_map = {}
