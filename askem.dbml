@@ -167,7 +167,7 @@ Table model_framework {
   name varchar [pk]
   version varchar [not null]
   semantics varchar [not null]
-  schema_url varchar [not null]
+  schema_url varchar
 }
 
 Table model_description {
