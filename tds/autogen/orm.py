@@ -329,7 +329,7 @@ class ModelFramework(Base):
     name = sa.Column(sa.String(), primary_key=True)
     version = sa.Column(sa.String(), nullable=False)
     semantics = sa.Column(sa.String(), nullable=False)
-    schema_url = sa.Column(sa.String(), nullable=False)
+    schema_url = sa.Column(sa.String())
 
 
 class ModelState(Base):

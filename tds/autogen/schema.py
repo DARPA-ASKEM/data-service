@@ -293,7 +293,7 @@ class ModelFramework(BaseModel):
     name: str
     version: str
     semantics: str
-    schema_url: str
+    schema_url: Optional[str]
 
 
 class ModelState(BaseModel):
