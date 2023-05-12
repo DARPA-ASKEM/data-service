@@ -57,6 +57,7 @@ def create_framework(url=url):
             "name": "Petri Net",
             "version": "0.0.1",
             "semantics": "semantics_go_here",
+            "schema_url": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",
         }
     )
     headers = {"Content-Type": "application/json"}
