@@ -262,9 +262,10 @@ def get_datasets(
             feature_index[feature.dataset_id].append(feature)
 
         for dataset in datasets:
-            dataset.annotations["annotations"]["feature"] = feature_index.get(
-                dataset.id, None
-            )
+            if dataset.annotations is not None:
+                dataset.annotations["annotations"]["feature"] = feature_index.get(
+                    dataset.id, None
+                )
         return datasets
 
 
