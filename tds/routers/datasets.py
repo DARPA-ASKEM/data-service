@@ -273,10 +273,10 @@ def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     Get a specific dataset by ID
     """
-    if not entry_exists(rdb.connect(), orm.Dataset, id):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     with Session(rdb) as session:
         result = session.query(orm.Dataset).get(id)
+        if result is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         return result
 
 
