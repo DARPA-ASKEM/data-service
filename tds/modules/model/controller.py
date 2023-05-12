@@ -56,6 +56,33 @@ def model_post(payload: Model) -> Response:
     )
 
 
+@model_router.get("/{id}/descriptions", **retrieve.fastapi_endpoint_config)
+def model_get(id: str | int) -> Response:
+    """
+    Retrieve a model 'description' from ElasticSearch
+    """
+    try:
+        res = es.get(index="model", id=id)
+        logger.info(f"model retrieved: {id}")
+
+        return Response(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content=json.dumps(
+                model_response(res, delete_fields=["model", "model_version"])
+            ),
+        )
+    except NotFoundError:
+        return Response(
+            status_code=status.HTTP_404_NOT_FOUND,
+            headers={
+                "content-type": "application/json",
+            },
+        )
+
+
 @model_router.get("/{id}", **retrieve.fastapi_endpoint_config)
 def model_get(id: str | int) -> Response:
     """
@@ -63,7 +90,6 @@ def model_get(id: str | int) -> Response:
     """
     try:
         res = es.get(index="model", id=id)
-        pprint(res)
         logger.info(f"model retrieved: {id}")
 
         return Response(
