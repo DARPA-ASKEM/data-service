@@ -24,7 +24,7 @@ def upgrade() -> None:
         sa.Column(
             "schema_url",
             sa.String(),
-            nullable=True,
+            nullable=False,
             default="https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",
         ),
     )
