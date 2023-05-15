@@ -1,6 +1,7 @@
 from typing import List
 
 import pandas as pd
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
@@ -49,16 +50,20 @@ def model_list_response(model_list_from_es) -> list:
     Function builds model response object from an ElasticSearch model.
     """
     df = pd.DataFrame(model_list_from_es)
-    fields = pd.json_normalize(df["fields"])
-
     framework_map = get_frameworks()
+    # We need to get the fields and then merge back to make the id available.
+    models = (
+        pd.concat({i: pd.DataFrame(x) for i, x in df.pop("fields").items()})
+        .reset_index(level=1, drop=True)
+        .join(df)
+        .reset_index(drop=True)
+    )
 
-    for col in fields.columns:
-        fields[col] = fields[col].map(lambda x: x[0])
-        if col == "model_schema":
-            fields["framework"] = fields[col].map(lambda x: framework_map[x])
+    models["framework"] = models["model_schema"].map(lambda x: framework_map[x])
+    models.rename(columns={"_id": "id"}, inplace=True)
+    models.drop(columns=["_index", "_ignored", "_score"], inplace=True)
 
-    return fields.to_json(orient="records")
+    return models.to_json(orient="records")
 
 
 def get_frameworks() -> dict:
