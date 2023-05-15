@@ -151,7 +151,9 @@ class TestRun(AETS):
             session.commit()
 
             # Arrange Sim
-            config = orm.ModelConfiguration(model_id=model.id, content="")
+            config = orm.ModelConfiguration(
+                name="default", model_id=model.id, content=""
+            )
             session.add(config)
             session.commit()
 
@@ -238,7 +240,9 @@ class TestModelConfig(AETS):
             session.commit()
 
             # Arrange Sim
-            config = orm.ModelConfiguration(model_id=model.id, content="")
+            config = orm.ModelConfiguration(
+                name="default", model_id=model.id, content=""
+            )
             session.add(config)
             session.commit()
 
@@ -249,6 +253,7 @@ class TestModelConfig(AETS):
     def test_rest_create(self):
         # Arrange
         payload = {
+            "name": "Untitled(1)",
             "model_id": 1,
             "content": "{}",
         }
