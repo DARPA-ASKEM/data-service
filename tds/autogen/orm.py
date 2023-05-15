@@ -188,6 +188,7 @@ class Dataset(Base):
     temporal_resolution = sa.Column(sa.String())
     geospatial_resolution = sa.Column(sa.String())
     annotations = sa.Column(JSON())
+    data_path = sa.Column(sa.String())
     maintainer = sa.Column(sa.Integer(), sa.ForeignKey('person.id'))
     simulation_run = sa.Column(sa.Boolean(), server_default='False')
 

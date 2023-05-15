@@ -146,7 +146,6 @@ def create_models(
             "description": model["description"],
             "content": raw_model,
             "framework": "petrinet",  # TODO(five): Dynamically select framework in the future OR have tds figure it out
-            "parameters": [],
         }
         model_id = create_asset("models", model_payload, url)
         attach_to_project(model_id, "models", necessary_entities["projects"], url)
@@ -181,20 +180,15 @@ def create_datasets(
         with open(os.path.join(dataset_dir, metadata_file), "r") as file:
             metadata = json.load(file)
 
-        # TODO(five): Use URL and remove annotations object in TDS
         dataset_metadata_payload = {
             "name": metadata["name"],
-            "url": "",  # metadata["maintainer"]["website"],
+            "url": metadata["maintainer"]["website"],
             "description": metadata["description"],
             "maintainer": necessary_entities["persons"],
-            "annotations": None,
-            # "annotations": json.dumps({"data_paths": []})
         }
         dataset_id = create_asset("datasets", dataset_metadata_payload, url)
         attach_to_project(dataset_id, "datasets", necessary_entities["projects"], url)
 
-        # TODO(five): Edit datapaths on file upload (Data Annotations used to handle this)
-        # NOTE: This does not work when trying to download because it's being read as a csv when no annotations exist
         with open(glob(os.path.join(dataset_dir, "*.parquet.gzip"))[0], "rb") as file:
             upload_response = requests.post(
                 URL + f"datasets/{dataset_id}/files",
@@ -216,7 +210,6 @@ def create_datasets(
             }
             create_asset("concepts", concept_payload, url)
         print(f"Created dataset with id: {dataset_id}")
-        # TODO(five): Do we actually want to update the path in the annotations object or just get rid of it
         # TODO(five): Upload features and qualifiers. Do we still want features??
 
 

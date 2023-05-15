@@ -136,6 +136,7 @@ Table dataset {
   temporal_resolution varchar
   geospatial_resolution varchar
   annotations json
+  data_path varchar
   maintainer int [ref: > public.person.id]
   simulation_run bool [default: false]
 }

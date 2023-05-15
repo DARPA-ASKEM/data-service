@@ -261,6 +261,7 @@ CREATE TABLE public.dataset (
     temporal_resolution character varying,
     geospatial_resolution character varying,
     annotations json,
+    data_path character varying,
     maintainer integer,
     simulation_run boolean DEFAULT false
 );
