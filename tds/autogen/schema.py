@@ -7,9 +7,8 @@ from pydantic import BaseModel, Json
 class ResourceType(str, Enum):
 
     datasets = 'datasets'
-    intermediates = 'intermediates'
+    model_configs = 'model_configs'
     models = 'models'
-    plans = 'plans'
     publications = 'publications'
     simulation_runs = 'simulation_runs'
     
@@ -18,14 +17,13 @@ class ProvenanceType(str, Enum):
 
     Concept = 'Concept'
     Dataset = 'Dataset'
-    Intermediate = 'Intermediate'
     Model = 'Model'
+    ModelConfig = 'ModelConfig'
     ModelParameter = 'ModelParameter'
     ModelRevision = 'ModelRevision'
-    Plan = 'Plan'
-    PlanParameter = 'PlanParameter'
     Project = 'Project'
     Publication = 'Publication'
+    SimParameter = 'SimParameter'
     SimulationRun = 'SimulationRun'
     
 
@@ -37,7 +35,6 @@ class ProvenanceSearchTypes(str, Enum):
     concept_counts = 'concept_counts'
     connected_nodes = 'connected_nodes'
     derived_models = 'derived_models'
-    model_to_primitive = 'model_to_primitive'
     parent_model_revisions = 'parent_model_revisions'
     parent_models = 'parent_models'
     parent_nodes = 'parent_nodes'
@@ -76,14 +73,13 @@ class TaggableType(str, Enum):
 
     datasets = 'datasets'
     features = 'features'
-    intermediates = 'intermediates'
+    model_configurations = 'model_configurations'
     model_parameters = 'model_parameters'
     models = 'models'
     projects = 'projects'
     publications = 'publications'
     qualifiers = 'qualifiers'
     simulation_parameters = 'simulation_parameters'
-    simulation_plans = 'simulation_plans'
     simulation_runs = 'simulation_runs'
     
 
@@ -100,20 +96,6 @@ class OntologicalField(str, Enum):
 
     obj = 'obj'
     unit = 'unit'
-    
-
-class IntermediateSource(str, Enum):
-
-    mrepresentationa = 'mrepresentationa'
-    skema = 'skema'
-    
-
-class IntermediateFormat(str, Enum):
-
-    bilayer = 'bilayer'
-    gromet = 'gromet'
-    other = 'other'
-    sbml = 'sbml'
     
 
 class Role(str, Enum):
@@ -163,6 +145,16 @@ class ModelRuntime(BaseModel):
     right: str
 
 
+class SimulationParameter(BaseModel):
+
+    id: Optional[int] = None
+    run_id: Optional[int] = None
+    model_parameter_id: Optional[int]
+    name: str
+    value: str
+    type: ValueType
+
+
 class Dataset(BaseModel):
 
     id: Optional[int] = None
@@ -176,6 +168,7 @@ class Dataset(BaseModel):
     temporal_resolution: Optional[str]
     geospatial_resolution: Optional[str]
     annotations: Optional[Json]
+    data_path: Optional[str]
     maintainer: Optional[int]
     simulation_run: Optional[bool] = False
 
@@ -199,12 +192,11 @@ class Qualifier(BaseModel):
     value_type: ValueType
 
 
-class SimulationPlan(BaseModel):
+class ModelConfiguration(BaseModel):
 
     id: Optional[int] = None
     model_id: Optional[int] = None
-    simulator: str
-    query: str
+    name: str
     content: Json
 
 
@@ -228,15 +220,6 @@ class ModelParameter(BaseModel):
     type: ValueType
     default_value: Optional[str]
     state_variable: bool
-
-
-class SimulationParameter(BaseModel):
-
-    id: Optional[int] = None
-    run_id: Optional[int] = None
-    name: str
-    value: str
-    type: ValueType
 
 
 class Extraction(BaseModel):
@@ -301,15 +284,6 @@ class ModelState(BaseModel):
     id: Optional[int] = None
     timestamp: datetime.datetime = datetime.datetime.now()
     content: Optional[Json]
-
-
-class Intermediate(BaseModel):
-
-    id: Optional[int] = None
-    timestamp: datetime.datetime = datetime.datetime.now()
-    source: IntermediateSource
-    type: IntermediateFormat
-    content: bytes
 
 
 class Software(BaseModel):

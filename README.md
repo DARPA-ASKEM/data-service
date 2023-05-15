@@ -14,8 +14,6 @@ make up
 
 Navigate to [http://localhost:8001/](http://localhost:8001/) to view the documentation for the endpoints
 
-**EXPERIMENTAL**: Navigate to [http://localhost:8001/graphql](http://localhost:8001/graphql) to interactively use the GraphQL schema.
-
 ## Development
 
 The requirements for developing this project locally are [Poetry](https://python-poetry.org/) and Docker.

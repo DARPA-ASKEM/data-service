@@ -262,9 +262,10 @@ def get_datasets(
             feature_index[feature.dataset_id].append(feature)
 
         for dataset in datasets:
-            dataset.annotations["annotations"]["feature"] = feature_index.get(
-                dataset.id, None
-            )
+            if dataset.annotations is not None:
+                dataset.annotations["annotations"]["feature"] = feature_index.get(
+                    dataset.id, None
+                )
         return datasets
 
 
@@ -275,6 +276,8 @@ def get_dataset(id: int, rdb: Engine = Depends(request_rdb)) -> str:
     """
     with Session(rdb) as session:
         result = session.query(orm.Dataset).get(id)
+        if result is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         return result
 
 
@@ -455,7 +458,7 @@ def upload_file_depr(
     )
 
 
-@router.get("/{id}/files")
+@router.get("/{id}/file")
 def get_csv_from_dataset(
     id: int,
     wide_format: bool = False,
@@ -467,30 +470,18 @@ def get_csv_from_dataset(
     via the data-annotation tool.
     """
     dataset = get_dataset(id=id, rdb=rdb)
-    uses_annotations = dataset.annotations is not None
-    path = dataset.annotations["data_paths"][0] if uses_annotations else dataset.url
-    storage_options = {"client_kwargs": {"endpoint_url": os.getenv("STORAGE_HOST")}}
-    if uses_annotations and path.endswith(".parquet.gzip"):
-        # Build single dataframe
-        dataframe = pandas.concat(
-            pandas.read_parquet(file, storage_options=storage_options)
-            for file in dataset.annotations["data_paths"]
-        )
-        output = prepare_csv(dataframe, wide_format, row_limit)
-        response = StreamingResponse(
-            iter([output]),
-            media_type="text/csv",
-        )
-        response.headers["Content-Disposition"] = "attachment; filename=export.csv"
-        return response
-
-    file = get_rawfile(path)
-    dataframe = pandas.read_csv(file)
+    if dataset.data_path is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    file = get_rawfile(dataset.data_path)
+    if dataset.data_path.endswith(".parquet.gzip"):
+        dataframe = pandas.read_parquet(file)
+    else:
+        dataframe = pandas.read_csv(file)
     output = prepare_csv(dataframe, wide_format, row_limit)
     return StreamingResponse(iter([output]), media_type="text/csv")
 
 
-@router.post("/{id}/files")
+@router.post("/{id}/file")
 def upload_file(
     id: int,
     file: UploadFile = File(...),
@@ -524,9 +515,8 @@ def upload_file(
 
     with Session(rdb) as session:
         dataset = session.query(orm.Dataset).get(id)
-        if dataset.annotations is None:
-            dataset.url = dest_path
-            session.commit()
+        dataset.data_path = dest_path
+        session.commit()
 
     return Response(
         status_code=status.HTTP_201_CREATED,

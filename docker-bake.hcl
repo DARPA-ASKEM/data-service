@@ -59,6 +59,12 @@ target "data-service-storage-base" {
 	dockerfile = "docker/Dockerfile.minio"
 }
 
+target "data-service-graphdb-base" {
+  context = "."
+  tags = tag("data-service-graphdb", "", "")
+  dockerfile = "docker/Dockerfile.neo4j"
+}
+
 target "data-service" {
   inherits = ["_platforms", "data-service-base"]
 }
@@ -69,4 +75,8 @@ target "data-service-dev-db" {
 
 target "data-service-storage" {
   inherits = ["_platforms", "data-service-storage-base"]
+}
+
+target "data-service-graphdb" {
+  inherits = ["_platforms", "data-service-graphdb-base"]
 }
