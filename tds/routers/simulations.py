@@ -33,7 +33,7 @@ def list_plans(
     Retrieve all plans
     """
 
-    return list_by_id(rdb.connect(), orm.SimulationPlan, page_size, page)
+    return list_by_id(rdb.connect(), orm.ModelConfiguration, page_size, page)
 
 
 @router.get("/plans/{id}", **retrieve.fastapi_endpoint_config)
@@ -41,9 +41,9 @@ def get_plan(id: int, rdb: Engine = Depends(request_rdb)) -> Plan:
     """
     Retrieve plan
     """
-    if entry_exists(rdb.connect(), orm.SimulationPlan, id):
+    if entry_exists(rdb.connect(), orm.ModelConfiguration, id):
         with Session(rdb) as session:
-            plan = session.query(orm.SimulationPlan).get(id)
+            plan = session.query(orm.ModelConfiguration).get(id)
 
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -60,7 +60,7 @@ def create_plan(payload: Plan, rdb: Engine = Depends(request_rdb)) -> Response:
         # pylint: disable-next=unused-variable
         concept_payload = plan_payload.pop("concept")  # TODO: Save ontology term
         plan_payload.pop("id")
-        plan = orm.SimulationPlan(**plan_payload)
+        plan = orm.ModelConfiguration(**plan_payload)
         session.add(plan)
         session.commit()
         id: int = plan.id

@@ -78,7 +78,7 @@ def parent_model_query_generator(root_type: schema.ProvenanceType, root_id):
     model_revision_node = node_builder(node_type=schema.ProvenanceType.ModelRevision)
     query_templates_index = {
         schema.ProvenanceType.Model: f"-[r:BEGINS_AT]->{model_revision_node} ",
-        schema.ProvenanceType.Plan: f"-[r:USES]->{model_revision_node} ",
+        schema.ProvenanceType.ModelConfig: f"-[r:USES]->{model_revision_node} ",
         schema.ProvenanceType.SimulationRun: ""
         + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
         schema.ProvenanceType.Dataset: ""
@@ -245,7 +245,6 @@ def nodes_edges(
             # loop over relationship and convert
             # ModelRevision nodes to the appropriate Model node
             for relation in clipped_relations:
-
                 if relation.get("relationship") == "BEGINS_AT":
                     model = relation.get("left")
                     modelrevision = relation.get("right")

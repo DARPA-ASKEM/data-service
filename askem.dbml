@@ -6,8 +6,7 @@ Project askem {
 Enum public.resource_type {
    datasets
    models
-   plans
-   intermediates
+   model_configs
    publications
    simulation_runs
 }
@@ -16,10 +15,9 @@ Enum public.provenance_type {
    Dataset
    Model
    ModelParameter
-   Plan
-   PlanParameter
+   ModelConfig
+   SimParameter
    ModelRevision
-   Intermediate
    Publication
    SimulationRun
    Project
@@ -34,7 +32,6 @@ Enum provenance_search_types{
   derived_models
   parent_model_revisions
   parent_models
-  model_to_primitive
   artifacts_created_by_user
   concept
   concept_counts
@@ -71,13 +68,12 @@ Enum taggable_type {
    features
    qualifiers
    datasets
-   simulation_plans
+   model_configurations
    models
    model_parameters
    projects
    publications
    simulation_runs
-   intermediates
    simulation_parameters
 }
 
@@ -92,18 +88,6 @@ Enum value_type {
 Enum ontological_field {
    unit
    obj
-}
-
-Enum intermediate_source {
-  mrepresentationa
-  skema
-}
-
-Enum intermediate_format {
-  gromet
-  bilayer
-  sbml
-  other
 }
 
 Enum public.role {
@@ -185,14 +169,6 @@ Table model_state {
   content json
 }
 
-Table intermediate {
-  id int [pk]
-  timestamp datetime [default: `now()`, not null]
-  source intermediate_source [not null]
-  type intermediate_format [not null]
-  content blob [not null]
-}
-
 Table software {
   id int [pk]
   timestamp datetime [default:`now()`, not null]
@@ -208,17 +184,16 @@ Table model_runtime {
   right varchar [ref: > model_framework.name, not null]
 }
 
-Table simulation_plan {
+Table model_configuration {
   id int [pk]
   model_id int [ref: > model_description.id, not null]
-  simulator varchar [not null]
-  query varchar [not null]
+  name varchar [not null]
   content json [not null]
 }
 
 Table simulation_run {
   id int [pk]
-  simulator_id int [ref: > simulation_plan.id, not null]
+  simulator_id int [ref: > model_configuration.id, not null]
   timestamp datetime [default: `now()`, not null]
   completed_at datetime
   success bool
@@ -239,6 +214,7 @@ Table model_parameter {
 Table simulation_parameter {
   id int [pk]
   run_id int [ref: > simulation_run.id, not null]
+  model_parameter_id int [ref: > model_parameter.id]
   name varchar [not null]
   value varchar [not null]
   type value_type [not null]
