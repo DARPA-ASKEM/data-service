@@ -56,14 +56,14 @@ def model_post(payload: Model) -> Response:
     )
 
 
-@model_router.get("/{id}/descriptions", **retrieve.fastapi_endpoint_config)
-def model_descriptions_get(id: str | int) -> Response:
+@model_router.get("/{model_id}/descriptions", **retrieve.fastapi_endpoint_config)
+def model_descriptions_get(model_id: str | int) -> Response:
     """
     Retrieve a model 'description' from ElasticSearch
     """
     try:
-        res = es.get(index="model", id=id)
-        logger.info(f"model retrieved for description: {id}")
+        res = es.get(index="model", id=model_id)
+        logger.info(f"model retrieved for description: {model_id}")
 
         return Response(
             status_code=status.HTTP_200_OK,
@@ -83,11 +83,11 @@ def model_descriptions_get(id: str | int) -> Response:
         )
 
 
-@model_router.get("/{id}/parameters", **retrieve.fastapi_endpoint_config)
-def model_parameters_get(id: str | int) -> Response:
+@model_router.get("/{model_id}/parameters", **retrieve.fastapi_endpoint_config)
+def model_parameters_get(model_id: str | int) -> Response:
     try:
-        res = es.get(index="model", id=id, _source_includes=["model.states"])
-        logger.info(f"model retrieved for params: {id}")
+        res = es.get(index="model", id=model_id, _source_includes=["model.states"])
+        logger.info(f"model retrieved for params: {model_id}")
 
         return Response(
             status_code=status.HTTP_200_OK,
@@ -105,14 +105,14 @@ def model_parameters_get(id: str | int) -> Response:
         )
 
 
-@model_router.get("/{id}", **retrieve.fastapi_endpoint_config)
-def model_get(id: str | int) -> Response:
+@model_router.get("/{model_id}", **retrieve.fastapi_endpoint_config)
+def model_get(model_id: str | int) -> Response:
     """
     Retrieve a model from ElasticSearch
     """
     try:
-        res = es.get(index="model", id=id)
-        logger.info(f"model retrieved: {id}")
+        res = es.get(index="model", id=model_id)
+        logger.info(f"model retrieved: {model_id}")
 
         return Response(
             status_code=status.HTTP_200_OK,
@@ -130,13 +130,13 @@ def model_get(id: str | int) -> Response:
         )
 
 
-@model_router.put("/{id}", **update.fastapi_endpoint_config)
-def model_put(id: str | int, payload: Model) -> Response:
+@model_router.put("/{model_id}", **update.fastapi_endpoint_config)
+def model_put(model_id: str | int, payload: Model) -> Response:
     """
     Update a model in ElasticSearch
     """
-    res = payload.save(id)
-    logger.info("model updated: %i", id)
+    res = payload.save(model_id)
+    logger.info(f"model updated: {model_id}")
     return Response(
         status_code=status.HTTP_200_OK,
         headers={
@@ -146,18 +146,18 @@ def model_put(id: str | int, payload: Model) -> Response:
     )
 
 
-@model_router.delete("/{id}", **delete.fastapi_endpoint_config)
-def model_delete(id: str | int) -> Response:
+@model_router.delete("/{model_id}", **delete.fastapi_endpoint_config)
+def model_delete(model_id: str | int) -> Response:
     try:
-        res = es.delete(index="model", id=id)
+        res = es.delete(index="model", id=model_id)
 
         if res["result"] != "deleted":
-            logger.error(f"Failed to delete model: {id}")
+            logger.error(f"Failed to delete model: {model_id}")
             raise Exception(
                 f"Failed to delete model. ElasticSearch Response: {res['result']}"
             )
 
-        logger.info(f"Model successfully deleted: {id}")
+        logger.info(f"Model successfully deleted: {model_id}")
         return Response(
             status_code=status.HTTP_200_OK,
             headers={
