@@ -11,9 +11,8 @@ Base = declarative_base()
 class ResourceType(str, Enum):
 
     datasets = 'datasets'
-    intermediates = 'intermediates'
+    model_configs = 'model_configs'
     models = 'models'
-    plans = 'plans'
     publications = 'publications'
     simulation_runs = 'simulation_runs'
     
@@ -22,14 +21,13 @@ class ProvenanceType(str, Enum):
 
     Concept = 'Concept'
     Dataset = 'Dataset'
-    Intermediate = 'Intermediate'
     Model = 'Model'
+    ModelConfig = 'ModelConfig'
     ModelParameter = 'ModelParameter'
     ModelRevision = 'ModelRevision'
-    Plan = 'Plan'
-    PlanParameter = 'PlanParameter'
     Project = 'Project'
     Publication = 'Publication'
+    SimParameter = 'SimParameter'
     SimulationRun = 'SimulationRun'
     
 
@@ -41,7 +39,6 @@ class ProvenanceSearchTypes(str, Enum):
     concept_counts = 'concept_counts'
     connected_nodes = 'connected_nodes'
     derived_models = 'derived_models'
-    model_to_primitive = 'model_to_primitive'
     parent_model_revisions = 'parent_model_revisions'
     parent_models = 'parent_models'
     parent_nodes = 'parent_nodes'
@@ -80,14 +77,13 @@ class TaggableType(str, Enum):
 
     datasets = 'datasets'
     features = 'features'
-    intermediates = 'intermediates'
+    model_configurations = 'model_configurations'
     model_parameters = 'model_parameters'
     models = 'models'
     projects = 'projects'
     publications = 'publications'
     qualifiers = 'qualifiers'
     simulation_parameters = 'simulation_parameters'
-    simulation_plans = 'simulation_plans'
     simulation_runs = 'simulation_runs'
     
 
@@ -104,20 +100,6 @@ class OntologicalField(str, Enum):
 
     obj = 'obj'
     unit = 'unit'
-    
-
-class IntermediateSource(str, Enum):
-
-    mrepresentationa = 'mrepresentationa'
-    skema = 'skema'
-    
-
-class IntermediateFormat(str, Enum):
-
-    bilayer = 'bilayer'
-    gromet = 'gromet'
-    other = 'other'
-    sbml = 'sbml'
     
 
 class Role(str, Enum):
@@ -173,6 +155,18 @@ class ModelRuntime(Base):
     right = sa.Column(sa.String(), sa.ForeignKey('model_framework.name'), nullable=False)
 
 
+class SimulationParameter(Base):
+
+    __tablename__ = 'simulation_parameter'
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    run_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_run.id'), nullable=False)
+    model_parameter_id = sa.Column(sa.Integer(), sa.ForeignKey('model_parameter.id'))
+    name = sa.Column(sa.String(), nullable=False)
+    value = sa.Column(sa.String(), nullable=False)
+    type = sa.Column(sa.Enum(ValueType), nullable=False)
+
+
 class Dataset(Base):
 
     __tablename__ = 'dataset'
@@ -216,14 +210,13 @@ class Qualifier(Base):
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class SimulationPlan(Base):
+class ModelConfiguration(Base):
 
-    __tablename__ = 'simulation_plan'
+    __tablename__ = 'model_configuration'
 
     id = sa.Column(sa.Integer(), primary_key=True)
     model_id = sa.Column(sa.Integer(), sa.ForeignKey('model_description.id'), nullable=False)
-    simulator = sa.Column(sa.String(), nullable=False)
-    query = sa.Column(sa.String(), nullable=False)
+    name = sa.Column(sa.String(), nullable=False)
     content = sa.Column(JSON(), nullable=False)
 
 
@@ -232,7 +225,7 @@ class SimulationRun(Base):
     __tablename__ = 'simulation_run'
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    simulator_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_plan.id'), nullable=False)
+    simulator_id = sa.Column(sa.Integer(), sa.ForeignKey('model_configuration.id'), nullable=False)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     completed_at = sa.Column(sa.DateTime())
     success = sa.Column(sa.Boolean())
@@ -251,17 +244,6 @@ class ModelParameter(Base):
     type = sa.Column(sa.Enum(ValueType), nullable=False)
     default_value = sa.Column(sa.String())
     state_variable = sa.Column(sa.Boolean(), nullable=False)
-
-
-class SimulationParameter(Base):
-
-    __tablename__ = 'simulation_parameter'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    run_id = sa.Column(sa.Integer(), sa.ForeignKey('simulation_run.id'), nullable=False)
-    name = sa.Column(sa.String(), nullable=False)
-    value = sa.Column(sa.String(), nullable=False)
-    type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
 class Extraction(Base):
@@ -339,17 +321,6 @@ class ModelState(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     content = sa.Column(JSON())
-
-
-class Intermediate(Base):
-
-    __tablename__ = 'intermediate'
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    source = sa.Column(sa.Enum(IntermediateSource), nullable=False)
-    type = sa.Column(sa.Enum(IntermediateFormat), nullable=False)
-    content = sa.Column(sa.LargeBinary(), nullable=False)
 
 
 class Software(Base):

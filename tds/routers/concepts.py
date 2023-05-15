@@ -65,13 +65,12 @@ def get_taggable_orm(taggable_type: schema.TaggableType):
         schema.TaggableType.features: orm.Feature,
         schema.TaggableType.qualifiers: orm.Qualifier,
         schema.TaggableType.datasets: orm.Dataset,
-        schema.TaggableType.simulation_plans: orm.SimulationPlan,
+        schema.TaggableType.model_configurations: orm.ModelConfiguration,
         schema.TaggableType.models: orm.ModelDescription,
         schema.TaggableType.model_parameters: orm.ModelParameter,
         schema.TaggableType.projects: orm.Project,
         schema.TaggableType.publications: orm.Publication,
         schema.TaggableType.simulation_runs: orm.SimulationRun,
-        schema.TaggableType.intermediates: orm.Intermediate,
         schema.TaggableType.simulation_parameters: orm.SimulationParameter,
     }
     return enum_to_orm[taggable_type]

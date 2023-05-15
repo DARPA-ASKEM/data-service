@@ -7,13 +7,8 @@ from pytest import mark
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.autogen.schema import (
-    IntermediateFormat,
-    IntermediateSource,
-    ResourceType,
-    ValueType,
-)
-from tds.schema.model import Intermediate, ModelFramework
+from tds.autogen.schema import ResourceType, ValueType
+from tds.schema.model import ModelFramework
 from tds.schema.resource import Publication, Software
 from tests.suite import AllowedMethod
 from tests.suite import ASKEMEntityTestSuite as AETS
@@ -156,14 +151,14 @@ class TestRun(AETS):
             session.commit()
 
             # Arrange Sim
-            plan = orm.SimulationPlan(
-                model_id=model.id, simulator="unknown", query="some query", content=""
+            config = orm.ModelConfiguration(
+                name="default", model_id=model.id, content=""
             )
-            session.add(plan)
+            session.add(config)
             session.commit()
 
             run = orm.SimulationRun(
-                simulator_id=plan.id,
+                simulator_id=config.id,
                 success=None,
                 completed_at=None,
                 response=b"sample",
@@ -214,7 +209,7 @@ class TestRun(AETS):
         assert response["parameters"][0]["name"] == "x"
 
 
-class TestPlan(AETS):
+class TestModelConfig(AETS):
     enabled_routers = ["models", "simulations"]
 
     def init_test_data(self):
@@ -245,22 +240,21 @@ class TestPlan(AETS):
             session.commit()
 
             # Arrange Sim
-            plan = orm.SimulationPlan(
-                model_id=model.id, simulator="unknown", query="some query", content=""
+            config = orm.ModelConfiguration(
+                name="default", model_id=model.id, content=""
             )
-            session.add(plan)
+            session.add(config)
             session.commit()
 
-    @mark.skip(reason="TODO: Add update functionality to simulation plan")
+    @mark.skip(reason="TODO: Add update functionality to model configuration")
     def test_rest_update(self):
-        raise Exception("Plan updates needs to be implemented")
+        raise Exception("Configuration updates needs to be implemented")
 
     def test_rest_create(self):
         # Arrange
         payload = {
+            "name": "Untitled(1)",
             "model_id": 1,
-            "simulator": "still unknown",
-            "query": "new query",
             "content": "{}",
         }
 
@@ -281,8 +275,6 @@ class TestPlan(AETS):
 
         # Assert
         assert status == expected_status[AllowedMethod.GET]
-        assert response["simulator"] == "unknown"
-        assert response["query"] == "some query"
         assert response["content"] == ""
 
 
@@ -417,59 +409,6 @@ class TestFramework(AETS):
         # Act
         _, delete_status = self.fetch("/models/frameworks/dummy", AllowedMethod.DELETE)
         _, retrieve_status = self.fetch("/models/frameworks/dummy")
-
-        # Assert
-        assert delete_status == expected_status[AllowedMethod.DELETE]
-        assert retrieve_status == 404
-
-
-class TestIntermediate(AETS):
-    enabled_routers = ["models"]
-
-    def init_test_data(self):
-        with Session(self.rdb) as session:
-            intermediate = orm.Intermediate(
-                source=IntermediateSource.skema,
-                type=IntermediateFormat.gromet,
-                content=b"",
-            )
-            session.add(intermediate)
-            session.commit()
-
-    def test_rest_create(self):
-        # Arrange
-        payload = {
-            "source": IntermediateSource.skema,
-            "type": IntermediateFormat.gromet,
-            "content": "",
-        }
-
-        # Act
-        create_response, create_status = self.fetch(
-            "/models/intermediates", AllowedMethod.POST, payload
-        )
-        _, retrieve_status = self.fetch("/models/intermediates/2")
-
-        # Assert
-        assert create_status == expected_status[AllowedMethod.POST]
-        assert create_response["id"] != 1
-        assert retrieve_status == expected_status[AllowedMethod.GET]
-
-    def test_rest_retrieve(self):
-        # Act
-        response, status = self.fetch("/models/intermediates/1")
-        intermediate = Intermediate.parse_obj(response)
-
-        # Assert
-        assert status == expected_status[AllowedMethod.GET]
-        assert intermediate.source == IntermediateSource.skema
-        assert intermediate.type == IntermediateFormat.gromet
-        assert intermediate.content == b""
-
-    def test_rest_delete(self):
-        # Act
-        _, delete_status = self.fetch("/models/intermediates/1", AllowedMethod.DELETE)
-        _, retrieve_status = self.fetch("/models/intermediates/1")
 
         # Assert
         assert delete_status == expected_status[AllowedMethod.DELETE]
