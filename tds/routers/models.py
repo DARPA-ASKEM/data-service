@@ -97,7 +97,7 @@ def delete_framework(name: str, rdb: Engine = Depends(request_rdb)) -> Response:
     )
 
 
-@router.get("/descriptions")
+@router.get("/descriptions", deprecated=True)
 def list_model_descriptions(
     page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
 ) -> List[Model]:
@@ -110,7 +110,7 @@ def list_model_descriptions(
     return list_by_id(rdb.connect(), orm.ModelDescription, page_size, page)
 
 
-@router.get("/{id}/descriptions", **retrieve.fastapi_endpoint_config)
+@router.get("/{id}/descriptions", deprecated=True, **retrieve.fastapi_endpoint_config)
 def get_model_description(
     id: int, rdb: Engine = Depends(request_rdb)
 ) -> ModelDescription:
@@ -141,7 +141,7 @@ def get_single_model_parameter(id: int, rdb: Engine = Depends(request_rdb)):
         raise HTTPException(status_code=status.HTTP_404_NOT_F)
 
 
-@router.get("/{id}/parameters", **retrieve.fastapi_endpoint_config)
+@router.get("/{id}/parameters", deprecated=True, **retrieve.fastapi_endpoint_config)
 def get_model_parameters(
     id: int, rdb: Engine = Depends(request_rdb)
 ) -> ModelParameters:
@@ -203,7 +203,7 @@ def update_model_parameters(
     )
 
 
-@router.get("/{id}", **retrieve.fastapi_endpoint_config)
+@router.get("/{id}", deprecated=True, **retrieve.fastapi_endpoint_config)
 def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
     """
     Retrieve model
@@ -223,7 +223,7 @@ def get_model(id: int, rdb: Engine = Depends(request_rdb)) -> Model:
     return Model.from_orm(model, content, parameters)
 
 
-@router.post("", **create.fastapi_endpoint_config)
+@router.post("", deprecated=True, **create.fastapi_endpoint_config)
 def create_model(
     payload: Model,
     rdb: Engine = Depends(request_rdb),
@@ -440,7 +440,7 @@ def model_opt(
     )
 
 
-@router.post("/{id}", **update.fastapi_endpoint_config)
+@router.post("/{id}", deprecated=True, **update.fastapi_endpoint_config)
 def update_model(
     payload: Model,
     id: int,
