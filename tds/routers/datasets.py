@@ -461,7 +461,6 @@ def upload_file_depr(
 @router.get("/{id}/file")
 def get_csv_from_dataset(
     id: int,
-    wide_format: bool = False,
     row_limit: Optional[int] = None,
     rdb: Engine = Depends(request_rdb),
 ):
@@ -477,7 +476,7 @@ def get_csv_from_dataset(
         dataframe = pandas.read_parquet(file)
     else:
         dataframe = pandas.read_csv(file)
-    output = prepare_csv(dataframe, wide_format, row_limit)
+    output = prepare_csv(dataframe, False, row_limit)
     return StreamingResponse(iter([output]), media_type="text/csv")
 
 
