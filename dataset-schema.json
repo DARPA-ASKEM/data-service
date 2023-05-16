@@ -8,10 +8,12 @@
         },
         "description": {
             "title": "Description",
+            "description": "Texual description of the dataset.",
             "type": "string"
         },
         "data_url": {
             "title": "Data Url",
+            "description": "Url from which the dataset can be downloaded/fetched.",
             "minLength": 1,
             "maxLength": 65536,
             "format": "uri",
@@ -19,6 +21,7 @@
         },
         "columns": {
             "title": "Columns",
+            "description": "Information regarding the columns that make up the dataset.",
             "type": "array",
             "items": {
                 "$ref": "#/definitions/DatasetColumn"
@@ -26,17 +29,21 @@
         },
         "metatada": {
             "title": "Metatada",
+            "description": "(Optional) Unformatted metadata about the dataset.",
             "type": "object"
         },
         "source": {
             "title": "Source",
+            "description": "Source of dataset",
             "type": "string"
+        },
+        "grounding": {
+            "$ref": "#/definitions/Grounding"
         }
     },
     "required": [
         "name",
-        "columns",
-        "metatada"
+        "columns"
     ],
     "definitions": {
         "ColumnTypes": {
@@ -58,6 +65,26 @@
             ],
             "type": "string"
         },
+        "Grounding": {
+            "title": "Grounding",
+            "type": "object",
+            "properties": {
+                "identifiers": {
+                    "title": "Identifiers",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "context": {
+                    "title": "Context",
+                    "type": "object"
+                }
+            },
+            "required": [
+                "identifiers"
+            ]
+        },
         "DatasetColumn": {
             "title": "DatasetColumn",
             "type": "object",
@@ -78,6 +105,7 @@
                 },
                 "format_str": {
                     "title": "Format Str",
+                    "description": "String that describes the formatting of the value.",
                     "type": "string"
                 },
                 "annotations": {
@@ -90,6 +118,9 @@
                 "metadata": {
                     "title": "Metadata",
                     "type": "object"
+                },
+                "grounding": {
+                    "$ref": "#/definitions/Grounding"
                 }
             },
             "required": [
