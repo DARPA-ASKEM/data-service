@@ -94,7 +94,7 @@ def model_parameters_get(model_id: str | int) -> Response:
             headers={
                 "content-type": "application/json",
             },
-            content=json.dumps(res["_source"]["model"]["states"]),
+            content=json.dumps(res["_source"]["model"]["parameters"]),
         )
     except NotFoundError:
         return Response(
