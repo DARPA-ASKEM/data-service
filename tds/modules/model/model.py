@@ -1,11 +1,12 @@
 from typing import List, Optional
 
 from pydantic import Field
-from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.db import ProvenanceHandler, request_graph_db
+from tds.db import ProvenanceHandler
 from tds.db.base import TdsModel
+from tds.db.graph.neo4j import ENGINE
 from tds.db.relational import engine as pg_engine
 from tds.lib.concepts import mark_concept_active
 from tds.schema.provenance import Provenance
@@ -21,8 +22,11 @@ class Model(TdsModel):
 
     _index = "model"
     concepts: Optional[List] = []
+    _exists = False
 
     def save(self, model_id: Optional[None | str | int] = None):
+        if model_id is not None:
+            self._exists = True
         res = super(Model, self).save(model_id)
         # Pass the model id so we have it for association.
         self._extract_concepts(res["_id"])
@@ -76,23 +80,19 @@ class Model(TdsModel):
 
     def _establish_provenance(self):
         # add ModelParameter nodes
-        provenance_handler = ProvenanceHandler(
-            rdb=pg_engine, graph_db=request_graph_db()
+        provenance_handler = ProvenanceHandler(rdb=pg_engine, graph_db=ENGINE)
+
+        payload = Provenance(
+            left=self.id,
+            left_type="Model",
+            right=self.id,
+            right_type="ModelRevision",
+            relation_type="BEGINS_AT" if self._exists is False else "EDITED_FROM",
+            user_id=None,
+            concept=".",
         )
 
-        with Session(pg_engine) as session:
-            model = session.query(orm.ModelDescription).get(id)
-            payload = Provenance(
-                left=self.id,
-                left_type="Model",
-                right=model.state_id,
-                right_type="ModelRevision",
-                relation_type="BEGINS_AT",
-                user_id=None,
-                concept=".",
-            )
-
-            provenance_handler.create_entry(payload)
+        provenance_handler.create_entry(payload)
 
     class Config:
         schema_extra = {
