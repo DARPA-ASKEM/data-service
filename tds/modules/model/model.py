@@ -4,10 +4,12 @@ from pydantic import Field
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
+from tds.db import ProvenanceHandler, request_graph_db
 from tds.db.base import TdsModel
 from tds.db.relational import engine as pg_engine
 from tds.lib.concepts import mark_concept_active
-from tds.modules.model.utils import orm_to_params
+from tds.schema.provenance import Provenance
+from tds.settings import settings
 
 
 class Model(TdsModel):
@@ -20,22 +22,12 @@ class Model(TdsModel):
     _index = "model"
     concepts: Optional[List] = []
 
-    @classmethod
-    def from_orm(
-        cls,
-        parameters: List,
-    ) -> "Model":
-        """
-        Handle ORM conversion while coercing `dict` to JSON
-        """
-        body.__dict__["content"] = dumps(ModelContent.from_orm(state).content)
-        body.__dict__["parameters"] = orm_to_params(parameters)
-        return super().from_orm(body)
-
-    def save(self, id: Optional[None | str | int] = None):
-        res = super(Model, self).save(id)
+    def save(self, model_id: Optional[None | str | int] = None):
+        res = super(Model, self).save(model_id)
         # Pass the model id so we have it for association.
         self._extract_concepts(res["_id"])
+        if settings.NEO4J_ENABLED:
+            self._establish_provenance()
         return res
 
     def _extract_concepts(self, model_id):
@@ -81,3 +73,23 @@ class Model(TdsModel):
                             pg_db.add(concept_association)
                             pg_db.commit()
                             self.concepts.append(concept.name)
+
+    def _establish_provenance(self):
+        # add ModelParameter nodes
+        provenance_handler = ProvenanceHandler(
+            rdb=pg_engine, graph_db=request_graph_db()
+        )
+
+        with Session(pg_engine) as session:
+            model = session.query(orm.ModelDescription).get(id)
+            payload = Provenance(
+                left=self.id,
+                left_type="Model",
+                right=model.state_id,
+                right_type="ModelRevision",
+                relation_type="BEGINS_AT",
+                user_id=None,
+                concept=".",
+            )
+
+            provenance_handler.create_entry(payload)
