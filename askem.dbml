@@ -264,9 +264,9 @@ Table provenance {
   id int [pk]
   timestamp datetime [default: `now()`, not null]
   relation_type relation_type [not null]
-  left int [not null]
+  left varchar [not null]
   left_type provenance_type [not null]
-  right int [not null]
+  right varchar [not null]
   right_type provenance_type [not null]
   user_id int [ref: > person.id]
   concept varchar 
