@@ -1,0 +1,102 @@
+{
+    "title": "DatasetDocument",
+    "type": "object",
+    "properties": {
+        "name": {
+            "title": "Name",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "type": "string"
+        },
+        "data_url": {
+            "title": "Data Url",
+            "minLength": 1,
+            "maxLength": 65536,
+            "format": "uri",
+            "type": "string"
+        },
+        "columns": {
+            "title": "Columns",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/DatasetColumn"
+            }
+        },
+        "metatada": {
+            "title": "Metatada",
+            "type": "object"
+        },
+        "source": {
+            "title": "Source",
+            "type": "string"
+        }
+    },
+    "required": [
+        "name",
+        "columns",
+        "metatada"
+    ],
+    "definitions": {
+        "ColumnTypes": {
+            "title": "ColumnTypes",
+            "description": "An enumeration.",
+            "enum": [
+                "unknown",
+                "boolean",
+                "string",
+                "char",
+                "integer",
+                "int",
+                "float",
+                "double",
+                "timestamp",
+                "datetime",
+                "date",
+                "time"
+            ],
+            "type": "string"
+        },
+        "DatasetColumn": {
+            "title": "DatasetColumn",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "title": "Name",
+                    "description": "Name of column",
+                    "type": "string"
+                },
+                "data_type": {
+                    "description": "Datatype. One of: unknown, boolean, string, char, integer, int, float, double, timestamp, datetime, date, time",
+                    "default": "unknown",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ColumnTypes"
+                        }
+                    ]
+                },
+                "format_str": {
+                    "title": "Format Str",
+                    "type": "string"
+                },
+                "annotations": {
+                    "title": "Annotations",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "metadata": {
+                    "title": "Metadata",
+                    "type": "object"
+                }
+            },
+            "required": [
+                "name",
+                "annotations",
+                "metadata"
+            ]
+        }
+    }
+}
