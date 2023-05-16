@@ -1,4 +1,4 @@
-from pydantic import BaseModel, AnyUrl, Field
+from pydantic import BaseModel, AnyUrl, Field, UUID4
 from typing import Optional, Any
 from enum import Enum
 
@@ -19,10 +19,10 @@ class ColumnTypes(str, Enum):
 
 class Grounding(BaseModel):
     identifiers: dict[str, str] = Field(
-        description="",
+        description="Ontological identifier per DKG",
     )
     context: Optional[dict[str, Any]] = Field(
-        description="",
+        description="(Optional) Additional context that informs the grounding",
     )
 
 
@@ -36,40 +36,44 @@ class DatasetColumn(BaseModel):
         description=f"Datatype. One of: {', '.join(ColumnTypes)}",
     )
     format_str: Optional[str] = Field(
-        description="String that describes the formatting of the value.",
+        description="(Optional) String that describes the formatting of the value",
     )
     # format_str_type
     annotations: list[str] = Field(
-        description="",
+        description="Column annotations from the MIT data profiling tool",
     )
-    metadata: dict[str, Any] = Field(
-        description="",
+    metadata: Optional[dict[str, Any]] = Field(
+        description="(Optional) Unformatted metadata about the dataset",
     )
-    grounding: Optional[Grounding] = Field(
-        description="",
+    grounding: Optional[dict[str, Grounding]] = Field(
+        description="(Optional) Grounding of ontological concepts related to the column",
     )
 
 
 class DatasetDocument(BaseModel):
+    id: UUID4 = Field(
+        description="Universally unique identifier for the dataset",
+    )
     name: str = Field(
+        description="Display/human name for the dataset",
     )
     description: Optional[str] = Field(
-        description="Texual description of the dataset.",
+        description="(Optional) Texual description of the dataset",
     )
     data_url: Optional[AnyUrl] = Field(
-        description="Url from which the dataset can be downloaded/fetched.",
+        description="(Optional) Url from which the dataset can be downloaded/fetched",
     )
     columns: list[DatasetColumn] = Field(
-        description="Information regarding the columns that make up the dataset.",
+        description="Information regarding the columns that make up the dataset",
     )
-    metatada: Optional[dict[str, Any]] = Field(
-        description="(Optional) Unformatted metadata about the dataset.",
+    metadata: Optional[dict[str, Any]] = Field(
+        description="(Optional) Unformatted metadata about the dataset",
     )
     source: Optional[str] = Field(
-        description="Source of dataset",
+        description="(Optional) Source of dataset",
     )
-    grounding: Optional[Grounding] = Field(
-        description="",
+    grounding: Optional[dict[str, Grounding]] = Field(
+        description="(Optional) Grounding of ontological concepts related to the dataset as a whole",
     )
 
 

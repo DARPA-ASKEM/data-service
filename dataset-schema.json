@@ -2,18 +2,25 @@
     "title": "DatasetDocument",
     "type": "object",
     "properties": {
+        "id": {
+            "title": "Id",
+            "description": "Universally unique identifier for the dataset",
+            "type": "string",
+            "format": "uuid4"
+        },
         "name": {
             "title": "Name",
+            "description": "Display/human name for the dataset",
             "type": "string"
         },
         "description": {
             "title": "Description",
-            "description": "Texual description of the dataset.",
+            "description": "(Optional) Texual description of the dataset",
             "type": "string"
         },
         "data_url": {
             "title": "Data Url",
-            "description": "Url from which the dataset can be downloaded/fetched.",
+            "description": "(Optional) Url from which the dataset can be downloaded/fetched",
             "minLength": 1,
             "maxLength": 65536,
             "format": "uri",
@@ -21,27 +28,33 @@
         },
         "columns": {
             "title": "Columns",
-            "description": "Information regarding the columns that make up the dataset.",
+            "description": "Information regarding the columns that make up the dataset",
             "type": "array",
             "items": {
                 "$ref": "#/definitions/DatasetColumn"
             }
         },
-        "metatada": {
-            "title": "Metatada",
-            "description": "(Optional) Unformatted metadata about the dataset.",
+        "metadata": {
+            "title": "Metadata",
+            "description": "(Optional) Unformatted metadata about the dataset",
             "type": "object"
         },
         "source": {
             "title": "Source",
-            "description": "Source of dataset",
+            "description": "(Optional) Source of dataset",
             "type": "string"
         },
         "grounding": {
-            "$ref": "#/definitions/Grounding"
+            "title": "Grounding",
+            "description": "(Optional) Grounding of ontological concepts related to the dataset as a whole",
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/Grounding"
+            }
         }
     },
     "required": [
+        "id",
         "name",
         "columns"
     ],
@@ -71,6 +84,7 @@
             "properties": {
                 "identifiers": {
                     "title": "Identifiers",
+                    "description": "Ontological identifier per DKG",
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
@@ -78,6 +92,7 @@
                 },
                 "context": {
                     "title": "Context",
+                    "description": "(Optional) Additional context that informs the grounding",
                     "type": "object"
                 }
             },
@@ -105,11 +120,12 @@
                 },
                 "format_str": {
                     "title": "Format Str",
-                    "description": "String that describes the formatting of the value.",
+                    "description": "(Optional) String that describes the formatting of the value",
                     "type": "string"
                 },
                 "annotations": {
                     "title": "Annotations",
+                    "description": "Column annotations from the MIT data profiling tool",
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -117,16 +133,21 @@
                 },
                 "metadata": {
                     "title": "Metadata",
+                    "description": "(Optional) Unformatted metadata about the dataset",
                     "type": "object"
                 },
                 "grounding": {
-                    "$ref": "#/definitions/Grounding"
+                    "title": "Grounding",
+                    "description": "(Optional) Grounding of ontological concepts related to the column",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Grounding"
+                    }
                 }
             },
             "required": [
                 "name",
-                "annotations",
-                "metadata"
+                "annotations"
             ]
         }
     }
