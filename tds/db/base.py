@@ -11,14 +11,17 @@ class TdsModel(BaseModel):
     _index: str
     timestamp: Optional[datetime]
 
-    def save(self, id: Optional[None | str | int] = None):
+    def save(self, entity_id: Optional[None | str | int] = None):
         self.timestamp = datetime.now()
-        if self.id or id:
+        if self.id or entity_id:
             res = es.index(
-                index=self._index, body=self.dict(), id=(id if id else self.id)
+                index=self._index,
+                body=self.dict(),
+                id=(entity_id if entity_id else self.id),
             )
         else:
             res = es.index(index=self._index, body=self.dict())
+            self.id = res["_id"]
         return res
 
     def delete(self):
