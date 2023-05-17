@@ -59,9 +59,11 @@ def model_list_response(model_list_from_es) -> list:
         .reset_index(drop=True)
     )
 
+    # we should use the same terminology here as is used in the ASKEM model representation
+    # e.g. instead of `model_schema` that should just be `schema`
     models["framework"] = models["model_schema"].map(lambda x: framework_map[x])
     models.rename(columns={"_id": "id"}, inplace=True)
-    models.drop(columns=["_index", "_ignored", "_score"], inplace=True)
+    models.drop(columns=["_index", "_score"], inplace=True)
 
     return models.to_json(orient="records")
 
