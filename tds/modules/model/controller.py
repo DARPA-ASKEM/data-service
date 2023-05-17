@@ -86,7 +86,7 @@ def model_descriptions_get(model_id: str | int) -> Response:
 @model_router.get("/{model_id}/parameters", **retrieve.fastapi_endpoint_config)
 def model_parameters_get(model_id: str | int) -> Response:
     try:
-        res = es.get(index="model", id=model_id, _source_includes=["model.states"])
+        res = es.get(index="model", id=model_id, _source_includes=["model.parameters"])
         logger.info(f"model retrieved for params: {model_id}")
 
         return Response(
