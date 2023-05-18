@@ -42,7 +42,7 @@ def model_configuration_post(payload: ModelConfiguration) -> Response:
     Create model_configuration and return its ID
     """
     res = payload.save()
-    logger.info(f"New model_configuration created: {id}")
+    logger.info("New model_configuration created: %s", res["_id"])
     return Response(
         status_code=200,
         headers={
@@ -61,7 +61,7 @@ def model_configuration_get(model_configuration_id: str | int) -> Response:
     """
     try:
         res = es.get(index="model_configuration", id=model_configuration_id)
-        logger.info(f"ModelConfiguration retrieved: {model_configuration_id}")
+        logger.info("ModelConfiguration retrieved: %s", model_configuration_id)
 
         return Response(
             status_code=status.HTTP_200_OK,
@@ -89,7 +89,7 @@ def model_configuration_put(
     Update a model_configuration in ElasticSearch
     """
     res = payload.save(model_configuration_id)
-    logger.info(f"model_configuration updated: {model_configuration_id}")
+    logger.info("model_configuration updated: %s", model_configuration_id)
     return Response(
         status_code=status.HTTP_200_OK,
         headers={
@@ -103,19 +103,22 @@ def model_configuration_put(
     "/{model_configuration_id}", **delete.fastapi_endpoint_config
 )
 def model_configuration_delete(model_configuration_id: str | int) -> Response:
+    """
+    Function deletes a model_configuration in ES.
+    """
     try:
         res = es.delete(index="model_configuration", id=model_configuration_id)
 
         if res["result"] != "deleted":
             logger.error(
-                f"Failed to delete model_configuration: {model_configuration_id}"
+                "Failed to delete model_configuration: %s", model_configuration_id
             )
             raise Exception(
                 f"Failed to delete  Model Configuration. ElasticSearch Response: {res['result']}"
             )
 
         logger.info(
-            f"ModelConfiguration successfully deleted: {model_configuration_id}"
+            f"ModelConfiguration successfully deleted: %s", model_configuration_id
         )
         return Response(
             status_code=status.HTTP_200_OK,
