@@ -114,7 +114,8 @@ def model_configuration_delete(model_configuration_id: str | int) -> Response:
                 "Failed to delete model_configuration: %s", model_configuration_id
             )
             raise Exception(
-                f"Failed to delete  Model Configuration. ElasticSearch Response: {res['result']}"
+                "Failed to delete  Model Configuration. ElasticSearch Response: %s",
+                res["result"],
             )
 
         logger.info(
