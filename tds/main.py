@@ -3,15 +3,35 @@
 The module hosts the API using a command line interface.
 """
 
+import logging
 from sys import exit as sys_exit
 
 from click import command, echo, option
 from dbml_builder import verify
+from elasticsearch.client import CatClient
 from sqlalchemy.exc import OperationalError
 from uvicorn import run as uvicorn_run
 
 from tds.db import init_dev_content, rdb, stamp, upgrade
+from tds.db.elasticsearch import es, wait_for_es_up
 from tds.settings import settings
+
+logger = logging.Logger("main.py")
+
+def setup_elasticsearch_indexes() -> None:
+    # Config should match keyword args on https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
+    indices = {
+        "model": {},
+    }
+
+    # Wait for elasticsearch to be online and healthy enough to proceed
+    wait_for_es_up()
+
+    # Create indexes
+    for idx, config in indices.items():
+        if not es.indices.exists(index=idx):
+            logger.debug(f"Creating index {idx}")
+            es.indices.create(index=idx, body=config)
 
 
 @command()
@@ -32,6 +52,7 @@ def cli(host: str, port: int, dev: bool, server_config: str) -> None:
     if not is_success:
         echo(f"Failed to start: {message}.")
         sys_exit()
+    setup_elasticsearch_indexes()
     if dev:
         try:
             echo("Connecting to DB... ", nl=False)
