@@ -113,12 +113,11 @@ class ProvenanceHandler:
         Create edge between two nodes
         """
         with self.graph_db.session() as session:
-
             # if node 1 is not created yet create node
 
             left_node_query = (
                 f"Merge (n: {provenance_payload.get('left_type')}"
-                + f"{{id: {provenance_payload.get('left')} , "
+                + f"{{id: '{provenance_payload.get('left')}' , "
                 + f"concept:'{provenance_payload.get('concept','.')}'}} )"
             )
 
@@ -128,7 +127,7 @@ class ProvenanceHandler:
 
             right_node_query = (
                 f"Merge (n: {provenance_payload.get('right_type')}"
-                + f"{{id: {provenance_payload.get('right')} , concept:'.'}} )"
+                + f"{{id: '{provenance_payload.get('right')}' , concept:'.'}} )"
             )
 
             session.run(right_node_query)

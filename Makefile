@@ -16,6 +16,7 @@ SQL_HASH = $(shell md5sum $(SCHEMA_FILES) $(DATA_PY_FILES) | md5sum | cut -c -32
 .PHONY:init
 init:
 	cp api.env.sample api.env
+	cp .env.sample .env
 	poetry install;
 	poetry run pre-commit install
 	

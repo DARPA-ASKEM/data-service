@@ -152,6 +152,7 @@ Table model_framework {
   name varchar [pk]
   version varchar [not null]
   semantics varchar [not null]
+  schema_url varchar
 }
 
 Table model_description {
@@ -255,7 +256,7 @@ Table ontology_concept {
   id int [pk]
   curie varchar [ref: > active_concept.curie, not null]
   type taggable_type [not null]
-  object_id int [not null]
+  object_id varchar [not null]
   status ontological_field [not null]
 }
 
@@ -263,9 +264,9 @@ Table provenance {
   id int [pk]
   timestamp datetime [default: `now()`, not null]
   relation_type relation_type [not null]
-  left int [not null]
+  left varchar [not null]
   left_type provenance_type [not null]
-  right int [not null]
+  right varchar [not null]
   right_type provenance_type [not null]
   user_id int [ref: > person.id]
   concept varchar 

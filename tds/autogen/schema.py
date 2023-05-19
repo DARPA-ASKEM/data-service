@@ -245,7 +245,7 @@ class OntologyConcept(BaseModel):
     id: Optional[int] = None
     curie: str
     type: TaggableType
-    object_id: Optional[int] = None
+    object_id: str
     status: OntologicalField
 
 
@@ -254,9 +254,9 @@ class Provenance(BaseModel):
     id: Optional[int] = None
     timestamp: datetime.datetime = datetime.datetime.now()
     relation_type: RelationType
-    left: int
+    left: str
     left_type: ProvenanceType
-    right: int
+    right: str
     right_type: ProvenanceType
     user_id: Optional[int]
     concept: Optional[str]
@@ -276,6 +276,7 @@ class ModelFramework(BaseModel):
     name: str
     version: str
     semantics: str
+    schema_url: Optional[str]
 
 
 class ModelState(BaseModel):

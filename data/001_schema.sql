@@ -448,7 +448,8 @@ ALTER SEQUENCE public.model_description_id_seq OWNED BY public.model_description
 CREATE TABLE public.model_framework (
     name character varying NOT NULL,
     version character varying NOT NULL,
-    semantics character varying NOT NULL
+    semantics character varying NOT NULL,
+    schema_url character varying NOT NULL
 );
 
 

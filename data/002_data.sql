@@ -506,8 +506,8 @@ COPY public.intermediate (id, "timestamp", source, type, content) FROM stdin;
 -- Data for Name: model_framework; Type: TABLE DATA; Schema: public; Owner: dev
 --
 
-COPY public.model_framework (name, version, semantics) FROM stdin;
-Petri Net	0.0.1	semantics_go_here
+COPY public.model_framework (name, version, semantics, schema_url) FROM stdin;
+Petri Net	0.0.1	semantics_go_here	https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json
 \.
 
 

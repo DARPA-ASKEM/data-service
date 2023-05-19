@@ -275,7 +275,7 @@ class OntologyConcept(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     curie = sa.Column(sa.String(), sa.ForeignKey('active_concept.curie'), nullable=False)
     type = sa.Column(sa.Enum(TaggableType), nullable=False)
-    object_id = sa.Column(sa.Integer(), nullable=False)
+    object_id = sa.Column(sa.String(), nullable=False)
     status = sa.Column(sa.Enum(OntologicalField), nullable=False)
 
 
@@ -286,9 +286,9 @@ class Provenance(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
     relation_type = sa.Column(sa.Enum(RelationType), nullable=False)
-    left = sa.Column(sa.Integer(), nullable=False)
+    left = sa.Column(sa.String(), nullable=False)
     left_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
-    right = sa.Column(sa.Integer(), nullable=False)
+    right = sa.Column(sa.String(), nullable=False)
     right_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
     user_id = sa.Column(sa.Integer(), sa.ForeignKey('person.id'))
     concept = sa.Column(sa.String())
@@ -312,6 +312,7 @@ class ModelFramework(Base):
     name = sa.Column(sa.String(), primary_key=True)
     version = sa.Column(sa.String(), nullable=False)
     semantics = sa.Column(sa.String(), nullable=False)
+    schema_url = sa.Column(sa.String())
 
 
 class ModelState(Base):
