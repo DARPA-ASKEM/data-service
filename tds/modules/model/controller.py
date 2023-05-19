@@ -1,12 +1,12 @@
+"""
+TDS Model Controller.
+"""
 import json
 from logging import Logger
-from pprint import pprint
-from typing import List, Optional
+from typing import List
 
 from elasticsearch import NotFoundError
-from fastapi import APIRouter, Depends, HTTPException, Response, status
-from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Query, Session
+from fastapi import APIRouter, Response, status
 
 from tds.db import es
 from tds.modules.model.model import Model
@@ -25,11 +25,11 @@ def list_models(page_size: int = 100, page: int = 0) -> List:
     list_body = {
         "size": page_size,
         "fields": ["name", "description", "model_schema", "model_version"],
-        "_source": False,
+        "source": False,
     }
     if page != 0:
         list_body["from"] = page
-    res = es.search(index="model", body=list_body)
+    res = es.search(index="model", **list_body)
 
     return Response(
         status_code=status.HTTP_200_OK,
@@ -46,7 +46,7 @@ def model_post(payload: Model) -> Response:
     Create model and return its ID
     """
     res = payload.save()
-    logger.info(f"new model created: {id}")
+    logger.info("new model created: %s", res["_id"])
     return Response(
         status_code=200,
         headers={
@@ -63,7 +63,7 @@ def model_descriptions_get(model_id: str | int) -> Response:
     """
     try:
         res = es.get(index="model", id=model_id)
-        logger.info(f"model retrieved for description: {model_id}")
+        logger.info("model retrieved for description: %s", model_id)
 
         return Response(
             status_code=status.HTTP_200_OK,
@@ -85,9 +85,12 @@ def model_descriptions_get(model_id: str | int) -> Response:
 
 @model_router.get("/{model_id}/parameters", **retrieve.fastapi_endpoint_config)
 def model_parameters_get(model_id: str | int) -> Response:
+    """
+    Function retrieves a Model's parameters.
+    """
     try:
-        res = es.get(index="model", id=model_id, _source_includes=["model.parameters"])
-        logger.info(f"model retrieved for params: {model_id}")
+        res = es.get(index="model", id=model_id, source_includes=["model.parameters"])
+        logger.info("model retrieved for params: %s", model_id)
 
         return Response(
             status_code=status.HTTP_200_OK,
@@ -112,7 +115,7 @@ def model_get(model_id: str | int) -> Response:
     """
     try:
         res = es.get(index="model", id=model_id)
-        logger.info(f"model retrieved: {model_id}")
+        logger.info("model retrieved: %s", model_id)
 
         return Response(
             status_code=status.HTTP_200_OK,
@@ -136,7 +139,7 @@ def model_put(model_id: str | int, payload: Model) -> Response:
     Update a model in ElasticSearch
     """
     res = payload.save(model_id)
-    logger.info(f"model updated: {model_id}")
+    logger.info("model updated: %s", model_id)
     return Response(
         status_code=status.HTTP_200_OK,
         headers={
@@ -148,16 +151,19 @@ def model_put(model_id: str | int, payload: Model) -> Response:
 
 @model_router.delete("/{model_id}", **delete.fastapi_endpoint_config)
 def model_delete(model_id: str | int) -> Response:
+    """
+    Function deletes a TDS Model from ElasticSearch.
+    """
     try:
         res = es.delete(index="model", id=model_id)
 
         if res["result"] != "deleted":
-            logger.error(f"Failed to delete model: {model_id}")
+            logger.error("Failed to delete model: %s", model_id)
             raise Exception(
                 f"Failed to delete model. ElasticSearch Response: {res['result']}"
             )
 
-        logger.info(f"Model successfully deleted: {model_id}")
+        logger.info("Model successfully deleted: %s", model_id)
         return Response(
             status_code=status.HTTP_200_OK,
             headers={
