@@ -1,3 +1,6 @@
+"""
+TDS Model
+"""
 from typing import List, Optional
 
 from pydantic import Field
@@ -14,6 +17,10 @@ from tds.settings import settings
 
 
 class Model(TdsModel):
+    """
+    TDS Model Data Model
+    """
+
     name: str
     description: str
     model: dict
@@ -24,10 +31,10 @@ class Model(TdsModel):
     concepts: Optional[List] = []
     _exists = False
 
-    def save(self, model_id: Optional[None | str | int] = None):
-        if model_id is not None:
+    def save(self, entity_id: Optional[None | str | int] = None):
+        if entity_id is not None:
             self._exists = True
-        res = super(Model, self).save(model_id)
+        res = super().save(entity_id)
         # Pass the model id so we have it for association.
         self._extract_concepts(res["_id"])
         if settings.NEO4J_ENABLED:
@@ -50,7 +57,8 @@ class Model(TdsModel):
                     for key in state["grounding"]["identifiers"]:
                         value = state["grounding"]["identifiers"][key]
                         curie = f"{key}:{value}"
-                        # @TODO: Break this code out for reuse where other data types can use it to handle concepts.
+                        # @TODO: Break this code out for reuse where other
+                        # data types can use it to handle concepts.
                         concept = (
                             pg_db.query(orm.ActiveConcept)
                             .filter(orm.ActiveConcept.curie == curie)
@@ -95,10 +103,14 @@ class Model(TdsModel):
         provenance_handler.create_entry(payload)
 
     class Config:
+        """
+        TDS Model Swagger Example.
+        """
+
         schema_extra = {
             "example": {
                 "name": "A Test Model",
-                "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",
+                "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",  # pylint: disable=line-too-long
                 "description": "Test Model Post from Swagger.",
                 "model_version": "1.0",
                 "model": {
@@ -129,7 +141,7 @@ class Model(TdsModel):
                                 "name": "t1",
                                 "rate": {
                                     "expression": "S/l_e",
-                                    "expression_mathml": "<apply><divide/><ci>S</ci><ci>l_e</ci></apply>",
+                                    "expression_mathml": "<apply><divide/><ci>S</ci><ci>l_e</ci></apply>",  # pylint: disable=line-too-long
                                 },
                             },
                         },
@@ -141,7 +153,7 @@ class Model(TdsModel):
                                 "name": "t2",
                                 "rate": {
                                     "expression": "V/l_e",
-                                    "expression_mathml": "<apply><divide/><ci>V</ci><ci>l_e</ci></apply>",
+                                    "expression_mathml": "<apply><divide/><ci>V</ci><ci>l_e</ci></apply>",  # pylint: disable=line-too-long
                                 },
                             },
                         },
