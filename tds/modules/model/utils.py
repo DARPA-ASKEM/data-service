@@ -71,7 +71,7 @@ def model_list_response(model_list_from_es) -> list:
     models.rename(columns={"_id": "id"}, inplace=True)
     models.drop(columns=["_index", "_score"], inplace=True)
 
-    return models.to_json(orient="records")
+    return models.to_dict(orient="records")
 
 
 def get_frameworks() -> dict:
