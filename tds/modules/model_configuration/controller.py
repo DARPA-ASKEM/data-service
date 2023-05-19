@@ -1,9 +1,12 @@
-import json
+"""
+TDS Model Configuration Controller
+"""
 from logging import Logger
 from typing import List
 
 from elasticsearch import NotFoundError
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Response, status
+from fastapi.responses import JSONResponse
 
 from tds.db import es
 from tds.modules.model_configuration.model import ModelConfiguration
@@ -27,35 +30,35 @@ def list_model_configurations(page_size: int = 100, page: int = 0) -> List:
         list_body["from"] = page
     res = es.search(index="model_configuration", body=list_body)
 
-    return Response(
+    return JSONResponse(
         status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps(res["hits"]["hits"]),
+        content=res["hits"]["hits"],
     )
 
 
 @model_configuration_router.post("", **create.fastapi_endpoint_config)
-def model_configuration_post(payload: ModelConfiguration) -> Response:
+def model_configuration_post(payload: ModelConfiguration) -> JSONResponse:
     """
     Create model_configuration and return its ID
     """
     res = payload.save()
     logger.info("New model_configuration created: %s", res["_id"])
-    return Response(
+    return JSONResponse(
         status_code=200,
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps({"id": res["_id"]}),
+        content={"id": res["_id"]},
     )
 
 
 @model_configuration_router.get(
     "/{model_configuration_id}", **retrieve.fastapi_endpoint_config
 )
-def model_configuration_get(model_configuration_id: str | int) -> Response:
+def model_configuration_get(model_configuration_id: str | int) -> JSONResponse:
     """
     Retrieve a model_configuration from ElasticSearch
     """
@@ -68,7 +71,7 @@ def model_configuration_get(model_configuration_id: str | int) -> Response:
             headers={
                 "content-type": "application/json",
             },
-            content=json.dumps(res),
+            content=res,
         )
     except NotFoundError:
         return Response(
@@ -84,18 +87,18 @@ def model_configuration_get(model_configuration_id: str | int) -> Response:
 )
 def model_configuration_put(
     model_configuration_id: str | int, payload: ModelConfiguration
-) -> Response:
+) -> JSONResponse:
     """
     Update a model_configuration in ElasticSearch
     """
     res = payload.save(model_configuration_id)
     logger.info("model_configuration updated: %s", model_configuration_id)
-    return Response(
+    return JSONResponse(
         status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps({"id": res["_id"]}),
+        content={"id": res["_id"]},
     )
 
 
