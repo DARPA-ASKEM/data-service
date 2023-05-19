@@ -1,3 +1,7 @@
+"""
+TDS Model Module init.
+"""
 from tds.modules.model.controller import model_router as router
 
-route_prefix = "mdl"
+ROUTE_PREFIX = "mdl"
+TAGS = ["TDS Model"]
