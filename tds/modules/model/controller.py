@@ -30,13 +30,20 @@ def list_models(page_size: int = 100, page: int = 0) -> List:
     if page != 0:
         list_body["from"] = page
     res = es.search(index="model", **list_body)
+    print(res)
+
+    list_body = (
+        model_list_response(res["hits"]["hits"])
+        if res["hits"]["hits"]
+        else json.dumps({"message": "No Results for Request"})
+    )
 
     return Response(
         status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
-        content=model_list_response(res["hits"]["hits"]),
+        content=list_body,
     )
 
 
