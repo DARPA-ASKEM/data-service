@@ -66,6 +66,6 @@ def build_api(*args: str) -> FastAPI:
 
     model_pkg = import_module("tds.modules.model")
     api.include_router(
-        model_pkg.router, tags=["TDS Model"], prefix="/" + model_pkg.route_prefix
+        model_pkg.router, tags=["TDS Model"], prefix="/" + model_pkg.ROUTE_PREFIX
     )
     return api
