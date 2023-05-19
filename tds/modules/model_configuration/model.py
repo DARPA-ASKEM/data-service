@@ -1,3 +1,6 @@
+"""
+TDS Model Configuration Data Model
+"""
 from typing import List, Optional
 
 from pydantic import Field
@@ -13,9 +16,9 @@ from tds.settings import settings
 class ModelConfiguration(TdsModel):
     name: str
     description: str
+    index = "model_configuration"
     model_id: str
-
-    _index = "model_configuration"
+    model: object
     concepts: Optional[List] = []
     _exists = False
 
@@ -37,3 +40,7 @@ class ModelConfiguration(TdsModel):
 
     class Config:
         schema_extra = {"example": {"model_id": "unique_uuid", "configuration": {}}}
+
+    @staticmethod
+    def get_index():
+        return "model_configuration"
