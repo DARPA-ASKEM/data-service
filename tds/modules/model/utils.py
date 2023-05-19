@@ -1,8 +1,14 @@
+"""
+TDS Model Utils
+
+Module provides basic utilities to handle model logic like
+response form.
+"""
 from typing import List
 
 import pandas as pd
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm import Session
 
 from tds.autogen import orm
 from tds.db.relational import engine as pg_engine
@@ -24,7 +30,7 @@ def orm_to_params(parameters: List):
     ]
 
 
-def model_response(model_from_es, delete_fields=[]) -> dict:
+def model_response(model_from_es, delete_fields=None) -> dict:
     """
     Function builds model response object from an ElasticSearch model.
     """
@@ -38,7 +44,7 @@ def model_response(model_from_es, delete_fields=[]) -> dict:
     del model["model_schema"]
     del model["concepts"]
 
-    if delete_fields:
+    if delete_fields and delete_fields is List:
         for field in delete_fields:
             del model[field]
 
@@ -49,18 +55,18 @@ def model_list_response(model_list_from_es) -> list:
     """
     Function builds model response object from an ElasticSearch model.
     """
-    df = pd.DataFrame(model_list_from_es)
+    model_df = pd.DataFrame(model_list_from_es)
     framework_map = get_frameworks()
     # We need to get the fields and then merge back to make the id available.
     models = (
-        pd.concat({i: pd.DataFrame(x) for i, x in df.pop("fields").items()})
+        pd.concat({i: pd.DataFrame(x) for i, x in model_df.pop("fields").items()})
         .reset_index(level=1, drop=True)
-        .join(df)
+        .join(model_df)
         .reset_index(drop=True)
     )
 
-    # we should use the same terminology here as is used in the ASKEM model representation
-    # e.g. instead of `model_schema` that should just be `schema`
+    # we should use the same terminology here as is used in the ASKEM model
+    # representation e.g. instead of `model_schema` that should just be `schema`
     models["framework"] = models["model_schema"].map(lambda x: framework_map[x])
     models.rename(columns={"_id": "id"}, inplace=True)
     models.drop(columns=["_index", "_score"], inplace=True)
@@ -69,9 +75,12 @@ def model_list_response(model_list_from_es) -> list:
 
 
 def get_frameworks() -> dict:
+    """
+    Get model frameworks from postgres.
+    """
     with Session(pg_engine) as pg_db:
         frameworks = pg_db.query(orm.ModelFramework).all()
         framework_map = {}
-        for f in frameworks:
-            framework_map[f.schema_url] = f.name
+        for framework in frameworks:
+            framework_map[framework.schema_url] = framework.name
     return framework_map
