@@ -1,7 +1,6 @@
 """
 TDS Model Controller.
 """
-import json
 from logging import Logger
 from typing import List
 
@@ -11,6 +10,7 @@ from fastapi.responses import JSONResponse
 
 from tds.db import es
 from tds.modules.model.model import Model
+from tds.modules.model.model_description import ModelDescription
 from tds.modules.model.utils import model_list_response, model_response
 from tds.operation import create, delete, retrieve, update
 
@@ -18,8 +18,12 @@ model_router = APIRouter()
 logger = Logger(__name__)
 
 
-@model_router.get("/descriptions", **retrieve.fastapi_endpoint_config)
-def list_models(page_size: int = 100, page: int = 0) -> List:
+@model_router.get(
+    "/descriptions",
+    response_model=list[ModelDescription],
+    **retrieve.fastapi_endpoint_config,
+)
+def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
     """
     Retrieve the list of models from ES.
     """
@@ -31,7 +35,6 @@ def list_models(page_size: int = 100, page: int = 0) -> List:
     if page != 0:
         list_body["from"] = page
     res = es.search(index="model", **list_body)
-    print(res)
 
     list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
 
