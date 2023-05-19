@@ -35,7 +35,7 @@ def list_models(page_size: int = 100, page: int = 0) -> List:
     list_body = (
         model_list_response(res["hits"]["hits"])
         if res["hits"]["hits"]
-        else json.dumps({"message": "No Results for Request"})
+        else json.dumps([])
     )
 
     return Response(
