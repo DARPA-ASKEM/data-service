@@ -6,4 +6,4 @@ from tds.modules.model_configuration.controller import (
 )
 
 ROUTE_PREFIX = "model_configuration"
-TAGS = [" Model Configuration"]
+TAGS = ["Model Configuration"]
