@@ -1,29 +1,46 @@
 from datetime import datetime
 from typing import Optional
+import uuid
 
-from pydantic import BaseModel
+from elasticsearch import ConflictError
+from pydantic import BaseModel, Field
 
 from tds.db import es_client
 
 es = es_client()
 
+new_uuid = lambda: str(uuid.uuid4())
 
 class TdsModel(BaseModel):
-    id: Optional[int | str]
+    id: str = Field(
+        default_factory=new_uuid,
+        description="Universally unique identifier for the item",
+    )
     _index: str
     timestamp: Optional[datetime]
 
-    def save(self, entity_id: Optional[None | str | int] = None):
+    def create(self):
         self.timestamp = datetime.now()
-        if self.id or entity_id:
-            res = es.index(
+        try:
+            res = es.create(
                 index=self._index,
                 body=self.dict(),
-                id=(entity_id if entity_id else self.id),
+                id=self.id,
             )
-        else:
-            res = es.index(index=self._index, body=self.dict())
-            self.id = res["_id"]
+        except ConflictError:
+            # ID is already in use, create a new id and resave
+            self.id = new_uuid()
+            return self.save()
+        return res
+
+
+    def save(self):
+        self.timestamp = datetime.now()
+        res = es.index(
+            index=self._index,
+            body=self.dict(),
+            id=self.id,
+        )
         return res
 
     def delete(self):
