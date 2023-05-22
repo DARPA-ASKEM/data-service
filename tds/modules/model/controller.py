@@ -7,6 +7,7 @@ from typing import List
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Response, status
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import HTTPException
 
 from tds.db import es_client
 from tds.modules.model.model import Model
@@ -54,7 +55,7 @@ def model_post(payload: Model) -> JSONResponse:
     """
     Create model and return its ID
     """
-    res = payload.save()
+    res = payload.create()
     logger.info("new model created: %s", res["_id"])
     return JSONResponse(
         status_code=200,
@@ -145,7 +146,9 @@ def model_put(model_id: str | int, payload: Model) -> JSONResponse:
     """
     Update a model in ElasticSearch
     """
-    res = payload.save(model_id)
+    if payload.id != model_id:
+        raise HTTPException(status_code=422, detail="ID in request URL and in payload must match.")
+    res = payload.save()
     logger.info("model updated: %s", model_id)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
