@@ -9,7 +9,7 @@ from fastapi import APIRouter, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
-from tds.db import es
+from tds.db import es_client
 from tds.modules.model_configuration.model import ModelConfiguration
 from tds.modules.model_configuration.response import ModelConfigurationResponse
 from tds.operation import create, delete, retrieve, update
@@ -27,6 +27,7 @@ def list_model_configurations(page_size: int = 100, page: int = 0) -> List:
     """
     Retrieve the list of model_configurations from ES.
     """
+    es = es_client()
     list_body = {
         "size": page_size,
         # "fields": [], --** This option allows you to select specific fields from ES **--
@@ -71,6 +72,7 @@ def model_configuration_get(model_configuration_id: str | int) -> JSONResponse:
     Retrieve a model_configuration from ElasticSearch
     """
     try:
+        es = es_client()
         res = es.get(index=ModelConfiguration.get_index(), id=model_configuration_id)
         logger.info("ModelConfiguration retrieved: %s", model_configuration_id)
         source = res["_source"]
@@ -120,6 +122,7 @@ def model_configuration_delete(model_configuration_id: str | int) -> Response:
     Function deletes a model_configuration in ES.
     """
     try:
+        es = es_client()
         res = es.delete(index=ModelConfiguration.get_index(), id=model_configuration_id)
 
         if res["result"] != "deleted":
