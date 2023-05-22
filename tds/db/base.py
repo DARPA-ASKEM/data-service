@@ -1,3 +1,6 @@
+"""
+TDS Base Model for ElasticSearch
+"""
 from datetime import datetime
 from typing import Optional
 
@@ -9,11 +12,18 @@ es = es_client()
 
 
 class TdsModel(BaseModel):
+    """
+    TDS Base Model Class for ElasticSearch.
+    """
+
     id: Optional[int | str]
     index: str
     timestamp: Optional[datetime]
 
     def save(self, entity_id: Optional[None | str | int] = None):
+        """
+        Method saves an entity to ElasticSearch.
+        """
         self.timestamp = datetime.now()
         if self.id or entity_id:
             res = es.index(
@@ -27,5 +37,8 @@ class TdsModel(BaseModel):
         return res
 
     def delete(self):
+        """
+        Method deletes an item from ElasticSearch.
+        """
         res = es.delete(index=self.index, id=self.id)
         return res
