@@ -14,18 +14,22 @@ from tds.settings import settings
 
 
 class ModelConfiguration(TdsModel):
+    """
+    TDS Model Configuration Data Model.
+    """
+
     name: str
     description: str
     index = "model_configuration"
     model_id: str
     model: object
     concepts: Optional[List] = []
-    _exists = False
+    exists: Optional[bool] = False
 
     def save(self, model_configuration_id: Optional[None | str | int] = None):
         if model_configuration_id is not None:
-            self._exists = True
-        res = super(ModelConfiguration, self).save(model_configuration_id)
+            self.exists = True
+        res = super().save(model_configuration_id)
         # Pass the model_configuration id so we have it for association.
         self._extract_concepts(res["_id"])
         if settings.NEO4J_ENABLED:
