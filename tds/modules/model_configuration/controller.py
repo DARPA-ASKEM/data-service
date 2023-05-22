@@ -6,17 +6,23 @@ from typing import List
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Response, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from tds.db import es
 from tds.modules.model_configuration.model import ModelConfiguration
+from tds.modules.model_configuration.response import ModelConfigurationResponse
 from tds.operation import create, delete, retrieve, update
 
 model_configuration_router = APIRouter()
 logger = Logger(__name__)
 
 
-@model_configuration_router.get("", **retrieve.fastapi_endpoint_config)
+@model_configuration_router.get(
+    "",
+    response_model=list[ModelConfigurationResponse],
+    **retrieve.fastapi_endpoint_config,
+)
 def list_model_configurations(page_size: int = 100, page: int = 0) -> List:
     """
     Retrieve the list of model_configurations from ES.
@@ -28,7 +34,7 @@ def list_model_configurations(page_size: int = 100, page: int = 0) -> List:
     }
     if page != 0:
         list_body["from"] = page
-    res = es.search(index="model_configuration", body=list_body)
+    res = es.search(index=ModelConfiguration.get_index(), body=list_body)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
@@ -56,22 +62,26 @@ def model_configuration_post(payload: ModelConfiguration) -> JSONResponse:
 
 
 @model_configuration_router.get(
-    "/{model_configuration_id}", **retrieve.fastapi_endpoint_config
+    "/{model_configuration_id}",
+    response_model=ModelConfigurationResponse,
+    **retrieve.fastapi_endpoint_config,
 )
 def model_configuration_get(model_configuration_id: str | int) -> JSONResponse:
     """
     Retrieve a model_configuration from ElasticSearch
     """
     try:
-        res = es.get(index="model_configuration", id=model_configuration_id)
+        res = es.get(index=ModelConfiguration.get_index(), id=model_configuration_id)
         logger.info("ModelConfiguration retrieved: %s", model_configuration_id)
+        source = res["_source"]
+        source["id"] = res["_id"]
 
-        return Response(
+        return JSONResponse(
             status_code=status.HTTP_200_OK,
             headers={
                 "content-type": "application/json",
             },
-            content=res,
+            content=jsonable_encoder(ModelConfigurationResponse(**res["_source"])),
         )
     except NotFoundError:
         return Response(
@@ -110,7 +120,7 @@ def model_configuration_delete(model_configuration_id: str | int) -> Response:
     Function deletes a model_configuration in ES.
     """
     try:
-        res = es.delete(index="model_configuration", id=model_configuration_id)
+        res = es.delete(index=ModelConfiguration.get_index(), id=model_configuration_id)
 
         if res["result"] != "deleted":
             logger.error(
