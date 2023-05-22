@@ -3,7 +3,9 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from tds.db import es
+from tds.db import es_client
+
+es = es_client()
 
 
 class TdsModel(BaseModel):

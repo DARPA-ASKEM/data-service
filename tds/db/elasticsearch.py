@@ -12,10 +12,14 @@ logger = logging.Logger(__name__)
 
 url = f"http://{settings.ES_HOST}:{settings.ES_PORT}"
 
-es = Elasticsearch([url])
+def es_client():
+    return Elasticsearch([url])
 
 
-def wait_for_es_up(timeout=120, sleep=5, healthy_statuses=('yellow', 'green')):
+def wait_for_es_up(client=None, timeout=120, sleep=5, healthy_statuses=('yellow', 'green')):
+    # Use default client if not provided
+    if client is None:
+        client = es_client()
 
     # Wait for cluster to become healthy enough to create indexes
     healthy = False
@@ -26,7 +30,7 @@ def wait_for_es_up(timeout=120, sleep=5, healthy_statuses=('yellow', 'green')):
     es_logger.setLevel(logging.ERROR)
     while not (healthy or (time.time() - start) > timeout):
         try:
-            health = es.health_report()
+            health = client.health_report()
             healthy = health['status'] in healthy_statuses
         except ConnectionError:
             logger.warn("ElasticSearch is not ready. Sleeping %s seconds", sleep)

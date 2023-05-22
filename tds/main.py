@@ -13,7 +13,7 @@ from sqlalchemy.exc import OperationalError
 from uvicorn import run as uvicorn_run
 
 from tds.db import init_dev_content, rdb, stamp, upgrade
-from tds.db.elasticsearch import es, wait_for_es_up
+from tds.db.elasticsearch import es_client, wait_for_es_up
 from tds.settings import settings
 
 logger = logging.Logger("main.py")
@@ -22,10 +22,12 @@ def setup_elasticsearch_indexes() -> None:
     # Config should match keyword args on https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
     indices = {
         "model": {},
+        "dataset": {},
     }
 
     # Wait for elasticsearch to be online and healthy enough to proceed
-    wait_for_es_up()
+    es = es_client()
+    wait_for_es_up(es)
 
     # Create indexes
     for idx, config in indices.items():
