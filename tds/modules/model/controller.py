@@ -8,7 +8,7 @@ from elasticsearch import NotFoundError
 from fastapi import APIRouter, Response, status
 from fastapi.responses import JSONResponse
 
-from tds.db import es
+from tds.db import es_client
 from tds.modules.model.model import Model
 from tds.modules.model.model_description import ModelDescription
 from tds.modules.model.utils import model_list_response, model_response
@@ -16,6 +16,8 @@ from tds.operation import create, delete, retrieve, update
 
 model_router = APIRouter()
 logger = Logger(__name__)
+
+es = es_client()
 
 
 @model_router.get(
