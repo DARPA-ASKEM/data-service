@@ -3,13 +3,7 @@ TDS Model Configuration Data Model
 """
 from typing import List, Optional
 
-from pydantic import Field
-from sqlalchemy.orm import Session
-
-from tds.autogen import orm
 from tds.db.base import TdsModel
-from tds.db.relational import engine as pg_engine
-from tds.lib.concepts import mark_concept_active
 from tds.settings import settings
 
 
