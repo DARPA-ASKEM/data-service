@@ -14,7 +14,7 @@ new_uuid = lambda: str(uuid.uuid4())
 class TdsModel(BaseModel):
     id: str = Field(
         default_factory=new_uuid,
-        description="Universally unique identifier for the dataset",
+        description="Universally unique identifier for the item",
     )
     _index: str
     timestamp: Optional[datetime]
