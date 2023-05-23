@@ -16,6 +16,7 @@ from tds.operation import create, delete, retrieve, update
 
 model_configuration_router = APIRouter()
 logger = Logger(__name__)
+es_index = ModelConfiguration.index
 
 
 @model_configuration_router.get(
@@ -35,7 +36,7 @@ def list_model_configurations(page_size: int = 100, page: int = 0) -> List:
     }
     if page != 0:
         list_body["from"] = page
-    res = es.search(index=ModelConfiguration.get_index(), body=list_body)
+    res = es.search(index=es_index, body=list_body)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
@@ -73,7 +74,7 @@ def model_configuration_get(model_configuration_id: str | int) -> JSONResponse:
     """
     try:
         es = es_client()
-        res = es.get(index=ModelConfiguration.get_index(), id=model_configuration_id)
+        res = es.get(index=es_index, id=model_configuration_id)
         logger.info("ModelConfiguration retrieved: %s", model_configuration_id)
         source = res["_source"]
         source["id"] = res["_id"]
@@ -123,7 +124,7 @@ def model_configuration_delete(model_configuration_id: str | int) -> Response:
     """
     try:
         es = es_client()
-        res = es.delete(index=ModelConfiguration.get_index(), id=model_configuration_id)
+        res = es.delete(index=es_index, id=model_configuration_id)
 
         if res["result"] != "deleted":
             logger.error(
