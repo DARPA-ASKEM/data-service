@@ -31,6 +31,7 @@ class Model(TdsModel):
     concepts: Optional[List] = []
     _exists = False
 
+
     def create(self):
         res = super().create()
         self._extract_concepts()

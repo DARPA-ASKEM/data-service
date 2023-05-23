@@ -6,6 +6,7 @@ from elasticsearch import ConflictError
 from pydantic import BaseModel, Field
 
 from tds.db import es_client
+from tds.settings import settings
 
 es = es_client()
 
@@ -19,11 +20,16 @@ class TdsModel(BaseModel):
     _index: str
     timestamp: Optional[datetime]
 
+    @classmethod
+    @property
+    def index(self):
+        return f"{settings.ES_INDEX_PREFIX}{self._index}"
+
     def create(self):
         self.timestamp = datetime.now()
         try:
             res = es.create(
-                index=self._index,
+                index=self.index,
                 body=self.dict(),
                 id=self.id,
             )
@@ -37,12 +43,12 @@ class TdsModel(BaseModel):
     def save(self):
         self.timestamp = datetime.now()
         res = es.index(
-            index=self._index,
+            index=self.index,
             body=self.dict(),
             id=self.id,
         )
         return res
 
     def delete(self):
-        res = es.delete(index=self._index, id=self.id)
+        res = es.delete(index=self.index, id=self.id)
         return res
