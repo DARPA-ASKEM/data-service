@@ -30,7 +30,7 @@ tidy:
 
 .PHONY:up
 up:
-	docker compose up --build -d;
+	docker compose --env-file api.env up --build -d;
 	
 .PHONY: gen-migration
 gen-migration:
@@ -53,7 +53,7 @@ fake:up
 	
 .PHONY:down
 down:
-	docker compose down;
+	docker compose --env-file api.env down;
 
 .PHONY:db-clean
 db-clean:
