@@ -40,10 +40,9 @@ def list_model_configurations(page_size: int = 100, page: int = 0) -> JSONRespon
         headers={
             "content-type": "application/json",
         },
-        content=[
-            jsonable_encoder(ModelConfigurationResponse(**x))
-            for x in res["hits"]["hits"]
-        ],
+        content=jsonable_encoder(
+            [ModelConfigurationResponse(**x["_source"]) for x in res["hits"]["hits"]]
+        ),
     )
 
 
