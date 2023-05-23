@@ -7,13 +7,10 @@ from pydantic import Field
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.db import ProvenanceHandler
 from tds.db.base import TdsModel
-from tds.db.graph.neo4j import ENGINE
 from tds.db.relational import engine as pg_engine
 from tds.lib.concepts import mark_concept_active
 from tds.lib.model_configs import model_config
-from tds.schema.provenance import Provenance
 from tds.settings import settings
 
 
@@ -93,19 +90,20 @@ class Model(TdsModel):
 
     def _establish_provenance(self):
         # add ModelParameter nodes
-        provenance_handler = ProvenanceHandler(rdb=pg_engine, graph_db=ENGINE)
-
-        payload = Provenance(
-            left=self.id,
-            left_type="Model",
-            right=self.id,
-            right_type="ModelRevision",
-            relation_type="BEGINS_AT" if self._exists is False else "EDITED_FROM",
-            user_id=None,
-            concept=".",
-        )
-
-        provenance_handler.create_entry(payload)
+        # provenance_handler = ProvenanceHandler(rdb=pg_engine, graph_db=ENGINE)
+        #
+        # payload = Provenance(
+        #     left=self.id,
+        #     left_type="Model",
+        #     right=self.id,
+        #     right_type="ModelRevision",
+        #     relation_type="BEGINS_AT" if self._exists is False else "EDITED_FROM",
+        #     user_id=None,
+        #     concept=".",
+        # )
+        #
+        # provenance_handler.create_entry(payload)
+        pass
 
     class Config:
         """
