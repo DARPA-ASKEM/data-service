@@ -11,23 +11,10 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm, schema
-from tds.db import (
-    ProvenanceHandler,
-    entry_exists,
-    list_by_id,
-    request_graph_db,
-    request_rdb,
-)
-from tds.lib.models import adjust_model_params, model_opt_relationship_mapping
-from tds.operation import create, delete, retrieve, update
-from tds.schema.model import (
-    Model,
-    ModelDescription,
-    ModelFramework,
-    ModelOptPayload,
-    ModelParameters,
-    orm_to_params,
-)
+from tds.db import ProvenanceHandler, request_graph_db, request_rdb
+from tds.lib.models import model_opt_relationship_mapping
+from tds.operation import create, delete, retrieve
+from tds.schema.model import ModelFramework, ModelOptPayload, orm_to_params
 from tds.schema.provenance import Provenance
 from tds.settings import settings
 
@@ -95,7 +82,6 @@ def delete_framework(name: str, rdb: Engine = Depends(request_rdb)) -> Response:
     return Response(
         status_code=status.HTTP_204_NO_CONTENT,
     )
-
 
 
 @router.post("/opts/{model_operation}", **create.fastapi_endpoint_config)
@@ -226,4 +212,3 @@ def model_opt(
         },
         content=json.dumps({"id": new_model.id}),
     )
-

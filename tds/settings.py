@@ -1,8 +1,6 @@
 """
 Configures data store using environment variables
 """
-import os
-
 from pydantic import BaseSettings
 
 

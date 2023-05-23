@@ -16,7 +16,6 @@ SQL_HASH = $(shell md5sum $(SCHEMA_FILES) $(DATA_PY_FILES) | md5sum | cut -c -32
 .PHONY:init
 init:
 	cp api.env.sample api.env
-	cp .env.sample .env
 	poetry install;
 	poetry run pre-commit install
 	
@@ -30,7 +29,7 @@ tidy:
 
 .PHONY:up
 up:
-	docker compose up --build -d;
+	docker compose --env-file api.env up --build -d;
 	
 .PHONY: gen-migration
 gen-migration:
@@ -53,7 +52,7 @@ fake:up
 	
 .PHONY:down
 down:
-	docker compose down;
+	docker compose --env-file api.env down;
 
 .PHONY:db-clean
 db-clean:
