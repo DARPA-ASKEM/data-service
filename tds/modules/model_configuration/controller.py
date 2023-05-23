@@ -2,7 +2,6 @@
 TDS Model Configuration Controller
 """
 from logging import Logger
-from typing import List
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, HTTPException, Response, status
@@ -24,7 +23,7 @@ es_index = ModelConfiguration.index
     response_model=list[ModelConfigurationResponse],
     **retrieve.fastapi_endpoint_config,
 )
-def list_model_configurations(page_size: int = 100, page: int = 0) -> List:
+def list_model_configurations(page_size: int = 100, page: int = 0) -> JSONResponse:
     """
     Retrieve the list of model_configurations from ES.
     """
@@ -32,18 +31,19 @@ def list_model_configurations(page_size: int = 100, page: int = 0) -> List:
     list_body = {
         "size": page_size,
         # "fields": [],
-        "_source": False,
+        "from_": page,
     }
-    if page != 0:
-        list_body["from"] = page
-    res = es.search(index=es_index, body=list_body)
+    res = es.search(index=es_index, **list_body)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
-        content=res["hits"]["hits"],
+        content=[
+            jsonable_encoder(ModelConfigurationResponse(**x))
+            for x in res["hits"]["hits"]
+        ],
     )
 
 
@@ -135,12 +135,12 @@ def model_configuration_delete(model_configuration_id: str | int) -> Response:
                 "Failed to delete model_configuration: %s", model_configuration_id
             )
             raise Exception(
-                "Failed to delete  Model Configuration. ElasticSearch Response: %s",
-                res["result"],
+                f"Failed to delete  Model Configuration. ElasticSearch Response: "
+                f"{res['result']}",
             )
 
         logger.info(
-            f"ModelConfiguration successfully deleted: %s", model_configuration_id
+            "ModelConfiguration successfully deleted: %s", model_configuration_id
         )
         return Response(
             status_code=status.HTTP_200_OK,
