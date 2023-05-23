@@ -1,6 +1,9 @@
+"""
+Model configurations to fill out Swagger doc examples.
+"""
 model_config = {
     "name": "A Test Model",
-    "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",
+    "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",  # pylint: disable=line-too-long
     "description": "Test Model Post from Swagger.",
     "model_version": "1.0",
     "model": {
@@ -31,7 +34,7 @@ model_config = {
                     "name": "t1",
                     "rate": {
                         "expression": "S/l_e",
-                        "expression_mathml": "<apply><divide/><ci>S</ci><ci>l_e</ci></apply>",
+                        "expression_mathml": "<apply><divide/><ci>S</ci><ci>l_e</ci></apply>",  # pylint: disable=line-too-long
                     },
                 },
             },
@@ -43,7 +46,7 @@ model_config = {
                     "name": "t2",
                     "rate": {
                         "expression": "V/l_e",
-                        "expression_mathml": "<apply><divide/><ci>V</ci><ci>l_e</ci></apply>",
+                        "expression_mathml": "<apply><divide/><ci>V</ci><ci>l_e</ci></apply>",  # pylint: disable=line-too-long
                     },
                 },
             },
