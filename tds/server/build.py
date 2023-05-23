@@ -40,6 +40,9 @@ def attach_router(api: FastAPI, router_name: str) -> None:
 
 
 def load_module_routers(api):
+    """
+    Function loads the module router objects and registers them with FastAPI.
+    """
     modules = import_module("tds.modules")
     for mod in iter_modules(modules.__path__):
         module = import_module(f"tds.modules.{mod.name}")
