@@ -28,7 +28,7 @@ class Model(TdsModel):
     model_schema: str = Field(alias="schema")
     model_version: str
 
-    index = "model"
+    _index = "model"
     concepts: Optional[List] = []
     _exists = False
 
