@@ -21,7 +21,7 @@ logger = Logger(__name__)
 router = APIRouter()
 
 
-@router.post("", **create.fastapi_endpoint_config)
+@router.post("", deprecated=True, **create.fastapi_endpoint_config)
 def create_parameters(
     payload: List[IndependentParameter], rdb: Engine = Depends(request_rdb)
 ) -> Response:
@@ -58,7 +58,7 @@ def create_parameters(
     )
 
 
-@router.get("", **retrieve.fastapi_endpoint_config)
+@router.get("", deprecated=True, **retrieve.fastapi_endpoint_config)
 def get_parameters(
     rdb: Engine = Depends(request_rdb), page: int = 0, page_size: int = 100
 ) -> List[IndependentParameter]:
