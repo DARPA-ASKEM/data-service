@@ -31,7 +31,7 @@ def list_model_configurations(page_size: int = 100, page: int = 0) -> List:
     es = es_client()
     list_body = {
         "size": page_size,
-        # "fields": [], --** This option allows you to select specific fields from ES **--
+        # "fields": [],
         "_source": False,
     }
     if page != 0:
