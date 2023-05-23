@@ -27,6 +27,7 @@ def setup_elasticsearch_indexes() -> None:
     indices = {
         "model": {},
         "dataset": {},
+        "model_configuration": {},
     }
 
     # Wait for elasticsearch to be online and healthy enough to proceed
