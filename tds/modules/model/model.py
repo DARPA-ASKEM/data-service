@@ -7,12 +7,10 @@ from pydantic import Field
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.db import ProvenanceHandler
 from tds.db.base import TdsModel
-from tds.db.graph.neo4j import ENGINE
 from tds.db.relational import engine as pg_engine
 from tds.lib.concepts import mark_concept_active
-from tds.schema.provenance import Provenance
+from tds.lib.model_configs import model_config
 from tds.settings import settings
 
 
@@ -30,7 +28,6 @@ class Model(TdsModel):
     _index = "model"
     concepts: Optional[List] = []
     _exists = False
-
 
     def create(self):
         res = super().create()
@@ -93,77 +90,24 @@ class Model(TdsModel):
 
     def _establish_provenance(self):
         # add ModelParameter nodes
-        provenance_handler = ProvenanceHandler(rdb=pg_engine, graph_db=ENGINE)
-
-        payload = Provenance(
-            left=self.id,
-            left_type="Model",
-            right=self.id,
-            right_type="ModelRevision",
-            relation_type="BEGINS_AT" if self._exists is False else "EDITED_FROM",
-            user_id=None,
-            concept=".",
-        )
-
-        provenance_handler.create_entry(payload)
+        # provenance_handler = ProvenanceHandler(rdb=pg_engine, graph_db=ENGINE)
+        #
+        # payload = Provenance(
+        #     left=self.id,
+        #     left_type="Model",
+        #     right=self.id,
+        #     right_type="ModelRevision",
+        #     relation_type="BEGINS_AT" if self._exists is False else "EDITED_FROM",
+        #     user_id=None,
+        #     concept=".",
+        # )
+        #
+        # provenance_handler.create_entry(payload)
+        pass
 
     class Config:
         """
         TDS Model Swagger Example.
         """
 
-        schema_extra = {
-            "example": {
-                "name": "A Test Model",
-                "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",  # pylint: disable=line-too-long
-                "description": "Test Model Post from Swagger.",
-                "model_version": "1.0",
-                "model": {
-                    "states": [
-                        {
-                            "id": "S",
-                            "name": "S",
-                            "grounding": {
-                                "identifiers": {"ncbitaxon": "9606"},
-                                "context": {},
-                            },
-                        },
-                        {
-                            "id": "V",
-                            "name": "V",
-                            "grounding": {
-                                "identifiers": {"ncbitaxon": "9606"},
-                                "context": {},
-                            },
-                        },
-                    ],
-                    "transitions": [
-                        {
-                            "id": "t1",
-                            "input": ["S"],
-                            "output": [],
-                            "properties": {
-                                "name": "t1",
-                                "rate": {
-                                    "expression": "S/l_e",
-                                    "expression_mathml": "<apply><divide/><ci>S</ci><ci>l_e</ci></apply>",  # pylint: disable=line-too-long
-                                },
-                            },
-                        },
-                        {
-                            "id": "t2",
-                            "input": ["V"],
-                            "output": [],
-                            "properties": {
-                                "name": "t2",
-                                "rate": {
-                                    "expression": "V/l_e",
-                                    "expression_mathml": "<apply><divide/><ci>V</ci><ci>l_e</ci></apply>",  # pylint: disable=line-too-long
-                                },
-                            },
-                        },
-                    ],
-                    "parameters": [{"id": "l_e", "value": 50.0}],
-                },
-            }
-        }
+        schema_extra = {"example": model_config}

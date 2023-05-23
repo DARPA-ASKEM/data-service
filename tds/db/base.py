@@ -1,5 +1,5 @@
 """
-TDS Base Model
+TDS Base Model for ElasticSearch
 """
 import uuid
 from datetime import datetime

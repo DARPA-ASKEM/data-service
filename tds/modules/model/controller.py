@@ -56,6 +56,7 @@ def model_post(payload: Model) -> JSONResponse:
     """
     Create model and return its ID
     """
+
     res = payload.create()
     logger.info("new model created: %s", res["_id"])
     return JSONResponse(
@@ -92,7 +93,9 @@ def model_descriptions_get(model_id: str | int) -> JSONResponse | Response:
         )
 
 
-@model_router.get("/{model_id}/parameters", **retrieve.fastapi_endpoint_config)
+@model_router.get(
+    "/{model_id}/parameters", deprecated=True, **retrieve.fastapi_endpoint_config
+)
 def model_parameters_get(model_id: str | int) -> JSONResponse | Response:
     """
     Function retrieves a Model's parameters.
