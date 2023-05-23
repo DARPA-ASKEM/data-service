@@ -76,7 +76,7 @@ extension-pkg-whitelist=["pydantic"]
 jobs=4
 
 [tool.pylint.basic]
-good-names=["id", "type"]
+good-names=["id", "type", "es"]
 
 [tool.pylint.variables]
 allowed-redefined-builtins=["id", "type"]

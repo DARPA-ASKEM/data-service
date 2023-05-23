@@ -8,7 +8,6 @@ from sys import exit as sys_exit
 
 from click import command, echo, option
 from dbml_builder import verify
-from elasticsearch.client import CatClient
 from sqlalchemy.exc import OperationalError
 from uvicorn import run as uvicorn_run
 
@@ -18,8 +17,13 @@ from tds.settings import settings
 
 logger = logging.Logger("main.py")
 
+
 def setup_elasticsearch_indexes() -> None:
-    # Config should match keyword args on https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
+    """
+    Function creates indexes in ElasticSearch.
+    """
+    # Config should match keyword args on
+    # https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
     indices = {
         "model": {},
         "dataset": {},
@@ -31,10 +35,10 @@ def setup_elasticsearch_indexes() -> None:
 
     # Create indexes
     for idx, config in indices.items():
-        index_name = f'{settings.ES_INDEX_PREFIX}{idx}'
+        index_name = f"{settings.ES_INDEX_PREFIX}{idx}"
         if not es.indices.exists(index=index_name):
-            logger.debug(f"Creating index {index_name}")
-            es.indices.create(index=index_name, body=config)
+            logger.debug("Creating index %s", index_name)
+            es.indices.create(index=index_name, mappings=config)
 
 
 @command()
