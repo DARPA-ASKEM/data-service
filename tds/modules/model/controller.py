@@ -6,6 +6,7 @@ from typing import List
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Response, status
+from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 
 from tds.db import es_client
@@ -16,6 +17,7 @@ from tds.operation import create, delete, retrieve, update
 
 model_router = APIRouter()
 logger = Logger(__name__)
+es_index = Model.index
 
 es = es_client()
 
@@ -36,7 +38,7 @@ def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
     }
     if page != 0:
         list_body["from"] = page
-    res = es.search(index="model", **list_body)
+    res = es.search(index=es_index, **list_body)
 
     list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
 
@@ -54,8 +56,8 @@ def model_post(payload: Model) -> JSONResponse:
     """
     Create model and return its ID
     """
-    res = payload.save()
 
+    res = payload.create()
     logger.info("new model created: %s", res["_id"])
     return JSONResponse(
         status_code=200,
@@ -72,7 +74,7 @@ def model_descriptions_get(model_id: str | int) -> JSONResponse | Response:
     Retrieve a model 'description' from ElasticSearch
     """
     try:
-        res = es.get(index="model", id=model_id)
+        res = es.get(index=es_index, id=model_id)
         logger.info("model retrieved for description: %s", model_id)
 
         return JSONResponse(
@@ -97,7 +99,7 @@ def model_parameters_get(model_id: str | int) -> JSONResponse | Response:
     Function retrieves a Model's parameters.
     """
     try:
-        res = es.get(index="model", id=model_id, source_includes=["model.parameters"])
+        res = es.get(index=es_index, id=model_id, source_includes=["model.parameters"])
         logger.info("model retrieved for params: %s", model_id)
 
         return JSONResponse(
@@ -122,7 +124,7 @@ def model_get(model_id: str | int) -> JSONResponse | Response:
     Retrieve a model from ElasticSearch
     """
     try:
-        res = es.get(index="model", id=model_id)
+        res = es.get(index=es_index, id=model_id)
         logger.info("model retrieved: %s", model_id)
 
         return JSONResponse(
@@ -146,7 +148,11 @@ def model_put(model_id: str | int, payload: Model) -> JSONResponse:
     """
     Update a model in ElasticSearch
     """
-    res = payload.save(model_id)
+    if payload.id != model_id:
+        raise HTTPException(
+            status_code=422, detail="ID in request URL and in payload must match."
+        )
+    res = payload.save()
     logger.info("model updated: %s", model_id)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
@@ -163,7 +169,7 @@ def model_delete(model_id: str | int) -> Response:
     Function deletes a TDS Model from ElasticSearch.
     """
     try:
-        res = es.delete(index="model", id=model_id)
+        res = es.delete(index=es_index, id=model_id)
 
         if res["result"] != "deleted":
             logger.error("Failed to delete model: %s", model_id)

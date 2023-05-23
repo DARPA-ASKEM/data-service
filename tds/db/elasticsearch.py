@@ -15,7 +15,7 @@ url = f"http://{settings.ES_HOST}:{settings.ES_PORT}"
 
 
 def es_client():
-    return Elasticsearch([url])
+    return Elasticsearch([url], basic_auth=(settings.ES_USERNAME, settings.ES_PASSWORD))
 
 
 def wait_for_es_up(

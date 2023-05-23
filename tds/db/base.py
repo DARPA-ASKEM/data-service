@@ -1,44 +1,57 @@
 """
 TDS Base Model for ElasticSearch
 """
+import uuid
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from elasticsearch import ConflictError
+from pydantic import BaseModel, Field
 
 from tds.db import es_client
+from tds.settings import settings
 
 es = es_client()
 
+new_uuid = lambda: str(uuid.uuid4())
+
 
 class TdsModel(BaseModel):
-    """
-    TDS Base Model Class for ElasticSearch.
-    """
-
-    id: Optional[int | str]
-    index: str
+    id: str = Field(
+        default_factory=new_uuid,
+        description="Universally unique identifier for the item",
+    )
+    _index: str
     timestamp: Optional[datetime]
 
-    def save(self, entity_id: Optional[None | str | int] = None):
-        """
-        Method saves an entity to ElasticSearch.
-        """
+    @classmethod
+    @property
+    def index(self):
+        return f"{settings.ES_INDEX_PREFIX}{self._index}"
+
+    def create(self):
         self.timestamp = datetime.now()
-        if self.id or entity_id:
-            res = es.index(
+        try:
+            res = es.create(
                 index=self.index,
                 body=self.dict(),
-                id=(entity_id if entity_id else self.id),
+                id=self.id,
             )
-        else:
-            res = es.index(index=self.index, body=self.dict())
-            self.id = res["_id"]
+        except ConflictError:
+            # ID is already in use, create a new id and resave
+            self.id = new_uuid()
+            return self.save()
+        return res
+
+    def save(self):
+        self.timestamp = datetime.now()
+        res = es.index(
+            index=self.index,
+            body=self.dict(),
+            id=self.id,
+        )
         return res
 
     def delete(self):
-        """
-        Method deletes an item from ElasticSearch.
-        """
         res = es.delete(index=self.index, id=self.id)
         return res

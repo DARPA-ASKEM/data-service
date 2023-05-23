@@ -32,17 +32,21 @@ class Model(TdsModel):
     concepts: Optional[List] = []
     _exists = False
 
-    def save(self, entity_id: Optional[None | str | int] = None):
-        if entity_id is not None:
-            self._exists = True
-        res = super().save(entity_id)
-        # Pass the model id so we have it for association.
-        self._extract_concepts(res["_id"])
+    def create(self):
+        res = super().create()
+        self._extract_concepts()
         if settings.NEO4J_ENABLED:
             self._establish_provenance()
         return res
 
-    def _extract_concepts(self, model_id):
+    def save(self, entity_id: Optional[None | str | int] = None):
+        if entity_id is not None:
+            self._exists = True
+        res = super().save()
+        self._extract_concepts()
+        return res
+
+    def _extract_concepts(self):
         """
         Method extracts concepts from the model and saves them to the db.
         """
@@ -80,7 +84,7 @@ class Model(TdsModel):
                             concept_association = orm.OntologyConcept(
                                 curie=curie,
                                 type="models",
-                                object_id=model_id,
+                                object_id=self.id,
                                 status="obj",
                             )
                             pg_db.add(concept_association)
