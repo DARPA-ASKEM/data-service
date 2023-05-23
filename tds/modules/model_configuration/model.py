@@ -14,7 +14,7 @@ class ModelConfiguration(TdsModel):
 
     name: str
     description: str
-    index = "model_configuration"
+    _index = "model_configuration"
     model_id: str
     model: object
     concepts: Optional[List] = []
