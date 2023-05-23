@@ -5,7 +5,7 @@ from logging import Logger
 from typing import List
 
 from elasticsearch import NotFoundError
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
@@ -104,6 +104,10 @@ def model_configuration_put(
     """
     Update a model_configuration in ElasticSearch
     """
+    if payload.id != model_configuration_id:
+        raise HTTPException(
+            status_code=422, detail="ID in request URL and in payload must match."
+        )
     res = payload.save(model_configuration_id)
     logger.info("model_configuration updated: %s", model_configuration_id)
     return JSONResponse(
