@@ -72,7 +72,7 @@ services:
       - data-api
       - data-annotation-stack
   elasticsearch:
-    image: elasticsearch:8.7.1
+    image: elasticsearch:8.5.3
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms1g -Xmx1g

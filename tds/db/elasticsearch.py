@@ -6,6 +6,7 @@ import time
 
 from elastic_transport import ConnectionError as EsConnectionError
 from elasticsearch import Elasticsearch
+from elasticsearch.client import ClusterClient
 
 from tds.settings import settings
 
@@ -30,6 +31,7 @@ def wait_for_es_up(
     # Use default client if not provided
     if client is None:
         client = es_client()
+    cluster_client = ClusterClient(client)
 
     # Wait for cluster to become healthy enough to create indexes
     healthy = False
@@ -40,7 +42,7 @@ def wait_for_es_up(
     es_logger.setLevel(logging.ERROR)
     while not (healthy or (time.time() - start) > timeout):
         try:
-            health = client.health_report()
+            health = cluster_client.health()
             healthy = health["status"] in healthy_statuses
         except EsConnectionError:
             logger.warning("ElasticSearch is not ready. Sleeping %s seconds", sleep)
