@@ -24,8 +24,7 @@ class Settings(BaseSettings):
     NEO4J_PASSWORD = "password"
     NEO4J_USER = "neo4j"
     OPENAI_KEY = "sk-.."
-    ES_PORT: int = 0000
-    ES_HOST: str = ""
+    ES_URL: str = ""
     ES_USERNAME: str = ""
     ES_PASSWORD: str = ""
     ES_INDEX_PREFIX: str = "tds_"

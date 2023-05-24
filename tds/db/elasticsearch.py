@@ -11,14 +11,14 @@ from tds.settings import settings
 
 logger = logging.Logger(__name__)
 
-url = f"http://{settings.ES_HOST}:{settings.ES_PORT}"
-
 
 def es_client():
     """
     Factory Function that provides an ElasticSearch connection.
     """
-    return Elasticsearch([url], basic_auth=(settings.ES_USERNAME, settings.ES_PASSWORD))
+    return Elasticsearch(
+        [settings.ES_URL], basic_auth=(settings.ES_USERNAME, settings.ES_PASSWORD)
+    )
 
 
 def wait_for_es_up(
