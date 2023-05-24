@@ -33,4 +33,3 @@ def downgrade() -> None:
     """
     Not needed
     """
-    pass
