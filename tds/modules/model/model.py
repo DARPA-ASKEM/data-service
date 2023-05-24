@@ -22,6 +22,7 @@ class Model(TdsModel):
     name: str
     description: str
     model: dict
+    semantics: dict
     model_schema: str = Field(alias="schema")
     model_version: str
 
