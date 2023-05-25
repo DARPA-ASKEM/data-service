@@ -574,7 +574,7 @@ CREATE TABLE public.ontology_concept (
     id integer NOT NULL,
     curie character varying NOT NULL,
     type public.taggabletype NOT NULL,
-    object_id integer NOT NULL,
+    object_id character varying NOT NULL,
     status public.ontologicalfield NOT NULL
 );
 
