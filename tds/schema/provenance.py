@@ -21,7 +21,7 @@ class NodeSchema(BaseModel):
 
 
 class ProvenancePayload(BaseModel):
-    root_id: Optional[int] = Field(default=1)
+    root_id: Optional[int | str] = Field(default=1)
     root_type: Optional[schema.ProvenanceType] = Field(default="Publication")
     user_id: Optional[int]
     curie: Optional[str]
