@@ -8,6 +8,8 @@ import json
 from logging import Logger
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -26,7 +28,21 @@ def get_provenance(id: int, rdb: Engine = Depends(request_rdb)):
     Searches for a provenance entry in TDS
     """
     with Session(rdb) as session:
-        return Provenance.from_orm(session.query(orm.Provenance).get(id))
+        provenance = session.query(orm.Provenance).get(id)
+        if provenance is not None:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                headers={
+                    "content-type": "application/json",
+                },
+                content=jsonable_encoder(Provenance.from_orm(provenance)),
+            )
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            headers={
+                "content-type": "application/json",
+            },
+        )
 
 
 @router.post("/search")
@@ -84,7 +100,7 @@ def search_provenance(
     The payload for searching needs to match the schema below.
 
     Provenance Types are :
-    Dataset, Model, ModelParameter, Plan, PlanParameter, ModelRevision, Intermediate,
+    Dataset, Model, ModelConfig, Plan, PlanParameter,
     Publication, SimulationRun, Project, Concept.
 
 
@@ -130,16 +146,18 @@ def search_provenance(
 
     """
     logger.info("Search provenance")
-    payload = payload.__dict__
+    payload_dict = payload.__dict__
+    print(search_type)
+    print(payload_dict)
     search_provenance_handler = SearchProvenance(rdb=rdb, graph_db=graph_db)
     search_function = search_provenance_handler[search_type]
-    results = search_function(payload=payload)
+    results = search_function(payload=payload_dict)
 
-    return Response(
+    return JSONResponse(
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps({"result": results}),
+        content={"result": results},
     )
 
 
