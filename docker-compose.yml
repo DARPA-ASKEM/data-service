@@ -18,6 +18,7 @@ services:
       - POSTGRES_DB=$SQL_DB
     volumes:
       - ./data:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
     networks:
       - data-api
   api:
@@ -56,6 +57,8 @@ services:
       - rdb
     networks:
       - data-api
+    volumes:
+      - neo4jdata:/data
   minio:
     build:
       context: ./
@@ -72,7 +75,7 @@ services:
       - data-api
       - data-annotation-stack
   elasticsearch:
-    image: elasticsearch:8.5.3
+    image: elasticsearch:${STACK_VERSION}
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
@@ -104,6 +107,10 @@ services:
       - data-annotation-stack
 volumes:
   elasticsearch_data:
+    driver: local
+  pgdata:
+    driver: local
+  neo4jdata:
     driver: local
   kibanadata:
     driver: local
