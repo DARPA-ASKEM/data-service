@@ -56,6 +56,7 @@ down:
 
 .PHONY:db-clean
 db-clean:
+	docker volume rm data-service_pgdata data-service_elasticsearch_data data-service_kibanadata
 	rm -f ./data/*.sql; \
 	rm -f ./data/datasets/*/*; \
 	rmdir ./data/datasets/*;
