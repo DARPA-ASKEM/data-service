@@ -96,7 +96,11 @@ def match_node_builder(node_type: schema.ProvenanceType = None, node_id=None):
     node_type_character = return_node_abbr(node_type)
     if node_id is None:
         return f"Match ({node_type_character}:{node_type})"
-    return f"Match ({node_type_character}:{node_type}  {{id: {node_id}}}) "
+    if type(node_id) is int:
+        node_str = f"Match ({node_type_character}:{node_type}  {{id: {node_id}}}) "
+    else:
+        node_str = f"Match ({node_type_character}:{node_type}  {{id: '{node_id}'}}) "
+    return node_str
 
 
 def return_node_abbr(root_type: schema.ProvenanceType):
