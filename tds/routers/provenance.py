@@ -175,12 +175,12 @@ def create_provenance(
     id: int = provenance_handler.create_entry(payload)
 
     logger.info("new provenance with %i", id)
-    return Response(
+    return JSONResponse(
         status_code=status.HTTP_201_CREATED,
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps({"id": id}),
+        content={"id": id},
     )
 
 
