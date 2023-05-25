@@ -76,6 +76,7 @@ CREATE TYPE public.provenancetype AS ENUM (
     'Dataset',
     'Intermediate',
     'Model',
+    'ModelConfig',
     'ModelParameter',
     'ModelRevision',
     'Plan',
