@@ -54,9 +54,13 @@ fake:up
 down:
 	docker compose --env-file api.env down;
 
+.PHONY:rm-db-volumes
+rm-db-volumes:
+	docker volume rm data-service_pgdata data-service_elasticsearch_data data-service_kibanadata
+
 .PHONY:db-clean
 db-clean:
-	docker volume rm data-service_pgdata data-service_elasticsearch_data data-service_kibanadata
+	make rm-db-volumes
 	rm -f ./data/*.sql; \
 	rm -f ./data/datasets/*/*; \
 	rmdir ./data/datasets/*;
