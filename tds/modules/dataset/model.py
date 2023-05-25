@@ -92,8 +92,8 @@ class Dataset(TdsModel):
     )
     grounding: Optional[dict[str, Grounding]] = Field(
         description=(
-            "(Optional) Grounding of ontological concepts related to the dataset as",
-            " a whole",
+            "(Optional) Grounding of ontological concepts related to the dataset as"
+            " a whole"
         ),
     )
 
