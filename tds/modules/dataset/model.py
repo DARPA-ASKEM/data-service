@@ -100,10 +100,62 @@ class Dataset(TdsModel):
     class Config:
         """Config"""
 
-        # schema_extra = {
-        #     "example": {
-        #     }
-        # }
+        schema_extra = {
+            "example": {
+                "name": "CDC COVID-19 Vaccination and Case Trends by Age Group",
+                "description": "CDC COVID-19 Vaccination and Case Trends by Age Group",
+                "columns": [
+                    {
+                        "name": "Date Administered",
+                        "data_type": "date",
+                        "format_str": "MM/dd/yy",
+                        "annotations": {},
+                        "metadata": {},
+                        "grounding": {},
+                    },
+                    {
+                        "name": "Country",
+                        "data_type": "string",
+                        "annotations": {},
+                        "metadata": {},
+                        "grounding": {},
+                    },
+                    {
+                        "name": "AgeGroupVacc",
+                        "data_type": "string",
+                        "annotations": {},
+                        "metadata": {},
+                        "grounding": {},
+                    },
+                    {
+                        "name": "7-day_avg_group_cases_per_100k",
+                        "data_type": "float",
+                        "annotations": {},
+                        "metadata": {},
+                        "grounding": {},
+                    },
+                    {
+                        "name": "Administered_Dose1_pct_agegroup",
+                        "data_type": "float",
+                        "annotations": {},
+                        "metadata": {},
+                        "grounding": {},
+                    },
+                    {
+                        "name": "Series_Complete_Pop_pct_agegroup",
+                        "data_type": "float",
+                        "annotations": {},
+                        "metadata": {},
+                        "grounding": {},
+                    },
+                ],
+                "metadata": {},
+                "source": "https://data.cdc.gov/Vaccinations/Archive-COVID-19-Vaccination-and-Case-Trends-by-Ag/gxj9-t96f/data",
+                "grounding": {
+                    "additionalProp1": {"identifiers": {}, "context": {}},
+                },
+            }
+        }
 
     # def _extract_concepts(self):
     #     """
