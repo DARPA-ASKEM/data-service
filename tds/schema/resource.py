@@ -8,8 +8,9 @@ from typing import Dict, Optional, Type
 
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
+from tds.modules.model.model import Model
+from tds.modules.model_configuration.model import ModelConfiguration
 from tds.schema.dataset import Dataset
-from tds.schema.model import Model
 from tds.schema.simulation import Run, RunDescription
 
 
@@ -23,19 +24,22 @@ class Software(schema.Software):
         orm_mode = True
 
 
-Resource = Dataset | Model | Publication | Run
+Resource = Dataset | Model | ModelConfiguration | Publication | Run
 
 ORMResource = orm.Dataset | orm.Publication | orm.SimulationRun
 
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
     Model: ResourceType.models,
+    ModelConfiguration: ResourceType.model_configs,
     Publication: ResourceType.publications,
     Run: ResourceType.simulation_runs,
 }
 
 obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
+    Model: ResourceType.models,
+    ModelConfiguration: ResourceType.model_configs,
     Publication: ResourceType.publications,
     RunDescription: ResourceType.simulation_runs,
 }
