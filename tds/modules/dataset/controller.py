@@ -84,7 +84,7 @@ def dataset_put(dataset_id: str | int, payload: Dataset) -> JSONResponse:
         raise HTTPException(
             status_code=422, detail="ID in request URL and in payload must match."
         )
-    res = payload.save(dataset_id)
+    res = payload.save()
     logger.info("dataset updated: %s", dataset_id)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
