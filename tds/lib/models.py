@@ -6,16 +6,16 @@ from logging import Logger
 
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
+from tds.autogen.enums import ModelOperations, orm
 from tds.schema.model import ModelParameters
 
 logger = Logger(__file__)
 
 model_opt_relationship_mapping = {
-    orm.ModelOperations.copy: orm.RelationType.COPIED_FROM,
-    orm.ModelOperations.decompose: orm.RelationType.DECOMPOSED_FROM,
-    orm.ModelOperations.stratify: orm.RelationType.STRATIFIED_FROM,
-    orm.ModelOperations.glue: orm.RelationType.GLUED_FROM,
+    ModelOperations.copy: orm.RelationType.COPIED_FROM,
+    ModelOperations.decompose: orm.RelationType.DECOMPOSED_FROM,
+    ModelOperations.stratify: orm.RelationType.STRATIFIED_FROM,
+    ModelOperations.glue: orm.RelationType.GLUED_FROM,
 }
 
 

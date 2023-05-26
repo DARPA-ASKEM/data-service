@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
-from tds.autogen import orm, schema
+from tds.autogen import enums, orm
 from tds.db import ProvenanceHandler, request_graph_db, request_rdb
 from tds.lib.models import model_opt_relationship_mapping
 from tds.operation import create, delete, retrieve
@@ -87,7 +87,7 @@ def delete_framework(name: str, rdb: Engine = Depends(request_rdb)) -> Response:
 @router.post("/opts/{model_operation}", **create.fastapi_endpoint_config)
 def model_opt(
     payload: ModelOptPayload,
-    model_operation: schema.ModelOperations,
+    model_operation: enums.ModelOperations,
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
 ) -> Response:
