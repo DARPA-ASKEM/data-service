@@ -30,35 +30,14 @@ def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
     ]
 
 
-class ModelDescription(schema.ModelDescription):
-    concept: Optional[Concept] = None
-
-    class Config:
-        orm_mode = True
-
-
-class ModelContent(schema.ModelState):
-    @classmethod
-    def from_orm(cls, body: orm.ModelState) -> "ModelContent":
-        """
-        Handle ORM conversion while coercing `dict` to JSON
-        """
-        body.__dict__["content"] = dumps(body.content)
-
-        return super().from_orm(body)
-
-    class Config:
-        orm_mode = True
-
-
-class ModelOptPayload(schema.ModelDescription):
+class ModelOptPayload:
     left: int
     right: Optional[int]
     name: str
     description: Optional[str]
     framework: str
-    content: Optional[ModelContent] = None
-    parameters: Optional[ModelParameters] = None
+    content: Optional = None
+    parameters: Optional = None
 
     class Config:
         orm_mode = True
@@ -82,7 +61,7 @@ class ModelOptPayload(schema.ModelDescription):
         }
 
 
-class Model(schema.ModelDescription):
+class Model:
     concept: Optional[Concept] = None
     parameters: ModelParameters = []
     content: Json
