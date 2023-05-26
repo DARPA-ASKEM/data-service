@@ -31,7 +31,7 @@ ORMResource = orm.Dataset | orm.Publication | orm.SimulationRun
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
     Model: ResourceType.models,
-    ModelConfiguration: ResourceType.model_configs,
+    ModelConfiguration: ResourceType.model_configurations,
     Publication: ResourceType.publications,
     Run: ResourceType.simulation_runs,
 }
@@ -39,7 +39,7 @@ obj_to_enum: Dict[Type[Resource], ResourceType] = {
 obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
     Model: ResourceType.models,
-    ModelConfiguration: ResourceType.model_configs,
+    ModelConfiguration: ResourceType.model_configurations,
     Publication: ResourceType.publications,
     RunDescription: ResourceType.simulation_runs,
 }
