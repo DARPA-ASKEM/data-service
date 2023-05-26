@@ -14,6 +14,14 @@ from tds.autogen import orm
 from tds.db.relational import engine as pg_engine
 from tds.modules.model.model_description import ModelDescription
 
+model_list_fields = [
+    "name",
+    "description",
+    "model_schema",
+    "model_version",
+    "timestamp",
+]
+
 
 def orm_to_params(parameters: List):
     """
