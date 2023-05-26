@@ -61,39 +61,6 @@ class ModelOptPayload(BaseModel):
         }
 
 
-class Model(BaseModel):
-    concept: Optional[Concept] = None
-    parameters: ModelParameters = []
-    content: Json
-
-    @classmethod
-    def from_orm(
-        cls,
-        body: orm.ModelDescription,
-        state: orm.ModelState,
-        parameters: List[orm.ModelParameter],
-    ) -> "Model":
-        """
-        Handle ORM conversion while coercing `dict` to JSON
-        """
-        body.__dict__["content"] = dumps(ModelContent.from_orm(state).content)
-        body.__dict__["parameters"] = orm_to_params(parameters)
-        return super().from_orm(body)
-
-    class Config:
-        orm_mode = True
-        schema_extra = {
-            "example": {
-                "name": "string",
-                "description": "string",
-                "content": "json-as-string",
-                "parameters": [{"string": "value-type"}],
-                "framework": "string",
-                "state_variable": "bool",
-            }
-        }
-
-
 class ModelFramework(schema.ModelFramework):
     class Config:
         orm_mode = True
