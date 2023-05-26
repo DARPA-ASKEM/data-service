@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 
 from tds.db import es_client
 from tds.modules.model_configuration.model import ModelConfiguration
-from tds.modules.model_configuration.response import ModelConfigurationResponse
+from tds.modules.model_configuration.response import configuration_response
 from tds.operation import create, delete, retrieve, update
 
 model_configuration_router = APIRouter()
@@ -40,9 +40,7 @@ def list_model_configurations(page_size: int = 100, page: int = 0) -> JSONRespon
         headers={
             "content-type": "application/json",
         },
-        content=jsonable_encoder(
-            [ModelConfigurationResponse(**x["_source"]) for x in res["hits"]["hits"]]
-        ),
+        content=jsonable_encoder(configuration_response(["hits"]["hits"])),
     )
 
 
