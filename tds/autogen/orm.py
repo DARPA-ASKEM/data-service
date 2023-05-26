@@ -11,7 +11,7 @@ Base = declarative_base()
 class ResourceType(str, Enum):
 
     datasets = 'datasets'
-    model_configs = 'model_configs'
+    model_configurations = 'model_configurations'
     models = 'models'
     publications = 'publications'
     simulation_runs = 'simulation_runs'
@@ -22,7 +22,7 @@ class ProvenanceType(str, Enum):
     Concept = 'Concept'
     Dataset = 'Dataset'
     Model = 'Model'
-    ModelConfig = 'ModelConfig'
+    ModelConfiguration = 'ModelConfiguration'
     ModelParameter = 'ModelParameter'
     ModelRevision = 'ModelRevision'
     Project = 'Project'
