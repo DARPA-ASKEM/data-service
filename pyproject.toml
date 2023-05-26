@@ -58,8 +58,8 @@ in-project = true
 profile = "black"
 skip = ["autogen"]
 
-[tool.black]
-force-exclude = "autogen"
+#[tool.black]
+#force-exclude = "autogen"
 
 [tool.pytest.ini_options]
 addopts = "--ignore-glob=*utils.py"
