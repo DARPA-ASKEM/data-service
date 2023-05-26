@@ -76,7 +76,7 @@ class RelationType(str, Enum):
 
 class ResourceType(str, Enum):
     datasets = "datasets"
-    model_configs = "model_configs"
+    model_configurations = "model_configurations"
     models = "models"
     publications = "publications"
     simulation_runs = "simulation_runs"
