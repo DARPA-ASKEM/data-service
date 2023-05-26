@@ -13,14 +13,18 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
-from tds.db import entry_exists, list_by_id, request_rdb
+from tds.db import entry_exists, es_client, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
+from tds.modules.model.utils import model_list_fields, model_list_response
+from tds.modules.model_configuration.response import configuration_response
 from tds.operation import create, delete, retrieve, update
 from tds.schema.project import Project, ProjectMetadata
 from tds.schema.resource import ResourceType, get_resource_orm, get_schema_description
+from tds.settings import settings
 
 logger = Logger(__name__)
 router = APIRouter()
+es = es_client()
 
 
 @router.get("")
@@ -151,7 +155,7 @@ def update_project(
 def delete_asset(
     project_id: int,
     resource_type: ResourceType,
-    resource_id: int,
+    resource_id: int | str,
     rdb: Engine = Depends(request_rdb),
 ) -> Response:
     """
@@ -162,7 +166,7 @@ def delete_asset(
             session.query(orm.ProjectAsset).filter(
                 orm.ProjectAsset.project_id == project_id,
                 orm.ProjectAsset.resource_type == resource_type,
-                orm.ProjectAsset.resource_id == resource_id,
+                orm.ProjectAsset.resource_id == str(resource_id),
             )
         )
         if len(project_assets) == 0:
@@ -181,7 +185,7 @@ def delete_asset(
 def create_asset(
     project_id: int,
     resource_type: ResourceType,
-    resource_id: int,
+    resource_id: int | str,
     rdb: Engine = Depends(request_rdb),
 ) -> Response:
     """
@@ -192,7 +196,7 @@ def create_asset(
             session.query(orm.ProjectAsset)
             .filter(
                 orm.ProjectAsset.project_id == project_id,
-                orm.ProjectAsset.resource_id == resource_id,
+                orm.ProjectAsset.resource_id == str(resource_id),
                 orm.ProjectAsset.resource_type == resource_type,
             )
             .count()
@@ -201,7 +205,7 @@ def create_asset(
         if identical_count == 0:
             project_asset = orm.ProjectAsset(
                 project_id=project_id,
-                resource_id=resource_id,
+                resource_id=str(resource_id),
                 resource_type=resource_type,
             )
             session.add(project_asset)
@@ -256,6 +260,21 @@ def get_project_assets(
                         session.query(orm_type).filter(
                             orm_type.id.in_(assets_key_ids[key])
                         )
+                    )
+                elif key in [ResourceType.models, ResourceType.model_configurations]:
+                    responder = es_list_response[key]
+                    index_singular = key if key[-1] != "s" else key.rstrip("s")
+                    index = f"{settings.ES_INDEX_PREFIX}{index_singular}"
+                    es_items = es.search(
+                        index=index,
+                        query={"ids": {"values": assets_key_ids[key]}},
+                        fields=responder["fields"],
+                    )
+                    print(es_items)
+                    assets_key_objects[key] = (
+                        []
+                        if es_items["hits"]["total"]["value"] == 0
+                        else responder["function"](es_items["hits"]["hits"])
                     )
                 else:
                     assets_key_objects[key] = [
