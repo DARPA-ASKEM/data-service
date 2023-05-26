@@ -1,6 +1,8 @@
 """
 TDS Model Description
 """
+from datetime import datetime
+
 from pydantic import Field
 
 from tds.db.base import TdsModel
@@ -14,6 +16,7 @@ class ModelDescription(TdsModel):
     name: str
     description: str
     model_schema: str = Field(alias="schema")
+    timestamp = datetime
     model_version: str
 
     class Config:
