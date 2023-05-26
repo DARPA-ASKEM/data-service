@@ -1,10 +1,8 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
-from enum import Enum
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import JSON
 from tds.autogen.enums import (
-    Direction,
     ExtractedType,
     OntologicalField,
     ProvenanceType,
