@@ -25,9 +25,31 @@ def setup_elasticsearch_indexes() -> None:
     # Config should match keyword args on
     # https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
     indices = {
-        "model": {},
+        "model": {
+            "properties": {
+                "model": {
+                    "type": "object",
+                    "enabled": False,
+                },
+                "semantics": {
+                    "type": "object",
+                    "enabled": False,
+                },
+            },
+        },
         "dataset": {},
-        "model_configuration": {},
+        "model_configuration": {
+            "properties": {
+                "model.model": {
+                    "type": "object",
+                    "enabled": False,
+                },
+                "model.semantics": {
+                    "type": "object",
+                    "enabled": False,
+                },
+            },
+        },
     }
 
     # Wait for elasticsearch to be online and healthy enough to proceed
