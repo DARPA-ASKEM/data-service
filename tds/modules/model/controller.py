@@ -33,7 +33,7 @@ def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
     """
     list_body = {
         "size": page_size,
-        "fields": ["name", "description", "model_schema", "model_version"],
+        "fields": ["name", "description", "model_schema", "model_version", "timestamp"],
         "source": False,
     }
     if page != 0:
