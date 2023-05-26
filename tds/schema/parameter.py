@@ -5,10 +5,10 @@ Allows manipulation of independent parameters
 
 from typing import Optional
 
-from tds.autogen import schema
+from pydantic import BaseModel
 
 
-class IndependentParameter(schema.ModelParameter):
+class IndependentParameter(BaseModel):
     curie: Optional[str] = None
 
     class Config:
