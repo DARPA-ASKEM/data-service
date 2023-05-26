@@ -6,7 +6,8 @@ from logging import Logger
 
 from sqlalchemy.orm import Session
 
-from tds.autogen.enums import ModelOperations, orm
+from tds.autogen import orm
+from tds.autogen.enums import ModelOperations
 from tds.schema.model import ModelParameters
 
 logger = Logger(__file__)
