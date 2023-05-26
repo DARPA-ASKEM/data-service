@@ -56,10 +56,10 @@ in-project = true
 
 [tool.isort]
 profile = "black"
-skip = ["autogen"]
+#skip = ["autogen"]
 
-[tool.black]
-force-exclude = "autogen"
+#[tool.black]
+#force-exclude = "autogen"
 
 [tool.pytest.ini_options]
 addopts = "--ignore-glob=*utils.py"
@@ -71,7 +71,7 @@ filterwarnings = ["ignore::DeprecationWarning"]
 # and leave TODOs for later.
 disable=["fixme", "too-few-public-methods", "broad-exception-raised"]
 # Pylint should not run on the the generated files
-ignore=["autogen"]
+#ignore=["autogen"]
 extension-pkg-whitelist=["pydantic"]
 jobs=4
 

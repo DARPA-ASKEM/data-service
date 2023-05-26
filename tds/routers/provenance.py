@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm, schema
+from tds.autogen import enums, orm, schema
 from tds.db import ProvenanceHandler, SearchProvenance, request_graph_db, request_rdb
 from tds.operation import create, delete, retrieve
 from tds.schema.provenance import Provenance, ProvenancePayload
@@ -32,8 +32,8 @@ def get_provenance(id: int, rdb: Engine = Depends(request_rdb)):
 @router.post("/search")
 def search_provenance(
     payload: ProvenancePayload,
-    search_type: schema.ProvenanceSearchTypes = Query(
-        default=schema.ProvenanceSearchTypes.connected_nodes
+    search_type: enums.ProvenanceSearchTypes = Query(
+        default=enums.ProvenanceSearchTypes.connected_nodes
     ),
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),

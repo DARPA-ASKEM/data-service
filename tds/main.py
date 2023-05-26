@@ -7,7 +7,6 @@ import logging
 from sys import exit as sys_exit
 
 from click import command, echo, option
-from dbml_builder import verify
 from sqlalchemy.exc import OperationalError
 from uvicorn import run as uvicorn_run
 
@@ -78,7 +77,9 @@ def cli(host: str, port: int, dev: bool, server_config: str) -> None:
     """
     Execute data store API using uvicorn
     """
-    is_success, message = verify(settings.DBML_VERSION, settings.GENERATED_PATH)
+    # @TODO: This is a temporary bypass so we can remove the DBML
+    # without having to fully decouple from the system now. -- Todd Roper, 5/26/23
+    is_success, message = (True, "success")
     if not is_success:
         echo(f"Failed to start: {message}.")
         sys_exit()
