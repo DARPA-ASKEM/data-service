@@ -6,7 +6,7 @@ from json import dumps
 from typing import Dict, List, Optional
 
 from fastapi.encoders import jsonable_encoder
-from pydantic import Json
+from pydantic import BaseModel, Json
 
 from tds.autogen import orm, schema
 from tds.schema.concept import Concept
@@ -30,14 +30,14 @@ def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
     ]
 
 
-class ModelOptPayload:
+class ModelOptPayload(BaseModel):
     left: int
     right: Optional[int]
     name: str
     description: Optional[str]
     framework: str
-    content: Optional = None
-    parameters: Optional = None
+    content: Optional[list] = None
+    parameters: Optional[list] = None
 
     class Config:
         orm_mode = True
@@ -61,7 +61,7 @@ class ModelOptPayload:
         }
 
 
-class Model:
+class Model(BaseModel):
     concept: Optional[Concept] = None
     parameters: ModelParameters = []
     content: Json
