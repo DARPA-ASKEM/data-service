@@ -12,7 +12,11 @@ from fastapi.responses import JSONResponse
 from tds.db import es_client
 from tds.modules.model.model import Model
 from tds.modules.model.model_description import ModelDescription
-from tds.modules.model.utils import model_list_response, model_response
+from tds.modules.model.utils import (
+    model_list_fields,
+    model_list_response,
+    model_response,
+)
 from tds.operation import create, delete, retrieve, update
 
 model_router = APIRouter()
@@ -33,7 +37,7 @@ def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
     """
     list_body = {
         "size": page_size,
-        "fields": ["name", "description", "model_schema", "model_version", "timestamp"],
+        "fields": model_list_fields,
         "source": False,
     }
     if page != 0:
