@@ -662,7 +662,7 @@ ALTER TABLE public.project OWNER TO dev;
 
 CREATE TABLE public.project_asset (
     id integer NOT NULL,
-    project_id integer NOT NULL,
+    project_id character varying NOT NULL,
     resource_id integer NOT NULL,
     resource_type public.resourcetype NOT NULL,
     external_ref character varying
