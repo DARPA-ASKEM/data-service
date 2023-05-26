@@ -33,56 +33,6 @@ def list_projects(
     return list_by_id(rdb.connect(), orm.Project, page_size, page)
 
 
-@router.get("/{id}/assets", **retrieve.fastapi_endpoint_config)
-def get_project_assets(
-    id: int,
-    types: Optional[List[ResourceType]] = FastAPIQuery(
-        default=[
-            ResourceType.datasets,
-            ResourceType.models,
-            ResourceType.model_configs,
-            ResourceType.publications,
-            ResourceType.simulation_runs,
-        ]
-    ),
-    rdb: Engine = Depends(request_rdb),
-):
-    """
-    Retrieve project assets
-    """
-    if entry_exists(rdb.connect(), orm.Project, id):
-        with Session(rdb) as session:
-            # project = session.query(orm.Project).get(id)
-            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
-                orm.ProjectAsset.project_id == id
-            )
-            assets_key_ids = {type: [] for type in types}
-            for asset in list(assets):
-                if asset.resource_type in types:
-                    assets_key_ids[asset.resource_type].append(asset.resource_id)
-
-            assets_key_objects = {}
-            for key in assets_key_ids:
-                orm_type = get_resource_orm(key)
-                orm_schema = get_schema_description(key)
-                if key == ResourceType.datasets:
-                    assets_key_objects[key] = list(
-                        session.query(orm_type).filter(
-                            orm_type.id.in_(assets_key_ids[key])
-                        )
-                    )
-                else:
-                    assets_key_objects[key] = [
-                        orm_schema.from_orm(asset)
-                        for asset in session.query(orm_type).filter(
-                            orm_type.id.in_(assets_key_ids[key])
-                        )
-                    ]
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return assets_key_objects
-
-
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
 def get_project(id: int, rdb: Engine = Depends(request_rdb)) -> Project:
     """
@@ -267,3 +217,53 @@ def create_asset(
                 content=json.dumps({"id": id}),
             )
         return Response(status.HTTP_409_CONFLICT)
+
+
+@router.get("/{id}/assets", **retrieve.fastapi_endpoint_config)
+def get_project_assets(
+    id: int,
+    types: Optional[List[ResourceType]] = FastAPIQuery(
+        default=[
+            ResourceType.datasets,
+            ResourceType.models,
+            ResourceType.model_configs,
+            ResourceType.publications,
+            ResourceType.simulation_runs,
+        ]
+    ),
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Retrieve project assets
+    """
+    if entry_exists(rdb.connect(), orm.Project, id):
+        with Session(rdb) as session:
+            # project = session.query(orm.Project).get(id)
+            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
+                orm.ProjectAsset.project_id == id
+            )
+            assets_key_ids = {type: [] for type in types}
+            for asset in list(assets):
+                if asset.resource_type in types:
+                    assets_key_ids[asset.resource_type].append(asset.resource_id)
+
+            assets_key_objects = {}
+            for key in assets_key_ids:
+                orm_type = get_resource_orm(key)
+                orm_schema = get_schema_description(key)
+                if key == ResourceType.datasets:
+                    assets_key_objects[key] = list(
+                        session.query(orm_type).filter(
+                            orm_type.id.in_(assets_key_ids[key])
+                        )
+                    )
+                else:
+                    assets_key_objects[key] = [
+                        orm_schema.from_orm(asset)
+                        for asset in session.query(orm_type).filter(
+                            orm_type.id.in_(assets_key_ids[key])
+                        )
+                    ]
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return assets_key_objects
