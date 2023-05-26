@@ -10,7 +10,10 @@ from fastapi.responses import JSONResponse
 
 from tds.db import es_client
 from tds.modules.model_configuration.model import ModelConfiguration
-from tds.modules.model_configuration.response import configuration_response
+from tds.modules.model_configuration.response import (
+    ModelConfigurationResponse,
+    configuration_response,
+)
 from tds.operation import create, delete, retrieve, update
 
 model_configuration_router = APIRouter()
