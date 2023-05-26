@@ -1274,7 +1274,7 @@ COPY public.project (id, name, description, "timestamp", active, username) FROM 
 COPY public.project_asset (id, project_id, resource_id, resource_type, external_ref) FROM stdin;
 1	1	1	intermediates	\N
 2	1	1	models	\N
-3	1	1	plans	\N
+3	1	1	model_configurations	\N
 4	1	1	datasets	\N
 5	1	1	simulation_runs	\N
 6	1	2	datasets	\N
@@ -1301,7 +1301,7 @@ COPY public.project_asset (id, project_id, resource_id, resource_type, external_
 27	1	2	intermediates	\N
 28	1	3	intermediates	\N
 29	1	2	models	\N
-30	1	2	plans	\N
+30	1	2	model_configurations	\N
 31	1	12	datasets	\N
 32	1	12	simulation_runs	\N
 33	1	13	datasets	\N
@@ -1327,7 +1327,7 @@ COPY public.project_asset (id, project_id, resource_id, resource_type, external_
 53	1	4	intermediates	\N
 54	1	5	intermediates	\N
 55	1	3	models	\N
-56	1	3	plans	\N
+56	1	3	model_configurations	\N
 57	1	23	datasets	\N
 58	1	23	simulation_runs	\N
 59	1	24	datasets	\N
@@ -1354,7 +1354,7 @@ COPY public.project_asset (id, project_id, resource_id, resource_type, external_
 80	1	6	intermediates	\N
 81	1	7	intermediates	\N
 82	1	4	models	\N
-83	1	4	plans	\N
+83	1	4	model_configurations	\N
 84	1	34	datasets	\N
 85	1	34	simulation_runs	\N
 86	1	35	datasets	\N
@@ -3263,4 +3263,11 @@ SELECT pg_catalog.setval('public.software_id_seq', 1, false);
 --
 -- PostgreSQL database dump complete
 --
+--- Data updates to facilitate basic flow.
+delete from public.provenance where left_type  = 'Intermediate';
+delete from public.provenance where right_type  = 'Intermediate';
+delete from public.project_asset where resource_type  = 'intermediates';
 
+update public.model_framework
+set schema_url = 'https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json'
+where "name" = 'Petri Net';
