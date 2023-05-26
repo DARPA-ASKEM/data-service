@@ -9,8 +9,8 @@ from typing import Dict, Optional, Type
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
 from tds.schema.dataset import Dataset
-from tds.schema.model import Model, ModelDescription
-from tds.schema.simulation import ModelConfiguration, Run, RunDescription
+from tds.schema.model import Model
+from tds.schema.simulation import Run, RunDescription
 
 
 class Publication(schema.Publication):
@@ -23,28 +23,19 @@ class Software(schema.Software):
         orm_mode = True
 
 
-Resource = Dataset | Model | ModelConfiguration | Publication | Run
+Resource = Dataset | Model | Publication | Run
 
-ORMResource = (
-    orm.Dataset
-    | orm.ModelDescription
-    | orm.ModelConfiguration
-    | orm.Publication
-    | orm.SimulationRun
-)
+ORMResource = orm.Dataset | orm.Publication | orm.SimulationRun
 
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
     Model: ResourceType.models,
-    ModelConfiguration: ResourceType.model_configs,
     Publication: ResourceType.publications,
     Run: ResourceType.simulation_runs,
 }
 
 obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
-    ModelDescription: ResourceType.models,
-    ModelConfiguration: ResourceType.model_configs,
     Publication: ResourceType.publications,
     RunDescription: ResourceType.simulation_runs,
 }
@@ -81,8 +72,6 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
         lambda: None,
         {
             ResourceType.datasets: orm.Dataset,
-            ResourceType.models: orm.ModelDescription,
-            ResourceType.model_configs: orm.ModelConfiguration,
             ResourceType.publications: orm.Publication,
             ResourceType.simulation_runs: orm.SimulationRun,
         },
