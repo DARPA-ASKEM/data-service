@@ -7,7 +7,6 @@ ADD poetry.lock poetry.lock
 ADD pyproject.toml pyproject.toml
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
-ADD askem.dbml askem.dbml
 COPY tests tests
 COPY tds tds 
 COPY graph_relations.json graph_relations.json
