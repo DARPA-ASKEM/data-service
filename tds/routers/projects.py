@@ -26,6 +26,14 @@ logger = Logger(__name__)
 router = APIRouter()
 es = es_client()
 
+es_list_response = {
+    ResourceType.models: {"function": model_list_response, "fields": model_list_fields},
+    ResourceType.model_configurations: {
+        "function": configuration_response,
+        "fields": None,
+    },
+}
+
 
 @router.get("")
 def list_projects(
@@ -253,6 +261,7 @@ def get_project_assets(
 
             assets_key_objects = {}
             for key in assets_key_ids:
+                print(key)
                 orm_type = get_resource_orm(key)
                 orm_schema = get_schema_description(key)
                 if key == ResourceType.datasets:
