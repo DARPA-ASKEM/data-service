@@ -15,3 +15,9 @@ class ModelConfigurationResponse(BaseModel):
     model_id: str
     model: object
     model_id: str
+
+
+def configuration_response(model_configuration_list):
+    return [
+        ModelConfigurationResponse(**x["_source"]) for x in model_configuration_list
+    ]
