@@ -12,7 +12,11 @@ from tds.db import es_client
 from tds.settings import settings
 
 es = es_client()
-new_uuid = lambda: str(uuid.uuid4())
+
+
+def new_uuid() -> str:
+    """Generates a uuid string"""
+    return str(uuid.uuid4())
 
 
 class TdsModel(BaseModel):
