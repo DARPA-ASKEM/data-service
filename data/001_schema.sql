@@ -74,8 +74,8 @@ ALTER TYPE public.ontologicalfield OWNER TO dev;
 CREATE TYPE public.provenancetype AS ENUM (
     'Concept',
     'Dataset',
-    'Intermediate',
     'Model',
+    'ModelConfiguration',
     'ModelParameter',
     'ModelRevision',
     'Plan',
