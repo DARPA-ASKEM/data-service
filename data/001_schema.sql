@@ -723,9 +723,9 @@ CREATE TABLE public.provenance (
     id integer NOT NULL,
     "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
     relation_type public.relationtype NOT NULL,
-    "left" integer NOT NULL,
+    "left" character varying NOT NULL,
     left_type public.provenancetype NOT NULL,
-    "right" integer NOT NULL,
+    "right" character varying NOT NULL,
     right_type public.provenancetype NOT NULL,
     user_id integer,
     concept character varying
