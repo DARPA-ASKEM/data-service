@@ -3171,9 +3171,9 @@ SELECT pg_catalog.setval('public.software_id_seq', 1, false);
 -- PostgreSQL database dump complete
 --
 --- Data updates to facilitate basic flow.
-delete from public.provenance where left_type  = 'Intermediate';
-delete from public.provenance where right_type  = 'Intermediate';
-delete from public.project_asset where resource_type  = 'intermediates';
+-- delete from public.provenance where left_type  = 'Intermediate';
+-- delete from public.provenance where right_type  = 'Intermediate';
+-- delete from public.project_asset where resource_type  = 'intermediates';
 
 update public.model_framework
 set schema_url = 'https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json'
