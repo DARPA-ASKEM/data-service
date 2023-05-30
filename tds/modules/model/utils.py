@@ -15,7 +15,9 @@ from tds.db.relational import engine as pg_engine
 from tds.modules.model.model_description import ModelDescription
 
 model_list_fields = [
+    "id",
     "name",
+    "model",
     "description",
     "model_schema",
     "model_version",
