@@ -627,16 +627,6 @@ COPY public.model_runtime (id, "timestamp", name, "left", "right") FROM stdin;
 --
 
 COPY public.ontology_concept (id, curie, type, object_id, status) FROM stdin;
-1	ido:0000512	intermediates	1	obj
-2	ido:0000514	intermediates	1	obj
-3	ido:0000592	intermediates	1	obj
-4	apollosv:00000154	intermediates	1	obj
-5	ido:0000511	intermediates	1	obj
-6	ido:0000512	intermediates	1	obj
-7	ido:0000514	intermediates	1	obj
-8	ido:0000592	intermediates	1	obj
-9	apollosv:00000154	intermediates	1	obj
-10	ido:0000511	intermediates	1	obj
 11	ido:0000512	models	1	obj
 12	ido:0000514	models	1	obj
 13	ido:0000592	models	1	obj
@@ -787,9 +777,6 @@ COPY public.ontology_concept (id, curie, type, object_id, status) FROM stdin;
 144	ido:0000514	datasets	11	obj
 153	ido:0000512	simulation_parameters	186	obj
 157	ido:0000514	publications	1	obj
-160	ido:0000514	intermediates	2	obj
-163	ido:0000514	intermediates	2	obj
-166	ido:0000514	intermediates	3	obj
 168	ido:0000511	models	2	obj
 173	ido:0000592	datasets	12	obj
 176	ido:0000514	simulation_parameters	190	obj
@@ -814,9 +801,6 @@ COPY public.ontology_concept (id, curie, type, object_id, status) FROM stdin;
 233	ido:0000592	datasets	22	obj
 236	ido:0000514	simulation_parameters	240	obj
 240	ido:0000511	publications	1	obj
-243	ido:0000511	intermediates	4	obj
-246	ido:0000511	intermediates	4	obj
-249	ido:0000511	intermediates	5	obj
 251	ido:0000592	models	3	obj
 255	ido:0000514	model_parameters	31	obj
 256	ido:0000511	model_parameters	32	obj
@@ -842,9 +826,6 @@ COPY public.ontology_concept (id, curie, type, object_id, status) FROM stdin;
 149	ido:0000511	simulation_parameters	181	obj
 152	ido:0000592	simulation_parameters	185	obj
 156	ido:0000511	publications	1	obj
-159	ido:0000511	intermediates	2	obj
-162	ido:0000511	intermediates	2	obj
-165	ido:0000511	intermediates	3	obj
 167	ido:0000592	models	2	obj
 171	ido:0000511	model_parameters	21	obj
 172	ido:0000592	model_parameters	22	obj
@@ -861,9 +842,6 @@ COPY public.ontology_concept (id, curie, type, object_id, status) FROM stdin;
 235	ido:0000514	datasets	22	obj
 238	ido:0000592	simulation_parameters	242	obj
 239	ido:0000592	publications	1	obj
-242	ido:0000592	intermediates	4	obj
-245	ido:0000592	intermediates	4	obj
-248	ido:0000592	intermediates	5	obj
 254	ido:0000514	model_parameters	30	obj
 258	ido:0000592	model_parameters	34	obj
 259	ido:0000592	datasets	23	obj
@@ -882,9 +860,6 @@ COPY public.ontology_concept (id, curie, type, object_id, status) FROM stdin;
 322	ido:0000592	simulation_parameters	338	obj
 143	ido:0000512	datasets	11	obj
 155	ido:0000592	publications	1	obj
-158	ido:0000592	intermediates	2	obj
-161	ido:0000592	intermediates	2	obj
-164	ido:0000592	intermediates	3	obj
 170	ido:0000514	model_parameters	20	obj
 174	ido:0000511	datasets	12	obj
 177	ido:0000511	simulation_parameters	191	obj
@@ -909,9 +884,6 @@ COPY public.ontology_concept (id, curie, type, object_id, status) FROM stdin;
 234	ido:0000511	datasets	22	obj
 237	ido:0000511	simulation_parameters	241	obj
 241	ido:0000514	publications	1	obj
-244	ido:0000514	intermediates	4	obj
-247	ido:0000514	intermediates	4	obj
-250	ido:0000514	intermediates	5	obj
 252	ido:0000511	models	3	obj
 260	ido:0000511	datasets	23	obj
 263	ido:0000511	simulation_parameters	251	obj
@@ -977,14 +949,6 @@ COPY public.ontology_concept (id, curie, type, object_id, status) FROM stdin;
 348	ncit:C28554	publications	2	obj
 349	ido:0000511	publications	2	obj
 350	ido:0000514	publications	2	obj
-351	ido:0000573	intermediates	6	obj
-352	ncit:C28554	intermediates	6	obj
-353	ido:0000511	intermediates	6	obj
-354	ido:0000514	intermediates	6	obj
-355	ido:0000573	intermediates	7	obj
-356	ncit:C28554	intermediates	7	obj
-357	ido:0000511	intermediates	7	obj
-358	ido:0000514	intermediates	7	obj
 359	ido:0000573	models	4	obj
 360	ncit:C28554	models	4	obj
 361	ido:0000511	models	4	obj
@@ -1272,7 +1236,6 @@ COPY public.project (id, name, description, "timestamp", active, username) FROM 
 --
 
 COPY public.project_asset (id, project_id, resource_id, resource_type, external_ref) FROM stdin;
-1	1	1	intermediates	\N
 2	1	1	models	\N
 3	1	1	model_configurations	\N
 4	1	1	datasets	\N
@@ -1298,8 +1261,6 @@ COPY public.project_asset (id, project_id, resource_id, resource_type, external_
 24	1	11	datasets	\N
 25	1	11	simulation_runs	\N
 26	1	1	publications	\N
-27	1	2	intermediates	\N
-28	1	3	intermediates	\N
 29	1	2	models	\N
 30	1	2	model_configurations	\N
 31	1	12	datasets	\N
@@ -1324,8 +1285,6 @@ COPY public.project_asset (id, project_id, resource_id, resource_type, external_
 50	1	21	simulation_runs	\N
 51	1	22	datasets	\N
 52	1	22	simulation_runs	\N
-53	1	4	intermediates	\N
-54	1	5	intermediates	\N
 55	1	3	models	\N
 56	1	3	model_configurations	\N
 57	1	23	datasets	\N
@@ -1351,8 +1310,6 @@ COPY public.project_asset (id, project_id, resource_id, resource_type, external_
 77	1	33	datasets	\N
 78	1	33	simulation_runs	\N
 79	1	2	publications	\N
-80	1	6	intermediates	\N
-81	1	7	intermediates	\N
 82	1	4	models	\N
 83	1	4	model_configurations	\N
 84	1	34	datasets	\N
@@ -1391,17 +1348,6 @@ COPY public.project_asset (id, project_id, resource_id, resource_type, external_
 --
 
 COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "right", right_type, user_id, concept) FROM stdin;
-1	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Intermediate	1	.
-2	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	ido:0000512
-3	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	ido:0000514
-4	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	ido:0000592
-5	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	apollosv:00000154
-6	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	ido:0000511
-7	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	ido:0000512
-8	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	ido:0000514
-9	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	ido:0000592
-10	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	apollosv:00000154
-11	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Intermediate	1	ido:0000511
 12	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Model	1	.
 13	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Model	1	ido:0000512
 14	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Model	1	ido:0000514
@@ -1495,9 +1441,6 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 112	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	11	Dataset	1	apollosv:00000154
 116	2023-05-12 14:58:36.644108	REINTERPRETS	11	Dataset	11	SimulationRun	1	.
 121	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Publication	1	.
-122	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Intermediate	1	.
-126	2023-05-12 14:58:36.644108	EXTRACTED_FROM	2	Intermediate	1	Publication	1	.
-131	2023-05-12 14:58:36.644108	EXTRACTED_FROM	3	Intermediate	1	Publication	1	.
 135	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Model	1	.
 145	2023-05-12 14:58:36.644108	GENERATED_BY	12	SimulationRun	2	Plan	1	.
 152	2023-05-12 14:58:36.644108	GENERATED_BY	13	SimulationRun	2	Plan	1	.
@@ -1511,9 +1454,6 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 208	2023-05-12 14:58:36.644108	GENERATED_BY	21	SimulationRun	2	Plan	1	.
 215	2023-05-12 14:58:36.644108	GENERATED_BY	22	SimulationRun	2	Plan	1	.
 221	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Publication	1	.
-222	2023-05-12 14:58:36.644108	CONTAINS	1	Project	4	Intermediate	1	.
-226	2023-05-12 14:58:36.644108	EXTRACTED_FROM	4	Intermediate	1	Publication	1	.
-231	2023-05-12 14:58:36.644108	EXTRACTED_FROM	5	Intermediate	1	Publication	1	.
 235	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Model	1	.
 241	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	23	Dataset	1	ido:0000592
 254	2023-05-12 14:58:36.644108	CONTAINS	1	Project	24	SimulationRun	1	.
@@ -1531,10 +1471,6 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 109	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	11	Dataset	1	ido:0000512
 117	2023-05-12 14:58:36.644108	CONTAINS	1	Project	11	SimulationRun	1	.
 118	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000592
-123	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Intermediate	1	ido:0000592
-127	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Intermediate	1	ido:0000592
-132	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Intermediate	1	ido:0000592
-136	2023-05-12 14:58:36.644108	REINTERPRETS	2	Model	3	Intermediate	1	.
 141	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	12	Dataset	1	ido:0000592
 154	2023-05-12 14:58:36.644108	CONTAINS	1	Project	13	SimulationRun	1	.
 155	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	14	Dataset	1	ido:0000592
@@ -1547,10 +1483,6 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 210	2023-05-12 14:58:36.644108	CONTAINS	1	Project	21	SimulationRun	1	.
 211	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	22	Dataset	1	ido:0000592
 218	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000592
-223	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Intermediate	1	ido:0000592
-227	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Intermediate	1	ido:0000592
-232	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	5	Intermediate	1	ido:0000592
-236	2023-05-12 14:58:36.644108	REINTERPRETS	3	Model	5	Intermediate	1	.
 245	2023-05-12 14:58:36.644108	GENERATED_BY	23	SimulationRun	3	Plan	1	.
 250	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	24	Dataset	1	ido:0000514
 251	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
@@ -1568,9 +1500,6 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 110	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	11	Dataset	1	ido:0000514
 115	2023-05-12 14:58:36.644108	GENERATED_BY	11	SimulationRun	1	Plan	1	.
 119	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000511
-124	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Intermediate	1	ido:0000511
-128	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Intermediate	1	ido:0000511
-133	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Intermediate	1	ido:0000511
 137	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Model	1	ido:0000592
 143	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	12	Dataset	1	ido:0000514
 144	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
@@ -1635,10 +1564,6 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 212	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	22	Dataset	1	ido:0000511
 216	2023-05-12 14:58:36.644108	REINTERPRETS	22	Dataset	22	SimulationRun	1	.
 220	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000514
-225	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Intermediate	1	ido:0000514
-229	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Intermediate	1	ido:0000514
-230	2023-05-12 14:58:36.644108	CONTAINS	1	Project	5	Intermediate	1	.
-234	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	5	Intermediate	1	ido:0000514
 238	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Model	1	ido:0000511
 247	2023-05-12 14:58:36.644108	CONTAINS	1	Project	23	SimulationRun	1	.
 252	2023-05-12 14:58:36.644108	GENERATED_BY	24	SimulationRun	3	Plan	1	.
@@ -1658,10 +1583,6 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 113	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	11	Dataset	1	ido:0000511
 114	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
 120	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000514
-125	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Intermediate	1	ido:0000514
-129	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Intermediate	1	ido:0000514
-130	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Intermediate	1	.
-134	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Intermediate	1	ido:0000514
 138	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Model	1	ido:0000511
 140	2023-05-12 14:58:36.644108	USES	2	Plan	2	ModelRevision	1	.
 147	2023-05-12 14:58:36.644108	CONTAINS	1	Project	12	SimulationRun	1	.
@@ -1676,9 +1597,6 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 204	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	21	Dataset	1	ido:0000592
 217	2023-05-12 14:58:36.644108	CONTAINS	1	Project	22	SimulationRun	1	.
 219	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000511
-224	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Intermediate	1	ido:0000511
-228	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Intermediate	1	ido:0000511
-233	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	5	Intermediate	1	ido:0000511
 237	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Model	1	ido:0000592
 242	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	23	Dataset	1	ido:0000511
 246	2023-05-12 14:58:36.644108	REINTERPRETS	23	Dataset	23	SimulationRun	1	.
@@ -1712,17 +1630,6 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 319	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Publication	1	ncit:C28554
 320	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Publication	1	ido:0000511
 321	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Publication	1	ido:0000514
-322	2023-05-12 14:58:36.644108	EXTRACTED_FROM	6	Intermediate	2	Publication	1	.
-323	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	6	Intermediate	1	ido:0000573
-324	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	6	Intermediate	1	ncit:C28554
-325	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	6	Intermediate	1	ido:0000511
-326	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	6	Intermediate	1	ido:0000514
-327	2023-05-12 14:58:36.644108	EXTRACTED_FROM	7	Intermediate	2	Publication	1	.
-328	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	7	Intermediate	1	ido:0000573
-329	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	7	Intermediate	1	ncit:C28554
-330	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	7	Intermediate	1	ido:0000511
-331	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	7	Intermediate	1	ido:0000514
-332	2023-05-12 14:58:36.644108	REINTERPRETS	4	Model	6	Intermediate	1	.
 333	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Model	1	ido:0000573
 334	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Model	1	ncit:C28554
 335	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Model	1	ido:0000511
