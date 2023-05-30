@@ -5,6 +5,7 @@ from logging import Logger
 from typing import Any, Dict, List
 
 from elasticsearch import NotFoundError
+from elasticsearch import exceptions as es_exceptions
 from fastapi import APIRouter, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import HTTPException
@@ -83,7 +84,10 @@ def search_models(
     }
     if page != 0:
         list_body["from"] = page
-    res = es.search(index=es_index, **list_body)
+    try:
+        res = es.search(index=es_index, **list_body)
+    except es_exceptions.RequestError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
 
