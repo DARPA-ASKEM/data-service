@@ -2,7 +2,7 @@
 TDS Model Controller.
 """
 from logging import Logger
-from typing import List
+from typing import Any, Dict, List
 
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, Response, status
@@ -45,6 +45,41 @@ def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
         "size": page_size,
         "fields": model_list_fields,
         "source": False,
+    }
+    if page != 0:
+        list_body["from"] = page
+    res = es.search(index=es_index, **list_body)
+
+    list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        headers={
+            "content-type": "application/json",
+        },
+        content=list_body,
+    )
+
+
+@model_router.post(
+    "/search",
+    response_model=list[ModelDescription],
+    **retrieve.fastapi_endpoint_config,
+)
+def search_models(
+    payload: Dict[str, Any] = {"query": {"match_all": {}}},
+    page_size: int = 100,
+    page: int = 0,
+) -> List[ModelDescription]:
+    """
+    Search models by providing any valid Elasticsearch query.
+    These may include `match` queries, `term` queries, etc.
+    """
+    list_body = {
+        "size": page_size,
+        "fields": model_list_fields,
+        "source": False,
+        "body": payload,
     }
     if page != 0:
         list_body["from"] = page
