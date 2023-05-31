@@ -33,3 +33,4 @@ api.env
 
 # Minio
 .minio.sys
+data/askem-staging-data-service
