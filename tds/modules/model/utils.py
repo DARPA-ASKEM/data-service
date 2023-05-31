@@ -48,7 +48,7 @@ def model_response(model_from_es, delete_fields=None) -> dict:
     es_response = model_from_es.body
     model = es_response["_source"]
     # model["state_id"] = es_response["_id"]
-    frameworks = get_frameworks()
+    # frameworks = get_frameworks()
     # model["framework"] = frameworks.get(model["model_schema"], model["model_schema"])
     model["schema"] = model["model_schema"]
 
@@ -67,7 +67,7 @@ def model_list_response(model_list_from_es) -> list:
     Function builds model response object from an ElasticSearch model.
     """
     model_df = pd.DataFrame(model_list_from_es)
-    framework_map = get_frameworks()
+    # framework_map = get_frameworks()
     # We need to get the fields and then merge back to make the id available.
     models = (
         pd.concat({i: pd.DataFrame(x) for i, x in model_df.pop("fields").items()})
@@ -78,7 +78,9 @@ def model_list_response(model_list_from_es) -> list:
     models["model_version"] = models["model_version"].fillna(0)
     # we should use the same terminology here as is used in the ASKEM model
     # representation e.g. instead of `model_schema` that should just be `schema`
-    # models["framework"] = models["model_schema"].map(lambda x: framework_map.get(x, x))
+    # models["framework"] = models["model_schema"].map(
+    #   lambda x: framework_map.get(x, x)
+    # )
     models.rename(columns={"model_schema": "schema"}, inplace=True)
     models.drop(columns=["_index", "_score"], inplace=True)
 
