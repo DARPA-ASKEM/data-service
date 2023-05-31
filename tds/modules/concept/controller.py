@@ -228,9 +228,16 @@ def create_concept(
 @concept_router.put("/{concept_id}")
 def update_concept(
     payload: OntologyConceptPayload, concept_id: int, rdb: Engine = Depends(request_rdb)
-) -> str:
+) -> JSONResponse:
     """
     Update a concept by ID
+    ## Example put body:
+        {
+            "curie": "ido:0000621",
+            "type": "models",
+            "object_id": "new_model_id",
+            "status": "obj"
+        }
     """
     with Session(rdb) as session:
         data_payload = payload.dict(exclude_unset=True)
@@ -243,7 +250,13 @@ def update_concept(
         )
         data_to_update.update(data_payload)
         session.commit()
-    return "Updated Concept"
+    return JSONResponse(
+        status_code=status.HTTP_202_ACCEPTED,
+        headers={
+            "content-type": "application/json",
+        },
+        content={"message": "Updated Concept"},
+    )
 
 
 @concept_router.delete("/{concept_id}")
