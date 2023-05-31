@@ -1,7 +1,6 @@
 """
 TDS Dataset
 """
-import copy
 import os.path
 from logging import Logger
 from typing import List
@@ -12,6 +11,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 
 from tds.db.elasticsearch import es_client
+from tds.lib.utils import patchable
 from tds.modules.dataset.model import Dataset
 from tds.operation import create, delete, retrieve, update
 from tds.settings import settings
@@ -93,15 +93,8 @@ def dataset_put(dataset_id: str | int, payload: Dataset) -> JSONResponse:
     )
 
 
-# Create a fully optional dataset model for use with PATCH
-# Run once at import time
-PatchDataset = copy.deepcopy(Dataset)
-for field_name, field_def in PatchDataset.__fields__.items():
-    field_def.required = False
-
-
 @dataset_router.patch("/{dataset_id}", **update.fastapi_endpoint_config)
-def dataset_patch(dataset_id: str | int, payload: PatchDataset) -> Dataset:
+def dataset_patch(dataset_id: str | int, payload: patchable(Dataset)) -> Dataset:
     """
     Update a dataset with partial upload
     """
