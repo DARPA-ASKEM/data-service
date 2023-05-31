@@ -1,6 +1,7 @@
 """
 TDS Dataset
 """
+import copy
 import os.path
 from logging import Logger
 from typing import List
@@ -92,8 +93,15 @@ def dataset_put(dataset_id: str | int, payload: Dataset) -> JSONResponse:
     )
 
 
+# Create a fully optional dataset model for use with PATCH
+# Run once at import time
+PatchDataset = copy.deepcopy(Dataset)
+for field_name, field_def in PatchDataset.__fields__.items():
+    field_def.required = False
+
+
 @dataset_router.patch("/{dataset_id}", **update.fastapi_endpoint_config)
-def dataset_patch(dataset_id: str | int, payload: Dataset) -> Dataset:
+def dataset_patch(dataset_id: str | int, payload: PatchDataset) -> Dataset:
     """
     Update a dataset with partial upload
     """
@@ -107,7 +115,7 @@ def dataset_patch(dataset_id: str | int, payload: Dataset) -> Dataset:
             detail="ID in request URL, the payload, and the stored data must match.",
         )
 
-    dataset = orig_dataset.copy(update=payload)
+    dataset = orig_dataset.copy(update=update_data)
     dataset.save()
     return dataset
 
