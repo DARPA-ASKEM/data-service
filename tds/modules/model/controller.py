@@ -68,7 +68,9 @@ def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
     **retrieve.fastapi_endpoint_config,
 )
 def search_models(
-    payload: Dict[str, Any] = {"query": {"match_all": {}}},
+    payload: Dict[str, Any] = {
+        "query": {"match_all": {}}
+    },  # pylint: disable-dangerous-default-value
     page_size: int = 100,
     page: int = 0,
 ) -> List[ModelDescription]:
@@ -86,8 +88,8 @@ def search_models(
         list_body["from"] = page
     try:
         res = es.search(index=es_index, **list_body)
-    except es_exceptions.RequestError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except es_exceptions.RequestError as es_exception:
+        raise HTTPException(status_code=400, detail=str(es_exception))
 
     list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
 
