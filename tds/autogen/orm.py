@@ -11,12 +11,10 @@ from sqlalchemy.sql import func
 
 from tds.autogen.enums import (
     ExtractedType,
-    OntologicalField,
     ProvenanceType,
     RelationType,
     ResourceType,
     Role,
-    TaggableType,
     ValueType,
 )
 
@@ -109,17 +107,6 @@ class Qualifier(Base):
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class ModelConfiguration(Base):
-    __tablename__ = "model_configuration"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    model_id = sa.Column(
-        sa.Integer(), sa.ForeignKey("model_description.id"), nullable=False
-    )
-    name = sa.Column(sa.String(), nullable=False)
-    content = sa.Column(JSON(), nullable=False)
-
-
 class SimulationRun(Base):
     __tablename__ = "simulation_run"
 
@@ -168,18 +155,6 @@ class ProjectAsset(Base):
     external_ref = sa.Column(sa.String())
 
 
-class OntologyConcept(Base):
-    __tablename__ = "ontology_concept"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    curie = sa.Column(
-        sa.String(), sa.ForeignKey("active_concept.curie"), nullable=False
-    )
-    type = sa.Column(sa.Enum(TaggableType), nullable=False)
-    object_id = sa.Column(sa.String(), nullable=False)
-    status = sa.Column(sa.Enum(OntologicalField), nullable=False)
-
-
 class Provenance(Base):
     __tablename__ = "provenance"
 
@@ -211,14 +186,6 @@ class ModelFramework(Base):
     version = sa.Column(sa.String(), nullable=False)
     semantics = sa.Column(sa.String(), nullable=False)
     schema_url = sa.Column(sa.String())
-
-
-class ModelState(Base):
-    __tablename__ = "model_state"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    content = sa.Column(JSON())
 
 
 class Software(Base):
@@ -258,10 +225,3 @@ class Person(Base):
     org = sa.Column(sa.String())
     website = sa.Column(sa.String())
     is_registered = sa.Column(sa.Boolean(), nullable=False)
-
-
-class ActiveConcept(Base):
-    __tablename__ = "active_concept"
-
-    curie = sa.Column(sa.String(), primary_key=True)
-    name = sa.Column(sa.String())
