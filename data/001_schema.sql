@@ -74,8 +74,8 @@ ALTER TYPE public.ontologicalfield OWNER TO dev;
 CREATE TYPE public.provenancetype AS ENUM (
     'Concept',
     'Dataset',
-    'Intermediate',
     'Model',
+    'ModelConfiguration',
     'ModelParameter',
     'ModelRevision',
     'Plan',
@@ -663,7 +663,7 @@ ALTER TABLE public.project OWNER TO dev;
 CREATE TABLE public.project_asset (
     id integer NOT NULL,
     project_id integer NOT NULL,
-    resource_id integer NOT NULL,
+    resource_id character varying NOT NULL,
     resource_type public.resourcetype NOT NULL,
     external_ref character varying
 );
@@ -723,9 +723,9 @@ CREATE TABLE public.provenance (
     id integer NOT NULL,
     "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
     relation_type public.relationtype NOT NULL,
-    "left" integer NOT NULL,
+    "left" character varying NOT NULL,
     left_type public.provenancetype NOT NULL,
-    "right" integer NOT NULL,
+    "right" character varying NOT NULL,
     right_type public.provenancetype NOT NULL,
     user_id integer,
     concept character varying
@@ -1385,30 +1385,6 @@ ALTER TABLE ONLY public.feature
 
 
 --
--- Name: model_description model_description_framework_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_description
-    ADD CONSTRAINT model_description_framework_fkey FOREIGN KEY (framework) REFERENCES public.model_framework(name);
-
-
---
--- Name: model_description model_description_state_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_description
-    ADD CONSTRAINT model_description_state_id_fkey FOREIGN KEY (state_id) REFERENCES public.model_state(id);
-
-
---
--- Name: model_parameter model_parameter_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_parameter
-    ADD CONSTRAINT model_parameter_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.model_description(id);
-
-
---
 -- Name: model_runtime model_runtime_left_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
 --
 
@@ -1481,14 +1457,6 @@ ALTER TABLE ONLY public.simulation_parameter
 
 
 --
--- Name: simulation_plan simulation_plan_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_plan
-    ADD CONSTRAINT simulation_plan_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.model_description(id);
-
-
---
 -- Name: simulation_run simulation_run_simulator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
 --
 
@@ -1500,3 +1468,5 @@ ALTER TABLE ONLY public.simulation_run
 -- PostgreSQL database dump complete
 --
 
+--- Updates for basic flow.
+ALTER TYPE public."resourcetype" RENAME VALUE 'plans' TO  'model_configurations';

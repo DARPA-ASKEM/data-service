@@ -34,6 +34,10 @@ def setup_elasticsearch_indexes() -> None:
                     "type": "object",
                     "enabled": False,
                 },
+                "metadata": {
+                    "type": "object",
+                    "enabled": False,
+                },
             },
         },
         "dataset": {},
@@ -44,6 +48,10 @@ def setup_elasticsearch_indexes() -> None:
                     "enabled": False,
                 },
                 "model.semantics": {
+                    "type": "object",
+                    "enabled": False,
+                },
+                "model.metadata": {
                     "type": "object",
                     "enabled": False,
                 },

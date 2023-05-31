@@ -6,7 +6,7 @@ from json import dumps
 from typing import Dict, List, Optional
 
 from fastapi.encoders import jsonable_encoder
-from pydantic import Json
+from pydantic import BaseModel, Json
 
 from tds.autogen import orm, schema
 from tds.schema.concept import Concept
@@ -30,35 +30,14 @@ def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
     ]
 
 
-class ModelDescription(schema.ModelDescription):
-    concept: Optional[Concept] = None
-
-    class Config:
-        orm_mode = True
-
-
-class ModelContent(schema.ModelState):
-    @classmethod
-    def from_orm(cls, body: orm.ModelState) -> "ModelContent":
-        """
-        Handle ORM conversion while coercing `dict` to JSON
-        """
-        body.__dict__["content"] = dumps(body.content)
-
-        return super().from_orm(body)
-
-    class Config:
-        orm_mode = True
-
-
-class ModelOptPayload(schema.ModelDescription):
+class ModelOptPayload(BaseModel):
     left: int
     right: Optional[int]
     name: str
     description: Optional[str]
     framework: str
-    content: Optional[ModelContent] = None
-    parameters: Optional[ModelParameters] = None
+    content: Optional[list] = None
+    parameters: Optional[list] = None
 
     class Config:
         orm_mode = True
@@ -78,39 +57,6 @@ class ModelOptPayload(schema.ModelDescription):
                     }
                 ],
                 "framework": "Petri Net",
-            }
-        }
-
-
-class Model(schema.ModelDescription):
-    concept: Optional[Concept] = None
-    parameters: ModelParameters = []
-    content: Json
-
-    @classmethod
-    def from_orm(
-        cls,
-        body: orm.ModelDescription,
-        state: orm.ModelState,
-        parameters: List[orm.ModelParameter],
-    ) -> "Model":
-        """
-        Handle ORM conversion while coercing `dict` to JSON
-        """
-        body.__dict__["content"] = dumps(ModelContent.from_orm(state).content)
-        body.__dict__["parameters"] = orm_to_params(parameters)
-        return super().from_orm(body)
-
-    class Config:
-        orm_mode = True
-        schema_extra = {
-            "example": {
-                "name": "string",
-                "description": "string",
-                "content": "json-as-string",
-                "parameters": [{"string": "value-type"}],
-                "framework": "string",
-                "state_variable": "bool",
             }
         }
 

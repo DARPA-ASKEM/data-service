@@ -13,14 +13,26 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
 from tds.autogen import orm
-from tds.db import entry_exists, list_by_id, request_rdb
+from tds.db import entry_exists, es_client, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
+from tds.modules.model.utils import model_list_fields, model_list_response
+from tds.modules.model_configuration.response import configuration_response
 from tds.operation import create, delete, retrieve, update
 from tds.schema.project import Project, ProjectMetadata
 from tds.schema.resource import ResourceType, get_resource_orm, get_schema_description
+from tds.settings import settings
 
 logger = Logger(__name__)
 router = APIRouter()
+es = es_client()
+
+es_list_response = {
+    ResourceType.models: {"function": model_list_response, "fields": model_list_fields},
+    ResourceType.model_configurations: {
+        "function": configuration_response,
+        "fields": None,
+    },
+}
 
 
 @router.get("")
@@ -31,56 +43,6 @@ def list_projects(
     Retrieve all projects
     """
     return list_by_id(rdb.connect(), orm.Project, page_size, page)
-
-
-@router.get("/{id}/assets", **retrieve.fastapi_endpoint_config)
-def get_project_assets(
-    id: int,
-    types: Optional[List[ResourceType]] = FastAPIQuery(
-        default=[
-            ResourceType.datasets,
-            ResourceType.models,
-            ResourceType.model_configs,
-            ResourceType.publications,
-            ResourceType.simulation_runs,
-        ]
-    ),
-    rdb: Engine = Depends(request_rdb),
-):
-    """
-    Retrieve project assets
-    """
-    if entry_exists(rdb.connect(), orm.Project, id):
-        with Session(rdb) as session:
-            # project = session.query(orm.Project).get(id)
-            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
-                orm.ProjectAsset.project_id == id
-            )
-            assets_key_ids = {type: [] for type in types}
-            for asset in list(assets):
-                if asset.resource_type in types:
-                    assets_key_ids[asset.resource_type].append(asset.resource_id)
-
-            assets_key_objects = {}
-            for key in assets_key_ids:
-                orm_type = get_resource_orm(key)
-                orm_schema = get_schema_description(key)
-                if key == ResourceType.datasets:
-                    assets_key_objects[key] = list(
-                        session.query(orm_type).filter(
-                            orm_type.id.in_(assets_key_ids[key])
-                        )
-                    )
-                else:
-                    assets_key_objects[key] = [
-                        orm_schema.from_orm(asset)
-                        for asset in session.query(orm_type).filter(
-                            orm_type.id.in_(assets_key_ids[key])
-                        )
-                    ]
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return assets_key_objects
 
 
 @router.get("/{id}", **retrieve.fastapi_endpoint_config)
@@ -201,7 +163,7 @@ def update_project(
 def delete_asset(
     project_id: int,
     resource_type: ResourceType,
-    resource_id: int,
+    resource_id: int | str,
     rdb: Engine = Depends(request_rdb),
 ) -> Response:
     """
@@ -212,7 +174,7 @@ def delete_asset(
             session.query(orm.ProjectAsset).filter(
                 orm.ProjectAsset.project_id == project_id,
                 orm.ProjectAsset.resource_type == resource_type,
-                orm.ProjectAsset.resource_id == resource_id,
+                orm.ProjectAsset.resource_id == str(resource_id),
             )
         )
         if len(project_assets) == 0:
@@ -231,7 +193,7 @@ def delete_asset(
 def create_asset(
     project_id: int,
     resource_type: ResourceType,
-    resource_id: int,
+    resource_id: int | str,
     rdb: Engine = Depends(request_rdb),
 ) -> Response:
     """
@@ -242,7 +204,7 @@ def create_asset(
             session.query(orm.ProjectAsset)
             .filter(
                 orm.ProjectAsset.project_id == project_id,
-                orm.ProjectAsset.resource_id == resource_id,
+                orm.ProjectAsset.resource_id == str(resource_id),
                 orm.ProjectAsset.resource_type == resource_type,
             )
             .count()
@@ -251,7 +213,7 @@ def create_asset(
         if identical_count == 0:
             project_asset = orm.ProjectAsset(
                 project_id=project_id,
-                resource_id=resource_id,
+                resource_id=str(resource_id),
                 resource_type=resource_type,
             )
             session.add(project_asset)
@@ -267,3 +229,69 @@ def create_asset(
                 content=json.dumps({"id": id}),
             )
         return Response(status.HTTP_409_CONFLICT)
+
+
+@router.get("/{id}/assets", **retrieve.fastapi_endpoint_config)
+def get_project_assets(
+    id: int,
+    types: Optional[List[ResourceType]] = FastAPIQuery(
+        default=[
+            ResourceType.datasets,
+            ResourceType.models,
+            ResourceType.model_configurations,
+            ResourceType.publications,
+            ResourceType.simulation_runs,
+        ]
+    ),
+    rdb: Engine = Depends(request_rdb),
+):
+    """
+    Retrieve project assets
+    """
+    if entry_exists(rdb.connect(), orm.Project, id):
+        with Session(rdb) as session:
+            # project = session.query(orm.Project).get(id)
+            assets: Query[orm.ProjectAsset] = session.query(orm.ProjectAsset).filter(
+                orm.ProjectAsset.project_id == id
+            )
+            assets_key_ids = {type: [] for type in types}
+            for asset in list(assets):
+                if asset.resource_type in types:
+                    assets_key_ids[asset.resource_type].append(asset.resource_id)
+
+            assets_key_objects = {}
+            for key in assets_key_ids:
+                print(key)
+                orm_type = get_resource_orm(key)
+                orm_schema = get_schema_description(key)
+                if key == ResourceType.datasets:
+                    assets_key_objects[key] = list(
+                        session.query(orm_type).filter(
+                            orm_type.id.in_(assets_key_ids[key])
+                        )
+                    )
+                elif key in [ResourceType.models, ResourceType.model_configurations]:
+                    responder = es_list_response[key]
+                    index_singular = key if key[-1] != "s" else key.rstrip("s")
+                    index = f"{settings.ES_INDEX_PREFIX}{index_singular}"
+                    es_items = es.search(
+                        index=index,
+                        query={"ids": {"values": assets_key_ids[key]}},
+                        fields=responder["fields"],
+                    )
+                    print(es_items)
+                    assets_key_objects[key] = (
+                        []
+                        if es_items["hits"]["total"]["value"] == 0
+                        else responder["function"](es_items["hits"]["hits"])
+                    )
+                else:
+                    assets_key_objects[key] = [
+                        orm_schema.from_orm(asset)
+                        for asset in session.query(orm_type).filter(
+                            orm_type.id.in_(assets_key_ids[key])
+                        )
+                    ]
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return assets_key_objects

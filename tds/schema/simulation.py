@@ -7,7 +7,8 @@ from json import dumps
 from typing import List, Optional
 
 from tds.autogen import orm
-from tds.autogen.schema import ModelConfiguration, SimulationRun
+from tds.autogen.schema import SimulationRun
+from tds.modules.model_configuration.model import ModelConfiguration
 from tds.schema.concept import Concept
 
 SimulationParameters = List[dict]

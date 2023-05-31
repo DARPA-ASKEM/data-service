@@ -6,7 +6,9 @@ Skipping linter to prevent class docstring errors.
 """
 import datetime
 from typing import Optional
+
 from pydantic import BaseModel, Json
+
 from tds.autogen.enums import (
     ExtractedType,
     OntologicalField,
@@ -23,15 +25,6 @@ class QualifierXref(BaseModel):
     id: Optional[int] = None
     qualifier_id: Optional[int] = None
     feature_id: Optional[int] = None
-
-
-class ModelDescription(BaseModel):
-    id: Optional[int] = None
-    name: str
-    description: Optional[str]
-    framework: str
-    timestamp: datetime.datetime = datetime.datetime.now()
-    state_id: Optional[int] = None
 
 
 class ModelRuntime(BaseModel):
@@ -85,13 +78,6 @@ class Qualifier(BaseModel):
     value_type: ValueType
 
 
-class ModelConfiguration(BaseModel):
-    id: Optional[int] = None
-    model_id: Optional[int] = None
-    name: str
-    content: Json
-
-
 class SimulationRun(BaseModel):
     id: Optional[int] = None
     simulator_id: Optional[int] = None
@@ -101,15 +87,6 @@ class SimulationRun(BaseModel):
     dataset_id: Optional[int]
     description: Optional[str]
     response: Optional[bytes]
-
-
-class ModelParameter(BaseModel):
-    id: Optional[int] = None
-    model_id: Optional[int]
-    name: str
-    type: ValueType
-    default_value: Optional[str]
-    state_variable: bool
 
 
 class Extraction(BaseModel):
@@ -163,17 +140,22 @@ class ModelFramework(BaseModel):
     schema_url: Optional[str]
 
 
-class ModelState(BaseModel):
-    id: Optional[int] = None
-    timestamp: datetime.datetime = datetime.datetime.now()
-    content: Optional[Json]
-
-
 class Software(BaseModel):
     id: Optional[int] = None
     timestamp: datetime.datetime = datetime.datetime.now()
     source: str
     storage_uri: str
+
+
+class SimulationRun(BaseModel):
+    id: Optional[int] = None
+    simulator_id: str
+    timestamp: datetime.datetime = datetime.datetime.now()
+    completed_at: Optional[datetime.datetime]
+    success: Optional[bool]
+    dataset_id: Optional[int]
+    description: Optional[str]
+    response: Optional[bytes]
 
 
 class Publication(BaseModel):

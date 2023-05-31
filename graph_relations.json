@@ -30,7 +30,8 @@
         ["SimulationRun","Plan"]
     ],
     "USES":[
-        ["Plan","ModelRevision"]
+        ["Plan","ModelRevision"],
+        ["ModelConfiguration","Model"]
     ],
     "CITES":[
         ["Publication","Publication"]

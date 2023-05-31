@@ -14,6 +14,16 @@ from tds.autogen import orm
 from tds.db.relational import engine as pg_engine
 from tds.modules.model.model_description import ModelDescription
 
+model_list_fields = [
+    "id",
+    "name",
+    "model",
+    "description",
+    "model_schema",
+    "model_version",
+    "timestamp",
+]
+
 
 def orm_to_params(parameters: List):
     """
@@ -37,9 +47,9 @@ def model_response(model_from_es, delete_fields=None) -> dict:
     """
     es_response = model_from_es.body
     model = es_response["_source"]
-    model["state_id"] = model["id"] = es_response["_id"]
+    # model["state_id"] = es_response["_id"]
     frameworks = get_frameworks()
-    model["framework"] = frameworks.get(model["model_schema"], model["model_schema"])
+    # model["framework"] = frameworks.get(model["model_schema"], model["model_schema"])
     model["schema"] = model["model_schema"]
 
     del model["model_schema"]
@@ -68,8 +78,8 @@ def model_list_response(model_list_from_es) -> list:
     models["model_version"] = models["model_version"].fillna(0)
     # we should use the same terminology here as is used in the ASKEM model
     # representation e.g. instead of `model_schema` that should just be `schema`
-    models["framework"] = models["model_schema"].map(lambda x: framework_map.get(x, x))
-    models.rename(columns={"_id": "id", "model_schema": "schema"}, inplace=True)
+    # models["framework"] = models["model_schema"].map(lambda x: framework_map.get(x, x))
+    models.rename(columns={"model_schema": "schema"}, inplace=True)
     models.drop(columns=["_index", "_score"], inplace=True)
 
     # Drop _ignored column when it is present.

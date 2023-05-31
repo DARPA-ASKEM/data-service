@@ -2,17 +2,28 @@
 TDS Model Controller.
 """
 from logging import Logger
-from typing import List
+from typing import Any, Dict, List
 
 from elasticsearch import NotFoundError
+from elasticsearch import exceptions as es_exceptions
 from fastapi import APIRouter, Response, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 
 from tds.db import es_client
 from tds.modules.model.model import Model
 from tds.modules.model.model_description import ModelDescription
-from tds.modules.model.utils import model_list_response, model_response
+from tds.modules.model.utils import (
+    model_list_fields,
+    model_list_response,
+    model_response,
+)
+from tds.modules.model_configuration.model import ModelConfiguration
+from tds.modules.model_configuration.response import (
+    ModelConfigurationResponse,
+    configuration_response,
+)
 from tds.operation import create, delete, retrieve, update
 
 model_router = APIRouter()
@@ -33,12 +44,50 @@ def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
     """
     list_body = {
         "size": page_size,
-        "fields": ["name", "description", "model_schema", "model_version"],
+        "fields": model_list_fields,
         "source": False,
     }
     if page != 0:
         list_body["from"] = page
     res = es.search(index=es_index, **list_body)
+
+    list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        headers={
+            "content-type": "application/json",
+        },
+        content=list_body,
+    )
+
+
+@model_router.post(
+    "/search",
+    response_model=list[ModelDescription],
+    **retrieve.fastapi_endpoint_config,
+)
+def search_models(
+    payload: Dict[str, Any] = {"query": {"match_all": {}}},
+    page_size: int = 100,
+    page: int = 0,
+) -> List[ModelDescription]:
+    """
+    Search models by providing any valid Elasticsearch query.
+    These may include `match` queries, `term` queries, etc.
+    """
+    list_body = {
+        "size": page_size,
+        "fields": model_list_fields,
+        "source": False,
+        "body": payload,
+    }
+    if page != 0:
+        list_body["from"] = page
+    try:
+        res = es.search(index=es_index, **list_body)
+    except es_exceptions.RequestError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
 
@@ -83,6 +132,40 @@ def model_descriptions_get(model_id: str | int) -> JSONResponse | Response:
                 "content-type": "application/json",
             },
             content=model_response(res, delete_fields=["model", "model_version"]),
+        )
+    except NotFoundError:
+        return Response(
+            status_code=status.HTTP_404_NOT_FOUND,
+            headers={
+                "content-type": "application/json",
+            },
+        )
+
+
+@model_router.get(
+    "/{model_id}/model_configurations",
+    response_model=list[ModelConfigurationResponse],
+    **retrieve.fastapi_endpoint_config,
+)
+def model_configurations_get(model_id: str | int) -> JSONResponse | Response:
+    """
+    Retrieve a model 'description' from ElasticSearch
+    """
+    try:
+        query = {
+            "bool": {
+                "must": [{"match": {"model_id": model_id}}],
+            }
+        }
+        res = es.search(index=ModelConfiguration.index, query=query)
+        logger.info("model retrieved for description: %s", model_id)
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content=jsonable_encoder(configuration_response(res["hits"]["hits"])),
         )
     except NotFoundError:
         return Response(
