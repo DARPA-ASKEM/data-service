@@ -1,13 +1,11 @@
 """
 CRUD operations for concepts and related tables in the DB
 """
-import json
 from logging import Logger
 from typing import List, Optional
 from urllib.parse import quote_plus
 
 from fastapi import APIRouter, Depends, Query, Response, status
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy import and_, func, or_
 from sqlalchemy.engine.base import Engine
