@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     ES_PASSWORD: str = ""
     ES_INDEX_PREFIX: str = "tds_"
     S3_DATASET_PATH: str = "datasets"
-    S3_BUCKET: str = "askem-staging-data-service"
+    S3_BUCKET: str = ""
     STORAGE_HOST: Optional[str] = None
     AWS_ACCESS_KEY_ID: Optional[str] = None
     AWS_SECRET_ACCESS_KEY: Optional[str] = None

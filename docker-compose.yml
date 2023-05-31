@@ -41,7 +41,6 @@ services:
       - elasticsearch
     volumes:
       - $PWD/tds:/api/tds
-      - $PWD/data/datasets:/datasets
   graphdb:
     build:
       context: ./
