@@ -6,6 +6,7 @@ from typing import List, Optional
 from urllib.parse import quote_plus
 
 from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy import and_, func, or_
 from sqlalchemy.engine.base import Engine
@@ -182,7 +183,6 @@ def get_concept(
     """
     with Session(rdb) as session:
         result = session.query(OntologyConcept).get(concept_id)
-        print(result.__dict__)
         if result is None:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
         return JSONResponse(
@@ -190,7 +190,7 @@ def get_concept(
             headers={
                 "content-type": "application/json",
             },
-            content=result,
+            content=jsonable_encoder(result),
         )
 
 
