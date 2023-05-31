@@ -11,6 +11,10 @@ from tds.autogen.orm import Base
 
 
 class OntologyConcept(Base):
+    """
+    OntologyConcept Data Model.
+    """
+
     __tablename__ = "ontology_concept"
 
     id = sa.Column(sa.Integer(), primary_key=True)
@@ -23,6 +27,10 @@ class OntologyConcept(Base):
 
 
 class ActiveConcept(Base):
+    """
+    ActiveConcept Data Model.
+    """
+
     __tablename__ = "active_concept"
 
     curie = sa.Column(sa.String(), primary_key=True)
@@ -30,6 +38,10 @@ class ActiveConcept(Base):
 
 
 class OntologyConceptPayload(BaseModel):
+    """
+    OntologyConcept Pydantic Model.
+    """
+
     id: Optional[int] = None
     curie: str
     type: TaggableType
