@@ -15,18 +15,15 @@ class Workflow(TdsModel):
 
     name: str
     description: str
+    nodes: List = []
 
     _index = "workflow"
-    concepts: Optional[List] = []
-    exists = False
 
     def save(self):
         """
         Method saves the object to ElasticSearch.
         """
         res = super().save()
-        # Pass the workflow id so we have it for association.
-        self._extract_concepts()
         if settings.NEO4J_ENABLED:
             self._establish_provenance()
         return res
@@ -42,4 +39,17 @@ class Workflow(TdsModel):
         Workflow Data Model Swagger Example
         """
 
-        schema_extra = {"example": {}}
+        schema_extra = {
+            "example": {
+                "name": "Test Workflow",
+                "description": "This is the description",
+                "nodes": [
+                    {
+                        "model": {
+                            "id": "model_id",
+                            "configurations": [{"id": "model_configuration_id"}],
+                        }
+                    }
+                ],
+            }
+        }
