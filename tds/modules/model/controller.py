@@ -84,7 +84,7 @@ def search_models(
         "query": payload,
     }
     if page != 0:
-        list_body["from"] = page
+        list_body["from_"] = page
     try:
         res = es.search(index=es_index, **list_body)
     except es_exceptions.RequestError as es_exception:
@@ -92,8 +92,8 @@ def search_models(
             headers={
                 "content-type": "application/json",
             },
-            status_code=status.HTTP_418_IM_A_TEAPOT,
-            content=es_exception,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=str(es_exception),
         )
 
     list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
