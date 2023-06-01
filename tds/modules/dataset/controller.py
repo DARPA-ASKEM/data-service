@@ -8,11 +8,13 @@ from typing import List
 import boto3
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, HTTPException, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from tds.db.elasticsearch import es_client
 from tds.lib.utils import patchable
 from tds.modules.dataset.model import Dataset
+from tds.modules.dataset.response import dataset_response
 from tds.operation import create, delete, retrieve, update
 from tds.settings import settings
 
@@ -36,7 +38,7 @@ es = es_client()
 
 
 @dataset_router.get("", **retrieve.fastapi_endpoint_config)
-def list_datasets(page_size: int = 100, page: int = 0) -> List[Dataset]:
+def list_datasets(page_size: int = 100, page: int = 0) -> JSONResponse:
     """
     Retrieve the list of models from ES.
     """
@@ -46,7 +48,10 @@ def list_datasets(page_size: int = 100, page: int = 0) -> List[Dataset]:
     if page != 0:
         list_body["from"] = page
     res = es.search(index=es_index, **list_body)
-    return [Dataset(**hit["_source"]) for hit in res["hits"]["hits"]]
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=jsonable_encoder(dataset_response(res["hits"]["hits"])),
+    )
 
 
 @dataset_router.post("", **create.fastapi_endpoint_config)
@@ -57,7 +62,7 @@ def create_dataset(payload: Dataset) -> JSONResponse:
     res = payload.create()
     logger.info("New dataset created: %s", id)
     return JSONResponse(
-        status_code=201,
+        status_code=status.HTTP_201_CREATED,
         content={"id": res["_id"]},
     )
 
@@ -83,7 +88,8 @@ def dataset_put(dataset_id: str | int, payload: Dataset) -> JSONResponse:
     """
     if payload.id != dataset_id:
         raise HTTPException(
-            status_code=422, detail="ID in request URL and in payload must match."
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="ID in request URL and in payload must match.",
         )
     res = payload.save()
     logger.info("dataset updated: %s", dataset_id)
@@ -104,7 +110,7 @@ def dataset_patch(dataset_id: str | int, payload: patchable(Dataset)) -> Dataset
 
     if update_data.get("id", dataset_id) != dataset_id or orig_dataset.id != dataset_id:
         raise HTTPException(
-            status_code=422,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="ID in request URL, the payload, and the stored data must match.",
         )
 
@@ -152,10 +158,11 @@ def dataset_upload_url(dataset_id: str | int, filename: str) -> JSONResponse:
         ClientMethod="put_object", Params={"Bucket": settings.S3_BUCKET, "Key": s3_key}
     )
     return JSONResponse(
+        status_code=status.HTTP_200_OK,
         content={
             "url": put_url,
             "method": "PUT",
-        }
+        },
     )
 
 
@@ -170,8 +177,9 @@ def dataset_download_url(dataset_id: str | int, filename: str) -> JSONResponse:
         ClientMethod="get_object", Params={"Bucket": settings.S3_BUCKET, "Key": s3_key}
     )
     return JSONResponse(
+        status_code=status.HTTP_200_OK,
         content={
             "url": get_url,
             "method": "GET",
-        }
+        },
     )
