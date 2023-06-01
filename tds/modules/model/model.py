@@ -6,11 +6,11 @@ from typing import List, Optional
 from pydantic import Field
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
 from tds.db.base import TdsModel
 from tds.db.relational import engine as pg_engine
 from tds.lib.concepts import mark_concept_active
 from tds.lib.model_configs import model_config
+from tds.modules.concept.model import ActiveConcept, OntologyConcept
 from tds.settings import settings
 
 
@@ -62,15 +62,15 @@ class Model(TdsModel):
                         # @TODO: Break this code out for reuse where other
                         # data types can use it to handle concepts.
                         concept = (
-                            pg_db.query(orm.ActiveConcept)
-                            .filter(orm.ActiveConcept.curie == curie)
+                            pg_db.query(ActiveConcept)
+                            .filter(ActiveConcept.curie == curie)
                             .first()
                         )
                         if concept is None:
                             mark_concept_active(pg_db, curie)
                             concept = (
-                                pg_db.query(orm.ActiveConcept)
-                                .filter(orm.ActiveConcept.curie == curie)
+                                pg_db.query(ActiveConcept)
+                                .filter(ActiveConcept.curie == curie)
                                 .first()
                             )
 
@@ -78,7 +78,7 @@ class Model(TdsModel):
                             curies.append(
                                 curie
                             )  # Append to local list to prevent repeated queries.
-                            concept_association = orm.OntologyConcept(
+                            concept_association = OntologyConcept(
                                 curie=curie,
                                 type="models",
                                 object_id=self.id,

@@ -9,8 +9,8 @@ from urllib.parse import quote_plus
 import requests
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
 from tds.lib.errors import DKGError
+from tds.modules.concept.model import ActiveConcept
 from tds.settings import settings
 
 logger = Logger(__file__)
@@ -41,12 +41,7 @@ def mark_concept_active(session: Session, curie):
     """
     Page through table using given ORM
     """
-    if (
-        session.query(orm.ActiveConcept)
-        .filter(orm.ActiveConcept.curie == curie)
-        .count()
-        == 0
-    ):
+    if session.query(ActiveConcept).filter(ActiveConcept.curie == curie).count() == 0:
         for _ in range(RETRIES):
             try:
                 params = f"/entity/{quote_plus(curie)}"
@@ -54,13 +49,13 @@ def mark_concept_active(session: Session, curie):
             except DKGError:
                 continue
             else:
-                active = orm.ActiveConcept(curie=curie, name=name)
+                active = ActiveConcept(curie=curie, name=name)
                 session.add(active)
                 session.commit()
                 logger.info("added active %s", curie)
                 return
 
-        active = orm.ActiveConcept(curie=curie, name=None)
+        active = ActiveConcept(curie=curie, name=None)
         session.add(active)
         session.commit()
         logger.info("added active %s", curie)

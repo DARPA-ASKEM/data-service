@@ -18,6 +18,9 @@ class ModelConfigurationResponse(BaseModel):
 
 
 def configuration_response(model_configuration_list):
+    """
+    Function builds list of model configs for response.
+    """
     return [
         ModelConfigurationResponse(**x["_source"]) for x in model_configuration_list
     ]

@@ -156,6 +156,7 @@ class Dataset(TdsModel):
                     },
                 ],
                 "metadata": {},
+                # pylint: disable-next=line-too-long
                 "source": "https://data.cdc.gov/Vaccinations/Archive-COVID-19-Vaccination-and-Case-Trends-by-Ag/gxj9-t96f/data",
                 "grounding": {
                     "additionalProp1": {"identifiers": {}, "context": {}},
