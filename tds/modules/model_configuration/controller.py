@@ -55,7 +55,7 @@ def model_configuration_post(payload: ModelConfiguration) -> JSONResponse:
     res = payload.save()
     logger.info("New model_configuration created: %s", res["_id"])
     return JSONResponse(
-        status_code=200,
+        status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
@@ -68,7 +68,7 @@ def model_configuration_post(payload: ModelConfiguration) -> JSONResponse:
     response_model=ModelConfigurationResponse,
     **retrieve.fastapi_endpoint_config,
 )
-def model_configuration_get(model_configuration_id: str | int) -> JSONResponse:
+def model_configuration_get(model_configuration_id: str) -> JSONResponse | Response:
     """
     Retrieve a model_configuration from ElasticSearch
     """
@@ -99,7 +99,7 @@ def model_configuration_get(model_configuration_id: str | int) -> JSONResponse:
     "/{model_configuration_id}", **update.fastapi_endpoint_config
 )
 def model_configuration_put(
-    model_configuration_id: str | int, payload: ModelConfiguration
+    model_configuration_id: str, payload: ModelConfiguration
 ) -> JSONResponse:
     """
     Update a model_configuration in ElasticSearch
@@ -122,7 +122,7 @@ def model_configuration_put(
 @model_configuration_router.delete(
     "/{model_configuration_id}", **delete.fastapi_endpoint_config
 )
-def model_configuration_delete(model_configuration_id: str | int) -> Response:
+def model_configuration_delete(model_configuration_id: str) -> Response:
     """
     Function deletes a model_configuration in ES.
     """
