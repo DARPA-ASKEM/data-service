@@ -11,6 +11,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 
 from tds.db.elasticsearch import es_client
+from tds.lib.utils import patchable
 from tds.modules.dataset.model import Dataset
 from tds.operation import create, delete, retrieve, update
 from tds.settings import settings
@@ -92,24 +93,24 @@ def dataset_put(dataset_id: str | int, payload: Dataset) -> JSONResponse:
     )
 
 
-# @dataset_router.patch("/{dataset_id}", **update.fastapi_endpoint_config)
-# def dataset_patch(dataset_id: str | int, payload: Dataset) -> Dataset:
-#     """
-#     Update a dataset with partial upload
-#     """
+@dataset_router.patch("/{dataset_id}", **update.fastapi_endpoint_config)
+def dataset_patch(dataset_id: str | int, payload: patchable(Dataset)) -> Dataset:
+    """
+    Update a dataset with partial upload
+    """
 
-#     update_data = payload.dict(exclude_unset=True)
-#     orig_dataset = dataset_get(dataset_id)
+    update_data = payload.dict(exclude_unset=True)
+    orig_dataset = dataset_get(dataset_id)
 
-#     if update_data.get("id", dataset_id) != dataset_id or orig_dataset.id != dataset_id:
-#         raise HTTPException(
-#             status_code=422,
-#             detail="ID in request URL, the payload, and the stored data must match.",
-#         )
+    if update_data.get("id", dataset_id) != dataset_id or orig_dataset.id != dataset_id:
+        raise HTTPException(
+            status_code=422,
+            detail="ID in request URL, the payload, and the stored data must match.",
+        )
 
-#     dataset = orig_dataset.copy(update=payload)
-#     dataset.save()
-#     return dataset
+    dataset = orig_dataset.copy(update=update_data)
+    dataset.save()
+    return dataset
 
 
 # @dataset_router.post("/deprecate/{dataset_id}")
