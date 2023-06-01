@@ -154,6 +154,7 @@ CREATE TYPE public.taggabletype AS ENUM (
     'features',
     'intermediates',
     'model_parameters',
+    'model_configurations',
     'models',
     'projects',
     'publications',

@@ -12,8 +12,10 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
+from tds.autogen.enums import OntologicalField, TaggableType
 from tds.db import request_rdb
 from tds.lib.concepts import mark_concept_active
+from tds.modules.concept.model import OntologyConcept
 from tds.operation import create, retrieve
 from tds.schema.parameter import IndependentParameter
 
@@ -38,17 +40,17 @@ def create_parameters(
             session.commit()
             if curie is not None:
                 mark_concept_active(session, curie)
-                concept = orm.OntologyConcept(
+                concept = OntologyConcept(
                     curie=curie,
-                    type=orm.TaggableType.model_parameters,
+                    type=TaggableType.model_parameters,
                     object_id=param.id,
-                    status=orm.OntologicalField.obj,
+                    status=OntologicalField.obj,
                 )
                 session.add(concept)
                 session.commit()
-                id: int = param.id
-                logger.info("new parameter with %i", id)
-                created_ids.append(id)
+                param_id: int = param.id
+                logger.info("new parameter with %i", param_id)
+                created_ids.append(param_id)
     return Response(
         status_code=status.HTTP_201_CREATED,
         headers={
@@ -68,12 +70,12 @@ def get_parameters(
 
     with Session(rdb) as session:
         query = (
-            session.query(orm.ModelParameter, orm.OntologyConcept)
+            session.query(orm.ModelParameter, OntologyConcept)
             .outerjoin(
-                orm.OntologyConcept,
+                OntologyConcept,
                 and_(
-                    orm.OntologyConcept.object_id == orm.ModelParameter.id,
-                    orm.OntologyConcept.type == orm.TaggableType.model_parameters,
+                    OntologyConcept.object_id == orm.ModelParameter.id,
+                    OntologyConcept.type == TaggableType.model_parameters,
                 ),
             )
             .order_by(orm.ModelParameter.id.asc())

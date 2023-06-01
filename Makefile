@@ -12,6 +12,7 @@ DATA_PY_FILES = $(shell find scripts/ -type f -name '*.py')
 DATA_FILES = $(DATA_PY_FILES) $(SCHEMA_SQL_FILE)
 SQL_HASH = $(shell md5sum $(SCHEMA_FILES) $(DATA_PY_FILES) | md5sum | cut -c -32)
 
+S3_BUCKET := $(shell grep S3_BUCKET api.env | cut -d '=' -f2)
 
 .PHONY:init
 init:
@@ -28,6 +29,7 @@ tidy:
 
 .PHONY:up
 up:
+	mkdir -p "data/${S3_BUCKET}"
 	docker compose --env-file api.env up --build -d;
 	
 .PHONY: gen-migration
