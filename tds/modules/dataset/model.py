@@ -1,6 +1,7 @@
 """
 TDS Dataset
 """
+from datetime import datetime
 from enum import Enum
 from typing import Any, List, Optional
 
@@ -80,6 +81,9 @@ class Dataset(TdsModel):
     )
     description: Optional[str] = Field(
         description="(Optional) Texual description of the dataset",
+    )
+    data_source_date: Optional[datetime] = Field(
+        description="(Optional) The date the data was created."
     )
     file_names: List[str] = Field(
         description="List of file names used for storage",
