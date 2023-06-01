@@ -72,6 +72,9 @@ class Dataset(TdsModel):
 
     _index = "dataset"
 
+    username: str = Field(
+        description="The username of the user that created the dataset."
+    )
     name: str = Field(
         description="Display/human name for the dataset",
     )
@@ -105,6 +108,7 @@ class Dataset(TdsModel):
 
         schema_extra = {
             "example": {
+                "username": "Adam Smith",
                 "name": "CDC COVID-19 Vaccination and Case Trends by Age Group",
                 "description": "CDC COVID-19 Vaccination and Case Trends by Age Group",
                 "file_names": [
