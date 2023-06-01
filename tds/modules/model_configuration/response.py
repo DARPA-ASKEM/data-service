@@ -1,6 +1,8 @@
 """
 TDS Model Configuration Response object.
 """
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -12,8 +14,9 @@ class ModelConfigurationResponse(BaseModel):
     id: str
     name: str
     description: str
+    timestamp: datetime
     model_id: str
-    model: object
+    configuration: object
     model_id: str
 
 
