@@ -38,7 +38,7 @@ es = es_client()
     response_model=list[ModelDescription],
     **retrieve.fastapi_endpoint_config,
 )
-def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
+def list_models(page_size: int = 100, page: int = 0) -> JSONResponse:
     """
     Retrieve the list of models from ES.
     """
@@ -51,14 +51,16 @@ def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
         list_body["from"] = page
     res = es.search(index=es_index, **list_body)
 
-    list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+    list_response = (
+        model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+    )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
-        content=list_body,
+        content=list_response,
     )
 
 
@@ -96,14 +98,16 @@ def search_models(
             content=es_exception,
         )
 
-    list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+    list_response = (
+        model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+    )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
-        content=list_body,
+        content=list_response,
     )
 
 
@@ -125,7 +129,7 @@ def model_post(payload: Model) -> JSONResponse:
 
 
 @model_router.get("/{model_id}/descriptions", **retrieve.fastapi_endpoint_config)
-def model_descriptions_get(model_id: str | int) -> JSONResponse | Response:
+def model_descriptions_get(model_id: str) -> JSONResponse | Response:
     """
     Retrieve a model 'description' from ElasticSearch
     """
