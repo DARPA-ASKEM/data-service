@@ -15,6 +15,7 @@ from sqlalchemy.orm import Query, Session
 from tds.autogen import orm
 from tds.db import entry_exists, es_client, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
+from tds.modules.dataset.response import dataset_response
 from tds.modules.model.utils import model_list_fields, model_list_response
 from tds.modules.model_configuration.response import configuration_response
 from tds.operation import create, delete, retrieve, update
@@ -32,6 +33,7 @@ es_list_response = {
         "function": configuration_response,
         "fields": None,
     },
+    ResourceType.datasets: {"function": dataset_response, "fields": None},
 }
 
 
@@ -264,13 +266,11 @@ def get_project_assets(
                 print(key)
                 orm_type = get_resource_orm(key)
                 orm_schema = get_schema_description(key)
-                if key == ResourceType.datasets:
-                    assets_key_objects[key] = list(
-                        session.query(orm_type).filter(
-                            orm_type.id.in_(assets_key_ids[key])
-                        )
-                    )
-                elif key in [ResourceType.models, ResourceType.model_configurations]:
+                if key in [
+                    ResourceType.models,
+                    ResourceType.model_configurations,
+                    ResourceType.datasets,
+                ]:
                     responder = es_list_response[key]
                     index_singular = key if key[-1] != "s" else key.rstrip("s")
                     index = f"{settings.ES_INDEX_PREFIX}{index_singular}"
