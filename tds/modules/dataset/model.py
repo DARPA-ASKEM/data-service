@@ -87,7 +87,7 @@ class Dataset(TdsModel):
     dataset_url: Optional[AnyUrl] = Field(
         description="(Optional) Url from which the dataset can be downloaded/fetched",
     )
-    columns: List[DatasetColumn] = Field(
+    columns: Optional[List[DatasetColumn]] = Field(
         description="Information regarding the columns that make up the dataset",
     )
     metadata: Optional[dict[str, Any]] = Field(
