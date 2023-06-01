@@ -113,6 +113,7 @@ class Dataset(TdsModel):
         schema_extra = {
             "example": {
                 "username": "Adam Smith",
+                "data_source_date": "2022-10-01T12:00:00",
                 "name": "CDC COVID-19 Vaccination and Case Trends by Age Group",
                 "description": "CDC COVID-19 Vaccination and Case Trends by Age Group",
                 "file_names": [
