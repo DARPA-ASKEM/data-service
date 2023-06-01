@@ -57,6 +57,7 @@ def setup_elasticsearch_indexes() -> None:
                 },
             },
         },
+        "workflow": {},
     }
 
     # Wait for elasticsearch to be online and healthy enough to proceed
