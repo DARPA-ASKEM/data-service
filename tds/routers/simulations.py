@@ -17,7 +17,6 @@ from tds.db import entry_exists, list_by_id, request_rdb
 from tds.lib.simulations import adjust_run_params
 from tds.operation import create, retrieve, update
 from tds.schema.simulation import (
-    Plan,
     Run,
     RunDescription,
     SimulationParameters,
@@ -40,56 +39,6 @@ else:
 
 logger = Logger(__name__)
 router = APIRouter()
-
-
-@router.get("/plans")
-def list_plans(
-    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
-) -> List[Plan]:
-    """
-    Retrieve all plans
-    """
-
-    return list_by_id(rdb.connect(), orm.ModelConfiguration, page_size, page)
-
-
-@router.get("/plans/{id}", **retrieve.fastapi_endpoint_config)
-def get_plan(id: int, rdb: Engine = Depends(request_rdb)) -> Plan:
-    """
-    Retrieve plan
-    """
-    if entry_exists(rdb.connect(), orm.ModelConfiguration, id):
-        with Session(rdb) as session:
-            plan = session.query(orm.ModelConfiguration).get(id)
-
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Plan.from_orm(plan)
-
-
-@router.post("/plans", **create.fastapi_endpoint_config)
-def create_plan(payload: Plan, rdb: Engine = Depends(request_rdb)) -> Response:
-    """
-    Create plan and return its ID
-    """
-    with Session(rdb) as session:
-        plan_payload = payload.dict()
-        # pylint: disable-next=unused-variable
-        concept_payload = plan_payload.pop("concept")  # TODO: Save ontology term
-        plan_payload.pop("id")
-        plan = orm.ModelConfiguration(**plan_payload)
-        session.add(plan)
-        session.commit()
-        id: int = plan.id
-
-    logger.info("new plan created: %i", id)
-    return Response(
-        status_code=status.HTTP_201_CREATED,
-        headers={
-            "content-type": "application/json",
-        },
-        content=json.dumps({"id": id}),
-    )
 
 
 @router.get("/runs/descriptions", **retrieve.fastapi_endpoint_config)
