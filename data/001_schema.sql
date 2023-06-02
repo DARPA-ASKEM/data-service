@@ -76,8 +76,6 @@ CREATE TYPE public.provenancetype AS ENUM (
     'Dataset',
     'Model',
     'ModelConfiguration',
-    'ModelParameter',
-    'ModelRevision',
     'Project',
     'Publication',
     'SimulationRun'
@@ -121,6 +119,7 @@ CREATE TYPE public.resourcetype AS ENUM (
     'datasets',
     'intermediates',
     'models',
+    'model_configurations',
     'publications',
     'simulation_runs'
 );
@@ -149,8 +148,6 @@ ALTER TYPE public.role OWNER TO dev;
 CREATE TYPE public.taggabletype AS ENUM (
     'datasets',
     'features',
-    'intermediates',
-    'model_parameters',
     'model_configurations',
     'models',
     'projects',
@@ -934,23 +931,6 @@ ALTER TABLE ONLY public.extraction
 ALTER TABLE ONLY public.feature
     ADD CONSTRAINT feature_pkey PRIMARY KEY (id);
 
-
---
--- Name: intermediate intermediate_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.intermediate
-    ADD CONSTRAINT intermediate_pkey PRIMARY KEY (id);
-
-
---
--- Name: model_description model_description_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_description
-    ADD CONSTRAINT model_description_pkey PRIMARY KEY (id);
-
-
 --
 -- Name: model_framework model_framework_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
 --
@@ -958,30 +938,12 @@ ALTER TABLE ONLY public.model_description
 ALTER TABLE ONLY public.model_framework
     ADD CONSTRAINT model_framework_pkey PRIMARY KEY (name);
 
-
---
--- Name: model_parameter model_parameter_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_parameter
-    ADD CONSTRAINT model_parameter_pkey PRIMARY KEY (id);
-
-
 --
 -- Name: model_runtime model_runtime_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
 --
 
 ALTER TABLE ONLY public.model_runtime
     ADD CONSTRAINT model_runtime_pkey PRIMARY KEY (id);
-
-
---
--- Name: model_state model_state_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_state
-    ADD CONSTRAINT model_state_pkey PRIMARY KEY (id);
-
 
 --
 -- Name: ontology_concept ontology_concept_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
@@ -1160,6 +1122,3 @@ ALTER TABLE ONLY public.qualifier_xref
 --
 -- PostgreSQL database dump complete
 --
-
---- Updates for basic flow.
-ALTER TYPE public."resourcetype" RENAME VALUE 'plans' TO  'model_configurations';
