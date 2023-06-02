@@ -2,11 +2,12 @@
 TDS Model Configuration Response object.
 """
 from datetime import datetime
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 
-class ModelConfigurationResponse(BaseModel):
+class WorkflowResponse(BaseModel):
     """
     Model Configuration Response Object.
     """
@@ -15,15 +16,12 @@ class ModelConfigurationResponse(BaseModel):
     name: str
     description: str
     timestamp: datetime
-    model_id: str
+    nodes: Optional[List]
     configuration: object
-    model_id: str
 
 
-def configuration_response(model_configuration_list):
+def workflow_response(workflow_list):
     """
     Function builds list of model configs for response.
     """
-    return [
-        ModelConfigurationResponse(**x["_source"]) for x in model_configuration_list
-    ]
+    return [WorkflowResponse(**x["_source"]) for x in workflow_list]
