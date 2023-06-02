@@ -38,7 +38,7 @@ es = es_client()
     response_model=list[ModelDescription],
     **retrieve.fastapi_endpoint_config,
 )
-def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
+def list_models(page_size: int = 100, page: int = 0) -> JSONResponse:
     """
     Retrieve the list of models from ES.
     """
@@ -51,14 +51,16 @@ def list_models(page_size: int = 100, page: int = 0) -> List[ModelDescription]:
         list_body["from"] = page
     res = es.search(index=es_index, **list_body)
 
-    list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+    list_response = (
+        model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+    )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
-        content=list_body,
+        content=list_response,
     )
 
 
@@ -72,7 +74,7 @@ def search_models(
     payload: Dict[str, Any] = {"query": {"match_all": {}}},
     page_size: int = 100,
     page: int = 0,
-) -> List[ModelDescription]:
+) -> JSONResponse:
     """
     Search models by providing any valid Elasticsearch query.
     These may include `match` queries, `term` queries, etc.
@@ -84,7 +86,7 @@ def search_models(
         "query": payload,
     }
     if page != 0:
-        list_body["from"] = page
+        list_body["from_"] = page
     try:
         res = es.search(index=es_index, **list_body)
     except es_exceptions.RequestError as es_exception:
@@ -92,18 +94,20 @@ def search_models(
             headers={
                 "content-type": "application/json",
             },
-            status_code=status.HTTP_418_IM_A_TEAPOT,
-            content=es_exception,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=str(es_exception),
         )
 
-    list_body = model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+    list_response = (
+        model_list_response(res["hits"]["hits"]) if res["hits"]["hits"] else []
+    )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
-        content=list_body,
+        content=list_response,
     )
 
 
@@ -116,7 +120,7 @@ def model_post(payload: Model) -> JSONResponse:
     res = payload.create()
     logger.info("new model created: %s", res["_id"])
     return JSONResponse(
-        status_code=200,
+        status_code=status.HTTP_200_OK,
         headers={
             "content-type": "application/json",
         },
@@ -125,7 +129,7 @@ def model_post(payload: Model) -> JSONResponse:
 
 
 @model_router.get("/{model_id}/descriptions", **retrieve.fastapi_endpoint_config)
-def model_descriptions_get(model_id: str | int) -> JSONResponse | Response:
+def model_descriptions_get(model_id: str) -> JSONResponse | Response:
     """
     Retrieve a model 'description' from ElasticSearch
     """
@@ -154,7 +158,7 @@ def model_descriptions_get(model_id: str | int) -> JSONResponse | Response:
     response_model=list[ModelConfigurationResponse],
     **retrieve.fastapi_endpoint_config,
 )
-def model_configurations_get(model_id: str | int) -> JSONResponse | Response:
+def model_configurations_get(model_id: str) -> JSONResponse | Response:
     """
     Retrieve a model 'description' from ElasticSearch
     """
@@ -186,7 +190,7 @@ def model_configurations_get(model_id: str | int) -> JSONResponse | Response:
 @model_router.get(
     "/{model_id}/parameters", deprecated=True, **retrieve.fastapi_endpoint_config
 )
-def model_parameters_get(model_id: str | int) -> JSONResponse | Response:
+def model_parameters_get(model_id: str) -> JSONResponse | Response:
     """
     Function retrieves a Model's parameters.
     """
@@ -211,7 +215,7 @@ def model_parameters_get(model_id: str | int) -> JSONResponse | Response:
 
 
 @model_router.get("/{model_id}", **retrieve.fastapi_endpoint_config)
-def model_get(model_id: str | int) -> JSONResponse | Response:
+def model_get(model_id: str) -> JSONResponse | Response:
     """
     Retrieve a model from ElasticSearch
     """
@@ -236,7 +240,7 @@ def model_get(model_id: str | int) -> JSONResponse | Response:
 
 
 @model_router.put("/{model_id}", **update.fastapi_endpoint_config)
-def model_put(model_id: str | int, payload: Model) -> JSONResponse:
+def model_put(model_id: str, payload: Model) -> JSONResponse:
     """
     Update a model in ElasticSearch
     """
@@ -256,7 +260,7 @@ def model_put(model_id: str | int, payload: Model) -> JSONResponse:
 
 
 @model_router.delete("/{model_id}", **delete.fastapi_endpoint_config)
-def model_delete(model_id: str | int) -> Response:
+def model_delete(model_id: str) -> Response:
     """
     Function deletes a TDS Model from ElasticSearch.
     """

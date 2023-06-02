@@ -1,6 +1,7 @@
 """
 TDS Dataset
 """
+from datetime import datetime
 from enum import Enum
 from typing import Any, List, Optional
 
@@ -72,11 +73,17 @@ class Dataset(TdsModel):
 
     _index = "dataset"
 
+    username: str = Field(
+        description="The username of the user that created the dataset."
+    )
     name: str = Field(
         description="Display/human name for the dataset",
     )
     description: Optional[str] = Field(
         description="(Optional) Texual description of the dataset",
+    )
+    data_source_date: Optional[datetime] = Field(
+        description="(Optional) The date the data was created."
     )
     file_names: List[str] = Field(
         description="List of file names used for storage",
@@ -84,7 +91,7 @@ class Dataset(TdsModel):
     dataset_url: Optional[AnyUrl] = Field(
         description="(Optional) Url from which the dataset can be downloaded/fetched",
     )
-    columns: List[DatasetColumn] = Field(
+    columns: Optional[List[DatasetColumn]] = Field(
         description="Information regarding the columns that make up the dataset",
     )
     metadata: Optional[dict[str, Any]] = Field(
@@ -105,6 +112,8 @@ class Dataset(TdsModel):
 
         schema_extra = {
             "example": {
+                "username": "Adam Smith",
+                "data_source_date": "2022-10-01T12:00:00",
                 "name": "CDC COVID-19 Vaccination and Case Trends by Age Group",
                 "description": "CDC COVID-19 Vaccination and Case Trends by Age Group",
                 "file_names": [
