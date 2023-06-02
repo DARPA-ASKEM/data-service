@@ -643,14 +643,14 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 15	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Model	1	ido:0000592
 16	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Model	1	apollosv:00000154
 17	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Model	1	ido:0000511
-18	2023-05-12 14:58:36.644108	USES	1	Plan	1	ModelRevision	1	.
+18	2023-05-12 14:58:36.644108	USES	1	ModelConfiguration	1	Model	1	.
 19	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Dataset	1	ido:0000512
 20	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Dataset	1	ido:0000514
 21	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Dataset	1	ido:0000592
 22	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Dataset	1	apollosv:00000154
 23	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Dataset	1	ido:0000511
-24	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
-25	2023-05-12 14:58:36.644108	GENERATED_BY	1	SimulationRun	1	Plan	1	.
+24	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
+25	2023-05-12 14:58:36.644108	GENERATED_BY	1	SimulationRun	1	ModelConfiguration	1	.
 26	2023-05-12 14:58:36.644108	REINTERPRETS	1	Dataset	1	SimulationRun	1	.
 27	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	SimulationRun	1	.
 28	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Dataset	1	ido:0000512
@@ -658,8 +658,8 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 30	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Dataset	1	ido:0000592
 31	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Dataset	1	apollosv:00000154
 32	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Dataset	1	ido:0000511
-33	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
-34	2023-05-12 14:58:36.644108	GENERATED_BY	2	SimulationRun	1	Plan	1	.
+33	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
+34	2023-05-12 14:58:36.644108	GENERATED_BY	2	SimulationRun	1	ModelConfiguration	1	.
 35	2023-05-12 14:58:36.644108	REINTERPRETS	2	Dataset	2	SimulationRun	1	.
 36	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	SimulationRun	1	.
 37	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Dataset	1	ido:0000512
@@ -667,8 +667,8 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 39	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Dataset	1	ido:0000592
 40	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Dataset	1	apollosv:00000154
 41	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Dataset	1	ido:0000511
-42	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
-43	2023-05-12 14:58:36.644108	GENERATED_BY	3	SimulationRun	1	Plan	1	.
+42	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
+43	2023-05-12 14:58:36.644108	GENERATED_BY	3	SimulationRun	1	ModelConfiguration	1	.
 44	2023-05-12 14:58:36.644108	REINTERPRETS	3	Dataset	3	SimulationRun	1	.
 45	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	SimulationRun	1	.
 46	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Dataset	1	ido:0000512
@@ -676,8 +676,8 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 48	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Dataset	1	ido:0000592
 49	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Dataset	1	apollosv:00000154
 50	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Dataset	1	ido:0000511
-51	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
-52	2023-05-12 14:58:36.644108	GENERATED_BY	4	SimulationRun	1	Plan	1	.
+51	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
+52	2023-05-12 14:58:36.644108	GENERATED_BY	4	SimulationRun	1	ModelConfiguration	1	.
 53	2023-05-12 14:58:36.644108	REINTERPRETS	4	Dataset	4	SimulationRun	1	.
 54	2023-05-12 14:58:36.644108	CONTAINS	1	Project	4	SimulationRun	1	.
 55	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	5	Dataset	1	ido:0000512
@@ -685,8 +685,8 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 57	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	5	Dataset	1	ido:0000592
 58	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	5	Dataset	1	apollosv:00000154
 59	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	5	Dataset	1	ido:0000511
-60	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
-61	2023-05-12 14:58:36.644108	GENERATED_BY	5	SimulationRun	1	Plan	1	.
+60	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
+61	2023-05-12 14:58:36.644108	GENERATED_BY	5	SimulationRun	1	ModelConfiguration	1	.
 62	2023-05-12 14:58:36.644108	REINTERPRETS	5	Dataset	5	SimulationRun	1	.
 63	2023-05-12 14:58:36.644108	CONTAINS	1	Project	5	SimulationRun	1	.
 64	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	6	Dataset	1	ido:0000512
@@ -694,8 +694,8 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 66	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	6	Dataset	1	ido:0000592
 67	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	6	Dataset	1	apollosv:00000154
 68	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	6	Dataset	1	ido:0000511
-69	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
-70	2023-05-12 14:58:36.644108	GENERATED_BY	6	SimulationRun	1	Plan	1	.
+69	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
+70	2023-05-12 14:58:36.644108	GENERATED_BY	6	SimulationRun	1	ModelConfiguration	1	.
 71	2023-05-12 14:58:36.644108	REINTERPRETS	6	Dataset	6	SimulationRun	1	.
 72	2023-05-12 14:58:36.644108	CONTAINS	1	Project	6	SimulationRun	1	.
 73	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	7	Dataset	1	ido:0000512
@@ -703,8 +703,8 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 75	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	7	Dataset	1	ido:0000592
 76	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	7	Dataset	1	apollosv:00000154
 77	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	7	Dataset	1	ido:0000511
-78	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
-79	2023-05-12 14:58:36.644108	GENERATED_BY	7	SimulationRun	1	Plan	1	.
+78	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
+79	2023-05-12 14:58:36.644108	GENERATED_BY	7	SimulationRun	1	ModelConfiguration	1	.
 80	2023-05-12 14:58:36.644108	REINTERPRETS	7	Dataset	7	SimulationRun	1	.
 81	2023-05-12 14:58:36.644108	CONTAINS	1	Project	7	SimulationRun	1	.
 82	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	8	Dataset	1	ido:0000512
@@ -712,8 +712,8 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 84	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	8	Dataset	1	ido:0000592
 85	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	8	Dataset	1	apollosv:00000154
 86	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	8	Dataset	1	ido:0000511
-87	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
-88	2023-05-12 14:58:36.644108	GENERATED_BY	8	SimulationRun	1	Plan	1	.
+87	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
+88	2023-05-12 14:58:36.644108	GENERATED_BY	8	SimulationRun	1	ModelConfiguration	1	.
 89	2023-05-12 14:58:36.644108	REINTERPRETS	8	Dataset	8	SimulationRun	1	.
 90	2023-05-12 14:58:36.644108	CONTAINS	1	Project	8	SimulationRun	1	.
 91	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	9	Dataset	1	ido:0000512
@@ -721,8 +721,8 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 93	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	9	Dataset	1	ido:0000592
 94	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	9	Dataset	1	apollosv:00000154
 95	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	9	Dataset	1	ido:0000511
-96	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
-97	2023-05-12 14:58:36.644108	GENERATED_BY	9	SimulationRun	1	Plan	1	.
+96	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
+97	2023-05-12 14:58:36.644108	GENERATED_BY	9	SimulationRun	1	ModelConfiguration	1	.
 98	2023-05-12 14:58:36.644108	REINTERPRETS	9	Dataset	9	SimulationRun	1	.
 99	2023-05-12 14:58:36.644108	CONTAINS	1	Project	9	SimulationRun	1	.
 100	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	10	Dataset	1	ido:0000512
@@ -731,17 +731,17 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 116	2023-05-12 14:58:36.644108	REINTERPRETS	11	Dataset	11	SimulationRun	1	.
 121	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Publication	1	.
 135	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Model	1	.
-145	2023-05-12 14:58:36.644108	GENERATED_BY	12	SimulationRun	2	Plan	1	.
-152	2023-05-12 14:58:36.644108	GENERATED_BY	13	SimulationRun	2	Plan	1	.
-159	2023-05-12 14:58:36.644108	GENERATED_BY	14	SimulationRun	2	Plan	1	.
-166	2023-05-12 14:58:36.644108	GENERATED_BY	15	SimulationRun	2	Plan	1	.
-173	2023-05-12 14:58:36.644108	GENERATED_BY	16	SimulationRun	2	Plan	1	.
-180	2023-05-12 14:58:36.644108	GENERATED_BY	17	SimulationRun	2	Plan	1	.
-187	2023-05-12 14:58:36.644108	GENERATED_BY	18	SimulationRun	2	Plan	1	.
-194	2023-05-12 14:58:36.644108	GENERATED_BY	19	SimulationRun	2	Plan	1	.
-201	2023-05-12 14:58:36.644108	GENERATED_BY	20	SimulationRun	2	Plan	1	.
-208	2023-05-12 14:58:36.644108	GENERATED_BY	21	SimulationRun	2	Plan	1	.
-215	2023-05-12 14:58:36.644108	GENERATED_BY	22	SimulationRun	2	Plan	1	.
+145	2023-05-12 14:58:36.644108	GENERATED_BY	12	SimulationRun	2	ModelConfiguration	1	.
+152	2023-05-12 14:58:36.644108	GENERATED_BY	13	SimulationRun	2	ModelConfiguration	1	.
+159	2023-05-12 14:58:36.644108	GENERATED_BY	14	SimulationRun	2	ModelConfiguration	1	.
+166	2023-05-12 14:58:36.644108	GENERATED_BY	15	SimulationRun	2	ModelConfiguration	1	.
+173	2023-05-12 14:58:36.644108	GENERATED_BY	16	SimulationRun	2	ModelConfiguration	1	.
+180	2023-05-12 14:58:36.644108	GENERATED_BY	17	SimulationRun	2	ModelConfiguration	1	.
+187	2023-05-12 14:58:36.644108	GENERATED_BY	18	SimulationRun	2	ModelConfiguration	1	.
+194	2023-05-12 14:58:36.644108	GENERATED_BY	19	SimulationRun	2	ModelConfiguration	1	.
+201	2023-05-12 14:58:36.644108	GENERATED_BY	20	SimulationRun	2	ModelConfiguration	1	.
+208	2023-05-12 14:58:36.644108	GENERATED_BY	21	SimulationRun	2	ModelConfiguration	1	.
+215	2023-05-12 14:58:36.644108	GENERATED_BY	22	SimulationRun	2	ModelConfiguration	1	.
 221	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Publication	1	.
 235	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Model	1	.
 241	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	23	Dataset	1	ido:0000592
@@ -754,9 +754,9 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 281	2023-05-12 14:58:36.644108	REINTERPRETS	28	Dataset	28	SimulationRun	1	.
 283	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	29	Dataset	1	ido:0000592
 296	2023-05-12 14:58:36.644108	CONTAINS	1	Project	30	SimulationRun	1	.
-301	2023-05-12 14:58:36.644108	GENERATED_BY	31	SimulationRun	3	Plan	1	.
+301	2023-05-12 14:58:36.644108	GENERATED_BY	31	SimulationRun	3	ModelConfiguration	1	.
 101	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	10	Dataset	1	ido:0000514
-106	2023-05-12 14:58:36.644108	GENERATED_BY	10	SimulationRun	1	Plan	1	.
+106	2023-05-12 14:58:36.644108	GENERATED_BY	10	SimulationRun	1	ModelConfiguration	1	.
 109	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	11	Dataset	1	ido:0000512
 117	2023-05-12 14:58:36.644108	CONTAINS	1	Project	11	SimulationRun	1	.
 118	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000592
@@ -772,13 +772,13 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 210	2023-05-12 14:58:36.644108	CONTAINS	1	Project	21	SimulationRun	1	.
 211	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	22	Dataset	1	ido:0000592
 218	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000592
-245	2023-05-12 14:58:36.644108	GENERATED_BY	23	SimulationRun	3	Plan	1	.
+245	2023-05-12 14:58:36.644108	GENERATED_BY	23	SimulationRun	3	ModelConfiguration	1	.
 250	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	24	Dataset	1	ido:0000514
-251	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
+251	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
 261	2023-05-12 14:58:36.644108	CONTAINS	1	Project	25	SimulationRun	1	.
 268	2023-05-12 14:58:36.644108	CONTAINS	1	Project	26	SimulationRun	1	.
-273	2023-05-12 14:58:36.644108	GENERATED_BY	27	SimulationRun	3	Plan	1	.
-280	2023-05-12 14:58:36.644108	GENERATED_BY	28	SimulationRun	3	Plan	1	.
+273	2023-05-12 14:58:36.644108	GENERATED_BY	27	SimulationRun	3	ModelConfiguration	1	.
+280	2023-05-12 14:58:36.644108	GENERATED_BY	28	SimulationRun	3	ModelConfiguration	1	.
 284	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	29	Dataset	1	ido:0000511
 288	2023-05-12 14:58:36.644108	REINTERPRETS	29	Dataset	29	SimulationRun	1	.
 291	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	30	Dataset	1	ido:0000511
@@ -787,45 +787,45 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 302	2023-05-12 14:58:36.644108	REINTERPRETS	31	Dataset	31	SimulationRun	1	.
 102	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	10	Dataset	1	ido:0000592
 110	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	11	Dataset	1	ido:0000514
-115	2023-05-12 14:58:36.644108	GENERATED_BY	11	SimulationRun	1	Plan	1	.
+115	2023-05-12 14:58:36.644108	GENERATED_BY	11	SimulationRun	1	ModelConfiguration	1	.
 119	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000511
 137	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Model	1	ido:0000592
 143	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	12	Dataset	1	ido:0000514
-144	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+144	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 149	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	13	Dataset	1	ido:0000511
 153	2023-05-12 14:58:36.644108	REINTERPRETS	13	Dataset	13	SimulationRun	1	.
 157	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	14	Dataset	1	ido:0000514
-158	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+158	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 163	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	15	Dataset	1	ido:0000511
 167	2023-05-12 14:58:36.644108	REINTERPRETS	15	Dataset	15	SimulationRun	1	.
 171	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	16	Dataset	1	ido:0000514
-172	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+172	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 177	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	17	Dataset	1	ido:0000511
 181	2023-05-12 14:58:36.644108	REINTERPRETS	17	Dataset	17	SimulationRun	1	.
 185	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	18	Dataset	1	ido:0000514
-186	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+186	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 191	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	19	Dataset	1	ido:0000511
 195	2023-05-12 14:58:36.644108	REINTERPRETS	19	Dataset	19	SimulationRun	1	.
 199	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	20	Dataset	1	ido:0000514
-200	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+200	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 205	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	21	Dataset	1	ido:0000511
 209	2023-05-12 14:58:36.644108	REINTERPRETS	21	Dataset	21	SimulationRun	1	.
 213	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	22	Dataset	1	ido:0000514
-214	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+214	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 239	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Model	1	ido:0000514
-240	2023-05-12 14:58:36.644108	USES	3	Plan	3	ModelRevision	1	.
+240	2023-05-12 14:58:36.644108	USES	3	ModelConfiguration	3	Model	1	.
 243	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	23	Dataset	1	ido:0000514
-244	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
+244	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
 248	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	24	Dataset	1	ido:0000592
 255	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	25	Dataset	1	ido:0000592
-266	2023-05-12 14:58:36.644108	GENERATED_BY	26	SimulationRun	3	Plan	1	.
+266	2023-05-12 14:58:36.644108	GENERATED_BY	26	SimulationRun	3	ModelConfiguration	1	.
 271	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	27	Dataset	1	ido:0000514
-272	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
+272	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
 282	2023-05-12 14:58:36.644108	CONTAINS	1	Project	28	SimulationRun	1	.
 289	2023-05-12 14:58:36.644108	CONTAINS	1	Project	29	SimulationRun	1	.
-294	2023-05-12 14:58:36.644108	GENERATED_BY	30	SimulationRun	3	Plan	1	.
+294	2023-05-12 14:58:36.644108	GENERATED_BY	30	SimulationRun	3	ModelConfiguration	1	.
 299	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	31	Dataset	1	ido:0000514
-300	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
+300	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
 103	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	10	Dataset	1	apollosv:00000154
 107	2023-05-12 14:58:36.644108	REINTERPRETS	10	Dataset	10	SimulationRun	1	.
 111	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	11	Dataset	1	ido:0000592
@@ -833,47 +833,47 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 142	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	12	Dataset	1	ido:0000511
 146	2023-05-12 14:58:36.644108	REINTERPRETS	12	Dataset	12	SimulationRun	1	.
 150	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	13	Dataset	1	ido:0000514
-151	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+151	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 156	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	14	Dataset	1	ido:0000511
 160	2023-05-12 14:58:36.644108	REINTERPRETS	14	Dataset	14	SimulationRun	1	.
 164	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	15	Dataset	1	ido:0000514
-165	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+165	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 170	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	16	Dataset	1	ido:0000511
 174	2023-05-12 14:58:36.644108	REINTERPRETS	16	Dataset	16	SimulationRun	1	.
 178	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	17	Dataset	1	ido:0000514
-179	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+179	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 184	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	18	Dataset	1	ido:0000511
 188	2023-05-12 14:58:36.644108	REINTERPRETS	18	Dataset	18	SimulationRun	1	.
 192	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	19	Dataset	1	ido:0000514
-193	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+193	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 198	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	20	Dataset	1	ido:0000511
 202	2023-05-12 14:58:36.644108	REINTERPRETS	20	Dataset	20	SimulationRun	1	.
 206	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	21	Dataset	1	ido:0000514
-207	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	Plan	1	.
+207	2023-05-12 14:58:36.644108	CONTAINS	1	Project	2	ModelConfiguration	1	.
 212	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	22	Dataset	1	ido:0000511
 216	2023-05-12 14:58:36.644108	REINTERPRETS	22	Dataset	22	SimulationRun	1	.
 220	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000514
 238	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	3	Model	1	ido:0000511
 247	2023-05-12 14:58:36.644108	CONTAINS	1	Project	23	SimulationRun	1	.
-252	2023-05-12 14:58:36.644108	GENERATED_BY	24	SimulationRun	3	Plan	1	.
-259	2023-05-12 14:58:36.644108	GENERATED_BY	25	SimulationRun	3	Plan	1	.
+252	2023-05-12 14:58:36.644108	GENERATED_BY	24	SimulationRun	3	ModelConfiguration	1	.
+259	2023-05-12 14:58:36.644108	GENERATED_BY	25	SimulationRun	3	ModelConfiguration	1	.
 263	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	26	Dataset	1	ido:0000511
 267	2023-05-12 14:58:36.644108	REINTERPRETS	26	Dataset	26	SimulationRun	1	.
 270	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	27	Dataset	1	ido:0000511
 274	2023-05-12 14:58:36.644108	REINTERPRETS	27	Dataset	27	SimulationRun	1	.
 278	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	28	Dataset	1	ido:0000514
-279	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
+279	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
 285	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	29	Dataset	1	ido:0000514
-286	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
+286	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
 290	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	30	Dataset	1	ido:0000592
 303	2023-05-12 14:58:36.644108	CONTAINS	1	Project	31	SimulationRun	1	.
 104	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	10	Dataset	1	ido:0000511
-105	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
+105	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
 113	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	11	Dataset	1	ido:0000511
-114	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	Plan	1	.
+114	2023-05-12 14:58:36.644108	CONTAINS	1	Project	1	ModelConfiguration	1	.
 120	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	1	Publication	1	ido:0000514
 138	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Model	1	ido:0000511
-140	2023-05-12 14:58:36.644108	USES	2	Plan	2	ModelRevision	1	.
+140	2023-05-12 14:58:36.644108	USES	2	ModelConfiguration	2	Model	1	.
 147	2023-05-12 14:58:36.644108	CONTAINS	1	Project	12	SimulationRun	1	.
 148	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	13	Dataset	1	ido:0000592
 161	2023-05-12 14:58:36.644108	CONTAINS	1	Project	14	SimulationRun	1	.
@@ -892,27 +892,27 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 249	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	24	Dataset	1	ido:0000511
 253	2023-05-12 14:58:36.644108	REINTERPRETS	24	Dataset	24	SimulationRun	1	.
 257	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	25	Dataset	1	ido:0000514
-258	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
+258	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
 264	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	26	Dataset	1	ido:0000514
-265	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
+265	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
 269	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	27	Dataset	1	ido:0000592
 276	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	28	Dataset	1	ido:0000592
-287	2023-05-12 14:58:36.644108	GENERATED_BY	29	SimulationRun	3	Plan	1	.
+287	2023-05-12 14:58:36.644108	GENERATED_BY	29	SimulationRun	3	ModelConfiguration	1	.
 292	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	30	Dataset	1	ido:0000514
-293	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
+293	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
 297	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	31	Dataset	1	ido:0000592
 304	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	32	Dataset	1	ido:0000592
 305	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	32	Dataset	1	ido:0000511
 306	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	32	Dataset	1	ido:0000514
-307	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
-308	2023-05-12 14:58:36.644108	GENERATED_BY	32	SimulationRun	3	Plan	1	.
+307	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
+308	2023-05-12 14:58:36.644108	GENERATED_BY	32	SimulationRun	3	ModelConfiguration	1	.
 309	2023-05-12 14:58:36.644108	REINTERPRETS	32	Dataset	32	SimulationRun	1	.
 310	2023-05-12 14:58:36.644108	CONTAINS	1	Project	32	SimulationRun	1	.
 311	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	33	Dataset	1	ido:0000592
 312	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	33	Dataset	1	ido:0000511
 313	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	33	Dataset	1	ido:0000514
-314	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	Plan	1	.
-315	2023-05-12 14:58:36.644108	GENERATED_BY	33	SimulationRun	3	Plan	1	.
+314	2023-05-12 14:58:36.644108	CONTAINS	1	Project	3	ModelConfiguration	1	.
+315	2023-05-12 14:58:36.644108	GENERATED_BY	33	SimulationRun	3	ModelConfiguration	1	.
 316	2023-05-12 14:58:36.644108	REINTERPRETS	33	Dataset	33	SimulationRun	1	.
 317	2023-05-12 14:58:36.644108	CONTAINS	1	Project	33	SimulationRun	1	.
 318	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	2	Publication	1	ido:0000573
@@ -923,36 +923,36 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 334	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Model	1	ncit:C28554
 335	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Model	1	ido:0000511
 336	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	4	Model	1	ido:0000514
-337	2023-05-12 14:58:36.644108	USES	4	Plan	4	ModelRevision	1	.
+337	2023-05-12 14:58:36.644108	USES	4	ModelConfiguration	4	Model	1	.
 338	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	34	Dataset	1	ido:0000573
 339	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	34	Dataset	1	ncit:C28554
 340	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	34	Dataset	1	ido:0000511
 341	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	34	Dataset	1	ido:0000514
-342	2023-05-12 14:58:36.644108	GENERATED_BY	34	SimulationRun	4	Plan	1	.
+342	2023-05-12 14:58:36.644108	GENERATED_BY	34	SimulationRun	4	ModelConfiguration	1	.
 343	2023-05-12 14:58:36.644108	REINTERPRETS	34	Dataset	34	SimulationRun	1	.
 344	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	35	Dataset	1	ido:0000573
 345	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	35	Dataset	1	ncit:C28554
 346	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	35	Dataset	1	ido:0000511
 347	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	35	Dataset	1	ido:0000514
-348	2023-05-12 14:58:36.644108	GENERATED_BY	35	SimulationRun	4	Plan	1	.
+348	2023-05-12 14:58:36.644108	GENERATED_BY	35	SimulationRun	4	ModelConfiguration	1	.
 349	2023-05-12 14:58:36.644108	REINTERPRETS	35	Dataset	35	SimulationRun	1	.
 350	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	36	Dataset	1	ido:0000573
 351	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	36	Dataset	1	ncit:C28554
 352	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	36	Dataset	1	ido:0000511
 353	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	36	Dataset	1	ido:0000514
-354	2023-05-12 14:58:36.644108	GENERATED_BY	36	SimulationRun	4	Plan	1	.
+354	2023-05-12 14:58:36.644108	GENERATED_BY	36	SimulationRun	4	ModelConfiguration	1	.
 355	2023-05-12 14:58:36.644108	REINTERPRETS	36	Dataset	36	SimulationRun	1	.
 356	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	37	Dataset	1	ido:0000573
 357	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	37	Dataset	1	ncit:C28554
 358	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	37	Dataset	1	ido:0000511
 359	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	37	Dataset	1	ido:0000514
-360	2023-05-12 14:58:36.644108	GENERATED_BY	37	SimulationRun	4	Plan	1	.
+360	2023-05-12 14:58:36.644108	GENERATED_BY	37	SimulationRun	4	ModelConfiguration	1	.
 361	2023-05-12 14:58:36.644108	REINTERPRETS	37	Dataset	37	SimulationRun	1	.
 362	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	38	Dataset	1	ido:0000573
 363	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	38	Dataset	1	ncit:C28554
 365	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	38	Dataset	1	ido:0000514
 367	2023-05-12 14:58:36.644108	REINTERPRETS	38	Dataset	38	SimulationRun	1	.
-372	2023-05-12 14:58:36.644108	GENERATED_BY	39	SimulationRun	4	Plan	1	.
+372	2023-05-12 14:58:36.644108	GENERATED_BY	39	SimulationRun	4	ModelConfiguration	1	.
 364	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	38	Dataset	1	ido:0000511
 368	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	39	Dataset	1	ido:0000573
 370	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	39	Dataset	1	ido:0000511
@@ -962,22 +962,22 @@ COPY public.provenance (id, "timestamp", relation_type, "left", left_type, "righ
 382	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	41	Dataset	1	ido:0000511
 386	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	42	Dataset	1	ido:0000573
 388	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	42	Dataset	1	ido:0000511
-366	2023-05-12 14:58:36.644108	GENERATED_BY	38	SimulationRun	4	Plan	1	.
+366	2023-05-12 14:58:36.644108	GENERATED_BY	38	SimulationRun	4	ModelConfiguration	1	.
 387	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	42	Dataset	1	ncit:C28554
 389	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	42	Dataset	1	ido:0000514
 391	2023-05-12 14:58:36.644108	REINTERPRETS	42	Dataset	42	SimulationRun	1	.
 369	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	39	Dataset	1	ncit:C28554
 371	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	39	Dataset	1	ido:0000514
 373	2023-05-12 14:58:36.644108	REINTERPRETS	39	Dataset	39	SimulationRun	1	.
-378	2023-05-12 14:58:36.644108	GENERATED_BY	40	SimulationRun	4	Plan	1	.
+378	2023-05-12 14:58:36.644108	GENERATED_BY	40	SimulationRun	4	ModelConfiguration	1	.
 375	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	40	Dataset	1	ncit:C28554
 377	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	40	Dataset	1	ido:0000514
 379	2023-05-12 14:58:36.644108	REINTERPRETS	40	Dataset	40	SimulationRun	1	.
-384	2023-05-12 14:58:36.644108	GENERATED_BY	41	SimulationRun	4	Plan	1	.
+384	2023-05-12 14:58:36.644108	GENERATED_BY	41	SimulationRun	4	ModelConfiguration	1	.
 381	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	41	Dataset	1	ncit:C28554
 383	2023-05-12 14:58:36.644108	IS_CONCEPT_OF	1	Concept	41	Dataset	1	ido:0000514
 385	2023-05-12 14:58:36.644108	REINTERPRETS	41	Dataset	41	SimulationRun	1	.
-390	2023-05-12 14:58:36.644108	GENERATED_BY	42	SimulationRun	4	Plan	1	.
+390	2023-05-12 14:58:36.644108	GENERATED_BY	42	SimulationRun	4	ModelConfiguration	1	.
 \.
 
 
@@ -1640,19 +1640,6 @@ COPY public.qualifier_xref (id, qualifier_id, feature_id) FROM stdin;
 507	112	319
 \.
 
-
---
--- Data for Name: simulation_plan; Type: TABLE DATA; Schema: public; Owner: dev
---
-
-COPY public.simulation_plan (id, model_id, simulator, query, content) FROM stdin;
-1	1	default	A query	{"InPort": [{"in_port_box": 1, "in_port_type": "Simplex"}, {"in_port_box": 2, "in_port_type": "Simplex"}, {"in_port_box": 3, "in_port_type": "Simplex"}, {"in_port_box": 3, "in_port_type": "Simplex"}, {"in_port_box": 5, "in_port_type": "Petri"}, {"in_port_box": 5, "in_port_type": "Number"}, {"in_port_box": 5, "in_port_type": "Number"}, {"in_port_box": 5, "in_port_type": "Simplex"}, {"in_port_box": 7, "in_port_type": "Petri"}, {"in_port_box": 7, "in_port_type": "Number"}, {"in_port_box": 7, "in_port_type": "Number"}, {"in_port_box": 7, "in_port_type": "Simplex"}, {"in_port_box": 8, "in_port_type": "Trajectory"}, {"in_port_box": 9, "in_port_type": "Trajectory"}, {"in_port_box": 10, "in_port_type": "Number"}, {"in_port_box": 10, "in_port_type": "Number"}], "Wire": [{"src": 4, "tgt": 5, "wire_value": null}, {"src": 1, "tgt": 3, "wire_value": null}, {"src": 1, "tgt": 8, "wire_value": null}, {"src": 9, "tgt": 16, "wire_value": null}, {"src": 5, "tgt": 13, "wire_value": null}, {"src": 7, "tgt": 14, "wire_value": null}, {"src": 6, "tgt": 9, "wire_value": null}, {"src": 2, "tgt": 4, "wire_value": null}, {"src": 3, "tgt": 12, "wire_value": null}, {"src": 8, "tgt": 15, "wire_value": null}], "OuterOutPort": [{"outer_out_port_type": "Number"}], "InWire": [{"in_src": 1, "in_tgt": 1, "in_wire_value": null}, {"in_src": 2, "in_tgt": 2, "in_wire_value": null}, {"in_src": 3, "in_tgt": 6, "in_wire_value": null}, {"in_src": 4, "in_tgt": 7, "in_wire_value": null}, {"in_src": 3, "in_tgt": 10, "in_wire_value": null}, {"in_src": 4, "in_tgt": 11, "in_wire_value": null}], "OuterInPort": [{"outer_in_port_type": "Simplex"}, {"outer_in_port_type": "Simplex"}, {"outer_in_port_type": "Number"}, {"outer_in_port_type": "Number"}], "OutWire": [{"out_src": 10, "out_tgt": 1, "out_wire_value": null}], "Box": [{"value": "multinomial", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "multinomial", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "ptwisesum", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "P", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "solve", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "P", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "solve", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "measure", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "measure", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "difference", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}], "OutPort": [{"out_port_box": 1, "out_port_type": "Simplex"}, {"out_port_box": 2, "out_port_type": "Simplex"}, {"out_port_box": 3, "out_port_type": "Simplex"}, {"out_port_box": 4, "out_port_type": "Petri"}, {"out_port_box": 5, "out_port_type": "Trajectory"}, {"out_port_box": 6, "out_port_type": "Petri"}, {"out_port_box": 7, "out_port_type": "Trajectory"}, {"out_port_box": 8, "out_port_type": "Number"}, {"out_port_box": 9, "out_port_type": "Number"}, {"out_port_box": 10, "out_port_type": "Number"}], "PassWire": []}
-2	2	default	A query	{"InPort": [{"in_port_box": 1, "in_port_type": "Simplex"}, {"in_port_box": 2, "in_port_type": "Simplex"}, {"in_port_box": 3, "in_port_type": "Simplex"}, {"in_port_box": 3, "in_port_type": "Simplex"}, {"in_port_box": 5, "in_port_type": "Petri"}, {"in_port_box": 5, "in_port_type": "Number"}, {"in_port_box": 5, "in_port_type": "Number"}, {"in_port_box": 5, "in_port_type": "Simplex"}, {"in_port_box": 7, "in_port_type": "Petri"}, {"in_port_box": 7, "in_port_type": "Number"}, {"in_port_box": 7, "in_port_type": "Number"}, {"in_port_box": 7, "in_port_type": "Simplex"}, {"in_port_box": 8, "in_port_type": "Trajectory"}, {"in_port_box": 9, "in_port_type": "Trajectory"}, {"in_port_box": 10, "in_port_type": "Number"}, {"in_port_box": 10, "in_port_type": "Number"}], "Wire": [{"src": 4, "tgt": 5, "wire_value": null}, {"src": 1, "tgt": 3, "wire_value": null}, {"src": 1, "tgt": 8, "wire_value": null}, {"src": 9, "tgt": 16, "wire_value": null}, {"src": 5, "tgt": 13, "wire_value": null}, {"src": 7, "tgt": 14, "wire_value": null}, {"src": 6, "tgt": 9, "wire_value": null}, {"src": 2, "tgt": 4, "wire_value": null}, {"src": 3, "tgt": 12, "wire_value": null}, {"src": 8, "tgt": 15, "wire_value": null}], "OuterOutPort": [{"outer_out_port_type": "Number"}], "InWire": [{"in_src": 1, "in_tgt": 1, "in_wire_value": null}, {"in_src": 2, "in_tgt": 2, "in_wire_value": null}, {"in_src": 3, "in_tgt": 6, "in_wire_value": null}, {"in_src": 4, "in_tgt": 7, "in_wire_value": null}, {"in_src": 3, "in_tgt": 10, "in_wire_value": null}, {"in_src": 4, "in_tgt": 11, "in_wire_value": null}], "OuterInPort": [{"outer_in_port_type": "Simplex"}, {"outer_in_port_type": "Simplex"}, {"outer_in_port_type": "Number"}, {"outer_in_port_type": "Number"}], "OutWire": [{"out_src": 10, "out_tgt": 1, "out_wire_value": null}], "Box": [{"value": "multinomial", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "multinomial", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "ptwisesum", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "P", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "solve", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "P", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "solve", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "measure", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "measure", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "difference", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}], "OutPort": [{"out_port_box": 1, "out_port_type": "Simplex"}, {"out_port_box": 2, "out_port_type": "Simplex"}, {"out_port_box": 3, "out_port_type": "Simplex"}, {"out_port_box": 4, "out_port_type": "Petri"}, {"out_port_box": 5, "out_port_type": "Trajectory"}, {"out_port_box": 6, "out_port_type": "Petri"}, {"out_port_box": 7, "out_port_type": "Trajectory"}, {"out_port_box": 8, "out_port_type": "Number"}, {"out_port_box": 9, "out_port_type": "Number"}, {"out_port_box": 10, "out_port_type": "Number"}], "PassWire": []}
-3	3	default	A query	{"InPort": [{"in_port_box": 1, "in_port_type": "Simplex"}, {"in_port_box": 2, "in_port_type": "Simplex"}, {"in_port_box": 3, "in_port_type": "Simplex"}, {"in_port_box": 3, "in_port_type": "Simplex"}, {"in_port_box": 5, "in_port_type": "Petri"}, {"in_port_box": 5, "in_port_type": "Number"}, {"in_port_box": 5, "in_port_type": "Number"}, {"in_port_box": 5, "in_port_type": "Simplex"}, {"in_port_box": 7, "in_port_type": "Petri"}, {"in_port_box": 7, "in_port_type": "Number"}, {"in_port_box": 7, "in_port_type": "Number"}, {"in_port_box": 7, "in_port_type": "Simplex"}, {"in_port_box": 8, "in_port_type": "Trajectory"}, {"in_port_box": 9, "in_port_type": "Trajectory"}, {"in_port_box": 10, "in_port_type": "Number"}, {"in_port_box": 10, "in_port_type": "Number"}], "Wire": [{"src": 4, "tgt": 5, "wire_value": null}, {"src": 1, "tgt": 3, "wire_value": null}, {"src": 1, "tgt": 8, "wire_value": null}, {"src": 9, "tgt": 16, "wire_value": null}, {"src": 5, "tgt": 13, "wire_value": null}, {"src": 7, "tgt": 14, "wire_value": null}, {"src": 6, "tgt": 9, "wire_value": null}, {"src": 2, "tgt": 4, "wire_value": null}, {"src": 3, "tgt": 12, "wire_value": null}, {"src": 8, "tgt": 15, "wire_value": null}], "OuterOutPort": [{"outer_out_port_type": "Number"}], "InWire": [{"in_src": 1, "in_tgt": 1, "in_wire_value": null}, {"in_src": 2, "in_tgt": 2, "in_wire_value": null}, {"in_src": 3, "in_tgt": 6, "in_wire_value": null}, {"in_src": 4, "in_tgt": 7, "in_wire_value": null}, {"in_src": 3, "in_tgt": 10, "in_wire_value": null}, {"in_src": 4, "in_tgt": 11, "in_wire_value": null}], "OuterInPort": [{"outer_in_port_type": "Simplex"}, {"outer_in_port_type": "Simplex"}, {"outer_in_port_type": "Number"}, {"outer_in_port_type": "Number"}], "OutWire": [{"out_src": 10, "out_tgt": 1, "out_wire_value": null}], "Box": [{"value": "multinomial", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "multinomial", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "ptwisesum", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "P", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "solve", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "P", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "solve", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "measure", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "measure", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "difference", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}], "OutPort": [{"out_port_box": 1, "out_port_type": "Simplex"}, {"out_port_box": 2, "out_port_type": "Simplex"}, {"out_port_box": 3, "out_port_type": "Simplex"}, {"out_port_box": 4, "out_port_type": "Petri"}, {"out_port_box": 5, "out_port_type": "Trajectory"}, {"out_port_box": 6, "out_port_type": "Petri"}, {"out_port_box": 7, "out_port_type": "Trajectory"}, {"out_port_box": 8, "out_port_type": "Number"}, {"out_port_box": 9, "out_port_type": "Number"}, {"out_port_box": 10, "out_port_type": "Number"}], "PassWire": []}
-4	4	default	A query	{"InPort": [{"in_port_box": 1, "in_port_type": "Simplex"}, {"in_port_box": 2, "in_port_type": "Simplex"}, {"in_port_box": 3, "in_port_type": "Simplex"}, {"in_port_box": 3, "in_port_type": "Simplex"}, {"in_port_box": 5, "in_port_type": "Petri"}, {"in_port_box": 5, "in_port_type": "Number"}, {"in_port_box": 5, "in_port_type": "Number"}, {"in_port_box": 5, "in_port_type": "Simplex"}, {"in_port_box": 7, "in_port_type": "Petri"}, {"in_port_box": 7, "in_port_type": "Number"}, {"in_port_box": 7, "in_port_type": "Number"}, {"in_port_box": 7, "in_port_type": "Simplex"}, {"in_port_box": 8, "in_port_type": "Trajectory"}, {"in_port_box": 9, "in_port_type": "Trajectory"}, {"in_port_box": 10, "in_port_type": "Number"}, {"in_port_box": 10, "in_port_type": "Number"}], "Wire": [{"src": 4, "tgt": 5, "wire_value": null}, {"src": 1, "tgt": 3, "wire_value": null}, {"src": 1, "tgt": 8, "wire_value": null}, {"src": 9, "tgt": 16, "wire_value": null}, {"src": 5, "tgt": 13, "wire_value": null}, {"src": 7, "tgt": 14, "wire_value": null}, {"src": 6, "tgt": 9, "wire_value": null}, {"src": 2, "tgt": 4, "wire_value": null}, {"src": 3, "tgt": 12, "wire_value": null}, {"src": 8, "tgt": 15, "wire_value": null}], "OuterOutPort": [{"outer_out_port_type": "Number"}], "InWire": [{"in_src": 1, "in_tgt": 1, "in_wire_value": null}, {"in_src": 2, "in_tgt": 2, "in_wire_value": null}, {"in_src": 3, "in_tgt": 6, "in_wire_value": null}, {"in_src": 4, "in_tgt": 7, "in_wire_value": null}, {"in_src": 3, "in_tgt": 10, "in_wire_value": null}, {"in_src": 4, "in_tgt": 11, "in_wire_value": null}], "OuterInPort": [{"outer_in_port_type": "Simplex"}, {"outer_in_port_type": "Simplex"}, {"outer_in_port_type": "Number"}, {"outer_in_port_type": "Number"}], "OutWire": [{"out_src": 10, "out_tgt": 1, "out_wire_value": null}], "Box": [{"value": "multinomial", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "multinomial", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "ptwisesum", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "P", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "solve", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "P", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "solve", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "measure", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "measure", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}, {"value": "difference", "box_type": "Catlab.WiringDiagrams.DirectedWiringDiagrams.Box{Symbol}"}], "OutPort": [{"out_port_box": 1, "out_port_type": "Simplex"}, {"out_port_box": 2, "out_port_type": "Simplex"}, {"out_port_box": 3, "out_port_type": "Simplex"}, {"out_port_box": 4, "out_port_type": "Petri"}, {"out_port_box": 5, "out_port_type": "Trajectory"}, {"out_port_box": 6, "out_port_type": "Petri"}, {"out_port_box": 7, "out_port_type": "Trajectory"}, {"out_port_box": 8, "out_port_type": "Number"}, {"out_port_box": 9, "out_port_type": "Number"}, {"out_port_box": 10, "out_port_type": "Number"}], "PassWire": []}
-\.
-
-
 --
 -- Data for Name: simulation_run; Type: TABLE DATA; Schema: public; Owner: dev
 --
@@ -1706,600 +1693,6 @@ COPY public.simulation_run (id, simulator_id, "timestamp", completed_at, success
 --
 -- Data for Name: simulation_parameter; Type: TABLE DATA; Schema: public; Owner: dev
 --
-
-COPY public.simulation_parameter (id, run_id, name, value, type) FROM stdin;
-1	1	delta_5	1.0	float
-2	1	gamma_2	1.0	float
-3	1	delta_1	1.0	float
-4	1	gamma_1	1.0	float
-5	1	delta_4	1.0	float
-6	1	delta_2	1.0	float
-7	1	delta_3	1.0	float
-8	1	tau	1.0	float
-9	1	beta	1.0	float
-10	1	S	0.0	float
-11	1	I_mild	0.0	float
-12	1	I_asym	0.0	float
-13	1	I_hosp	0.0	float
-14	1	E	0.0	float
-15	1	R	0.0	float
-16	1	D	0.0	float
-17	1	R_hosp	0.0	float
-18	2	delta_5	0.9050433345803066	float
-19	2	gamma_2	0.8291509525058485	float
-20	2	delta_1	0.7527036065357532	float
-21	2	gamma_1	0.8839923500815574	float
-22	2	delta_4	0.22626637947201467	float
-23	2	delta_2	0.3304366878029371	float
-24	2	delta_3	0.7578583272238696	float
-25	2	tau	0.22225629285952875	float
-26	2	beta	0.9118900441669631	float
-27	2	S	0.20339980652203782	float
-28	2	I_mild	0.10761869252853046	float
-29	2	I_asym	0.19974617318764554	float
-30	2	I_hosp	0.08025576907961228	float
-31	2	E	0.1545706317707479	float
-32	2	R	0.13136485357312633	float
-33	2	D	0.006365308410645606	float
-34	2	R_hosp	0.11667876492765404	float
-35	3	delta_5	0.531678369353569	float
-36	3	gamma_2	0.7330929094804765	float
-37	3	delta_1	0.7147319848599317	float
-38	3	gamma_1	0.12842312950898715	float
-39	3	delta_4	0.5535073418959787	float
-40	3	delta_2	0.7284362874753255	float
-41	3	delta_3	0.4748116786889164	float
-42	3	tau	0.49979004723993625	float
-43	3	beta	0.06947617474616408	float
-44	3	S	0.13028451879862435	float
-45	3	I_mild	0.30091425718452147	float
-46	3	I_asym	0.0178295384742401	float
-47	3	I_hosp	0.221208784543199	float
-48	3	E	0.07836333716728712	float
-49	3	R	0.11792870462707145	float
-50	3	D	0.09992414243919467	float
-51	3	R_hosp	0.03354671676586181	float
-52	4	delta_5	0.7168568870548959	float
-53	4	gamma_2	0.8269588131346308	float
-54	4	delta_1	0.869712327759773	float
-55	4	gamma_1	0.8382758568495268	float
-56	4	delta_4	0.26280503064549265	float
-57	4	delta_2	0.6170692519976005	float
-58	4	delta_3	0.8372173065430567	float
-59	4	tau	0.406845054995697	float
-60	4	beta	0.7840185730250493	float
-61	4	S	0.11880980684947381	float
-62	4	I_mild	0.1526236763935514	float
-63	4	I_asym	0.1495750255433745	float
-64	4	I_hosp	0.10929886082819347	float
-65	4	E	0.14992151215108968	float
-66	4	R	0.0669698411274865	float
-67	4	D	0.1141811321797247	float
-68	4	R_hosp	0.13862014492710614	float
-69	5	delta_5	0.853088636466078	float
-70	5	gamma_2	0.6966190850602731	float
-71	5	delta_1	0.13626155150754138	float
-72	5	gamma_1	0.9954043549975968	float
-73	5	delta_4	0.5522798213981484	float
-74	5	delta_2	0.37544180013802464	float
-75	5	delta_3	0.7613783429670753	float
-76	5	tau	0.24979702718292662	float
-77	5	beta	0.8622507801991525	float
-78	5	S	0.012931538020019494	float
-79	5	I_mild	0.08920015007843901	float
-80	5	I_asym	0.14343373245249333	float
-81	5	I_hosp	0.10473864529547638	float
-82	5	E	0.16660189342208526	float
-83	5	R	0.1758254171687167	float
-84	5	D	0.1576344823030841	float
-85	5	R_hosp	0.14963414125968552	float
-86	6	delta_5	0.7822874891123169	float
-87	6	gamma_2	0.7621233251839298	float
-88	6	delta_1	0.062178849548742754	float
-89	6	gamma_1	0.4930247970290449	float
-90	6	delta_4	0.8768667551245364	float
-91	6	delta_2	0.007722083404419378	float
-92	6	delta_3	0.9298492445972839	float
-93	6	tau	0.8077767986903902	float
-94	6	beta	0.6940397594871855	float
-95	6	S	0.14439312429445925	float
-96	6	I_mild	0.14184935934044063	float
-97	6	I_asym	0.15381404307168464	float
-98	6	I_hosp	0.0619844632604358	float
-99	6	E	0.1984038465772552	float
-100	6	R	0.042857706187936696	float
-101	6	D	0.19012258926712938	float
-102	6	R_hosp	0.06657486800065841	float
-103	7	delta_5	0.037339027955924364	float
-104	7	gamma_2	0.6287422701396865	float
-105	7	delta_1	0.24224332442377916	float
-106	7	gamma_1	0.6837766484356901	float
-107	7	delta_4	0.9342097547350073	float
-108	7	delta_2	0.7427787271391786	float
-109	7	delta_3	0.11846760109516297	float
-110	7	tau	0.8230917728062271	float
-111	7	beta	0.5574898940407415	float
-112	7	S	0.16828500054618478	float
-113	7	I_mild	0.062282152513528935	float
-114	7	I_asym	0.059197238845324476	float
-115	7	I_hosp	0.08971077853855233	float
-116	7	E	0.07675232272231182	float
-117	7	R	0.1760001102448074	float
-118	7	D	0.07950132848311052	float
-119	7	R_hosp	0.28827106810617964	float
-120	8	delta_5	0.8167764997335036	float
-121	8	gamma_2	0.2693888682497243	float
-122	8	delta_1	0.6476156006467524	float
-123	8	gamma_1	0.043846446765471336	float
-124	8	delta_4	0.9059294424058448	float
-125	8	delta_2	0.7330554456750921	float
-126	8	delta_3	0.3923372560419197	float
-127	8	tau	0.22444435199784973	float
-128	8	beta	0.9924506250532081	float
-129	8	S	0.055384683753798424	float
-130	8	I_mild	0.0349514785322842	float
-131	8	I_asym	0.17762707942614483	float
-132	8	I_hosp	0.22984617528783738	float
-133	8	E	0.03392540700756003	float
-134	8	R	0.020031609945529005	float
-135	8	D	0.13475832810918018	float
-136	8	R_hosp	0.31347523793766596	float
-171	11	delta_5	0.4065612774546743	float
-172	11	gamma_2	0.854716871131719	float
-173	11	delta_1	0.6905617418277441	float
-174	11	gamma_1	0.6204165383010756	float
-175	11	delta_4	0.31079920977764997	float
-176	11	delta_2	0.875989957600698	float
-177	11	delta_3	0.3796673126862238	float
-178	11	tau	0.74340251444107	float
-179	11	beta	0.44016057508245177	float
-180	11	S	0.15732826370124717	float
-181	11	I_mild	0.07167711537781953	float
-182	11	I_asym	0.07099929121587109	float
-183	11	I_hosp	0.18395744836703484	float
-184	11	E	0.007730739190164181	float
-185	11	R	0.1643653212519011	float
-186	11	D	0.1613887788998347	float
-187	11	R_hosp	0.18255304199612743	float
-327	30	beta_1	0.7133293693393257	float
-328	30	v_s1	0.43048461890500755	float
-329	30	v_r	0.3461109598394918	float
-330	30	v_s2	0.7104954916856823	float
-331	30	gamma_1	0.714076437776655	float
-332	30	gamma_2	0.5689383548423645	float
-333	30	beta_2	0.5624830061535012	float
-334	30	S	0.19473225137411856	float
-335	30	I	0.19410219989891106	float
-336	30	V	0.013222592881573724	float
-337	30	I_v	0.3894057161283927	float
-338	30	R	0.2085372397170042	float
-137	9	delta_5	0.9808785585265646	float
-138	9	gamma_2	0.9618355000371281	float
-139	9	delta_1	0.1238730376246544	float
-140	9	gamma_1	0.18852922313787757	float
-141	9	delta_4	0.7055276868044134	float
-142	9	delta_2	0.7044788632182062	float
-143	9	delta_3	0.6522273119257661	float
-144	9	tau	0.9116855944629744	float
-145	9	beta	0.39800403269487616	float
-146	9	S	0.1234906605245987	float
-147	9	I_mild	0.2444091759404086	float
-148	9	I_asym	0.25644222352878027	float
-149	9	I_hosp	0.006655394799155663	float
-150	9	E	0.04969523304663501	float
-151	9	R	0.05770873398678494	float
-152	9	D	0.1266002114826224	float
-153	9	R_hosp	0.1349983666910144	float
-243	23	beta_1	1.0	float
-244	23	v_s1	1.0	float
-245	23	v_r	1.0	float
-246	23	v_s2	1.0	float
-247	23	gamma_1	1.0	float
-248	23	gamma_2	1.0	float
-249	23	beta_2	1.0	float
-250	23	S	0.0	float
-251	23	I	0.0	float
-252	23	V	0.0	float
-253	23	I_v	0.0	float
-254	23	R	0.0	float
-279	26	beta_1	0.3363641736243429	float
-280	26	v_s1	0.2655991251363441	float
-281	26	v_r	0.6981416316244918	float
-282	26	v_s2	0.5973686834398846	float
-283	26	gamma_1	0.17355575156037117	float
-284	26	gamma_2	0.8962000039452029	float
-285	26	beta_2	0.3198004601096982	float
-286	26	S	0.2837906564994524	float
-287	26	I	0.17626613679948347	float
-288	26	V	0.23567394099545705	float
-289	26	I_v	0.03919036811860949	float
-290	26	R	0.2650788975869976	float
-315	29	beta_1	0.3871141617598609	float
-316	29	v_s1	0.9644501789048509	float
-317	29	v_r	0.14307612393955504	float
-318	29	v_s2	0.6825392952575344	float
-319	29	gamma_1	0.587962124082734	float
-320	29	gamma_2	0.4184019314764845	float
-321	29	beta_2	0.08629370032765726	float
-322	29	S	0.319816405316531	float
-323	29	I	0.08321156911005496	float
-324	29	V	0.28243882908872137	float
-325	29	I_v	0.07502475994142543	float
-326	29	R	0.23950843654326726	float
-154	10	delta_5	0.03782263752361703	float
-155	10	gamma_2	0.32343976692757614	float
-156	10	delta_1	0.6434998378491518	float
-157	10	gamma_1	0.9328242876417623	float
-158	10	delta_4	0.011096375029434835	float
-159	10	delta_2	0.13977415761929868	float
-160	10	delta_3	0.2501224791246306	float
-161	10	tau	0.9524124025615712	float
-162	10	beta	0.39417481439868274	float
-163	10	S	0.001392234090210303	float
-164	10	I_mild	0.32482637037470785	float
-165	10	I_asym	0.18471377429589847	float
-166	10	I_hosp	0.11634982694431427	float
-167	10	E	0.035059393968080055	float
-168	10	R	0.1835558746172755	float
-169	10	D	0.12356486819249743	float
-170	10	R_hosp	0.030537657517016085	float
-255	24	beta_1	0.5720836115900737	float
-256	24	v_s1	0.42826104407905985	float
-257	24	v_r	0.2002475975357838	float
-258	24	v_s2	0.2653415452774641	float
-259	24	gamma_1	0.513191285680091	float
-260	24	gamma_2	0.7276602413733949	float
-261	24	beta_2	0.09042449680809561	float
-262	24	S	0.25223192540540895	float
-263	24	I	0.16093617014981823	float
-264	24	V	0.043772485053396995	float
-265	24	I_v	0.31377525216524965	float
-266	24	R	0.22928416722612605	float
-267	25	beta_1	0.3923115512445784	float
-268	25	v_s1	0.009248919577389603	float
-269	25	v_r	0.4506758571233608	float
-270	25	v_s2	0.13614271049943183	float
-271	25	gamma_1	0.6934892039943024	float
-272	25	gamma_2	0.4541587883294238	float
-273	25	beta_2	0.18149891539066976	float
-274	25	S	0.19082997765630177	float
-275	25	I	0.2140799778471869	float
-276	25	V	0.14187451331971296	float
-277	25	I_v	0.21921037840098093	float
-278	25	R	0.23400515277581743	float
-188	12	gamma	1.0	float
-189	12	beta	1.0	float
-190	12	S	0.0	float
-191	12	I	0.0	float
-192	12	R	0.0	float
-198	14	gamma	0.6262012695896452	float
-199	14	beta	0.07747148478339705	float
-200	14	S	0.2758258377450973	float
-201	14	I	0.31400570206093253	float
-202	14	R	0.4101684601939702	float
-208	16	gamma	0.6900978479178946	float
-209	16	beta	0.8035523281461004	float
-210	16	S	0.24485153258058326	float
-211	16	I	0.04985223545336655	float
-212	16	R	0.7052962319660502	float
-218	18	gamma	0.10937525746237065	float
-219	18	beta	0.6105926770998533	float
-220	18	S	0.4163437030459399	float
-221	18	I	0.06944366668791481	float
-222	18	R	0.5142126302661453	float
-228	20	gamma	0.7415338007189297	float
-229	20	beta	0.717531728383038	float
-230	20	S	0.2550880811472267	float
-231	20	I	0.3297818205795969	float
-232	20	R	0.4151300982731764	float
-238	22	gamma	0.1185129001362989	float
-239	22	beta	0.6775777144220173	float
-240	22	S	0.04852934137969565	float
-241	22	I	0.6921901099431436	float
-242	22	R	0.2592805486771608	float
-193	13	gamma	0.14730599139000522	float
-194	13	beta	0.9388788931872065	float
-195	13	S	0.21520878107963037	float
-196	13	I	0.41809041068951225	float
-197	13	R	0.3667008082308575	float
-203	15	gamma	0.23952462765778515	float
-204	15	beta	0.8912116023282588	float
-205	15	S	0.6133375773532984	float
-206	15	I	0.10494225010447034	float
-207	15	R	0.2817201725422311	float
-213	17	gamma	0.22605858147983438	float
-214	17	beta	0.359794538765409	float
-215	17	S	0.25373364032659235	float
-216	17	I	0.40487902173257634	float
-217	17	R	0.3413873379408313	float
-223	19	gamma	0.9925762840876589	float
-224	19	beta	0.9606407099048614	float
-225	19	S	0.5006012615393978	float
-226	19	I	0.2996797544774079	float
-227	19	R	0.19971898398319438	float
-233	21	gamma	0.18457355148031862	float
-234	21	beta	0.4756900097402319	float
-235	21	S	0.5274001802094297	float
-236	21	I	0.23768009360054196	float
-237	21	R	0.23491972619002838	float
-291	27	beta_1	0.7400893659890674	float
-292	27	v_s1	0.904179340105178	float
-293	27	v_r	0.8145602228212905	float
-294	27	v_s2	0.2616745120910632	float
-295	27	gamma_1	0.019133901962905098	float
-296	27	gamma_2	0.8122882402157512	float
-297	27	beta_2	0.2578570426737371	float
-298	27	S	0.015602812621637659	float
-299	27	I	0.23237801773063296	float
-300	27	V	0.4739462661210483	float
-301	27	I_v	0.2151661795198948	float
-302	27	R	0.06290672400678626	float
-303	28	beta_1	0.9457487218781886	float
-304	28	v_s1	0.43109357811261095	float
-305	28	v_r	0.04382323619504258	float
-306	28	v_s2	0.1929063332016029	float
-307	28	gamma_1	0.8196654193504033	float
-308	28	gamma_2	0.5808099931221162	float
-309	28	beta_2	0.10058470216892357	float
-310	28	S	0.29171395765210284	float
-311	28	I	0.36534789530741013	float
-312	28	V	0.03287969874865654	float
-313	28	I_v	0.05717498397727087	float
-314	28	R	0.25288346431455977	float
-339	31	beta_1	0.8111371378554209	float
-340	31	v_s1	0.8570787515793504	float
-341	31	v_r	0.04316085834793626	float
-342	31	v_s2	0.9506973299794764	float
-343	31	gamma_1	0.17044208851027398	float
-344	31	gamma_2	0.7987787588805061	float
-345	31	beta_2	0.07790455555073805	float
-346	31	S	0.3012145798323824	float
-347	31	I	0.1948942245387033	float
-348	31	V	0.2719030151879459	float
-349	31	I_v	0.08692426689586957	float
-350	31	R	0.14506391354509873	float
-351	32	beta_1	0.9570021808257088	float
-352	32	v_s1	0.37660102196785183	float
-353	32	v_r	0.8312959324010726	float
-354	32	v_s2	0.6953029585270809	float
-355	32	gamma_1	0.24656682608923108	float
-356	32	gamma_2	0.01263408182850645	float
-357	32	beta_2	0.27093933026903705	float
-358	32	S	0.029893751794678153	float
-359	32	I	0.45153994006480697	float
-360	32	V	0.2880207771147271	float
-361	32	I_v	0.02191907567918168	float
-362	32	R	0.20862645534660598	float
-363	33	beta_1	0.2505439697895021	float
-364	33	v_s1	0.9006372122189635	float
-365	33	v_r	0.24576009822446943	float
-366	33	v_s2	0.4534011798872426	float
-367	33	gamma_1	0.4443154494770417	float
-368	33	gamma_2	0.32511774627001344	float
-369	33	beta_2	0.4253161244249981	float
-370	33	S	0.49529980026940884	float
-371	33	I	0.21809601820580213	float
-372	33	V	0.06871792279617844	float
-373	33	I_v	0.018005118325550757	float
-374	33	R	0.19988114040305976	float
-375	34	t7	0.252	float
-376	34	nu	0.027	float
-377	34	tau	0.01	float
-378	34	delta	0.0011	float
-379	34	mu	0.017	float
-380	34	sigma	0.017	float
-381	34	theta	0.371	float
-382	34	kappa	0.017	float
-383	34	xi	0.017	float
-384	34	alpha	0.57	float
-385	34	zeta	0.125	float
-386	34	eta	0.125	float
-387	34	rho	0.034	float
-388	34	beta	0.011	float
-389	34	epsilon	0.171	float
-390	34	gamma	0.456	float
-391	34	Infected	0.24301402107660747	float
-392	34	Healed	0.0	float
-393	34	Extinct	0.0	float
-394	34	Diagnosed	0.024301402107660745	float
-395	34	Ailing	0.0012150701017378269	float
-396	34	Recognized	0.0024301402107660746	float
-397	34	Susceptible	0.7290393665032278	float
-398	34	Threatened	0.0	float
-399	35	t7	0.252	float
-400	35	nu	0.027	float
-401	35	tau	0.01	float
-402	35	delta	0.0011	float
-403	35	mu	0.017	float
-404	35	sigma	0.017	float
-405	35	theta	0.371	float
-406	35	kappa	0.017	float
-407	35	xi	0.017	float
-408	35	alpha	0.57	float
-409	35	zeta	0.125	float
-410	35	eta	0.125	float
-411	35	rho	0.034	float
-412	35	beta	0.011	float
-413	35	epsilon	0.171	float
-414	35	gamma	0.456	float
-415	35	Infected	0.24301402107660747	float
-416	35	Healed	0.0	float
-417	35	Extinct	0.0	float
-418	35	Diagnosed	0.024301402107660745	float
-419	35	Ailing	0.0012150701017378269	float
-420	35	Recognized	0.0024301402107660746	float
-421	35	Susceptible	0.7290393665032278	float
-422	35	Threatened	0.0	float
-423	36	t7	0.252	float
-424	36	nu	0.027	float
-425	36	tau	0.01	float
-426	36	delta	0.0011	float
-427	36	mu	0.017	float
-428	36	sigma	0.017	float
-429	36	theta	0.371	float
-430	36	kappa	0.017	float
-431	36	xi	0.017	float
-432	36	alpha	0.57	float
-433	36	zeta	0.125	float
-434	36	eta	0.125	float
-435	36	rho	0.034	float
-436	36	beta	0.011	float
-437	36	epsilon	0.171	float
-438	36	gamma	0.456	float
-439	36	Infected	0.24301402107660747	float
-440	36	Healed	0.0	float
-441	36	Extinct	0.0	float
-442	36	Diagnosed	0.024301402107660745	float
-443	36	Ailing	0.0012150701017378269	float
-444	36	Recognized	0.0024301402107660746	float
-445	36	Susceptible	0.7290393665032278	float
-446	36	Threatened	0.0	float
-447	37	t7	0.252	float
-448	37	nu	0.027	float
-449	37	tau	0.01	float
-450	37	delta	0.0011	float
-451	37	mu	0.017	float
-452	37	sigma	0.017	float
-453	37	theta	0.371	float
-454	37	kappa	0.017	float
-455	37	xi	0.017	float
-456	37	alpha	0.57	float
-457	37	zeta	0.125	float
-458	37	eta	0.125	float
-459	37	rho	0.034	float
-460	37	beta	0.011	float
-461	37	epsilon	0.171	float
-462	37	gamma	0.456	float
-463	37	Infected	0.24301402107660747	float
-464	37	Healed	0.0	float
-465	37	Extinct	0.0	float
-466	37	Diagnosed	0.024301402107660745	float
-467	37	Ailing	0.0012150701017378269	float
-468	37	Recognized	0.0024301402107660746	float
-469	37	Susceptible	0.7290393665032278	float
-470	37	Threatened	0.0	float
-471	38	t7	0.252	float
-472	38	nu	0.027	float
-473	38	tau	0.01	float
-474	38	delta	0.0011	float
-475	38	mu	0.017	float
-476	38	sigma	0.017	float
-477	38	theta	0.371	float
-478	38	kappa	0.017	float
-479	38	xi	0.017	float
-480	38	alpha	0.57	float
-481	38	zeta	0.125	float
-482	38	eta	0.125	float
-483	38	rho	0.034	float
-484	38	beta	0.011	float
-485	38	epsilon	0.171	float
-486	38	gamma	0.456	float
-487	38	Infected	0.24301402107660747	float
-488	38	Healed	0.0	float
-489	38	Extinct	0.0	float
-490	38	Diagnosed	0.024301402107660745	float
-491	38	Ailing	0.0012150701017378269	float
-492	38	Recognized	0.0024301402107660746	float
-493	38	Susceptible	0.7290393665032278	float
-494	38	Threatened	0.0	float
-495	39	t7	0.252	float
-496	39	nu	0.027	float
-497	39	tau	0.01	float
-498	39	delta	0.0011	float
-499	39	mu	0.017	float
-500	39	sigma	0.017	float
-501	39	theta	0.371	float
-502	39	kappa	0.017	float
-503	39	xi	0.017	float
-504	39	alpha	0.57	float
-505	39	zeta	0.125	float
-506	39	eta	0.125	float
-507	39	rho	0.034	float
-508	39	beta	0.011	float
-509	39	epsilon	0.171	float
-510	39	gamma	0.456	float
-511	39	Infected	0.24301402107660747	float
-512	39	Healed	0.0	float
-513	39	Extinct	0.0	float
-514	39	Diagnosed	0.024301402107660745	float
-515	39	Ailing	0.0012150701017378269	float
-516	39	Recognized	0.0024301402107660746	float
-517	39	Susceptible	0.7290393665032278	float
-518	39	Threatened	0.0	float
-519	40	t7	0.252	float
-520	40	nu	0.027	float
-521	40	tau	0.01	float
-522	40	delta	0.0011	float
-523	40	mu	0.017	float
-524	40	sigma	0.017	float
-525	40	theta	0.371	float
-526	40	kappa	0.017	float
-527	40	xi	0.017	float
-528	40	alpha	0.57	float
-529	40	zeta	0.125	float
-530	40	eta	0.125	float
-531	40	rho	0.034	float
-532	40	beta	0.011	float
-533	40	epsilon	0.171	float
-534	40	gamma	0.456	float
-535	40	Infected	0.24301402107660747	float
-536	40	Healed	0.0	float
-537	40	Extinct	0.0	float
-538	40	Diagnosed	0.024301402107660745	float
-539	40	Ailing	0.0012150701017378269	float
-540	40	Recognized	0.0024301402107660746	float
-541	40	Susceptible	0.7290393665032278	float
-542	40	Threatened	0.0	float
-543	41	t7	0.252	float
-544	41	nu	0.027	float
-545	41	tau	0.01	float
-546	41	delta	0.0011	float
-547	41	mu	0.017	float
-548	41	sigma	0.017	float
-549	41	theta	0.371	float
-550	41	kappa	0.017	float
-551	41	xi	0.017	float
-552	41	alpha	0.57	float
-553	41	zeta	0.125	float
-554	41	eta	0.125	float
-555	41	rho	0.034	float
-556	41	beta	0.011	float
-557	41	epsilon	0.171	float
-558	41	gamma	0.456	float
-559	41	Infected	0.24301402107660747	float
-560	41	Healed	0.0	float
-561	41	Extinct	0.0	float
-562	41	Diagnosed	0.024301402107660745	float
-563	41	Ailing	0.0012150701017378269	float
-564	41	Recognized	0.0024301402107660746	float
-565	41	Susceptible	0.7290393665032278	float
-566	41	Threatened	0.0	float
-567	42	t7	0.252	float
-568	42	nu	0.027	float
-569	42	tau	0.01	float
-570	42	delta	0.0011	float
-571	42	mu	0.017	float
-572	42	sigma	0.017	float
-573	42	theta	0.371	float
-574	42	kappa	0.017	float
-575	42	xi	0.017	float
-576	42	alpha	0.57	float
-577	42	zeta	0.125	float
-578	42	eta	0.125	float
-579	42	rho	0.034	float
-580	42	beta	0.011	float
-581	42	epsilon	0.171	float
-582	42	gamma	0.456	float
-583	42	Infected	0.24301402107660747	float
-584	42	Healed	0.0	float
-585	42	Extinct	0.0	float
-586	42	Diagnosed	0.024301402107660745	float
-587	42	Ailing	0.0012150701017378269	float
-588	42	Recognized	0.0024301402107660746	float
-589	42	Susceptible	0.7290393665032278	float
-590	42	Threatened	0.0	float
-\.
-
 
 --
 -- Data for Name: software; Type: TABLE DATA; Schema: public; Owner: dev
