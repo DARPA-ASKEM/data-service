@@ -1,5 +1,5 @@
 """
-TDS Model Module init.
+TDS Concept Module init.
 """
 from tds.modules.concept.controller import concept_router as router
 
