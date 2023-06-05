@@ -31,19 +31,6 @@ class QualifierXref(Base):
     feature_id = sa.Column(sa.Integer(), sa.ForeignKey("feature.id"), nullable=False)
 
 
-class ModelDescription(Base):
-    __tablename__ = "model_description"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.Text())
-    framework = sa.Column(
-        sa.String(), sa.ForeignKey("model_framework.name"), nullable=False
-    )
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    state_id = sa.Column(sa.Integer(), sa.ForeignKey("model_state.id"), nullable=False)
-
-
 class ModelRuntime(Base):
     __tablename__ = "model_runtime"
 
@@ -54,17 +41,6 @@ class ModelRuntime(Base):
     right = sa.Column(
         sa.String(), sa.ForeignKey("model_framework.name"), nullable=False
     )
-
-
-class SimulationParameter(Base):
-    __tablename__ = "simulation_parameter"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    run_id = sa.Column(sa.Integer(), sa.ForeignKey("simulation_run.id"), nullable=False)
-    model_parameter_id = sa.Column(sa.Integer(), sa.ForeignKey("model_parameter.id"))
-    name = sa.Column(sa.String(), nullable=False)
-    value = sa.Column(sa.String(), nullable=False)
-    type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
 class Dataset(Base):
@@ -83,7 +59,7 @@ class Dataset(Base):
     annotations = sa.Column(JSON())
     data_path = sa.Column(sa.String())
     maintainer = sa.Column(sa.Integer(), sa.ForeignKey("person.id"))
-    simulation_run = sa.Column(sa.Boolean(), server_default="False")
+    simulation_result = sa.Column(sa.Boolean(), server_default="False")
 
 
 class Feature(Base):
@@ -105,32 +81,6 @@ class Qualifier(Base):
     description = sa.Column(sa.Text())
     name = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
-
-
-class SimulationRun(Base):
-    __tablename__ = "simulation_run"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    simulator_id = sa.Column(
-        sa.Integer(), sa.ForeignKey("model_configuration.id"), nullable=False
-    )
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    completed_at = sa.Column(sa.DateTime())
-    success = sa.Column(sa.Boolean())
-    dataset_id = sa.Column(sa.Integer())
-    description = sa.Column(sa.Text())
-    response = sa.Column(sa.LargeBinary())
-
-
-class ModelParameter(Base):
-    __tablename__ = "model_parameter"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    model_id = sa.Column(sa.Integer(), sa.ForeignKey("model_description.id"))
-    name = sa.Column(sa.String(), nullable=False)
-    type = sa.Column(sa.Enum(ValueType), nullable=False)
-    default_value = sa.Column(sa.String())
-    state_variable = sa.Column(sa.Boolean(), nullable=False)
 
 
 class Extraction(Base):
