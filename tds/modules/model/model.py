@@ -21,9 +21,12 @@ class Model(TdsModel):
 
     name: str
     description: str
+    username: str
     model: dict
     model_schema: str = Field(alias="schema")
     model_version: str
+    semantics: Optional[dict]
+    metadata: Optional[dict]
 
     _index = "model"
     concepts: Optional[List] = []
