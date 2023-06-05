@@ -121,7 +121,7 @@ CREATE TYPE public.resourcetype AS ENUM (
     'models',
     'model_configurations',
     'publications',
-    'simulation_runs'
+    'simulations'
 );
 
 
@@ -153,7 +153,7 @@ CREATE TYPE public.taggabletype AS ENUM (
     'projects',
     'publications',
     'qualifiers',
-    'simulation_runs'
+    'simulations'
 );
 
 
@@ -256,7 +256,7 @@ CREATE TABLE public.dataset (
     annotations json,
     data_path character varying,
     maintainer integer,
-    simulation_run boolean DEFAULT false
+    simulation_result boolean DEFAULT false
 );
 
 
@@ -707,46 +707,6 @@ ALTER TABLE public.qualifier_xref_id_seq OWNER TO dev;
 ALTER SEQUENCE public.qualifier_xref_id_seq OWNED BY public.qualifier_xref.id;
 
 --
--- Name: simulation_run; Type: TABLE; Schema: public; Owner: dev
---
-
-CREATE TABLE public.simulation_run (
-    id integer NOT NULL,
-    simulator_id integer NOT NULL,
-    "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
-    completed_at timestamp without time zone,
-    success boolean,
-    dataset_id integer,
-    description text,
-    response bytea
-);
-
-
-ALTER TABLE public.simulation_run OWNER TO dev;
-
---
--- Name: simulation_run_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
---
-
-CREATE SEQUENCE public.simulation_run_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.simulation_run_id_seq OWNER TO dev;
-
---
--- Name: simulation_run_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
---
-
-ALTER SEQUENCE public.simulation_run_id_seq OWNED BY public.simulation_run.id;
-
-
---
 -- Name: software; Type: TABLE; Schema: public; Owner: dev
 --
 
@@ -869,13 +829,6 @@ ALTER TABLE ONLY public.qualifier ALTER COLUMN id SET DEFAULT nextval('public.qu
 --
 
 ALTER TABLE ONLY public.qualifier_xref ALTER COLUMN id SET DEFAULT nextval('public.qualifier_xref_id_seq'::regclass);
-
---
--- Name: simulation_run id; Type: DEFAULT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_run ALTER COLUMN id SET DEFAULT nextval('public.simulation_run_id_seq'::regclass);
-
 
 --
 -- Name: software id; Type: DEFAULT; Schema: public; Owner: dev
@@ -1007,13 +960,6 @@ ALTER TABLE ONLY public.qualifier
 
 ALTER TABLE ONLY public.qualifier_xref
     ADD CONSTRAINT qualifier_xref_pkey PRIMARY KEY (id);
-
---
--- Name: simulation_run simulation_run_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_run
-    ADD CONSTRAINT simulation_run_pkey PRIMARY KEY (id);
 
 
 --
