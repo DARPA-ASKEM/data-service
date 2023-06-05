@@ -80,7 +80,7 @@ COPY public.association (id, person_id, resource_id, resource_type, role) FROM s
 -- Data for Name: dataset; Type: TABLE DATA; Schema: public; Owner: dev
 --
 
-COPY public.dataset (id, name, url, description, "timestamp", deprecated, sensitivity, quality, temporal_resolution, geospatial_resolution, annotations, data_path, maintainer, simulation_run) FROM stdin;
+COPY public.dataset (id, name, url, description, "timestamp", deprecated, sensitivity, quality, temporal_resolution, geospatial_resolution, annotations, data_path, maintainer, simulation_result) FROM stdin;
 52	COVID-19 Nursing Home Data	https://data.cms.gov/covid-19/covid-19-nursing-home-data/data	Nursing home cases and deaths at the county level from Centers for Medicare & Medicaid Services (CMS)	2023-05-12 14:58:36.63499	f					{"annotations": {}, "data_paths": ["s3://datasets/52/d7ac1807-99d4-4d11-a75f-1de76af57d45.parquet.gzip"]}	"s3://datasets/52/d7ac1807-99d4-4d11-a75f-1de76af57d45.parquet.gzip"	1	f
 26	Simulation output from CHIME-SVIIvR : run number 2		Dataset from simulation run output- Model description: CHIME-SVIIvR was used to create this dataset. Run number 2	2023-05-12 14:58:36.63499	f		Measured			{"annotations": {"geo": [{"name": "mock_lon", "display_name": "loc", "description": "location", "type": "geo", "geo_type": "longitude", "primary_geo": true, "resolve_to_gadm": false, "coord_format": "lonlat", "qualifies": [], "aliases": {}, "gadm_level": "admin1"}, {"name": "mock_lat", "display_name": "loc", "description": "location", "type": "geo", "geo_type": "latitude", "primary_geo": true, "resolve_to_gadm": false, "is_geo_pair": "mock_lon", "coord_format": "lonlat", "qualifies": [], "aliases": {}, "gadm_level": "admin1"}], "date": [{"name": "mock_time", "display_name": "", "description": "date", "type": "date", "date_type": "date", "primary_date": true, "time_format": "%m/%d/%Y", "qualifies": [], "aliases": {}}], "feature": [{"name": "S", "display_name": "", "description": "S state feature", "type": "feature", "feature_type": "float", "units": "na", "units_description": "", "qualifies": [], "primary_ontology_id": "", "qualifierrole": "breakdown", "aliases": {}}, {"name": "I", "display_name": "", "description": "I state feature", "type": "feature", "feature_type": "float", "units": "na", "units_description": "", "qualifies": [], "primary_ontology_id": "", "qualifierrole": "breakdown", "aliases": {}}, {"name": "V", "display_name": "", "description": "V state feature", "type": "feature", "feature_type": "float", "units": "na", "units_description": "", "qualifies": [], "primary_ontology_id": "", "qualifierrole": "breakdown", "aliases": {}}, {"name": "time", "display_name": "", "description": "time state feature", "type": "feature", "feature_type": "float", "units": "na", "units_description": "", "qualifies": [], "primary_ontology_id": "", "qualifierrole": "breakdown", "aliases": {}}, {"name": "I_v", "display_name": "", "description": "I_v state feature", "type": "feature", "feature_type": "float", "units": "na", "units_description": "", "qualifies": [], "primary_ontology_id": "", "qualifierrole": "breakdown", "aliases": {}}, {"name": "R", "display_name": "", "description": "R state feature", "type": "feature", "feature_type": "float", "units": "na", "units_description": "", "qualifies": [], "primary_ontology_id": "", "qualifierrole": "breakdown", "aliases": {}}, {"name": "time", "display_name": "", "description": "time step feature", "type": "feature", "feature_type": "float", "units": "na", "units_description": "", "qualifies": ["S", "I", "V", "time", "I_v", "R"], "primary_ontology_id": "", "qualifierrole": "breakdown", "aliases": {}}]}, "data_paths": ["s3://datasets/26/sim_output.csv"]}	"s3://datasets/26/sim_output.csv"	1	t
 45	CDC COVID-19 Vaccination and Case Trends by Age Group	https://data.cdc.gov/Vaccinations/Archive-COVID-19-Vaccination-and-Case-Trends-by-Ag/gxj9-t96f/data	COVID-19 Vaccination and Case Trends by Age Group	2023-05-12 14:58:36.63499	f					{"annotations": {}, "data_paths": ["s3://datasets/45/419e141a-2ba9-4fc8-91ba-27698a12a6e6.parquet.gzip"]}	"s3://datasets/45/419e141a-2ba9-4fc8-91ba-27698a12a6e6.parquet.gzip"	1	f
@@ -528,97 +528,97 @@ COPY public.project_asset (id, project_id, resource_id, resource_type, external_
 2	1	1	models	\N
 3	1	1	model_configurations	\N
 4	1	1	datasets	\N
-5	1	1	simulation_runs	\N
+5	1	1	simulations	\N
 6	1	2	datasets	\N
-7	1	2	simulation_runs	\N
+7	1	2	simulations	\N
 8	1	3	datasets	\N
-9	1	3	simulation_runs	\N
+9	1	3	simulations	\N
 10	1	4	datasets	\N
-11	1	4	simulation_runs	\N
+11	1	4	simulations	\N
 12	1	5	datasets	\N
-13	1	5	simulation_runs	\N
+13	1	5	simulations	\N
 14	1	6	datasets	\N
-15	1	6	simulation_runs	\N
+15	1	6	simulations	\N
 16	1	7	datasets	\N
-17	1	7	simulation_runs	\N
+17	1	7	simulations	\N
 18	1	8	datasets	\N
-19	1	8	simulation_runs	\N
+19	1	8	simulations	\N
 20	1	9	datasets	\N
-21	1	9	simulation_runs	\N
+21	1	9	simulations	\N
 22	1	10	datasets	\N
-23	1	10	simulation_runs	\N
+23	1	10	simulations	\N
 24	1	11	datasets	\N
-25	1	11	simulation_runs	\N
+25	1	11	simulations	\N
 26	1	1	publications	\N
 29	1	2	models	\N
 30	1	2	model_configurations	\N
 31	1	12	datasets	\N
-32	1	12	simulation_runs	\N
+32	1	12	simulations	\N
 33	1	13	datasets	\N
-34	1	13	simulation_runs	\N
+34	1	13	simulations	\N
 35	1	14	datasets	\N
-36	1	14	simulation_runs	\N
+36	1	14	simulations	\N
 37	1	15	datasets	\N
-38	1	15	simulation_runs	\N
+38	1	15	simulations	\N
 39	1	16	datasets	\N
-40	1	16	simulation_runs	\N
+40	1	16	simulations	\N
 41	1	17	datasets	\N
-42	1	17	simulation_runs	\N
+42	1	17	simulations	\N
 43	1	18	datasets	\N
-44	1	18	simulation_runs	\N
+44	1	18	simulations	\N
 45	1	19	datasets	\N
-46	1	19	simulation_runs	\N
+46	1	19	simulations	\N
 47	1	20	datasets	\N
-48	1	20	simulation_runs	\N
+48	1	20	simulations	\N
 49	1	21	datasets	\N
-50	1	21	simulation_runs	\N
+50	1	21	simulations	\N
 51	1	22	datasets	\N
-52	1	22	simulation_runs	\N
+52	1	22	simulations	\N
 55	1	3	models	\N
 56	1	3	model_configurations	\N
 57	1	23	datasets	\N
-58	1	23	simulation_runs	\N
+58	1	23	simulations	\N
 59	1	24	datasets	\N
-60	1	24	simulation_runs	\N
+60	1	24	simulations	\N
 61	1	25	datasets	\N
-62	1	25	simulation_runs	\N
+62	1	25	simulations	\N
 63	1	26	datasets	\N
-64	1	26	simulation_runs	\N
+64	1	26	simulations	\N
 65	1	27	datasets	\N
-66	1	27	simulation_runs	\N
+66	1	27	simulations	\N
 67	1	28	datasets	\N
-68	1	28	simulation_runs	\N
+68	1	28	simulations	\N
 69	1	29	datasets	\N
-70	1	29	simulation_runs	\N
+70	1	29	simulations	\N
 71	1	30	datasets	\N
-72	1	30	simulation_runs	\N
+72	1	30	simulations	\N
 73	1	31	datasets	\N
-74	1	31	simulation_runs	\N
+74	1	31	simulations	\N
 75	1	32	datasets	\N
-76	1	32	simulation_runs	\N
+76	1	32	simulations	\N
 77	1	33	datasets	\N
-78	1	33	simulation_runs	\N
+78	1	33	simulations	\N
 79	1	2	publications	\N
 82	1	4	models	\N
 83	1	4	model_configurations	\N
 84	1	34	datasets	\N
-85	1	34	simulation_runs	\N
+85	1	34	simulations	\N
 86	1	35	datasets	\N
-87	1	35	simulation_runs	\N
+87	1	35	simulations	\N
 88	1	36	datasets	\N
-89	1	36	simulation_runs	\N
+89	1	36	simulations	\N
 90	1	37	datasets	\N
-91	1	37	simulation_runs	\N
+91	1	37	simulations	\N
 92	1	38	datasets	\N
-93	1	38	simulation_runs	\N
+93	1	38	simulations	\N
 94	1	39	datasets	\N
-95	1	39	simulation_runs	\N
+95	1	39	simulations	\N
 96	1	40	datasets	\N
-97	1	40	simulation_runs	\N
+97	1	40	simulations	\N
 98	1	41	datasets	\N
-99	1	41	simulation_runs	\N
+99	1	41	simulations	\N
 100	1	42	datasets	\N
-101	1	42	simulation_runs	\N
+101	1	42	simulations	\N
 102	1	43	datasets	\N
 103	1	44	datasets	\N
 104	1	45	datasets	\N
@@ -1791,13 +1791,6 @@ SELECT pg_catalog.setval('public.qualifier_id_seq', 119, true);
 --
 
 SELECT pg_catalog.setval('public.qualifier_xref_id_seq', 525, true);
-
-
---
--- Name: simulation_run_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dev
---
-
-SELECT pg_catalog.setval('public.simulation_run_id_seq', 42, true);
 
 
 --
