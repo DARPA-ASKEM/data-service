@@ -35,15 +35,6 @@ class ModelRuntime(BaseModel):
     right: str
 
 
-class SimulationParameter(BaseModel):
-    id: Optional[int] = None
-    run_id: Optional[int] = None
-    model_parameter_id: Optional[int]
-    name: str
-    value: str
-    type: ValueType
-
-
 class Dataset(BaseModel):
     id: Optional[int] = None
     name: str
@@ -58,7 +49,7 @@ class Dataset(BaseModel):
     annotations: Optional[Json]
     data_path: Optional[str]
     maintainer: Optional[int]
-    simulation_run: Optional[bool] = False
+    simulation_result: Optional[bool] = False
 
 
 class Feature(BaseModel):
@@ -76,17 +67,6 @@ class Qualifier(BaseModel):
     description: Optional[str]
     name: str
     value_type: ValueType
-
-
-class SimulationRun(BaseModel):
-    id: Optional[int] = None
-    simulator_id: Optional[int] = None
-    timestamp: datetime.datetime = datetime.datetime.now()
-    completed_at: Optional[datetime.datetime]
-    success: Optional[bool]
-    dataset_id: Optional[int]
-    description: Optional[str]
-    response: Optional[bytes]
 
 
 class Extraction(BaseModel):
@@ -145,17 +125,6 @@ class Software(BaseModel):
     timestamp: datetime.datetime = datetime.datetime.now()
     source: str
     storage_uri: str
-
-
-class SimulationRun(BaseModel):
-    id: Optional[int] = None
-    simulator_id: str
-    timestamp: datetime.datetime = datetime.datetime.now()
-    completed_at: Optional[datetime.datetime]
-    success: Optional[bool]
-    dataset_id: Optional[int]
-    description: Optional[str]
-    response: Optional[bytes]
 
 
 class Publication(BaseModel):
