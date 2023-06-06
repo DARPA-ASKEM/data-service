@@ -125,7 +125,8 @@ CREATE TYPE public.resourcetype AS ENUM (
     'models',
     'plans',
     'publications',
-    'simulation_runs'
+    'simulation_runs',
+    'workflows'
 );
 
 
