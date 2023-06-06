@@ -16,7 +16,6 @@ class WorkflowResponse(BaseModel):
 
     id: str
     name: str
-    username: Optional[str]
     description: str
     timestamp: datetime
     transform: Transform
