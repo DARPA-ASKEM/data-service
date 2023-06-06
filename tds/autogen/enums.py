@@ -80,6 +80,7 @@ class ResourceType(str, Enum):
     models = "models"
     publications = "publications"
     simulation_runs = "simulation_runs"
+    workflows = "workflows"
 
 
 class Role(str, Enum):
