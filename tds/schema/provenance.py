@@ -44,10 +44,8 @@ provenance_type_to_abbr: Dict[Type[schema.ProvenanceType], str] = {
     schema.ProvenanceType.Model: "Md",
     schema.ProvenanceType.ModelConfig: "Mc",
     schema.ProvenanceType.Publication: "Pu",
-    schema.ProvenanceType.SimulationRun: "Sr",
+    schema.ProvenanceType.Simulation: "Si",
     schema.ProvenanceType.Project: "Pr",
     schema.ProvenanceType.ModelRevision: "Mr",
     schema.ProvenanceType.Concept: "Cn",
-    schema.ProvenanceType.ModelParameter: "Mp",
-    schema.ProvenanceType.SimParameter: "Sp",
 }
