@@ -14,7 +14,7 @@ from tds.schema.concept import Concept
 ModelParameters = List[Dict]
 
 
-def orm_to_params(parameters: List[orm.ModelParameter]) -> ModelParameters:
+def orm_to_params(parameters: List) -> ModelParameters:
     """
     Convert SQL parameter search to dict
     """
