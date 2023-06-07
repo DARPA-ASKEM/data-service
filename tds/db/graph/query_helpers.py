@@ -34,10 +34,8 @@ def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
         return f"""
             Match(Pu:Publication {{id:{root_id}}})
             <-[r:EXTRACTED_FROM]-(In:Intermediate) 
-            Optional Match (In)<-[r2:REINTERPRETS *1..]-(Mr:ModelRevision) 
             Optional Match(Mr)
             -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
-            (Mr2:ModelRevision) 
             with *,collect(r)+collect(r2)+collect(r3) as r4, 
             collect(Mr)+collect(Mr2) as ms 
             unwind ms as mss 
@@ -50,10 +48,8 @@ def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
     if root_type == "Intermediate":
         return f"""
             Match (In:Intermediate {{id:{root_id}}})<-[r2:REINTERPRETS *1..]
-            -(Mr:ModelRevision) 
             Optional Match(Mr)
             -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
-            (Mr2:ModelRevision) 
             with *,collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms 
             unwind ms as mss 
             unwind r4 as r5 
@@ -75,10 +71,10 @@ def parent_model_query_generator(root_type: schema.ProvenanceType, root_id):
     relationships_str = relationships_array_as_str(
         exclude=["CONTAINS", "IS_CONCEPT_OF"]
     )
-    model_revision_node = node_builder(node_type=schema.ProvenanceType.ModelRevision)
+    model_revision_node = node_builder(node_type=schema.ProvenanceType.Model)
     query_templates_index = {
         schema.ProvenanceType.Model: f"-[r:BEGINS_AT]->{model_revision_node} ",
-        schema.ProvenanceType.ModelConfig: f"-[r:USES]->{model_revision_node} ",
+        schema.ProvenanceType.ModelConfiguration: f"-[r:USES]->{model_revision_node} ",
         schema.ProvenanceType.Simulation: ""
         + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
         schema.ProvenanceType.Dataset: ""
