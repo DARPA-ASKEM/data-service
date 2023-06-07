@@ -6,18 +6,21 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from tds.modules.workflow.model import Transform
+
 
 class WorkflowResponse(BaseModel):
     """
-    Model Configuration Response Object.
+    Workflow Response Object.
     """
 
     id: str
     name: str
     description: str
     timestamp: datetime
-    nodes: Optional[List]
-    configuration: object
+    transform: Transform
+    nodes: List[dict]
+    edges: Optional[List[dict]]
 
 
 def workflow_response(workflow_list):
