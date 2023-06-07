@@ -22,6 +22,7 @@ from tds.modules.concept.model import (
 )
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
+from tds.modules.simulation.model import Simulation
 
 logger = Logger(__file__)
 concept_router = APIRouter()
@@ -81,11 +82,9 @@ def get_taggable_orm(taggable_type: schema.TaggableType):
         schema.TaggableType.datasets: orm.Dataset,
         schema.TaggableType.model_configurations: ModelConfiguration,
         schema.TaggableType.models: Model,
-        schema.TaggableType.model_parameters: orm.ModelParameter,
         schema.TaggableType.projects: orm.Project,
         schema.TaggableType.publications: orm.Publication,
-        schema.TaggableType.simulation_runs: orm.SimulationRun,
-        schema.TaggableType.simulation_parameters: orm.SimulationParameter,
+        schema.TaggableType.simulations: Simulation,
     }
     return enum_to_orm[taggable_type]
 
