@@ -3,7 +3,6 @@ TDS Dataset
 """
 import os.path
 from logging import Logger
-from typing import List
 
 import boto3
 from elasticsearch import NotFoundError
