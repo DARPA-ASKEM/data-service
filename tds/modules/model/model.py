@@ -21,7 +21,7 @@ class Model(TdsModel):
 
     name: str
     description: str
-    username: str
+    username: Optional[str]
     model: dict
     model_schema: str = Field(alias="schema")
     model_version: str
