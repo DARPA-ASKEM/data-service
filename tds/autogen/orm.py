@@ -100,7 +100,7 @@ class ProjectAsset(Base):
 
     id = sa.Column(sa.Integer(), primary_key=True)
     project_id = sa.Column(sa.Integer(), sa.ForeignKey("project.id"), nullable=False)
-    resource_id = sa.Column(sa.Integer(), nullable=False)
+    resource_id = sa.Column(sa.String(), nullable=False)
     resource_type = sa.Column(sa.Enum(ResourceType), nullable=False)
     external_ref = sa.Column(sa.String())
 

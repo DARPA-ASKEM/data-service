@@ -122,6 +122,7 @@ CREATE TYPE public.resourcetype AS ENUM (
     'model_configurations',
     'publications',
     'simulations'
+    'workflows'
 );
 
 

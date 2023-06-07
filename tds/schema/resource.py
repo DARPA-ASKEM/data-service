@@ -10,6 +10,7 @@ from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
+from tds.modules.workflow.model import Workflow
 from tds.schema.dataset import Dataset
 from tds.schema.simulation import Run, RunDescription
 
@@ -24,7 +25,7 @@ class Software(schema.Software):
         orm_mode = True
 
 
-Resource = Dataset | Model | ModelConfiguration | Publication | Run
+Resource = Dataset | Model | ModelConfiguration | Publication | Run | Workflow
 
 ORMResource = orm.Dataset | orm.Publication | orm.SimulationRun
 
@@ -34,6 +35,7 @@ obj_to_enum: Dict[Type[Resource], ResourceType] = {
     ModelConfiguration: ResourceType.model_configurations,
     Publication: ResourceType.publications,
     Run: ResourceType.simulation_runs,
+    Workflow: ResourceType.workflows,
 }
 
 obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
@@ -42,6 +44,7 @@ obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
     ModelConfiguration: ResourceType.model_configurations,
     Publication: ResourceType.publications,
     RunDescription: ResourceType.simulation_runs,
+    Workflow: ResourceType.workflows,
 }
 
 

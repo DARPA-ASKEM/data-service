@@ -4,8 +4,16 @@ TDS Workflow Model Definition.
 
 from typing import List, Optional
 
+from pydantic import BaseModel
+
 from tds.db.base import TdsModel
 from tds.settings import settings
+
+
+class Transform(BaseModel):
+    x: float
+    y: float
+    z: float
 
 
 class Workflow(TdsModel):
@@ -14,8 +22,10 @@ class Workflow(TdsModel):
     """
 
     name: str
-    description: str
-    nodes: List = []
+    description: Optional[str]
+    nodes: List[dict] = []
+    edges: List[dict] = []
+    transform: Transform
 
     _index = "workflow"
 
@@ -43,6 +53,11 @@ class Workflow(TdsModel):
             "example": {
                 "name": "Test Workflow",
                 "description": "This is the description",
+                "transform": {
+                    "x": 127.0002,
+                    "y": 17.1284,
+                    "z": 2.53,
+                },
                 "nodes": [
                     {
                         "model": {
@@ -51,5 +66,6 @@ class Workflow(TdsModel):
                         }
                     }
                 ],
+                "edges": [],
             }
         }

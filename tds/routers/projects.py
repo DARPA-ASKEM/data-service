@@ -18,6 +18,7 @@ from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.modules.dataset.response import dataset_response
 from tds.modules.model.utils import model_list_fields, model_list_response
 from tds.modules.model_configuration.response import configuration_response
+from tds.modules.workflow.response import workflow_response
 from tds.operation import create, delete, retrieve, update
 from tds.schema.project import Project, ProjectMetadata
 from tds.schema.resource import ResourceType, get_resource_orm, get_schema_description
@@ -34,7 +35,15 @@ es_list_response = {
         "fields": None,
     },
     ResourceType.datasets: {"function": dataset_response, "fields": None},
+    ResourceType.workflows: {"fields": None, "function": workflow_response},
 }
+
+es_resources = [
+    ResourceType.datasets,
+    ResourceType.models,
+    ResourceType.model_configurations,
+    ResourceType.workflows,
+]
 
 
 @router.get("")
@@ -243,6 +252,7 @@ def get_project_assets(
             ResourceType.model_configurations,
             ResourceType.publications,
             ResourceType.simulation_runs,
+            ResourceType.workflows,
         ]
     ),
     rdb: Engine = Depends(request_rdb),
@@ -263,14 +273,9 @@ def get_project_assets(
 
             assets_key_objects = {}
             for key in assets_key_ids:
-                print(key)
                 orm_type = get_resource_orm(key)
                 orm_schema = get_schema_description(key)
-                if key in [
-                    ResourceType.models,
-                    ResourceType.model_configurations,
-                    ResourceType.datasets,
-                ]:
+                if key in es_resources:
                     responder = es_list_response[key]
                     index_singular = key if key[-1] != "s" else key.rstrip("s")
                     index = f"{settings.ES_INDEX_PREFIX}{index_singular}"
