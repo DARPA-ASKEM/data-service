@@ -24,10 +24,10 @@
     ],
     "PARAMETER_OF":[
         ["ModelParameter","ModelRevision"],
-        ["PlanParameter","SimulationRun"]
+        ["PlanParameter","Simulation"]
     ],
     "GENERATED_BY":[
-        ["SimulationRun","Plan"]
+        ["Simulation","Plan"]
     ],
     "USES":[
         ["Plan","ModelRevision"],
@@ -44,14 +44,14 @@
         ["Project","Publication"],
         ["Project","Model"],
         ["Project","Plan"],
-        ["Project","SimulationRun"],
+        ["Project","Simulation"],
         ["Project","Dataset"]
     ],
     "IS_CONCEPT_OF":[
         ["Concept","Publication"],
         ["Concept","Model"],
         ["Concept","Plan"],
-        ["Concept","SimulationRun"],
+        ["Concept","Simulation"],
         ["Concept","Dataset"]
     ]
 }
