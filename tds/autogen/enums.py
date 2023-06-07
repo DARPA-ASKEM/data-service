@@ -38,8 +38,7 @@ class ProvenanceType(str, Enum):
     ModelRevision = "ModelRevision"
     Project = "Project"
     Publication = "Publication"
-    SimParameter = "SimParameter"
-    SimulationRun = "SimulationRun"
+    Simulation = "Simulation"
 
 
 class ProvenanceSearchTypes(str, Enum):
@@ -79,7 +78,7 @@ class ResourceType(str, Enum):
     model_configurations = "model_configurations"
     models = "models"
     publications = "publications"
-    simulation_runs = "simulation_runs"
+    simulations = "simulations"
     workflows = "workflows"
 
 
@@ -99,8 +98,7 @@ class TaggableType(str, Enum):
     projects = "projects"
     publications = "publications"
     qualifiers = "qualifiers"
-    simulation_parameters = "simulation_parameters"
-    simulation_runs = "simulation_runs"
+    simulations = "simulations"
 
 
 class ValueType(str, Enum):
@@ -109,3 +107,23 @@ class ValueType(str, Enum):
     float = "float"
     int = "int"
     str = "str"
+
+
+class SimulationEngine(str, Enum):
+    sciml = "sciml"
+    ciemss = "ciemss"
+
+
+class SimulationType(str, Enum):
+    calibration = "calibration"
+    calibration_simulation = "calibration_simulation"
+    ensemble = "ensemble"
+    simulation = "simulation"
+
+
+class SimulationStatus(str, Enum):
+    cancelled = "cancelled"
+    complete = "complete"
+    error = "error"
+    queued = "queued"
+    running = "running"
