@@ -11,7 +11,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from tds.db import es_client
-from tds.db.s3 import get_presigned_url
+from tds.lib.s3 import get_presigned_url
 from tds.modules.simulation.model import Simulation
 from tds.modules.simulation.response import SimulationResponse, simulation_response
 from tds.operation import create, delete, retrieve, update
