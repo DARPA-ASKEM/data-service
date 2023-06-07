@@ -78,7 +78,7 @@ CREATE TYPE public.provenancetype AS ENUM (
     'ModelConfiguration',
     'Project',
     'Publication',
-    'SimulationRun'
+    'Simulation'
 );
 
 
