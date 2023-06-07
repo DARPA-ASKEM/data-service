@@ -13,7 +13,7 @@ def s3_client():
     Function sets up an S3 client based on env settings.
     """
     if settings.STORAGE_HOST:
-        s3 = boto3.client(
+        s3_ = boto3.client(
             "s3",
             endpoint_url=settings.STORAGE_HOST,
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -23,9 +23,9 @@ def s3_client():
             verify=False,
         )
     else:
-        s3 = boto3.client("s3")
+        s3_ = boto3.client("s3")
 
-    return s3
+    return s3_
 
 
 def get_file_path(entity_id: str | int, file_name: str) -> str:
@@ -39,8 +39,8 @@ def get_presigned_url(entity_id: str | int, file_name: str, method: str):
     """
     Function generates a presigned URL for the HMI client.
     """
-    s3 = s3_client()
+    s3_ = s3_client()
     s3_key = get_file_path(entity_id, file_name)
-    return s3.generate_presigned_url(
+    return s3_.generate_presigned_url(
         ClientMethod=method, Params={"Bucket": settings.S3_BUCKET, "Key": s3_key}
     )
