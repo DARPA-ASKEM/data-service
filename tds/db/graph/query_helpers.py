@@ -79,7 +79,7 @@ def parent_model_query_generator(root_type: schema.ProvenanceType, root_id):
     query_templates_index = {
         schema.ProvenanceType.Model: f"-[r:BEGINS_AT]->{model_revision_node} ",
         schema.ProvenanceType.ModelConfig: f"-[r:USES]->{model_revision_node} ",
-        schema.ProvenanceType.SimulationRun: ""
+        schema.ProvenanceType.Simulation: ""
         + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
         schema.ProvenanceType.Dataset: ""
         + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
