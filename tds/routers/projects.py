@@ -18,6 +18,7 @@ from tds.lib.projects import adjust_project_assets, save_project_assets
 from tds.modules.dataset.response import dataset_response
 from tds.modules.model.utils import model_list_fields, model_list_response
 from tds.modules.model_configuration.response import configuration_response
+from tds.modules.simulation.response import simulation_response
 from tds.modules.workflow.response import workflow_response
 from tds.operation import create, delete, retrieve, update
 from tds.schema.project import Project, ProjectMetadata
@@ -35,6 +36,7 @@ es_list_response = {
         "fields": None,
     },
     ResourceType.datasets: {"function": dataset_response, "fields": None},
+    ResourceType.simulations: {"fields": None, "function": simulation_response},
     ResourceType.workflows: {"fields": None, "function": workflow_response},
 }
 
@@ -42,6 +44,7 @@ es_resources = [
     ResourceType.datasets,
     ResourceType.models,
     ResourceType.model_configurations,
+    ResourceType.simulations,
     ResourceType.workflows,
 ]
 
@@ -251,7 +254,7 @@ def get_project_assets(
             ResourceType.models,
             ResourceType.model_configurations,
             ResourceType.publications,
-            ResourceType.simulation_runs,
+            ResourceType.simulations,
             ResourceType.workflows,
         ]
     ),

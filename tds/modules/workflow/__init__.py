@@ -7,4 +7,4 @@
 from tds.modules.workflow.controller import workflow_router as router
 
 ROUTE_PREFIX = "workflows"
-TAGS = ["Workflow"]
+TAGS = ["TDS Workflow"]
