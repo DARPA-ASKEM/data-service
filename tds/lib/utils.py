@@ -1,3 +1,6 @@
+"""
+TDS Utilities.
+"""
 import copy
 
 from pydantic import BaseModel
