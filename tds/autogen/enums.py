@@ -34,8 +34,6 @@ class ProvenanceType(str, Enum):
     Dataset = "Dataset"
     Model = "Model"
     ModelConfiguration = "ModelConfiguration"
-    ModelParameter = "ModelParameter"
-    ModelRevision = "ModelRevision"
     Project = "Project"
     Publication = "Publication"
     Simulation = "Simulation"
