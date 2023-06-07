@@ -57,6 +57,7 @@ def setup_elasticsearch_indexes() -> None:
                 },
             },
         },
+        "simulation": {},
         "workflow": {},
     }
 
