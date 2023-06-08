@@ -140,6 +140,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("version", sa.String(), nullable=False),
         sa.Column("semantics", sa.String(), nullable=False),
+        sa.Column("url_schema", sa.String(), nullable=False),
         sa.PrimaryKeyConstraint("name"),
     )
     op.create_table(

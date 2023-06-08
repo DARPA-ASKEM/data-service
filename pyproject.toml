@@ -25,7 +25,6 @@ pyarrow = "^10.0.0"
 fsspec = "^2022.11.0"
 python-multipart = "^0.0.5"
 pandas = "^1.5.2"
-strawberry-graphql = {extras = ["fastapi"], version = "^0.142.3"}
 minio = "^7.1.12"
 openai = "^0.25.0"
 s3fs = "^2022.11.0"
@@ -33,6 +32,7 @@ botocore = "1.27.59"
 boto3 = "1.24"
 psycopg2 = "^2.9.5"
 alembic = "^1.9.4"
+elasticsearch = {extras = ["async"], version = "8.5.3"}
 
 [tool.poetry.scripts]
 tds = "tds.main:cli"
@@ -43,7 +43,6 @@ black = "^22.10.0"
 pylint = "^2.15.5"
 pytest = "^7.2.0"
 pre-commit = "^3.1.1"
-strawberry-graphql = {extras = ["debug"], version = "^0.142.3"}
 pytest-alembic = "^0.10.0"
 pytest-mock-resources = "^2.6.8"
 python-on-whales = "^0.59.0"
@@ -57,10 +56,10 @@ in-project = true
 
 [tool.isort]
 profile = "black"
-skip = ["autogen"]
+#skip = ["autogen"]
 
-[tool.black]
-force-exclude = "autogen"
+#[tool.black]
+#force-exclude = "autogen"
 
 [tool.pytest.ini_options]
 addopts = "--ignore-glob=*utils.py"
@@ -72,12 +71,12 @@ filterwarnings = ["ignore::DeprecationWarning"]
 # and leave TODOs for later.
 disable=["fixme", "too-few-public-methods", "broad-exception-raised"]
 # Pylint should not run on the the generated files
-ignore=["autogen"]
+#ignore=["autogen"]
 extension-pkg-whitelist=["pydantic"]
 jobs=4
 
 [tool.pylint.basic]
-good-names=["id", "type"]
+good-names=["id", "type", "es"]
 
 [tool.pylint.variables]
 allowed-redefined-builtins=["id", "type"]

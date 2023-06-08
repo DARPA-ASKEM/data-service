@@ -13,9 +13,9 @@ services:
     ports:
       - "8032:5432"
     environment:
-      - POSTGRES_PASSWORD=dev
-      - POSTGRES_USER=dev
-      - POSTGRES_DB=askem
+      - POSTGRES_PASSWORD=$SQL_PASSWORD
+      - POSTGRES_USER=$SQL_USER
+      - POSTGRES_DB=$SQL_DB
     volumes:
       - ./data:/docker-entrypoint-initdb.d
     networks:
@@ -38,9 +38,9 @@ services:
       - rdb
       - graphdb
       - minio
+      - elasticsearch
     volumes:
       - $PWD/tds:/api/tds
-      - $PWD/data/datasets:/datasets
   graphdb:
     build:
       context: ./
@@ -49,7 +49,7 @@ services:
       - 7474:7474
       - 7687:7687
     environment:
-      - NEO4J_AUTH=neo4j/password
+      - NEO4J_AUTH=$NEO4J_AUTH
       - NEO4J_dbms_memory_pagecache_size=512M
     depends_on:
       - rdb
@@ -60,8 +60,8 @@ services:
       context: ./
       dockerfile: docker/Dockerfile.minio
     environment:
-      MINIO_ROOT_USER: miniouser
-      MINIO_ROOT_PASSWORD: miniopass
+      MINIO_ROOT_USER: $MINIO_USER
+      MINIO_ROOT_PASSWORD: $MINIO_PWD
     ports:
       - 9000:9000
       - 9001:9001
@@ -70,3 +70,39 @@ services:
     networks:
       - data-api
       - data-annotation-stack
+  elasticsearch:
+    image: elasticsearch:8.5.3
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+      - action.auto_create_index=false
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - target: 9200
+        published: 9200
+    networks:
+      - data-api
+  kibana:
+    depends_on:
+      - elasticsearch
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    volumes:
+      - kibanadata:/usr/share/kibana/data
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+    mem_limit: ${MEM_LIMIT}
+    networks:
+      - data-api
+      - data-annotation-stack
+volumes:
+  elasticsearch_data:
+    driver: local
+  kibanadata:
+    driver: local

@@ -42,13 +42,9 @@ class ProvenancePayload(BaseModel):
 provenance_type_to_abbr: Dict[Type[schema.ProvenanceType], str] = {
     schema.ProvenanceType.Dataset: "Ds",
     schema.ProvenanceType.Model: "Md",
-    schema.ProvenanceType.Plan: "Sp",
+    schema.ProvenanceType.ModelConfiguration: "Mc",
     schema.ProvenanceType.Publication: "Pu",
-    schema.ProvenanceType.Intermediate: "In",
-    schema.ProvenanceType.SimulationRun: "Sr",
+    schema.ProvenanceType.Simulation: "Si",
     schema.ProvenanceType.Project: "Pr",
-    schema.ProvenanceType.ModelRevision: "Mr",
     schema.ProvenanceType.Concept: "Cn",
-    schema.ProvenanceType.ModelParameter: "Mp",
-    schema.ProvenanceType.PlanParameter: "Pp",
 }

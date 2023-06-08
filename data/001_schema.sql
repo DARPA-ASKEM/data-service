@@ -74,15 +74,11 @@ ALTER TYPE public.ontologicalfield OWNER TO dev;
 CREATE TYPE public.provenancetype AS ENUM (
     'Concept',
     'Dataset',
-    'Intermediate',
     'Model',
-    'ModelParameter',
-    'ModelRevision',
-    'Plan',
-    'PlanParameter',
+    'ModelConfiguration',
     'Project',
     'Publication',
-    'SimulationRun'
+    'Simulation'
 );
 
 
@@ -123,9 +119,10 @@ CREATE TYPE public.resourcetype AS ENUM (
     'datasets',
     'intermediates',
     'models',
-    'plans',
+    'model_configurations',
     'publications',
-    'simulation_runs'
+    'simulations',
+    'workflows'
 );
 
 
@@ -152,15 +149,12 @@ ALTER TYPE public.role OWNER TO dev;
 CREATE TYPE public.taggabletype AS ENUM (
     'datasets',
     'features',
-    'intermediates',
-    'model_parameters',
+    'model_configurations',
     'models',
     'projects',
     'publications',
     'qualifiers',
-    'simulation_parameters',
-    'simulation_plans',
-    'simulation_runs'
+    'simulations'
 );
 
 
@@ -263,7 +257,7 @@ CREATE TABLE public.dataset (
     annotations json,
     data_path character varying,
     maintainer integer,
-    simulation_run boolean DEFAULT false
+    simulation_result boolean DEFAULT false
 );
 
 
@@ -365,82 +359,6 @@ ALTER TABLE public.feature_id_seq OWNER TO dev;
 
 ALTER SEQUENCE public.feature_id_seq OWNED BY public.feature.id;
 
-
---
--- Name: intermediate; Type: TABLE; Schema: public; Owner: dev
---
-
-CREATE TABLE public.intermediate (
-    id integer NOT NULL,
-    "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
-    source public.intermediatesource NOT NULL,
-    type public.intermediateformat NOT NULL,
-    content bytea NOT NULL
-);
-
-
-ALTER TABLE public.intermediate OWNER TO dev;
-
---
--- Name: intermediate_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
---
-
-CREATE SEQUENCE public.intermediate_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.intermediate_id_seq OWNER TO dev;
-
---
--- Name: intermediate_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
---
-
-ALTER SEQUENCE public.intermediate_id_seq OWNED BY public.intermediate.id;
-
-
---
--- Name: model_description; Type: TABLE; Schema: public; Owner: dev
---
-
-CREATE TABLE public.model_description (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    description text,
-    framework character varying NOT NULL,
-    "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
-    state_id integer NOT NULL
-);
-
-
-ALTER TABLE public.model_description OWNER TO dev;
-
---
--- Name: model_description_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
---
-
-CREATE SEQUENCE public.model_description_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.model_description_id_seq OWNER TO dev;
-
---
--- Name: model_description_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
---
-
-ALTER SEQUENCE public.model_description_id_seq OWNED BY public.model_description.id;
-
-
 --
 -- Name: model_framework; Type: TABLE; Schema: public; Owner: dev
 --
@@ -448,49 +366,12 @@ ALTER SEQUENCE public.model_description_id_seq OWNED BY public.model_description
 CREATE TABLE public.model_framework (
     name character varying NOT NULL,
     version character varying NOT NULL,
-    semantics character varying NOT NULL
+    semantics character varying NOT NULL,
+    schema_url character varying NOT NULL
 );
 
 
 ALTER TABLE public.model_framework OWNER TO dev;
-
---
--- Name: model_parameter; Type: TABLE; Schema: public; Owner: dev
---
-
-CREATE TABLE public.model_parameter (
-    id integer NOT NULL,
-    model_id integer,
-    name character varying NOT NULL,
-    type public.valuetype NOT NULL,
-    default_value character varying,
-    state_variable boolean NOT NULL
-);
-
-
-ALTER TABLE public.model_parameter OWNER TO dev;
-
---
--- Name: model_parameter_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
---
-
-CREATE SEQUENCE public.model_parameter_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.model_parameter_id_seq OWNER TO dev;
-
---
--- Name: model_parameter_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
---
-
-ALTER SEQUENCE public.model_parameter_id_seq OWNED BY public.model_parameter.id;
-
 
 --
 -- Name: model_runtime; Type: TABLE; Schema: public; Owner: dev
@@ -530,41 +411,6 @@ ALTER SEQUENCE public.model_runtime_id_seq OWNED BY public.model_runtime.id;
 
 
 --
--- Name: model_state; Type: TABLE; Schema: public; Owner: dev
---
-
-CREATE TABLE public.model_state (
-    id integer NOT NULL,
-    "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
-    content json
-);
-
-
-ALTER TABLE public.model_state OWNER TO dev;
-
---
--- Name: model_state_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
---
-
-CREATE SEQUENCE public.model_state_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.model_state_id_seq OWNER TO dev;
-
---
--- Name: model_state_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
---
-
-ALTER SEQUENCE public.model_state_id_seq OWNED BY public.model_state.id;
-
-
---
 -- Name: ontology_concept; Type: TABLE; Schema: public; Owner: dev
 --
 
@@ -572,7 +418,7 @@ CREATE TABLE public.ontology_concept (
     id integer NOT NULL,
     curie character varying NOT NULL,
     type public.taggabletype NOT NULL,
-    object_id integer NOT NULL,
+    object_id character varying NOT NULL,
     status public.ontologicalfield NOT NULL
 );
 
@@ -662,7 +508,7 @@ ALTER TABLE public.project OWNER TO dev;
 CREATE TABLE public.project_asset (
     id integer NOT NULL,
     project_id integer NOT NULL,
-    resource_id integer NOT NULL,
+    resource_id character varying NOT NULL,
     resource_type public.resourcetype NOT NULL,
     external_ref character varying
 );
@@ -722,9 +568,9 @@ CREATE TABLE public.provenance (
     id integer NOT NULL,
     "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
     relation_type public.relationtype NOT NULL,
-    "left" integer NOT NULL,
+    "left" character varying NOT NULL,
     left_type public.provenancetype NOT NULL,
-    "right" integer NOT NULL,
+    "right" character varying NOT NULL,
     right_type public.provenancetype NOT NULL,
     user_id integer,
     concept character varying
@@ -861,121 +707,6 @@ ALTER TABLE public.qualifier_xref_id_seq OWNER TO dev;
 
 ALTER SEQUENCE public.qualifier_xref_id_seq OWNED BY public.qualifier_xref.id;
 
-
---
--- Name: simulation_parameter; Type: TABLE; Schema: public; Owner: dev
---
-
-CREATE TABLE public.simulation_parameter (
-    id integer NOT NULL,
-    run_id integer NOT NULL,
-    name character varying NOT NULL,
-    value character varying NOT NULL,
-    type public.valuetype NOT NULL
-);
-
-
-ALTER TABLE public.simulation_parameter OWNER TO dev;
-
---
--- Name: simulation_parameter_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
---
-
-CREATE SEQUENCE public.simulation_parameter_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.simulation_parameter_id_seq OWNER TO dev;
-
---
--- Name: simulation_parameter_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
---
-
-ALTER SEQUENCE public.simulation_parameter_id_seq OWNED BY public.simulation_parameter.id;
-
-
---
--- Name: simulation_plan; Type: TABLE; Schema: public; Owner: dev
---
-
-CREATE TABLE public.simulation_plan (
-    id integer NOT NULL,
-    model_id integer NOT NULL,
-    simulator character varying NOT NULL,
-    query character varying NOT NULL,
-    content json NOT NULL
-);
-
-
-ALTER TABLE public.simulation_plan OWNER TO dev;
-
---
--- Name: simulation_plan_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
---
-
-CREATE SEQUENCE public.simulation_plan_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.simulation_plan_id_seq OWNER TO dev;
-
---
--- Name: simulation_plan_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
---
-
-ALTER SEQUENCE public.simulation_plan_id_seq OWNED BY public.simulation_plan.id;
-
-
---
--- Name: simulation_run; Type: TABLE; Schema: public; Owner: dev
---
-
-CREATE TABLE public.simulation_run (
-    id integer NOT NULL,
-    simulator_id integer NOT NULL,
-    "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
-    completed_at timestamp without time zone,
-    success boolean,
-    dataset_id integer,
-    description text,
-    response bytea
-);
-
-
-ALTER TABLE public.simulation_run OWNER TO dev;
-
---
--- Name: simulation_run_id_seq; Type: SEQUENCE; Schema: public; Owner: dev
---
-
-CREATE SEQUENCE public.simulation_run_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.simulation_run_id_seq OWNER TO dev;
-
---
--- Name: simulation_run_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dev
---
-
-ALTER SEQUENCE public.simulation_run_id_seq OWNED BY public.simulation_run.id;
-
-
 --
 -- Name: software; Type: TABLE; Schema: public; Owner: dev
 --
@@ -1039,41 +770,11 @@ ALTER TABLE ONLY public.extraction ALTER COLUMN id SET DEFAULT nextval('public.e
 
 ALTER TABLE ONLY public.feature ALTER COLUMN id SET DEFAULT nextval('public.feature_id_seq'::regclass);
 
-
---
--- Name: intermediate id; Type: DEFAULT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.intermediate ALTER COLUMN id SET DEFAULT nextval('public.intermediate_id_seq'::regclass);
-
-
---
--- Name: model_description id; Type: DEFAULT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_description ALTER COLUMN id SET DEFAULT nextval('public.model_description_id_seq'::regclass);
-
-
---
--- Name: model_parameter id; Type: DEFAULT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_parameter ALTER COLUMN id SET DEFAULT nextval('public.model_parameter_id_seq'::regclass);
-
-
 --
 -- Name: model_runtime id; Type: DEFAULT; Schema: public; Owner: dev
 --
 
 ALTER TABLE ONLY public.model_runtime ALTER COLUMN id SET DEFAULT nextval('public.model_runtime_id_seq'::regclass);
-
-
---
--- Name: model_state id; Type: DEFAULT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_state ALTER COLUMN id SET DEFAULT nextval('public.model_state_id_seq'::regclass);
-
 
 --
 -- Name: ontology_concept id; Type: DEFAULT; Schema: public; Owner: dev
@@ -1130,28 +831,6 @@ ALTER TABLE ONLY public.qualifier ALTER COLUMN id SET DEFAULT nextval('public.qu
 
 ALTER TABLE ONLY public.qualifier_xref ALTER COLUMN id SET DEFAULT nextval('public.qualifier_xref_id_seq'::regclass);
 
-
---
--- Name: simulation_parameter id; Type: DEFAULT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_parameter ALTER COLUMN id SET DEFAULT nextval('public.simulation_parameter_id_seq'::regclass);
-
-
---
--- Name: simulation_plan id; Type: DEFAULT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_plan ALTER COLUMN id SET DEFAULT nextval('public.simulation_plan_id_seq'::regclass);
-
-
---
--- Name: simulation_run id; Type: DEFAULT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_run ALTER COLUMN id SET DEFAULT nextval('public.simulation_run_id_seq'::regclass);
-
-
 --
 -- Name: software id; Type: DEFAULT; Schema: public; Owner: dev
 --
@@ -1206,23 +885,6 @@ ALTER TABLE ONLY public.extraction
 ALTER TABLE ONLY public.feature
     ADD CONSTRAINT feature_pkey PRIMARY KEY (id);
 
-
---
--- Name: intermediate intermediate_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.intermediate
-    ADD CONSTRAINT intermediate_pkey PRIMARY KEY (id);
-
-
---
--- Name: model_description model_description_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_description
-    ADD CONSTRAINT model_description_pkey PRIMARY KEY (id);
-
-
 --
 -- Name: model_framework model_framework_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
 --
@@ -1230,30 +892,12 @@ ALTER TABLE ONLY public.model_description
 ALTER TABLE ONLY public.model_framework
     ADD CONSTRAINT model_framework_pkey PRIMARY KEY (name);
 
-
---
--- Name: model_parameter model_parameter_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_parameter
-    ADD CONSTRAINT model_parameter_pkey PRIMARY KEY (id);
-
-
 --
 -- Name: model_runtime model_runtime_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
 --
 
 ALTER TABLE ONLY public.model_runtime
     ADD CONSTRAINT model_runtime_pkey PRIMARY KEY (id);
-
-
---
--- Name: model_state model_state_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_state
-    ADD CONSTRAINT model_state_pkey PRIMARY KEY (id);
-
 
 --
 -- Name: ontology_concept ontology_concept_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
@@ -1320,30 +964,6 @@ ALTER TABLE ONLY public.qualifier_xref
 
 
 --
--- Name: simulation_parameter simulation_parameter_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_parameter
-    ADD CONSTRAINT simulation_parameter_pkey PRIMARY KEY (id);
-
-
---
--- Name: simulation_plan simulation_plan_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_plan
-    ADD CONSTRAINT simulation_plan_pkey PRIMARY KEY (id);
-
-
---
--- Name: simulation_run simulation_run_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_run
-    ADD CONSTRAINT simulation_run_pkey PRIMARY KEY (id);
-
-
---
 -- Name: software software_pkey; Type: CONSTRAINT; Schema: public; Owner: dev
 --
 
@@ -1381,30 +1001,6 @@ ALTER TABLE ONLY public.extraction
 
 ALTER TABLE ONLY public.feature
     ADD CONSTRAINT feature_dataset_id_fkey FOREIGN KEY (dataset_id) REFERENCES public.dataset(id);
-
-
---
--- Name: model_description model_description_framework_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_description
-    ADD CONSTRAINT model_description_framework_fkey FOREIGN KEY (framework) REFERENCES public.model_framework(name);
-
-
---
--- Name: model_description model_description_state_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_description
-    ADD CONSTRAINT model_description_state_id_fkey FOREIGN KEY (state_id) REFERENCES public.model_state(id);
-
-
---
--- Name: model_parameter model_parameter_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.model_parameter
-    ADD CONSTRAINT model_parameter_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.model_description(id);
 
 
 --
@@ -1470,32 +1066,6 @@ ALTER TABLE ONLY public.qualifier_xref
 ALTER TABLE ONLY public.qualifier_xref
     ADD CONSTRAINT qualifier_xref_qualifier_id_fkey FOREIGN KEY (qualifier_id) REFERENCES public.qualifier(id);
 
-
---
--- Name: simulation_parameter simulation_parameter_run_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_parameter
-    ADD CONSTRAINT simulation_parameter_run_id_fkey FOREIGN KEY (run_id) REFERENCES public.simulation_run(id);
-
-
---
--- Name: simulation_plan simulation_plan_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_plan
-    ADD CONSTRAINT simulation_plan_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.model_description(id);
-
-
---
--- Name: simulation_run simulation_run_simulator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dev
---
-
-ALTER TABLE ONLY public.simulation_run
-    ADD CONSTRAINT simulation_run_simulator_id_fkey FOREIGN KEY (simulator_id) REFERENCES public.simulation_plan(id);
-
-
 --
 -- PostgreSQL database dump complete
 --
-

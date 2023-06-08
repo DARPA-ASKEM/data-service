@@ -11,7 +11,7 @@ from tds.schema.concept import Concept
 class Project(schema.Project):
     concept: Optional[Concept] = None
     active = True
-    assets: Dict[schema.ResourceType, Set[int]] = {}
+    assets: Dict[schema.ResourceType, Set[int | str]] = {}
 
     @classmethod
     def from_orm(

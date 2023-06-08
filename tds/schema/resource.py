@@ -8,9 +8,11 @@ from typing import Dict, Optional, Type
 
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
+from tds.modules.model.model import Model
+from tds.modules.model_configuration.model import ModelConfiguration
+from tds.modules.simulation.model import Simulation
+from tds.modules.workflow.model import Workflow
 from tds.schema.dataset import Dataset
-from tds.schema.model import Intermediate, Model, ModelDescription
-from tds.schema.simulation import Plan, Run, RunDescription
 
 
 class Publication(schema.Publication):
@@ -23,33 +25,26 @@ class Software(schema.Software):
         orm_mode = True
 
 
-Resource = Dataset | Model | Plan | Publication | Intermediate | Run
+Resource = Dataset | Model | ModelConfiguration | Publication | Simulation | Workflow
 
-ORMResource = (
-    orm.Dataset
-    | orm.ModelDescription
-    | orm.SimulationPlan
-    | orm.Publication
-    | orm.Intermediate
-    | orm.SimulationRun
-)
+ORMResource = orm.Dataset | orm.Publication | Simulation
 
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
     Model: ResourceType.models,
-    Plan: ResourceType.plans,
+    ModelConfiguration: ResourceType.model_configurations,
     Publication: ResourceType.publications,
-    Intermediate: ResourceType.intermediates,
-    Run: ResourceType.simulation_runs,
+    Simulation: ResourceType.simulations,
+    Workflow: ResourceType.workflows,
 }
 
 obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
-    ModelDescription: ResourceType.models,
-    Plan: ResourceType.plans,
+    Model: ResourceType.models,
+    ModelConfiguration: ResourceType.model_configurations,
     Publication: ResourceType.publications,
-    Intermediate: ResourceType.intermediates,
-    RunDescription: ResourceType.simulation_runs,
+    Simulation: ResourceType.simulations,
+    Workflow: ResourceType.workflows,
 }
 
 
@@ -84,11 +79,8 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
         lambda: None,
         {
             ResourceType.datasets: orm.Dataset,
-            ResourceType.models: orm.ModelDescription,
-            ResourceType.plans: orm.SimulationPlan,
             ResourceType.publications: orm.Publication,
-            ResourceType.intermediates: orm.Intermediate,
-            ResourceType.simulation_runs: orm.SimulationRun,
+            ResourceType.simulations: Simulation,
         },
     )
     return enum_to_orm[resource_type]

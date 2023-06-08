@@ -24,40 +24,34 @@
     ],
     "PARAMETER_OF":[
         ["ModelParameter","ModelRevision"],
-        ["PlanParameter","SimulationRun"]
-    ],
-    "REINTERPRETS":[
-        ["Intermediate","Intermediate"],
-        ["Model","Intermediate"],
-        ["Dataset","SimulationRun"]
+        ["PlanParameter","Simulation"]
     ],
     "GENERATED_BY":[
-        ["SimulationRun","Plan"]
+        ["Simulation","Plan"]
     ],
     "USES":[
-        ["Plan","ModelRevision"]
+        ["Plan","ModelRevision"],
+        ["ModelConfiguration","Model"]
     ],
     "CITES":[
         ["Publication","Publication"]
     ],
     "EXTRACTED_FROM":[
-        ["Intermediate","Publication"],
+        ["Model","Publication"],
         ["Dataset","Publication"]
     ],
     "CONTAINS":[
         ["Project","Publication"],
-        ["Project","Intermediate"],
         ["Project","Model"],
         ["Project","Plan"],
-        ["Project","SimulationRun"],
+        ["Project","Simulation"],
         ["Project","Dataset"]
     ],
     "IS_CONCEPT_OF":[
         ["Concept","Publication"],
-        ["Concept","Intermediate"],
         ["Concept","Model"],
         ["Concept","Plan"],
-        ["Concept","SimulationRun"],
+        ["Concept","Simulation"],
         ["Concept","Dataset"]
     ]
 }

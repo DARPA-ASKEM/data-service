@@ -39,6 +39,18 @@ def attach_router(api: FastAPI, router_name: str) -> None:
     )
 
 
+def load_module_routers(api):
+    """
+    Function loads the module router objects and registers them with FastAPI.
+    """
+    modules = import_module("tds.modules")
+    for mod in iter_modules(modules.__path__):
+        module = import_module(f"tds.modules.{mod.name}")
+        api.include_router(
+            module.router, tags=module.TAGS, prefix="/" + module.ROUTE_PREFIX
+        )
+
+
 def build_api(*args: str) -> FastAPI:
     """
     Build an API using a group of specified router modules
@@ -61,6 +73,10 @@ def build_api(*args: str) -> FastAPI:
         allow_headers=["*"],
     )
 
+    # Load routers from the modules package.
+    load_module_routers(api)
+
     for router_name in args if len(args) != 0 else find_valid_routers():
         attach_router(api, router_name)
+
     return api

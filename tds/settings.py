@@ -1,6 +1,8 @@
 """
 Configures data store using environment variables
 """
+from typing import Optional
+
 from pydantic import BaseSettings
 
 
@@ -24,6 +26,16 @@ class Settings(BaseSettings):
     NEO4J_PASSWORD = "password"
     NEO4J_USER = "neo4j"
     OPENAI_KEY = "sk-.."
+    ES_URL: str = ""
+    ES_USERNAME: str = ""
+    ES_PASSWORD: str = ""
+    ES_INDEX_PREFIX: str = "tds_"
+    S3_DATASET_PATH: str = ""
+    S3_RESULT_PATH: str = ""
+    S3_BUCKET: str = ""
+    STORAGE_HOST: Optional[str] = None
+    AWS_ACCESS_KEY_ID: Optional[str] = None
+    AWS_SECRET_ACCESS_KEY: Optional[str] = None
 
 
 settings = Settings()

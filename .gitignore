@@ -29,6 +29,8 @@ dist
 .sqlite
 experiments-main
 api.env
+.env
 
 # Minio
 .minio.sys
+data/askem-staging-data-service
