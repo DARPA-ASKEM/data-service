@@ -28,6 +28,7 @@ class Simulation(TdsModel):
     Simulation Data Model
     """
 
+    id: str
     name: Optional[str]
     description: Optional[str]
 
