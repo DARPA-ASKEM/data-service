@@ -9,7 +9,7 @@ fastapi_endpoint_config = {
                 "application/json": {
                     "schema": {
                         "type": "object",
-                        "properties": {"id": {"type": "integer"}},
+                        "properties": {"id": {"type": "integer|string"}},
                     }
                 }
             },
