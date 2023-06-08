@@ -35,23 +35,6 @@ class ModelRuntime(BaseModel):
     right: str
 
 
-class Dataset(BaseModel):
-    id: Optional[int] = None
-    name: str
-    url: str
-    description: str
-    timestamp: datetime.datetime = datetime.datetime.now()
-    deprecated: Optional[bool] = False
-    sensitivity: Optional[str]
-    quality: Optional[str]
-    temporal_resolution: Optional[str]
-    geospatial_resolution: Optional[str]
-    annotations: Optional[Json]
-    data_path: Optional[str]
-    maintainer: Optional[int]
-    simulation_result: Optional[bool] = False
-
-
 class Feature(BaseModel):
     id: Optional[int] = None
     dataset_id: Optional[int] = None
