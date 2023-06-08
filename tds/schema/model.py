@@ -2,14 +2,12 @@
 Provides the API interface for models.
 """
 # pylint: disable=missing-class-docstring
-from json import dumps
 from typing import Dict, List, Optional
 
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel, Json
+from pydantic import BaseModel
 
-from tds.autogen import orm, schema
-from tds.schema.concept import Concept
+from tds.autogen import schema
 
 ModelParameters = List[Dict]
 

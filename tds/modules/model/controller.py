@@ -2,7 +2,7 @@
 TDS Model Controller.
 """
 from logging import Logger
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from elasticsearch import NotFoundError
 from elasticsearch import exceptions as es_exceptions

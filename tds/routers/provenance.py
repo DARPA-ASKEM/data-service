@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import enums, orm, schema
+from tds.autogen import enums, orm
 from tds.db import ProvenanceHandler, SearchProvenance, request_graph_db, request_rdb
 from tds.operation import create, delete, retrieve
 from tds.schema.provenance import Provenance, ProvenancePayload

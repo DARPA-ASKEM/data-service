@@ -117,6 +117,7 @@ class Dataset(TdsModel):
                 "name": "CDC COVID-19 Vaccination and Case Trends by Age Group",
                 "description": "CDC COVID-19 Vaccination and Case Trends by Age Group",
                 "file_names": [
+                    # pylint: disable-next=line-too-long
                     "Archive__COVID-19_Vaccination_and_Case_Trends_by_Age_Group__United_States.csv"
                 ],
                 "columns": [

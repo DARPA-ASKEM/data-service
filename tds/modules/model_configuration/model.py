@@ -20,7 +20,7 @@ class ModelConfiguration(TdsModel):
     concepts: Optional[List] = []
     exists: Optional[bool] = False
 
-    def save(self, model_configuration_id: Optional[None | str | int] = None):
+    def save(self):
         res = super().save()
         if settings.NEO4J_ENABLED:
             self._establish_provenance()

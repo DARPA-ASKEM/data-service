@@ -11,6 +11,10 @@ from tds.settings import settings
 
 
 class Transform(BaseModel):
+    """
+    Transform data model.
+    """
+
     x: float
     y: float
     z: float

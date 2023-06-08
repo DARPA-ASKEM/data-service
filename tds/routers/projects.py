@@ -287,7 +287,6 @@ def get_project_assets(
                         query={"ids": {"values": assets_key_ids[key]}},
                         fields=responder["fields"],
                     )
-                    print(es_items)
                     assets_key_objects[key] = (
                         []
                         if es_items["hits"]["total"]["value"] == 0

@@ -1,15 +1,7 @@
 """
 API schema for simulation objects
 """
-# pylint: disable=missing-class-docstring
-
-from json import dumps
-from typing import List, Optional
-
-from tds.autogen import orm
-from tds.modules.model_configuration.model import ModelConfiguration
-from tds.modules.simulation.model import Simulation
-from tds.schema.concept import Concept
+from typing import List
 
 SimulationParameters = List[dict]
 
