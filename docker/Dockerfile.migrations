@@ -1,0 +1,5 @@
+FROM python:3.10
+COPY migrate /migrate
+RUN pip install -r /migrate/requirements.txt
+COPY docker/scripts/run_migrations.sh /run_migrations.sh
+RUN chmod +x /run_migrations.sh
