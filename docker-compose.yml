@@ -40,12 +40,15 @@ services:
       - data-annotation-stack
       - data-api
     depends_on:
-      - rdb
-      - graphdb
-      - minio
-      - elasticsearch
+      migrations:
+        condition: service_completed_successfully
+      graphdb:
+        condition: service_started
+      minio:
+        condition: service_started
     volumes:
       - $PWD/tds:/api/tds
+      - $PWD/migrate:/api/migrate
   graphdb:
     build:
       context: ./
