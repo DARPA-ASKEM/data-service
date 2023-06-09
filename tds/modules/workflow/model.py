@@ -17,7 +17,7 @@ class Transform(BaseModel):
 
     x: float
     y: float
-    z: float
+    k: float
 
 
 class Workflow(TdsModel):
