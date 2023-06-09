@@ -112,6 +112,10 @@ services:
       - data-api
       - data-annotation-stack
 volumes:
+  tds_data:
+    driver: local
+  neo4j_data:
+    driver: local
   elasticsearch_data:
     driver: local
   kibanadata:
