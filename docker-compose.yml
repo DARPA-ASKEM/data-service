@@ -56,8 +56,11 @@ services:
     environment:
       - NEO4J_AUTH=$NEO4J_AUTH
       - NEO4J_dbms_memory_pagecache_size=512M
+    volumes:
+      - neo4j_data:/data
     depends_on:
-      - rdb
+      rdb:
+        condition: service_healthy
     networks:
       - data-api
   minio:
