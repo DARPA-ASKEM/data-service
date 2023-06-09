@@ -43,15 +43,15 @@ def setup_elasticsearch_indexes() -> None:
         "dataset": {},
         "model_configuration": {
             "properties": {
-                "model.model": {
+                "configuration.model": {
                     "type": "object",
                     "enabled": False,
                 },
-                "model.semantics": {
+                "configuration.semantics": {
                     "type": "object",
                     "enabled": False,
                 },
-                "model.metadata": {
+                "configuration.metadata": {
                     "type": "object",
                     "enabled": False,
                 },
