@@ -7,11 +7,9 @@ import logging
 from sys import exit as sys_exit
 
 from click import command, echo, option
-from sqlalchemy.exc import OperationalError
 from uvicorn import run as uvicorn_run
 
-from tds.db import init_dev_content, rdb, stamp, upgrade
-from tds.db.elasticsearch import es_client, wait_for_es_up
+from tds.db.elasticsearch import es_client
 from tds.settings import settings
 
 logger = logging.Logger("main.py")
@@ -63,7 +61,6 @@ def setup_elasticsearch_indexes() -> None:
 
     # Wait for elasticsearch to be online and healthy enough to proceed
     es = es_client()
-    wait_for_es_up(es)
 
     # Create indexes
     for idx, config in indices.items():
