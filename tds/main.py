@@ -94,21 +94,6 @@ def cli(host: str, port: int, dev: bool, server_config: str) -> None:
         echo(f"Failed to start: {message}.")
         sys_exit()
     setup_elasticsearch_indexes()
-    if dev:
-        try:
-            echo("Connecting to DB... ", nl=False)
-            connection = rdb.connect()
-        except OperationalError:
-            echo("FAILED: DB NOT CONNECTED")
-        else:
-            echo("SUCCESS")
-            if len(rdb.table_names()) == 0:
-                init_dev_content(connection)
-                stamp()
-                echo("STAMPED WITH CURRENT DB VERSION")
-            else:
-                upgrade()
-                echo("DB IS UP TO DATE")
 
     uvicorn_run(f"tds.server.configs:{server_config}", host=host, port=port, reload=dev)
 
