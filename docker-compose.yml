@@ -11,15 +11,20 @@ services:
     container_name: data-service-rdb
     image: "postgres:15.1"
     ports:
-      - "8032:5432"
+      - 8032:$SQL_PORT
     environment:
       - POSTGRES_PASSWORD=$SQL_PASSWORD
       - POSTGRES_USER=$SQL_USER
       - POSTGRES_DB=$SQL_DB
     volumes:
-      - ./data:/docker-entrypoint-initdb.d
+      - tds_data:/var/lib/pgsql/data
     networks:
       - data-api
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${SQL_USER} -d ${SQL_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   api:
     container_name: data-service-api
     build:
