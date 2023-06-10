@@ -16,7 +16,7 @@ from logging.config import fileConfig
 # pylint: disable=no-member
 # NOTE: context doesn't exist until runtime
 from alembic import context
-from sqlalchemy import create_engine, engine_from_config, pool
+from sqlalchemy import create_engine
 
 config = context.config
 
@@ -24,7 +24,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-def setup_context():
+def setup_context() -> str:
     tokens = {
         "SQL_USER": os.getenv("SQL_USER"),
         "SQL_PASSWORD": os.getenv("SQL_PASSWORD"),
