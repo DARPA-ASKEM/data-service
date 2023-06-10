@@ -17,7 +17,7 @@ services:
       - POSTGRES_USER=$SQL_USER
       - POSTGRES_DB=$SQL_DB
     volumes:
-      - tds_data:/var/lib/pgsql/data
+      - tds_data:/var/lib/postgresql/data
     networks:
       - data-api
     healthcheck:
