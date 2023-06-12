@@ -57,23 +57,7 @@ down:
 
 .PHONY:db-clean
 db-clean:
-	rm -f ./data/*.sql; \
-	rm -f ./data/datasets/*/*; \
-	rmdir ./data/datasets/*;
-
-$(SCHEMA_SQL_FILE):$(SCHEMA_FILES)
-	if [ -n "$$(docker compose ps | grep rdb)" ]; then \
-		echo "Writing out file $(SCHEMA_SQL_FILE)"; \
-		docker compose exec -u postgres rdb /bin/bash -c 'pg_dump -s -h "localhost" -U "$$POSTGRES_USER" "$$POSTGRES_DB" > /tmp/001_schema.sql' && \
-		docker compose cp rdb:/tmp/001_schema.sql ./data; \
-	fi
-
-$(DATA_SQL_FILE):$(DATA_FILES)
-	if [ -n "$$(docker compose ps | grep rdb)" ]; then \
-		echo "Writing out file $(DATA_SQL_FILE)"; \
-		docker compose exec -u postgres rdb /bin/bash -c 'pg_dump -a -h "localhost" -U "$$POSTGRES_USER" "$$POSTGRES_DB" > /tmp/002_data.sql' && \
-		docker compose cp rdb:/tmp/002_data.sql ./data; \
-	fi
+	docker volume rm data-service_elasticsearch_data data-service_kibanadata data-service_tds_data data-service_neo4j_data
 
 .PHONY:db-full
 db-full: | $(SCHEMA_SQL_FILE) $(DATA_SQL_FILE)
