@@ -9,65 +9,7 @@ from sys import exit as sys_exit
 from click import command, echo, option
 from uvicorn import run as uvicorn_run
 
-from tds.db.elasticsearch import es_client
-from tds.settings import settings
-
 logger = logging.Logger("main.py")
-
-
-def setup_elasticsearch_indexes() -> None:
-    """
-    Function creates indexes in ElasticSearch.
-    """
-    # Config should match keyword args on
-    # https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
-    indices = {
-        "model": {
-            "properties": {
-                "model": {
-                    "type": "object",
-                    "enabled": False,
-                },
-                "semantics": {
-                    "type": "object",
-                    "enabled": False,
-                },
-                "metadata": {
-                    "type": "object",
-                    "enabled": False,
-                },
-            },
-        },
-        "dataset": {},
-        "model_configuration": {
-            "properties": {
-                "configuration.model": {
-                    "type": "object",
-                    "enabled": False,
-                },
-                "configuration.semantics": {
-                    "type": "object",
-                    "enabled": False,
-                },
-                "configuration.metadata": {
-                    "type": "object",
-                    "enabled": False,
-                },
-            },
-        },
-        "simulation": {},
-        "workflow": {},
-    }
-
-    # Wait for elasticsearch to be online and healthy enough to proceed
-    es = es_client()
-
-    # Create indexes
-    for idx, config in indices.items():
-        index_name = f"{settings.ES_INDEX_PREFIX}{idx}"
-        if not es.indices.exists(index=index_name):
-            logger.debug("Creating index %s", index_name)
-            es.indices.create(index=index_name, mappings=config)
 
 
 @command()
@@ -90,7 +32,6 @@ def cli(host: str, port: int, dev: bool, server_config: str) -> None:
     if not is_success:
         echo(f"Failed to start: {message}.")
         sys_exit()
-    setup_elasticsearch_indexes()
 
     uvicorn_run(f"tds.server.configs:{server_config}", host=host, port=port, reload=dev)
 
