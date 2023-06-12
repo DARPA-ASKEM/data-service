@@ -1,3 +1,4 @@
 psycopg2>=2.9.5
 alembic>=1.9.4
 elasticsearch==8.5.3
+boto3==1.24
