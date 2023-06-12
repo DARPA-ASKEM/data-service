@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-
 echo "Running migrations."
 alembic -c migrate/alembic.ini upgrade head
 echo "Completed Postgres migrations."
 
 echo "Checking storage bucket."
-
+python migrate/scripts/file_storage.py create_bucket
 
 echo "Running Elasticsearch index build"
 python migrate/scripts/start_elasticsearch.py
