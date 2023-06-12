@@ -23,6 +23,7 @@ def setup_elasticsearch_indexes() -> None:
         # Create indexes
         for idx, config in indices.items():
             index_name = f"{ES_INDEX_PREFIX}{idx}"
+            print(f"Checking {index_name}")
             if not es.indices.exists(index=index_name):
                 print(f"Creating {index_name} index.")
                 # logger.debug("Creating index %s", index_name)
