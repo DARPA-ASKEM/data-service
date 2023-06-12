@@ -13,6 +13,7 @@ python migrate/scripts/start_elasticsearch.py
 
 if [[ "$SEED_DATA" == "true" ]] ; then
   echo "Seeding Data"
+  python migrate/scripts/start_elasticsearch.py "seed"
   python migrate/scripts/seed_data.py
 fi
 # To Troubleshoot the migration container, uncomment the following lines:
