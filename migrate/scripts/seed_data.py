@@ -2,9 +2,6 @@
 import json
 import os
 import sys
-
-print(sys.path)
-
 from pathlib import Path
 
 from alembic import config
