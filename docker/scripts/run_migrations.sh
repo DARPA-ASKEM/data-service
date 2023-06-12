@@ -10,6 +10,7 @@ python migrate/start_elasticsearch.py
 
 if [[ "$SEED_DATA" == "true" ]] ; then
   echo "Seeding Data"
+  python migrate/seed_data.py
 fi
 #touch /logger.log
 #tail -f /logger.log
