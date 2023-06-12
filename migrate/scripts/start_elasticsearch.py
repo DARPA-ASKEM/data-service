@@ -23,7 +23,7 @@ def setup_elasticsearch_indexes() -> None:
     """
     # Config should match keyword args on
     # https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
-    with open("/migrate/seeds/indexes.json", "r") as index_file:
+    with open("/migrate/seeds/es/indexes.json", "r") as index_file:
         indices = json.load(index_file)
 
         # Create indexes
