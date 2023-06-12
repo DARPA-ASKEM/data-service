@@ -17,7 +17,7 @@ def setup_elasticsearch_indexes() -> None:
     es = Elasticsearch([ES_URL], basic_auth=(ES_USERNAME, ES_PASSWORD))
     # Config should match keyword args on
     # https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
-    with open("/migrate/indexes.json", "r") as index_file:
+    with open("/migrate/seeds/indexes.json", "r") as index_file:
         indices = json.load(index_file)
 
         # Create indexes
