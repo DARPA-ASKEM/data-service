@@ -23,7 +23,7 @@ def setup_elasticsearch_indexes() -> None:
     """
     # Config should match keyword args on
     # https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
-    with open("/migrate/seeds/es/indexes.json", "r") as index_file:
+    with open(f"{es_seed_dir}/indexes.json", "r") as index_file:
         indices = json.load(index_file)
 
         # Create indexes
@@ -55,6 +55,8 @@ def seed_es_data():
     print("Seeding ElasticSearch Data.")
     for directory in os.listdir(es_seed_dir):
         path_dir = f"{es_seed_dir}/{directory}"
+        if os.path.isfile(path_dir):
+            continue
         for file in os.listdir(path_dir):
             file_path = f"{path_dir}/{file}"
             with open(file_path, "r") as es_file_data:
