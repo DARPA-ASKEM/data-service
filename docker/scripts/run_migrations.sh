@@ -17,7 +17,7 @@ if [[ "$SEED_DATA" == "true" ]] ; then
   python migrate/scripts/seed_data.py
 fi
 # To Troubleshoot the migration container, uncomment the following lines:
-touch /logger.log
-tail -f /logger.log
+#touch /logger.log
+#tail -f /logger.log
 echo "Booting TDS API."
 exit 0
