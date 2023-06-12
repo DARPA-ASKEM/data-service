@@ -96,7 +96,7 @@ services:
     networks:
       - data-api
     healthcheck:
-      test: curl http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1
+      test: curl http://localhost:9200/_cluster/health?wait_for_status=green || exit 1
       interval: 10s
       timeout: 5s
       retries: 5
@@ -132,6 +132,8 @@ services:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
+      minio:
+        condition: service_started
     networks:
       - data-api
 volumes:
