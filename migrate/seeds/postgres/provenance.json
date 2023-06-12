@@ -1,0 +1,9 @@
+[
+  {
+    "relation_type": "EXTRACTED_FROM",
+    "left": "sir-model-id",
+    "left_type": "Model",
+    "right": "1",
+    "right_type": "Publication"
+  }
+]
