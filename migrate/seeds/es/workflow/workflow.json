@@ -1,0 +1,21 @@
+{
+    "id": "demo-workflow-id",
+    "name": "Test Workflow",
+    "description": "This is the description",
+    "edges": [{"id": "edge"}],
+    "transform": {
+        "x": 124.932,
+        "y": 48.65,
+        "z": 3.1
+    },
+    "nodes": [
+        {
+            "model": {
+                "id": "biomd0000000294-model-id",
+                "configurations": [
+                    {"id": "biomd0000000294-model-config-id"}
+                ]
+            }
+        }
+    ]
+}
