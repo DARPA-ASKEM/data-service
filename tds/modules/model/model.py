@@ -39,9 +39,7 @@ class Model(TdsModel):
             self._establish_provenance()
         return res
 
-    def save(self, entity_id: Optional[None | str | int] = None):
-        if entity_id is not None:
-            self._exists = True
+    def save(self):
         res = super().save()
         self._extract_concepts()
         return res
