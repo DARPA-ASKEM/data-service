@@ -23,6 +23,10 @@ tidy:
 
 .PHONY:up
 up:
+	docker compose --env-file api.env up -d;
+
+.PHONY:build
+up:
 	docker compose --env-file api.env up --build -d;
 	
 .PHONY: gen-migration
