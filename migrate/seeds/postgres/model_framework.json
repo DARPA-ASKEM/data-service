@@ -1,6 +1,6 @@
 [
   {
-    "name": "Petri Net",
+    "name": "Petri Net v1",
     "version": "0.0.1",
     "semantics": "{}",
     "schema_url": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json"
