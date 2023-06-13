@@ -95,7 +95,7 @@ def search_models(
                 "content-type": "application/json",
             },
             status_code=status.HTTP_400_BAD_REQUEST,
-            content=str(es_exception),
+            content=str(es_exception.error()),
         )
 
     list_response = (
