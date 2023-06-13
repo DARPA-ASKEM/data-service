@@ -40,6 +40,10 @@ def setup_elasticsearch_indexes() -> None:
 
 
 def save_data_to_es(directory, data):
+    """
+    Function saves data to ES.
+    """
+
     index = f"{ES_INDEX_PREFIX}{directory}"
     data_dict = json.load(data)
     try:
@@ -49,12 +53,17 @@ def save_data_to_es(directory, data):
         else:
             name = data_dict["name"]
             print(f"Created {name}.")
-    except ConflictError as e:
+    except ConflictError as error:
         fail_id = data_dict["id"]
-        print(f"Item with id {fail_id} already exists in {index}. ({e.status_code})")
+        print(
+            f"Item with id {fail_id} already exists in {index}. ({error.status_code})"
+        )
 
 
 def seed_es_data():
+    """
+    Function seeds data into ES.
+    """
     print("Seeding ElasticSearch Data.")
     for directory in os.listdir(es_seed_dir):
         path_dir = f"{es_seed_dir}/{directory}"
@@ -62,7 +71,7 @@ def seed_es_data():
             continue
         for file in os.listdir(path_dir):
             file_path = f"{path_dir}/{file}"
-            with open(file_path, "r") as es_file_data:
+            with open(file_path, "r", encoding="utf-8") as es_file_data:
                 save_data_to_es(directory=directory, data=es_file_data)
 
 
