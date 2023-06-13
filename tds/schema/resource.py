@@ -78,7 +78,7 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
     enum_to_orm = defaultdict(
         lambda: None,
         {
-            ResourceType.datasets: orm.Dataset,
+            ResourceType.datasets: Dataset,
             ResourceType.publications: orm.Publication,
             ResourceType.simulations: Simulation,
         },
