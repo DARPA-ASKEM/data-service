@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+"""
+TDS Data seed for postgres.
+"""
 import json
 import os
-import sys
 from pathlib import Path
 
 from alembic import config
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
@@ -20,34 +22,40 @@ SQL_PORT = str(os.getenv("SQL_PORT"))
 SQL_DB = os.getenv("SQL_DB")
 
 
+# pylint: disable-next=(too-many-locals
 def seed_postgres_data(conn):
+    """
+    Function seeds postgres data.
+    """
     print("Seeding Postgres Data.")
     session = Session(bind=conn)
 
-    projects = json.load(open(f"{seed_dir}/projects.json"))
+    with open(f"{seed_dir}/projects.json", encoding="utf-8") as project_json:
+        projects = json.load(project_json)
+        for project in projects:
+            session.add(orm.Project(**project))
 
-    for project in projects:
-        session.add(orm.Project(**project))
+    with open(f"{seed_dir}/publications.json", encoding="utf-8") as publications_json:
+        publications = json.load(publications_json)
+        for publication in publications:
+            session.add(orm.Publication(**publication))
 
-    publications = json.load(open(f"{seed_dir}/publications.json"))
+    with open(f"{seed_dir}/project_assets.json", encoding="utf-8") as assets_json:
+        assets = json.load(assets_json)
+        for asset in assets:
+            session.add(orm.ProjectAsset(**asset))
 
-    for publication in publications:
-        session.add(orm.Publication(**publication))
+    with open(f"{seed_dir}/provenance.json", encoding="utf-8") as provenance_json:
+        provenance = json.load(provenance_json)
+        for record in provenance:
+            session.add(orm.Provenance(**record))
 
-    assets = json.load(open(f"{seed_dir}/project_assets.json"))
-
-    for asset in assets:
-        session.add(orm.ProjectAsset(**asset))
-
-    provenance = json.load(open(f"{seed_dir}/provenance.json"))
-
-    for record in provenance:
-        session.add(orm.Provenance(**record))
-
-    frameworks = json.load(open(f"{seed_dir}/model_framework.json"))
-
-    for framework in frameworks:
-        session.add(orm.ModelFramework(**framework))
+    with open(
+        f"{seed_dir}/model_framework.json", encoding="utf-8"
+    ) as model_framework_json:
+        frameworks = json.load(model_framework_json)
+        for framework in frameworks:
+            session.add(orm.ModelFramework(**framework))
     session.commit()
 
 
