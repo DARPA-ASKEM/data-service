@@ -26,7 +26,7 @@ up:
 	docker compose --env-file api.env up -d;
 
 .PHONY:build
-up:
+build:
 	docker compose --env-file api.env up --build -d;
 	
 .PHONY: gen-migration
