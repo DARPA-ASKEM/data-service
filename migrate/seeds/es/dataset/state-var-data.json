@@ -5,6 +5,7 @@
   "data_source_date": "2020-01-21 00:00:00",
   "name": "State var data for Scenario 3",
   "description": "State var data for scenario 3.",
+  "timestamp": "2023-06-12 23:25:26",
   "columns": [
     {
       "name": "date",

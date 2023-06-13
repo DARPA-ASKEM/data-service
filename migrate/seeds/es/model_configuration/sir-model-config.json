@@ -3,7 +3,7 @@
   "model_id": "sir-model-id",
   "name": "SIR Config",
   "description": "SIR....",
-  "timestamp": "2023-06-12 23:25:26.467",
+  "timestamp": "2023-06-12 23:25:26",
   "model_version": "1.0",
   "configuration": {
     "name": "SIR Model",

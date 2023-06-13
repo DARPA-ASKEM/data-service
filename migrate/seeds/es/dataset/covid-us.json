@@ -5,6 +5,7 @@
   "data_source_date": "2020-01-21 00:00:00",
   "name": "US Covid-19 Case and Death Data",
   "description": "Simple US Covid-19 Data from the NY Times.",
+  "timestamp": "2023-06-12 23:25:26",
   "columns": [
     {
       "name": "date",

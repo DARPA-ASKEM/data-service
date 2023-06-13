@@ -2,6 +2,7 @@
     "id": "demo-workflow-id",
     "name": "Test Workflow",
     "description": "This is the description",
+    "timestamp": "2023-06-12 23:25:26",
     "edges": [{"id": "edge"}],
     "transform": {
         "x": 124.932,
