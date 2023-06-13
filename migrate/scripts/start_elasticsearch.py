@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+Elasticsearch data module.
+"""
 import json
 import os
 import sys
