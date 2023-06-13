@@ -19,7 +19,7 @@ model_list_fields = [
     "name",
     "model",
     "description",
-    "model_schema",
+    "schema",
     "model_version",
     "timestamp",
 ]
@@ -50,10 +50,11 @@ def model_response(model_from_es, delete_fields=None) -> dict:
     # model["state_id"] = es_response["_id"]
     # frameworks = get_frameworks()
     # model["framework"] = frameworks.get(model["model_schema"], model["model_schema"])
-    model["schema"] = model["model_schema"]
-
-    del model["model_schema"]
-    del model["concepts"]
+    if "model_schema" in model:
+        model["schema"] = model["model_schema"]
+        del model["model_schema"]
+    if "concepts" in model:
+        del model["concepts"]
 
     if delete_fields and delete_fields is List:
         for field in delete_fields:
