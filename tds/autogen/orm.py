@@ -43,25 +43,6 @@ class ModelRuntime(Base):
     )
 
 
-class Dataset(Base):
-    __tablename__ = "dataset"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    url = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.Text(), nullable=False)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    deprecated = sa.Column(sa.Boolean(), server_default="False")
-    sensitivity = sa.Column(sa.Text())
-    quality = sa.Column(sa.Text())
-    temporal_resolution = sa.Column(sa.String())
-    geospatial_resolution = sa.Column(sa.String())
-    annotations = sa.Column(JSON())
-    data_path = sa.Column(sa.String())
-    maintainer = sa.Column(sa.Integer(), sa.ForeignKey("person.id"))
-    simulation_result = sa.Column(sa.Boolean(), server_default="False")
-
-
 class Feature(Base):
     __tablename__ = "feature"
 

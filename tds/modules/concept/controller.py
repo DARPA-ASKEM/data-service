@@ -20,6 +20,7 @@ from tds.modules.concept.model import (
     OntologyConcept,
     OntologyConceptPayload,
 )
+from tds.modules.dataset.model import Dataset
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
 from tds.modules.simulation.model import Simulation
@@ -79,7 +80,7 @@ def get_taggable_orm(taggable_type: schema.TaggableType):
     enum_to_orm = {
         schema.TaggableType.features: orm.Feature,
         schema.TaggableType.qualifiers: orm.Qualifier,
-        schema.TaggableType.datasets: orm.Dataset,
+        schema.TaggableType.datasets: Dataset,
         schema.TaggableType.model_configurations: ModelConfiguration,
         schema.TaggableType.models: Model,
         schema.TaggableType.projects: orm.Project,
@@ -107,16 +108,16 @@ def search_concept_using_facets(
             base_query = base_query.filter(OntologyConcept.curie.in_(curies))
         if is_simulation is not None:
             base_query = base_query.join(
-                orm.Dataset,
+                Dataset,
                 and_(
                     OntologyConcept.type == schema.TaggableType.datasets,
-                    OntologyConcept.object_id == orm.Dataset.id,
+                    OntologyConcept.object_id == Dataset.id,
                 ),
                 isouter=True,
             ).filter(
                 or_(
                     OntologyConcept.type != schema.TaggableType.datasets,
-                    orm.Dataset.simulation_run == is_simulation,
+                    Dataset.simulation_run == is_simulation,
                 )
             )
         result = {

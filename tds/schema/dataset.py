@@ -21,12 +21,3 @@ class Feature(schema.Feature):
 
     class Config:
         orm_mode = True
-
-
-class Dataset(schema.Dataset):
-    features: List[Feature]
-    qualifiers: List[Qualifier]
-    concept: Optional[Concept]
-
-    class Config:
-        orm_mode = True

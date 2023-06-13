@@ -8,11 +8,11 @@ from typing import Dict, Optional, Type
 
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
+from tds.modules.dataset.model import Dataset
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
 from tds.modules.simulation.model import Simulation
 from tds.modules.workflow.model import Workflow
-from tds.schema.dataset import Dataset
 
 
 class Publication(schema.Publication):
@@ -27,7 +27,7 @@ class Software(schema.Software):
 
 Resource = Dataset | Model | ModelConfiguration | Publication | Simulation | Workflow
 
-ORMResource = orm.Dataset | orm.Publication | Simulation
+ORMResource = Dataset | orm.Publication | Simulation
 
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
@@ -78,7 +78,7 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
     enum_to_orm = defaultdict(
         lambda: None,
         {
-            ResourceType.datasets: orm.Dataset,
+            ResourceType.datasets: Dataset,
             ResourceType.publications: orm.Publication,
             ResourceType.simulations: Simulation,
         },
