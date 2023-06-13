@@ -25,6 +25,9 @@ if config.config_file_name is not None:
 
 
 def setup_context() -> str:
+    """
+    Function sets up context with alembic URL.
+    """
     tokens = {
         "SQL_USER": os.getenv("SQL_USER"),
         "SQL_PASSWORD": os.getenv("SQL_PASSWORD"),
@@ -34,11 +37,6 @@ def setup_context() -> str:
     }
     url = config.get_main_option("sqlalchemy.url")
     url = re.sub(r"\${(.+?)}", lambda m: tokens[m.group(1)], url)
-
-    context.configure(
-        url=url,
-        dialect_opts={"paramstyle": "named"},
-    )
 
     return url
 
@@ -56,6 +54,11 @@ def run_migrations_offline() -> None:
 
     """
     url = setup_context()
+
+    context.configure(
+        url=url,
+        dialect_opts={"paramstyle": "named"},
+    )
 
     with context.begin_transaction():
         context.run_migrations()
