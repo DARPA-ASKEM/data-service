@@ -82,7 +82,6 @@ def model_list_response(model_list_from_es) -> list:
     # models["framework"] = models["model_schema"].map(
     #   lambda x: framework_map.get(x, x)
     # )
-    models.rename(columns={"model_schema": "schema"}, inplace=True)
     models.drop(columns=["_index", "_score"], inplace=True)
 
     # Drop _ignored column when it is present.
