@@ -23,7 +23,7 @@ class Model(TdsModel):
     description: str
     username: Optional[str]
     model: dict
-    model_schema: str = Field(alias="schema")
+    model_schema: Optional[str] = Field(alias="schema")
     model_version: str
     semantics: Optional[dict]
     metadata: Optional[dict]
