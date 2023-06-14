@@ -2,12 +2,12 @@
   "us.csv": {
     "path": "covid-19-us-data/us.csv",
     "download": true,
-    "url": "https://raw.githubusercontent.com//DARPA-ASKEM/experiments/blob/main/thin-thread-examples/milestone_6month/evaluation/ta1/usa-IRDVHN_age.csv"
+    "url": "https://raw.githubusercontent.com/DARPA-ASKEM/experiments/blob/main/thin-thread-examples/milestone_6month/evaluation/ta1/usa-IRDVHN_age.csv"
   },
   "usa-IRDVHN_age.csv": {
     "path": "state-var-data-stage-3/usa-IRDVHN_age.csv",
     "download": true,
-    "url": "https://raw.githubusercontent.com//nytimes/covid-19-data/blob/master/us.csv"
+    "url": "https://raw.githubusercontent.com/nytimes/covid-19-data/blob/master/us.csv"
   },
   "truth-Incident Cases.csv": {
     "path": "truth-incident-case/truth-Incident Cases.csv",
