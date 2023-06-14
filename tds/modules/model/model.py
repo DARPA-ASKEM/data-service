@@ -24,6 +24,7 @@ class Model(TdsModel):
     username: Optional[str]
     model: dict
     model_schema: Optional[str] = Field(alias="schema")
+    schema_name: Optional[str]
     model_version: str
     semantics: Optional[dict]
     metadata: Optional[dict]
