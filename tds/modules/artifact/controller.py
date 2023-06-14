@@ -11,9 +11,11 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from tds.db import es_client
+from tds.lib.s3 import get_presigned_url
 from tds.modules.artifact.model import Artifact
 from tds.modules.artifact.response import ArtifactResponse, artifact_response
 from tds.operation import create, delete, retrieve, update
+from tds.settings import settings
 
 artifact_router = APIRouter()
 logger = Logger(__name__)
@@ -148,3 +150,43 @@ def artifact_delete(artifact_id: str) -> JSONResponse | Response:
                 "content-type": "application/json",
             },
         )
+
+
+@artifact_router.get("/{artifact_id}/upload-url")
+def artifact_upload_url(artifact_id: str, filename: str) -> JSONResponse:
+    """
+    Generates a pre-signed url to allow a user to upload to a secure S3 bucket
+    without end-user authentication.
+    """
+    put_url = get_presigned_url(
+        entity_id=artifact_id,
+        file_name=filename,
+        method="put_object",
+        path=settings.S3_ARTIFACT_PATH,
+    )
+    return JSONResponse(
+        content={
+            "url": put_url,
+            "method": "PUT",
+        }
+    )
+
+
+@artifact_router.get("/{artifact_id}/download-url")
+def artifact_download_url(artifact_id: str, filename: str) -> JSONResponse:
+    """
+    Generates a pre-signed url to allow a user to donwload from a secure S3 bucket
+    without the bucket being public or end-user authentication.
+    """
+    get_url = get_presigned_url(
+        entity_id=artifact_id,
+        file_name=filename,
+        method="get_object",
+        path=settings.S3_ARTIFACT_PATH,
+    )
+    return JSONResponse(
+        content={
+            "url": get_url,
+            "method": "GET",
+        }
+    )
