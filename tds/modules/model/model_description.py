@@ -16,7 +16,9 @@ class ModelDescription(TdsModel):
 
     name: str
     description: str
+    username: Optional[str]
     model_schema: Optional[str] = Field(alias="schema")
+    schema_name: Optional[str]
     timestamp = datetime
     model_version: str
 
