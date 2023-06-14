@@ -1,0 +1,12 @@
+[
+  {
+    "name": "ASKEM Demo Project",
+    "description": "The ASKEM Demo Project",
+    "active": true
+  },
+  {
+    "name": "Another COVID-19 Modeling",
+    "description": "A project around modeling COVID-19.",
+    "active": true
+  }
+]

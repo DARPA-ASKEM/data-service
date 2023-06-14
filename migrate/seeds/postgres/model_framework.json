@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Petri Net v1",
+    "version": "0.0.1",
+    "semantics": "{}",
+    "schema_url": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json"
+  },
+  {
+    "name": "Petri Net",
+    "version": "0.0.2",
+    "semantics": "{}",
+    "schema_url": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json"
+  }
+]

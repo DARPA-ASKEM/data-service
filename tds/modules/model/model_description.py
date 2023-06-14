@@ -2,6 +2,7 @@
 TDS Model Description
 """
 from datetime import datetime
+from typing import Optional
 
 from pydantic import Field
 
@@ -15,7 +16,9 @@ class ModelDescription(TdsModel):
 
     name: str
     description: str
-    model_schema: str = Field(alias="schema")
+    username: Optional[str]
+    model_schema: Optional[str] = Field(alias="schema")
+    schema_name: Optional[str]
     timestamp = datetime
     model_version: str
 

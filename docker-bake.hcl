@@ -28,11 +28,11 @@ function "check_suffix" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 group "prod" {
-  targets = ["data-service", "data-service-dev-db", "data-service-storage"]
+  targets = ["data-service", "data-service-dev-db", "data-service-storage", "data-service-migrations"]
 }
 
 group "default" {
-  targets = ["data-service-base", "data-service-dev-db-base", "data-service-storage-base"]
+  targets = ["data-service-base", "data-service-dev-db-base", "data-service-storage-base", "data-service-migrations-base"]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -65,6 +65,12 @@ target "data-service-graphdb-base" {
   dockerfile = "docker/Dockerfile.neo4j"
 }
 
+target "data-service-migrations-base" {
+  context = "."
+  tags = tag("data-service-migrations", "", "")
+  dockerfile = "docker/Dockerfile.migrations"
+}
+
 target "data-service" {
   inherits = ["_platforms", "data-service-base"]
 }
@@ -79,4 +85,8 @@ target "data-service-storage" {
 
 target "data-service-graphdb" {
   inherits = ["_platforms", "data-service-graphdb-base"]
+}
+
+target "data-service-migrations" {
+  inherits = ["_platforms", "data-service-migrations-base"]
 }

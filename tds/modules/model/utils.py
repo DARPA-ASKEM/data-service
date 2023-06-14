@@ -19,7 +19,8 @@ model_list_fields = [
     "name",
     "model",
     "description",
-    "model_schema",
+    "schema",
+    "schema_name",
     "model_version",
     "timestamp",
 ]
@@ -50,10 +51,11 @@ def model_response(model_from_es, delete_fields=None) -> dict:
     # model["state_id"] = es_response["_id"]
     # frameworks = get_frameworks()
     # model["framework"] = frameworks.get(model["model_schema"], model["model_schema"])
-    model["schema"] = model["model_schema"]
-
-    del model["model_schema"]
-    del model["concepts"]
+    if "model_schema" in model:
+        model["schema"] = model["model_schema"]
+        del model["model_schema"]
+    if "concepts" in model:
+        del model["concepts"]
 
     if delete_fields and delete_fields is List:
         for field in delete_fields:
@@ -81,7 +83,6 @@ def model_list_response(model_list_from_es) -> list:
     # models["framework"] = models["model_schema"].map(
     #   lambda x: framework_map.get(x, x)
     # )
-    models.rename(columns={"model_schema": "schema"}, inplace=True)
     models.drop(columns=["_index", "_score"], inplace=True)
 
     # Drop _ignored column when it is present.

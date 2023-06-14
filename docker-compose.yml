@@ -11,15 +11,20 @@ services:
     container_name: data-service-rdb
     image: "postgres:15.1"
     ports:
-      - "8032:5432"
+      - 8032:$SQL_PORT
     environment:
       - POSTGRES_PASSWORD=$SQL_PASSWORD
       - POSTGRES_USER=$SQL_USER
       - POSTGRES_DB=$SQL_DB
     volumes:
-      - ./data:/docker-entrypoint-initdb.d
+      - tds_data:/var/lib/postgresql/data
     networks:
       - data-api
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${SQL_USER} -d ${SQL_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   api:
     container_name: data-service-api
     build:
@@ -35,12 +40,15 @@ services:
       - data-annotation-stack
       - data-api
     depends_on:
-      - rdb
-      - graphdb
-      - minio
-      - elasticsearch
+      migrations:
+        condition: service_completed_successfully
+      graphdb:
+        condition: service_started
+      minio:
+        condition: service_started
     volumes:
       - $PWD/tds:/api/tds
+      - $PWD/migrate:/api/migrate
   graphdb:
     build:
       context: ./
@@ -51,8 +59,13 @@ services:
     environment:
       - NEO4J_AUTH=$NEO4J_AUTH
       - NEO4J_dbms_memory_pagecache_size=512M
+    volumes:
+      - neo4j_data:/data
     depends_on:
-      - rdb
+      rdb:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
     networks:
       - data-api
   minio:
@@ -71,7 +84,7 @@ services:
       - data-api
       - data-annotation-stack
   elasticsearch:
-    image: elasticsearch:8.5.3
+    image: elasticsearch:${STACK_VERSION}
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
@@ -84,6 +97,11 @@ services:
         published: 9200
     networks:
       - data-api
+    healthcheck:
+      test: curl http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1
+      interval: 10s
+      timeout: 20s
+      retries: 5
   kibana:
     depends_on:
       - elasticsearch
@@ -101,7 +119,30 @@ services:
     networks:
       - data-api
       - data-annotation-stack
+  migrations:
+    container_name: data-service-migrations
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile.migrations
+    entrypoint: /run_migrations.sh
+    env_file:
+      - api.env
+    volumes:
+      - $PWD/migrate:/migrate
+    depends_on:
+      rdb:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    networks:
+      - data-api
 volumes:
+  tds_data:
+    driver: local
+  neo4j_data:
+    driver: local
   elasticsearch_data:
     driver: local
   kibanadata:
