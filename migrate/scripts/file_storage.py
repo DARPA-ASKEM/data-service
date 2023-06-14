@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 import boto3
+import requests
 
 STORAGE_HOST = os.getenv("STORAGE_HOST")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
@@ -48,6 +49,11 @@ def upload_file(s3_client, s3_path: str, filename: str):
     Function uploads a file to S3.
     """
     file_path = file_dict[filename]
+    if type(file_path) is dict:
+        download_dict = file_path
+        file_path = file_path["path"]
+        download_file(filename, download_dict)
+
     s3_path_key = s3_paths[s3_path]
     key = f"{s3_path_key}/{file_path}"
     s3_client.upload_file(
@@ -55,6 +61,14 @@ def upload_file(s3_client, s3_path: str, filename: str):
         Filename=f"{file_dir}/{filename}",
         Key=key,
     )
+
+
+def download_file(name: str, download_dict: dict):
+    url, path = download_dict["url"], download_dict["path"]
+    print(f"Downloading {name}")
+    file_dl = requests.get(url, allow_redirects=True)
+    with open(f"{file_dir}/{name}", "w", encoding="utf-8") as dlf:
+        dlf.write(file_dl.text)
 
 
 if __name__ == "__main__":
@@ -77,5 +91,5 @@ if __name__ == "__main__":
             create_bucket(s3)
         elif FILE_OP == "upload_file":
             s3_path_arg = sys.argv[2]
-            for file in os.listdir(file_dir):
+            for file in file_dict:
                 upload_file(s3_client=s3, s3_path=s3_path_arg, filename=file)
