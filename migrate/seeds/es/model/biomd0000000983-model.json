@@ -1,6 +1,7 @@
 {
  "id": "biomd0000000983-model-id",
  "name": "BIOMD0000000983",
+ "username": "Adam Smith",
  "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.4/petrinet/petrinet_schema.json",
  "description": "BioModels model BIOMD0000000983 processed using MIRA.",
  "timestamp": "2023-06-12 23:25:26",

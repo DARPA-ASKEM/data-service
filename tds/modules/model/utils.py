@@ -20,6 +20,7 @@ model_list_fields = [
     "model",
     "description",
     "schema",
+    "schema_name",
     "model_version",
     "timestamp",
 ]
