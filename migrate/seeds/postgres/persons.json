@@ -1,7 +1,7 @@
 [
   {
     "name": "Adam Smith",
-    "organization": "League of Extraordinary Economists",
+    "org": "League of Extraordinary Economists",
     "email": "adam@wealthofnations.org",
     "website": "www.wealthofnations.org",
     "is_registered": true
