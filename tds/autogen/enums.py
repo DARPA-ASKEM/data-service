@@ -37,6 +37,7 @@ class ProvenanceType(str, Enum):
     Project = "Project"
     Publication = "Publication"
     Simulation = "Simulation"
+    Artifact = "Artifact"
 
 
 class ProvenanceSearchTypes(str, Enum):
@@ -78,6 +79,7 @@ class ResourceType(str, Enum):
     publications = "publications"
     simulations = "simulations"
     workflows = "workflows"
+    artifacts = "artifacts"
 
 
 class Role(str, Enum):
@@ -97,6 +99,7 @@ class TaggableType(str, Enum):
     publications = "publications"
     qualifiers = "qualifiers"
     simulations = "simulations"
+    artifacts = "artifacts"
 
 
 class ValueType(str, Enum):
