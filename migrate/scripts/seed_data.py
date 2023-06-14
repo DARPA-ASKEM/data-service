@@ -24,6 +24,7 @@ SQL_DB = os.getenv("SQL_DB")
 
 pg_data_load = {
     "model_framework": orm.ModelFramework,
+    "persons": orm.Person,
     "projects": orm.Project,
     "project_assets": orm.ProjectAsset,
     "provenance": orm.Provenance,
