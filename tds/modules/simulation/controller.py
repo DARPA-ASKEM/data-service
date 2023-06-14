@@ -10,6 +10,7 @@ from fastapi import APIRouter, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+from tds import settings
 from tds.db import es_client
 from tds.lib.s3 import get_presigned_url
 from tds.modules.simulation.model import Simulation
@@ -153,7 +154,10 @@ def run_result_upload_url(simulation_id: str, filename: str) -> JSONResponse:
     without end-user authentication.
     """
     put_url = get_presigned_url(
-        entity_id=simulation_id, file_name=filename, method="put_object"
+        entity_id=simulation_id,
+        file_name=filename,
+        method="put_object",
+        path=settings.S3_RESULT_PATH,
     )
     return JSONResponse(
         content={
@@ -170,7 +174,10 @@ def run_result_download_url(simulation_id: str, filename: str) -> JSONResponse:
     without the bucket being public or end-user authentication.
     """
     get_url = get_presigned_url(
-        entity_id=simulation_id, file_name=filename, method="get_object"
+        entity_id=simulation_id,
+        file_name=filename,
+        method="get_object",
+        path=settings.S3_RESULT_PATH,
     )
     return JSONResponse(
         content={
