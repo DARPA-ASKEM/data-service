@@ -64,6 +64,8 @@ services:
     depends_on:
       rdb:
         condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
     networks:
       - data-api
   minio:
