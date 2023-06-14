@@ -1,4 +1,19 @@
 {
   "us.csv": "covid-19-us-data/us.csv",
-  "usa-IRDVHN_age.csv": "state-var-data-stage-3/usa-IRDVHN_age.csv"
+  "usa-IRDVHN_age.csv": "state-var-data-stage-3/usa-IRDVHN_age.csv",
+  "truth-Incident Cases.csv": {
+    "path": "truth-incident-case/truth-Incident Cases.csv",
+    "download": true,
+    "url": "https://media.githubusercontent.com/media/reichlab/covid19-forecast-hub/master/data-truth/truth-Incident%20Cases.csv"
+  },
+  "truth-Incident Deaths.csv": {
+    "path": "truth-incident-death/truth-Incident Deaths.csv",
+    "download": true,
+    "url": "https://media.githubusercontent.com/media/reichlab/covid19-forecast-hub/master/data-truth/truth-Incident%20Deaths.csv"
+  },
+  "truth-Incident Hospitalizations.csv": {
+    "path": "truth-incident-hospitalization/truth-Incident Hospitalizations.csv",
+    "download": true,
+    "url": "https://media.githubusercontent.com/media/reichlab/covid19-forecast-hub/master/data-truth/truth-Incident%20Hospitalizations.csv"
+  }
 }
