@@ -71,7 +71,7 @@ def list_models(page_size: int = 100, page: int = 0) -> JSONResponse:
 )
 # pylint: disable=dangerous-default-value
 def search_models(
-    payload: Dict[str, Any] = {"query": {"match_all": {}}},
+    payload: Dict[str, Any] = {"match_all": {}},
     page_size: int = 100,
     page: int = 0,
 ) -> JSONResponse:
