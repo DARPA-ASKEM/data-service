@@ -33,5 +33,6 @@
     }
   },
   "simulation": {},
-  "workflow": {}
+  "workflow": {},
+  "artifact": {}
 }
