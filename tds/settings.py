@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     SQL_PORT: int = 8032
     SQL_USER: str = "dev"
     SQL_PASSWORD: str = "dev"
+    SQL_DB: str = "askem"
     DKG_URL = "http://34.230.33.149"
     DKG_API_PORT = 8771
     DKG_DESC_PORT = 8772

@@ -1,0 +1,37 @@
+{
+  "model": {
+    "properties": {
+      "model": {
+        "type": "object",
+        "enabled": false
+      },
+      "semantics": {
+        "type": "object",
+        "enabled": false
+      },
+      "metadata": {
+        "type": "object",
+        "enabled": false
+      }
+    }
+  },
+  "dataset": {},
+  "model_configuration": {
+    "properties": {
+      "configuration.model": {
+        "type": "object",
+        "enabled": false
+      },
+      "configuration.semantics": {
+        "type": "object",
+        "enabled": false
+      },
+      "configuration.metadata": {
+        "type": "object",
+        "enabled": false
+      }
+    }
+  },
+  "simulation": {},
+  "workflow": {}
+}

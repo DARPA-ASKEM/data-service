@@ -1,0 +1,16 @@
+[
+  {
+    "relation_type": "EXTRACTED_FROM",
+    "left": "sir-model-id",
+    "left_type": "Model",
+    "right": "1",
+    "right_type": "Publication"
+  },
+  {
+    "relation_type": "USES",
+    "left": "sir-model-config-id",
+    "left_type": "ModelConfiguration",
+    "right": "sir-model-id",
+    "right_type": "Model"
+  }
+]

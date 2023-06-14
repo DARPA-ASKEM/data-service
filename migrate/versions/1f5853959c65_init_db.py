@@ -29,45 +29,30 @@ def drop_enums(enums: Iterator[sa.Enum]):
         enum.drop(op.get_bind(), checkfirst=True)
 
 
-intermediate_source = sa.Enum("mrepresentationa", "skema", name="intermediatesource")
-intermediate_format = sa.Enum(
-    "bilayer", "gromet", "other", "sbml", name="intermediateformat"
-)
 resource_type = sa.Enum(
     "datasets",
-    "intermediates",
     "models",
-    "plans",
+    "model_configurations",
     "publications",
-    "simulation_runs",
+    "simulations",
+    "workflows",
     name="resourcetype",
 )
 extracted_type = sa.Enum("equation", "figure", "table", name="extractedtype")
 taggable_type = sa.Enum(
     "datasets",
-    "features",
-    "intermediates",
-    "model_parameters",
     "models",
     "projects",
     "publications",
     "qualifiers",
     "simulation_parameters",
-    "simulation_plans",
-    "simulation_runs",
+    "model_configurations",
+    "simulations",
+    "workflows",
     name="taggabletype",
 )
 role = sa.Enum("author", "contributor", "maintainer", "other", name="role")
 ontological_field = sa.Enum("obj", "unit", name="ontologicalfield")
-resource_type = sa.Enum(
-    "datasets",
-    "intermediates",
-    "models",
-    "plans",
-    "publications",
-    "simulation_runs",
-    name="resourcetype",
-)
 relation_type = sa.Enum(
     "BEGINS_AT",
     "CITES",
@@ -91,15 +76,11 @@ relation_type = sa.Enum(
 provenance_type = sa.Enum(
     "Concept",
     "Dataset",
-    "Intermediate",
     "Model",
-    "ModelParameter",
-    "ModelRevision",
-    "Plan",
-    "PlanParameter",
+    "ModelConfiguration",
     "Project",
     "Publication",
-    "SimulationRun",
+    "Simulation",
     name="provenancetype",
 )
 value_type = sa.Enum("binary", "bool", "float", "int", "str", name="valuetype")
@@ -117,40 +98,12 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("curie"),
     )
     op.create_table(
-        "intermediate",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
-        ),
-        sa.Column(
-            "source",
-            intermediate_source,
-            nullable=False,
-        ),
-        sa.Column(
-            "type",
-            intermediate_format,
-            nullable=False,
-        ),
-        sa.Column("content", sa.LargeBinary(), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_table(
         "model_framework",
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("version", sa.String(), nullable=False),
         sa.Column("semantics", sa.String(), nullable=False),
-        sa.Column("url_schema", sa.String(), nullable=False),
+        sa.Column("schema_url", sa.String(), nullable=False),
         sa.PrimaryKeyConstraint("name"),
-    )
-    op.create_table(
-        "model_state",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
-        ),
-        sa.Column("content", postgresql.JSON(astext_type=sa.Text()), nullable=True),
-        sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "person",
@@ -212,31 +165,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_table(
-        "dataset",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(), nullable=False),
-        sa.Column("url", sa.String(), nullable=False),
-        sa.Column("description", sa.Text(), nullable=False),
-        sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
-        ),
-        sa.Column("deprecated", sa.Boolean(), nullable=True),
-        sa.Column("sensitivity", sa.Text(), nullable=True),
-        sa.Column("quality", sa.Text(), nullable=True),
-        sa.Column("temporal_resolution", sa.String(), nullable=True),
-        sa.Column("geospatial_resolution", sa.String(), nullable=True),
-        sa.Column("annotations", postgresql.JSON(astext_type=sa.Text()), nullable=True),
-        sa.Column("maintainer", sa.Integer(), nullable=False),
-        sa.Column(
-            "simulation_run", sa.Boolean(), server_default="False", nullable=True
-        ),
-        sa.ForeignKeyConstraint(
-            ["maintainer"],
-            ["person.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
+
     op.create_table(
         "extraction",
         sa.Column("id", sa.Integer(), nullable=False),
@@ -251,26 +180,6 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["publication_id"],
             ["publication.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_table(
-        "model_description",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(), nullable=False),
-        sa.Column("description", sa.Text(), nullable=True),
-        sa.Column("framework", sa.String(), nullable=False),
-        sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
-        ),
-        sa.Column("state_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["framework"],
-            ["model_framework.name"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["state_id"],
-            ["model_state.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -361,7 +270,7 @@ def upgrade() -> None:
     op.create_table(
         "feature",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("dataset_id", sa.Integer(), nullable=False),
+        sa.Column("dataset_id", sa.String(), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("display_name", sa.String(), nullable=True),
         sa.Column("name", sa.String(), nullable=False),
@@ -370,57 +279,18 @@ def upgrade() -> None:
             value_type,
             nullable=False,
         ),
-        sa.ForeignKeyConstraint(
-            ["dataset_id"],
-            ["dataset.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_table(
-        "model_parameter",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("model_id", sa.Integer(), nullable=True),
-        sa.Column("name", sa.String(), nullable=False),
-        sa.Column(
-            "type",
-            value_type,
-            nullable=False,
-        ),
-        sa.Column("default_value", sa.String(), nullable=True),
-        sa.Column("state_variable", sa.Boolean(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["model_id"],
-            ["model_description.id"],
-        ),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "qualifier",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("dataset_id", sa.Integer(), nullable=False),
+        sa.Column("dataset_id", sa.String(), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column(
             "value_type",
             value_type,
             nullable=False,
-        ),
-        sa.ForeignKeyConstraint(
-            ["dataset_id"],
-            ["dataset.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_table(
-        "simulation_plan",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("model_id", sa.Integer(), nullable=False),
-        sa.Column("simulator", sa.String(), nullable=False),
-        sa.Column("query", sa.String(), nullable=False),
-        sa.Column("content", postgresql.JSON(astext_type=sa.Text()), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["model_id"],
-            ["model_description.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -439,74 +309,29 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_table(
-        "simulation_run",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("simulator_id", sa.Integer(), nullable=False),
-        sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
-        ),
-        sa.Column("completed_at", sa.DateTime(), nullable=True),
-        sa.Column("success", sa.Boolean(), nullable=True),
-        sa.Column("dataset_id", sa.Integer(), nullable=True),
-        sa.Column("description", sa.Text(), nullable=True),
-        sa.Column("response", sa.LargeBinary(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["simulator_id"],
-            ["simulation_plan.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_table(
-        "simulation_parameter",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("run_id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(), nullable=False),
-        sa.Column("value", sa.String(), nullable=False),
-        sa.Column(
-            "type",
-            value_type,
-            nullable=False,
-        ),
-        sa.ForeignKeyConstraint(
-            ["run_id"],
-            ["simulation_run.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
 
 
 def downgrade() -> None:
     """
     Drop all tables and enums (LOSSY)
     """
-    op.drop_table("simulation_parameter")
-    op.drop_table("simulation_run")
     op.drop_table("qualifier_xref")
-    op.drop_table("simulation_plan")
     op.drop_table("qualifier")
-    op.drop_table("model_parameter")
     op.drop_table("feature")
     op.drop_table("provenance")
     op.drop_table("project_asset")
     op.drop_table("ontology_concept")
     op.drop_table("model_runtime")
-    op.drop_table("model_description")
     op.drop_table("extraction")
-    op.drop_table("dataset")
     op.drop_table("association")
     op.drop_table("software")
     op.drop_table("publication")
     op.drop_table("project")
     op.drop_table("person")
-    op.drop_table("model_state")
     op.drop_table("model_framework")
-    op.drop_table("intermediate")
     op.drop_table("active_concept")
     new_enums = iter(
         (
-            intermediate_source,
-            intermediate_format,
             resource_type,
             extracted_type,
             taggable_type,

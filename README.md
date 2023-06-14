@@ -45,16 +45,14 @@ There are three types of tests:
 
 ### Populated Data
 
-Sample data is automatically populated into the data service on `make up`
-via `.sql` files and dataset files. These can be found in the `./data` directory.
+To populate demo data you will need to set the `SEED_DATA` to `true` in the `api.env` file.  With that set you can 
+run a general build or up command and the DBs will be seeded with the data from `migrate/seeds`.
 
 In order to regenerate these files, run the following commands:
 ```
 make down
 make db-clean
 make up
-make populate
-make db-full
 ```
 
 ## ASKEM Data Model

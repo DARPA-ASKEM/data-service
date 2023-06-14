@@ -1,0 +1,195 @@
+{
+  "id": "state-var-data-stage-3",
+  "file_names": ["usa-IRDVHN_age.csv"],
+  "username": "Adam Smith",
+  "data_source_date": "2020-01-21 00:00:00",
+  "name": "State var data for Scenario 3",
+  "description": "State var data for scenario 3.",
+  "timestamp": "2023-06-12 23:25:26",
+  "columns": [
+    {
+      "name": "date",
+      "data_type": "date",
+      "format_str": "yyyy-MM-dd",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "I",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "R",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "D",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "V",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "H",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "I_0-9",
+      "data_type": "float",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "I_10-19",
+      "data_type": "float",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "I_20-29",
+      "data_type": "float",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "I_30-39",
+      "data_type": "float",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "I_40-49",
+      "data_type": "float",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "I_50-59",
+      "data_type": "float",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "I_60-69",
+      "data_type": "float",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "I_70-79",
+      "data_type": "float",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_0-9",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_10-19",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_20-29",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_30-39",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_40-49",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_50-59",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_60-69",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_70-79",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_80-89",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_90-99",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    },
+    {
+      "name": "N_100+",
+      "data_type": "integer",
+      "annotations": {},
+      "metadata": {},
+      "grounding": {}
+    }
+  ],
+  "metadata": {},
+  "source": "https://github.com/DARPA-ASKEM/experiments/blob/main/thin-thread-examples/milestone_6month/evaluation/ta1/usa-IRDVHN_age.csv",
+  "grounding": {
+    "additionalProp1": {
+      "identifiers": {},
+      "context": {}
+    }
+  }
+}
