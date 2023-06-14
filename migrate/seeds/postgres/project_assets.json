@@ -13,6 +13,24 @@
   },
   {
     "project_id": 1,
+    "resource_id": "truth-incident-case",
+    "resource_type": "datasets",
+    "external_ref": "object"
+  },
+  {
+    "project_id": 1,
+    "resource_id": "truth-incident-hospitalization",
+    "resource_type": "datasets",
+    "external_ref": "object"
+  },
+  {
+    "project_id": 1,
+    "resource_id": "truth-incident-death",
+    "resource_type": "datasets",
+    "external_ref": "object"
+  },
+  {
+    "project_id": 1,
     "resource_id": "biomd0000000294-model-id",
     "resource_type": "models",
     "external_ref": "object"
@@ -29,8 +47,25 @@
     "resource_id": "sir-model-id",
     "resource_type": "models",
     "external_ref": "object"
-  }
-  ,
+  },
+  {
+    "project_id": 1,
+    "resource_id": "biomd0000000983-model-id",
+    "resource_type": "models",
+    "external_ref": "object"
+  },
+  {
+    "project_id": 1,
+    "resource_id": "biomd0000000960-model-id",
+    "resource_type": "models",
+    "external_ref": "object"
+  },
+  {
+    "project_id": 1,
+    "resource_id": "biomd0000000955-model-id",
+    "resource_type": "models",
+    "external_ref": "object"
+  },
   {
     "project_id": 1,
     "resource_id": "sir-model-config-id",
