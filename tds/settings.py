@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     ES_INDEX_PREFIX: str = "tds_"
     S3_DATASET_PATH: str = ""
     S3_RESULT_PATH: str = ""
+    S3_ARTIFACT_PATH: str = ""
     S3_BUCKET: str = ""
     STORAGE_HOST: Optional[str] = None
     AWS_ACCESS_KEY_ID: Optional[str] = None
