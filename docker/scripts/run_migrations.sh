@@ -19,5 +19,5 @@ fi
 # To Troubleshoot the migration container, uncomment the following lines:
 #touch /logger.log
 #tail -f /logger.log
-echo "Booting TDS API."
+echo "Completed running migrations."
 exit 0
