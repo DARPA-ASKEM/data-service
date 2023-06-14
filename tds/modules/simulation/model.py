@@ -35,7 +35,7 @@ class Simulation(TdsModel):
     _index = "simulation"
     engine: SimulationEngine
     type: SimulationType
-    status: SimulationStatus = Field(default="queued")
+    status: Optional[SimulationStatus] = Field(default="queued")
     execution_payload: ExecutionPayload
     start_time: Optional[datetime]
     completed_time: Optional[datetime]
