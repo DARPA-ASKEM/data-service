@@ -52,6 +52,9 @@ class DatasetColumn(BaseModel):
         default=ColumnTypes.UNKNOWN,
         description=f"Datatype. One of: {', '.join(ColumnTypes)}",
     )
+    description: Optional[str] = Field(
+        description="(Optional) Textual description of the dataset column.",
+    )
     format_str: Optional[str] = Field(
         description="(Optional) String that describes the formatting of the value",
     )
@@ -80,7 +83,7 @@ class Dataset(TdsModel):
         description="Display/human name for the dataset",
     )
     description: Optional[str] = Field(
-        description="(Optional) Texual description of the dataset",
+        description="(Optional) Textual description of the dataset",
     )
     data_source_date: Optional[datetime] = Field(
         description="(Optional) The date the data was created."
