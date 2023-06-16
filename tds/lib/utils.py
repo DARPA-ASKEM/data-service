@@ -17,7 +17,7 @@ def patchable(model: BaseModel) -> BaseModel:
     if model_name in _PATCHABLE_MODELS:
         return _PATCHABLE_MODELS[model_name]
 
-    PatchableModel = type(model_name, (model,), {})
+    PatchableModel = type(model_name, (model,), {})  # pylint: disable=invalid-name
 
     # Update the fields to be optional
     for field_def in PatchableModel.__fields__.values():
