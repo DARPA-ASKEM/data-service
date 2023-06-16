@@ -12,7 +12,9 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import enums, orm
-from tds.db import ProvenanceHandler, SearchProvenance, request_graph_db, request_rdb
+from tds.db import request_graph_db, request_rdb
+from tds.db.graph.provenance_handler import ProvenanceHandler
+from tds.db.graph.search_provenance import SearchProvenance
 from tds.operation import create, delete, retrieve
 from tds.schema.provenance import Provenance, ProvenancePayload
 
