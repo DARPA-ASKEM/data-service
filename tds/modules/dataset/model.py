@@ -58,13 +58,13 @@ class DatasetColumn(BaseModel):
     format_str: Optional[str] = Field(
         description="(Optional) String that describes the formatting of the value",
     )
-    annotations: dict[str, List[str]] = Field(
+    annotations: List[str] = Field(
         description="Column annotations from the MIT data profiling tool",
     )
     metadata: Optional[dict[str, Any]] = Field(
         description="(Optional) Unformatted metadata about the dataset",
     )
-    grounding: Optional[dict[str, Grounding]] = Field(
+    grounding: Optional[Grounding] = Field(
         description=(
             "(Optional) Grounding of ontological concepts related to the column"
         ),
@@ -103,7 +103,7 @@ class Dataset(TdsModel):
     source: Optional[str] = Field(
         description="(Optional) Source of dataset",
     )
-    grounding: Optional[dict[str, Grounding]] = Field(
+    grounding: Optional[Grounding] = Field(
         description=(
             "(Optional) Grounding of ontological concepts related to the dataset as"
             " a whole"
