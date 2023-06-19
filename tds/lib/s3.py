@@ -23,7 +23,13 @@ def s3_client():
             verify=False,
         )
     else:
-        s3_ = boto3.client("s3")
+        s3_ = boto3.client(
+            "s3",
+            region_name=settings.AWS_REGION,
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            config=boto3.session.Config(signature_version="s3v4"),
+        )
 
     return s3_
 
@@ -32,7 +38,7 @@ def get_file_path(entity_id: str | int, file_name: str) -> str:
     """
     Function builds a file path for s3.
     """
-    return os.path.join(settings.S3_RESULT_PATH, str(entity_id), file_name)
+    return os.path.join(settings.S3_RESULTS_PATH, str(entity_id), file_name)
 
 
 def get_presigned_url(entity_id: str | int, file_name: str, method: str):
@@ -41,6 +47,11 @@ def get_presigned_url(entity_id: str | int, file_name: str, method: str):
     """
     s3_ = s3_client()
     s3_key = get_file_path(entity_id, file_name)
-    return s3_.generate_presigned_url(
-        ClientMethod=method, Params={"Bucket": settings.S3_BUCKET, "Key": s3_key}
+
+    presigned_url = s3_.generate_presigned_url(
+        ClientMethod=method,
+        Params={"Bucket": settings.S3_BUCKET, "Key": s3_key},
+        ExpiresIn=1500,
     )
+
+    return presigned_url
