@@ -108,7 +108,7 @@ def model_configuration_put(
         raise HTTPException(
             status_code=422, detail="ID in request URL and in payload must match."
         )
-    res = payload.save(model_configuration_id)
+    res = payload.save()
     logger.info("model_configuration updated: %s", model_configuration_id)
     return JSONResponse(
         status_code=status.HTTP_200_OK,

@@ -52,16 +52,19 @@ class DatasetColumn(BaseModel):
         default=ColumnTypes.UNKNOWN,
         description=f"Datatype. One of: {', '.join(ColumnTypes)}",
     )
+    description: Optional[str] = Field(
+        description="(Optional) Textual description of the dataset column.",
+    )
     format_str: Optional[str] = Field(
         description="(Optional) String that describes the formatting of the value",
     )
-    annotations: dict[str, List[str]] = Field(
+    annotations: List[str] = Field(
         description="Column annotations from the MIT data profiling tool",
     )
     metadata: Optional[dict[str, Any]] = Field(
         description="(Optional) Unformatted metadata about the dataset",
     )
-    grounding: Optional[dict[str, Grounding]] = Field(
+    grounding: Optional[Grounding] = Field(
         description=(
             "(Optional) Grounding of ontological concepts related to the column"
         ),
@@ -80,7 +83,7 @@ class Dataset(TdsModel):
         description="Display/human name for the dataset",
     )
     description: Optional[str] = Field(
-        description="(Optional) Texual description of the dataset",
+        description="(Optional) Textual description of the dataset",
     )
     data_source_date: Optional[datetime] = Field(
         description="(Optional) The date the data was created."
@@ -100,7 +103,7 @@ class Dataset(TdsModel):
     source: Optional[str] = Field(
         description="(Optional) Source of dataset",
     )
-    grounding: Optional[dict[str, Grounding]] = Field(
+    grounding: Optional[Grounding] = Field(
         description=(
             "(Optional) Grounding of ontological concepts related to the dataset as"
             " a whole"
