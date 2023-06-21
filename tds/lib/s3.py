@@ -13,14 +13,14 @@ def s3_client():
     Function sets up an S3 client based on env settings.
     """
     s3_opts = {
-        "aws_access_key_id": settings.AWS_ACCESS_KEY_ID,
-        "aws_secret_access_key": settings.AWS_SECRET_ACCESS_KEY,
         "config": boto3.session.Config(signature_version="s3v4"),
     }
     if settings.STORAGE_HOST:
         s3_opts["endpoint_url"] = settings.STORAGE_HOST
         s3_opts["aws_session_token"] = None
         s3_opts["verify"] = False
+        s3_opts["aws_access_key_id"] = settings.AWS_ACCESS_KEY_ID
+        s3_opts["aws_secret_access_key"] = settings.AWS_SECRET_ACCESS_KEY
     else:
         s3_opts["region_name"] = settings.AWS_REGION
 
