@@ -6,5 +6,5 @@
 """
 from tds.modules.provenance.controller import provenance_router as router
 
-ROUTE_PREFIX = "provenance_new"
+ROUTE_PREFIX = "provenance"
 TAGS = ["Provenance"]
