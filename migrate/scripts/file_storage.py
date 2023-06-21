@@ -15,7 +15,7 @@ AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 S3_BUCKET = os.getenv("S3_BUCKET")
 S3_DATASET_PATH = os.getenv("S3_DATASET_PATH")
-S3_RESULT_PATH = os.getenv("S3_RESULT_PATH")
+S3_RESULTS_PATH = os.getenv("S3_RESULTS_PATH")
 
 migrate_dir = Path(os.path.dirname(__file__))
 file_dir = f"{migrate_dir.parent}/seeds/files"
@@ -26,7 +26,7 @@ file_dict = json.load(
 
 s3_paths = {
     "datasets": S3_DATASET_PATH,
-    "simulations": S3_RESULT_PATH,
+    "simulations": S3_RESULTS_PATH,
 }
 
 

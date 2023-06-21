@@ -1,16 +1,15 @@
 """
 TDS Dataset
 """
-import os.path
 from logging import Logger
 
-import boto3
 from elasticsearch import NotFoundError
 from fastapi import APIRouter, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from tds.db.elasticsearch import es_client
+from tds.lib.s3 import get_presigned_url
 from tds.lib.utils import patchable
 from tds.modules.dataset.model import Dataset
 from tds.modules.dataset.response import dataset_response
@@ -21,18 +20,6 @@ dataset_router = APIRouter()
 logger = Logger(__name__)
 es_index = Dataset.index
 
-if settings.STORAGE_HOST:
-    s3 = boto3.client(
-        "s3",
-        endpoint_url=settings.STORAGE_HOST,
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        aws_session_token=None,
-        config=boto3.session.Config(signature_version="s3v4"),
-        verify=False,
-    )
-else:
-    s3 = boto3.client("s3")
 es = es_client()
 
 
@@ -152,9 +139,11 @@ def dataset_upload_url(dataset_id: str | int, filename: str) -> JSONResponse:
     Generates a pre-signed url to allow a user to upload to a secure S3 bucket
     without end-user authentication.
     """
-    s3_key = os.path.join(settings.S3_DATASET_PATH, str(dataset_id), filename)
-    put_url = s3.generate_presigned_url(
-        ClientMethod="put_object", Params={"Bucket": settings.S3_BUCKET, "Key": s3_key}
+    put_url = get_presigned_url(
+        entity_id=dataset_id,
+        file_name=filename,
+        method="put_object",
+        path=settings.S3_DATASET_PATH,
     )
     return JSONResponse(
         status_code=status.HTTP_200_OK,
@@ -171,9 +160,11 @@ def dataset_download_url(dataset_id: str | int, filename: str) -> JSONResponse:
     Generates a pre-signed url to allow a user to donwload from a secure S3 bucket
     without the bucket being public or end-user authentication.
     """
-    s3_key = os.path.join(settings.S3_DATASET_PATH, str(dataset_id), filename)
-    get_url = s3.generate_presigned_url(
-        ClientMethod="get_object", Params={"Bucket": settings.S3_BUCKET, "Key": s3_key}
+    get_url = get_presigned_url(
+        entity_id=dataset_id,
+        file_name=filename,
+        method="get_object",
+        path=settings.S3_DATASET_PATH,
     )
     return JSONResponse(
         status_code=status.HTTP_200_OK,

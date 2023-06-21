@@ -16,6 +16,7 @@ from tds.lib.s3 import get_presigned_url
 from tds.modules.simulation.model import Simulation
 from tds.modules.simulation.response import SimulationResponse, simulation_response
 from tds.operation import create, delete, retrieve, update
+from tds.settings import settings
 
 simulation_router = APIRouter()
 logger = Logger(__name__)
@@ -157,7 +158,7 @@ def run_result_upload_url(simulation_id: str, filename: str) -> JSONResponse:
         entity_id=simulation_id,
         file_name=filename,
         method="put_object",
-        path=settings.S3_RESULT_PATH,
+        path=settings.S3_RESULTS_PATH,
     )
     return JSONResponse(
         content={
@@ -177,7 +178,7 @@ def run_result_download_url(simulation_id: str, filename: str) -> JSONResponse:
         entity_id=simulation_id,
         file_name=filename,
         method="get_object",
-        path=settings.S3_RESULT_PATH,
+        path=settings.S3_RESULTS_PATH,
     )
     return JSONResponse(
         content={
