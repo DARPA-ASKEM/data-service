@@ -5,6 +5,11 @@ PG_USER=${PG_USER:-dev}
 PG_PASSWORD=${PG_PASSWORD:-dev}
 PG_PORT=${PG_PORT:-5432}
 PG_DB=${PG_DB:-askem}
+PG_HOST=${SQL_URL:-rdb}
+PG_USER=${SQL_USER:-dev}
+PG_PASSWORD=${SQL_PASSWORD:-dev}
+PG_PORT=${SQL_PORT:-5432}
+PG_DB=${SQL_DB:-askem}
 
 echo Waiting for ${PG_HOST} to be available
 while ! nc -z ${PG_HOST} ${PG_PORT}; do
