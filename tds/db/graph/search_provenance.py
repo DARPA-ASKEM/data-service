@@ -38,7 +38,7 @@ class SearchProvenance:
         """
         with self.graph_db.session() as session:
             query = (
-                f"Match (Md:Model {{id:{payload.get('root_id')}}})"
+                f"Match (Md:Model {{id:'{payload.get('root_id')}'}})"
                 "<-[r:REINTERPRETS|EXTRACTED_FROM|BEGINS_AT *1..]->"
                 "(Pu:Publication) return Pu"
             )
