@@ -18,6 +18,7 @@ def s3_client():
     if settings.STORAGE_HOST:
         s3_opts["endpoint_url"] = settings.STORAGE_HOST
     else:
+        # @TODO: Deprecate this and use AWS_DEFAULT_REGION in ENV.
         s3_opts["region_name"] = settings.AWS_REGION
 
     s3_ = boto3.client("s3", **s3_opts)
