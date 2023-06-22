@@ -11,31 +11,22 @@
       "name": "date",
       "data_type": "date",
       "format_str": "yyyy-MM-dd",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "cases",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "deaths",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     }
   ],
   "metadata": {},
-  "source": "https://github.com/nytimes/covid-19-data/blob/master/us.csv",
-  "grounding": {
-    "additionalProp1": {
-      "identifiers": {},
-      "context": {}
-    }
-  }
+  "source": "https://github.com/nytimes/covid-19-data/blob/master/us.csv"
 }
