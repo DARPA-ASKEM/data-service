@@ -77,7 +77,6 @@ class SearchProvenance:
                 # + "With DISTINCT n "
                 + f"return {node_abbr}, r, n"
             )
-            print(query)
 
             logging.info(query)
             response = session.run(query)
@@ -119,7 +118,6 @@ class SearchProvenance:
                 RETURN nodes, relationships
                 """
             )
-            print(query)
             response = session.run(query)
 
             return nodes_edges(
@@ -199,7 +197,6 @@ class SearchProvenance:
                 Unwind r6 as r7 
                 RETURN Both_rms,Md,r7
                 """
-            print(query)
             response = session.run(query)
             return nodes_edges(response=response)
 
@@ -244,7 +241,6 @@ class SearchProvenance:
                 with *,  collect(r3)+collect(r4)as r5
                 Return {node_abbr},md2,Both_rms,r5
                 """
-            print(query)
 
             response = session.run(query)
             return nodes_edges(response=response)
