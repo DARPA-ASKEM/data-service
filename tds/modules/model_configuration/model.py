@@ -17,6 +17,7 @@ class ModelConfiguration(TdsModel):
     _index = "model_configuration"
     model_id: str
     configuration: object
+    amr_configuration: object
     concepts: Optional[List] = []
     exists: Optional[bool] = False
 
