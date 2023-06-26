@@ -11,38 +11,28 @@
       "name": "date",
       "data_type": "date",
       "format_str": "yyyy-MM-dd",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "location",
       "data_type": "string",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "location_name",
       "data_type": "string",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "value",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     }
   ],
   "metadata": {},
-  "source": "https://media.githubusercontent.com/media/reichlab/covid19-forecast-hub/master/data-truth/truth-Incident%20Hospitalizations.csv",
-  "grounding": {
-    "additionalProp1": {
-      "identifiers": {},
-      "context": {}
-    }
-  }
+  "source": "https://media.githubusercontent.com/media/reichlab/covid19-forecast-hub/master/data-truth/truth-Incident%20Hospitalizations.csv"
 }
