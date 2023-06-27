@@ -9,9 +9,8 @@ from neo4j import Driver
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
-from tds.db.helpers import validate_relationship
-from tds.schema.provenance import Provenance
+from tds.modules.provenance.model import Provenance, ProvenancePayload
+from tds.modules.provenance.utils import validate_relationship
 
 
 class ProvenanceHandler:
@@ -30,7 +29,7 @@ class ProvenanceHandler:
         """
         return self.graph_db is not None
 
-    def create_entry(self, entry: Provenance) -> int:
+    def create_entry(self, entry: ProvenancePayload) -> int:
         """
         Draws a relation between two resources
         """
@@ -44,15 +43,15 @@ class ProvenanceHandler:
             raise HTTPException(status_code=400, detail="Relationship not supported")
 
         with Session(self.__connection__) as session:
-            provenance = orm.Provenance(**entry_dict)
+            provenance = Provenance(**entry_dict)
             session.add(provenance)
             session.commit()
-            id: int = provenance.id
+            provenance_id: int = provenance.id
 
         if self.cache_enabled():
             self.create_node_relationship(entry_dict)
 
-        return id
+        return provenance_id
 
     # def create(self, left: Resource, right: Resource, label: RelationType) -> int:
     #     """
@@ -92,11 +91,8 @@ class ProvenanceHandler:
         Deletes the edge between two resources (not the nodes)
         """
         with Session(self.__connection__) as session:
-            if (
-                session.query(orm.Provenance).filter(orm.Provenance.id == id).count()
-                == 1
-            ):
-                provenance = session.query(orm.Provenance).get(id)
+            if session.query(Provenance).filter(Provenance.id == id).count() == 1:
+                provenance = session.query(Provenance).get(id)
                 session.delete(provenance)
                 session.commit()
                 provenance_dict = provenance.__dict__
@@ -167,8 +163,8 @@ class ProvenanceHandler:
                 + "Where n2.id = $right "
                 + "Match (n1)-[r:"
                 + provenance_payload.get("relation_type")
-                + " {user_id : $user_id"
-                + "}]->(n2)"
+                # + " {user_id : $user_id}"
+                + "]->(n2)"
                 + "Delete r"
             )
 

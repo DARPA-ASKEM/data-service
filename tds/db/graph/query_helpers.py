@@ -92,7 +92,7 @@ def match_node_builder(node_type: schema.ProvenanceType = None, node_id=None):
     node_type_character = return_node_abbr(node_type)
     if node_id is None:
         return f"Match ({node_type_character}:{node_type})"
-    return f"Match ({node_type_character}:{node_type}  {{id: {node_id}}}) "
+    return f"Match ({node_type_character}:{node_type}  {{id: '{node_id}'}}) "
 
 
 def return_node_abbr(root_type: schema.ProvenanceType):

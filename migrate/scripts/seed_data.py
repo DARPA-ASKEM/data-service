@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
+from tds.modules.provenance.model import Provenance
 
 migrate_dir = Path(os.path.dirname(__file__))
 alembic_cfg = config.Config(f"{migrate_dir.parent}/alembic.ini")
@@ -27,7 +28,7 @@ pg_data_load = {
     "persons": orm.Person,
     "projects": orm.Project,
     "project_assets": orm.ProjectAsset,
-    "provenance": orm.Provenance,
+    "provenance": Provenance,
     "publications": orm.Publication,
 }
 
