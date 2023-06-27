@@ -176,7 +176,7 @@ def delete_hanging_nodes(
 @provenance_router.get(
     "/{provenance_id}",
     response_model=ProvenanceResponse,
-    **retrieve.fastapi_endpoint_config
+    **retrieve.fastapi_endpoint_config,
 )
 def provenance_get(
     provenance_id: int, rdb: Engine = Depends(request_rdb)
@@ -237,7 +237,7 @@ def provenance_delete(
     provenance_id: int,
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
-) -> JSONResponse | Response:
+) -> JSONResponse:
     """
     Delete a Provenance in ElasticSearch
     """
@@ -250,21 +250,30 @@ def provenance_delete(
                 provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
                 success = provenance_handler.delete(id=provenance_id)
 
-        success_msg = "Provenance successfully deleted: {}".format(provenance_id)
+                success_msg = "Provenance successfully deleted: {}".format(
+                    provenance_id
+                )
 
-        logger.info(success_msg)
-        print(success_msg)
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            headers={
-                "content-type": "application/json",
-            },
-            content={"id": provenance_id, "message": success_msg, "success": success},
-        )
+                logger.info(success_msg)
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    headers={
+                        "content-type": "application/json",
+                    },
+                    content={
+                        "id": provenance_id,
+                        "message": success_msg,
+                        "success": success,
+                    },
+                )
+            else:
+                raise NoResultFound
+
     except NoResultFound:
-        return Response(
+        return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             headers={
                 "content-type": "application/json",
             },
+            content={"message": f"Provenance record for id {provenance_id} not found"},
         )
