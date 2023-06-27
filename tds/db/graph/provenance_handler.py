@@ -163,8 +163,8 @@ class ProvenanceHandler:
                 + "Where n2.id = $right "
                 + "Match (n1)-[r:"
                 + provenance_payload.get("relation_type")
-                + " {user_id : $user_id"
-                + "}]->(n2)"
+                # + " {user_id : $user_id}"
+                + "]->(n2)"
                 + "Delete r"
             )
 
