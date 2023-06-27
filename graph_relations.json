@@ -39,7 +39,8 @@
         ["Project","Model"],
         ["Project","ModelConfiguration"],
         ["Project","Simulation"],
-        ["Project","Dataset"]
+        ["Project","Dataset"],
+        ["Project","Artifact"]
     ],
     "IS_CONCEPT_OF":[
         ["Concept","Publication"],
