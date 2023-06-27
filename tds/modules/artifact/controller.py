@@ -1,5 +1,5 @@
 """
-    TDS Simulation Controller.
+    TDS Artifact Controller.
 
     Description: Defines the basic rest endpoints for the TDS Module.
 """
@@ -10,28 +10,32 @@ from fastapi import APIRouter, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
-from tds import settings
 from tds.db import es_client
 from tds.lib.s3 import get_presigned_url
-from tds.modules.simulation.model import Simulation
-from tds.modules.simulation.response import SimulationResponse, simulation_response
+from tds.modules.artifact.model import Artifact
+from tds.modules.artifact.response import ArtifactResponse, artifact_response
 from tds.operation import create, delete, retrieve, update
 from tds.settings import settings
 
-simulation_router = APIRouter()
+artifact_router = APIRouter()
 logger = Logger(__name__)
-es_index = Simulation.index
+es_index = Artifact.index
 
 
-@simulation_router.get(
-    "", response_model=list[SimulationResponse], **retrieve.fastapi_endpoint_config
+@artifact_router.get(
+    "", response_model=list[ArtifactResponse], **retrieve.fastapi_endpoint_config
 )
-def list_simulations(page_size: int = 100, page: int = 0) -> JSONResponse:
+def list_artifacts(page_size: int = 100, page: int = 0) -> JSONResponse:
     """
-    Retrieve the list of simulations from ES.
+    Retrieve the list of artifacts from ES.
     """
     es = es_client()
-    list_body = {"size": page_size, "from_": page}
+    list_body = {
+        "size": page_size,
+        # --** This option allows you to select specific fields from ES **--
+        # "fields": [],
+        "from_": page,
+    }
 
     res = es.search(index=es_index, **list_body)
 
@@ -40,17 +44,17 @@ def list_simulations(page_size: int = 100, page: int = 0) -> JSONResponse:
         headers={
             "content-type": "application/json",
         },
-        content=jsonable_encoder(simulation_response(res["hits"]["hits"])),
+        content=jsonable_encoder(artifact_response(res["hits"]["hits"])),
     )
 
 
-@simulation_router.post("", **create.fastapi_endpoint_config)
-def simulation_post(payload: Simulation) -> JSONResponse:
+@artifact_router.post("", **create.fastapi_endpoint_config)
+def artifact_post(payload: Artifact) -> JSONResponse:
     """
-    Create simulation and return its ID
+    Create artifact and return its ID
     """
     res = payload.save()
-    logger.info("New simulation created: %s", res["_id"])
+    logger.info("New artifact created: %s", res["_id"])
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         headers={
@@ -60,26 +64,26 @@ def simulation_post(payload: Simulation) -> JSONResponse:
     )
 
 
-@simulation_router.get(
-    "/{simulation_id}",
-    response_model=SimulationResponse,
+@artifact_router.get(
+    "/{artifact_id}",
+    response_model=ArtifactResponse,
     **retrieve.fastapi_endpoint_config,
 )
-def simulation_get(simulation_id: str) -> JSONResponse | Response:
+def artifact_get(artifact_id: str) -> JSONResponse | Response:
     """
-    Retrieve a simulation from ElasticSearch
+    Retrieve a artifact from ElasticSearch
     """
     try:
         es = es_client()
-        res = es.get(index=es_index, id=simulation_id)
-        logger.info("Simulation retrieved: %s", simulation_id)
+        res = es.get(index=es_index, id=artifact_id)
+        logger.info("Artifact retrieved: %s", artifact_id)
 
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             headers={
                 "content-type": "application/json",
             },
-            content=jsonable_encoder(SimulationResponse(**res["_source"])),
+            content=jsonable_encoder(ArtifactResponse(**res["_source"])),
         )
     except NotFoundError:
         return Response(
@@ -90,20 +94,20 @@ def simulation_get(simulation_id: str) -> JSONResponse | Response:
         )
 
 
-@simulation_router.put("/{simulation_id}", **update.fastapi_endpoint_config)
-def simulation_put(simulation_id: str, payload: Simulation) -> JSONResponse | Response:
+@artifact_router.put("/{artifact_id}", **update.fastapi_endpoint_config)
+def artifact_put(artifact_id: str, payload: Artifact) -> JSONResponse | Response:
     """
-    Update a simulation in ElasticSearch
+    Update a artifact in ElasticSearch
     """
     try:
-        res = payload.save()
-        logger.info("simulation updated: %s", res["_id"])
+        res = payload.save(artifact_id)
+        logger.info("artifact updated: %s", res["_id"])
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             headers={
                 "content-type": "application/json",
             },
-            content={"id": simulation_id},
+            content={"id": artifact_id},
         )
     except NotFoundError:
         return Response(
@@ -114,22 +118,22 @@ def simulation_put(simulation_id: str, payload: Simulation) -> JSONResponse | Re
         )
 
 
-@simulation_router.delete("/{simulation_id}", **delete.fastapi_endpoint_config)
-def simulation_delete(simulation_id: str) -> JSONResponse | Response:
+@artifact_router.delete("/{artifact_id}", **delete.fastapi_endpoint_config)
+def artifact_delete(artifact_id: str) -> JSONResponse | Response:
     """
-    Delete a Simulation in ElasticSearch
+    Delete a Artifact in ElasticSearch
     """
     try:
         es = es_client()
-        res = es.delete(index=es_index, id=simulation_id)
+        res = es.delete(index=es_index, id=artifact_id)
 
         if res["result"] != "deleted":
-            logger.error("Failed to delete Simulation: %s", simulation_id)
+            logger.error("Failed to delete Artifact: %s", artifact_id)
             raise Exception(
-                f"Failed to delete Simulation. ElasticSearch Response: {res['result']}"
+                f"Failed to delete Artifact. ElasticSearch Response: {res['result']}"
             )
 
-        success_msg = "Simulation successfully deleted: %s", simulation_id
+        success_msg = "Artifact successfully deleted: %s", artifact_id
 
         logger.info(success_msg)
         return JSONResponse(
@@ -148,17 +152,17 @@ def simulation_delete(simulation_id: str) -> JSONResponse | Response:
         )
 
 
-@simulation_router.get("/{simulation_id}/upload-url")
-def run_result_upload_url(simulation_id: str, filename: str) -> JSONResponse:
+@artifact_router.get("/{artifact_id}/upload-url")
+def artifact_upload_url(artifact_id: str, filename: str) -> JSONResponse:
     """
     Generates a pre-signed url to allow a user to upload to a secure S3 bucket
     without end-user authentication.
     """
     put_url = get_presigned_url(
-        entity_id=simulation_id,
+        entity_id=artifact_id,
         file_name=filename,
         method="put_object",
-        path=settings.S3_RESULTS_PATH,
+        path=settings.S3_ARTIFACT_PATH,
     )
     return JSONResponse(
         content={
@@ -168,17 +172,17 @@ def run_result_upload_url(simulation_id: str, filename: str) -> JSONResponse:
     )
 
 
-@simulation_router.get("/{simulation_id}/download-url")
-def run_result_download_url(simulation_id: str, filename: str) -> JSONResponse:
+@artifact_router.get("/{artifact_id}/download-url")
+def artifact_download_url(artifact_id: str, filename: str) -> JSONResponse:
     """
     Generates a pre-signed url to allow a user to donwload from a secure S3 bucket
     without the bucket being public or end-user authentication.
     """
     get_url = get_presigned_url(
-        entity_id=simulation_id,
+        entity_id=artifact_id,
         file_name=filename,
         method="get_object",
-        path=settings.S3_RESULTS_PATH,
+        path=settings.S3_ARTIFACT_PATH,
     )
     return JSONResponse(
         content={

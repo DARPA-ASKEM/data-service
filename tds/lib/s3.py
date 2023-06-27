@@ -26,21 +26,14 @@ def s3_client():
     return s3_
 
 
-def get_file_path(
-    entity_id: str | int, file_name: str, path: str = settings.S3_RESULTS_PATH
-) -> str:
+def get_file_path(entity_id: str | int, file_name: str, path: str) -> str:
     """
     Function builds a file path for s3.
     """
     return os.path.join(path, str(entity_id), file_name)
 
 
-def get_presigned_url(
-    entity_id: str | int,
-    file_name: str,
-    method: str,
-    path: str = settings.S3_RESULTS_PATH,
-):
+def get_presigned_url(entity_id: str | int, file_name: str, method: str, path: str):
     """
     Function generates a presigned URL for the HMI client.
     """
