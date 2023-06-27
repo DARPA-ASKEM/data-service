@@ -17,6 +17,7 @@ class ModelConfigurationResponse(BaseModel):
     timestamp: datetime
     model_id: str
     configuration: object
+    amr_configuration: object
     model_id: str
 
 

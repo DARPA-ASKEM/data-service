@@ -29,10 +29,22 @@
       "configuration.metadata": {
         "type": "object",
         "enabled": false
+      },
+      "amr_configuration": {
+        "type": "object",
+        "enabled": false
       }
     }
   },
   "simulation": {},
-  "workflow": {},
+  "workflow": {
+    "dynamic": false,
+    "properties": {
+      "document": {
+        "type": "object",
+        "enabled": false
+      }
+    }
+  },
   "artifact": {}
 }

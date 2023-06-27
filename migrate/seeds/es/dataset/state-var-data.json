@@ -11,185 +11,154 @@
       "name": "date",
       "data_type": "date",
       "format_str": "yyyy-MM-dd",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "I",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "R",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "D",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "V",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "H",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "I_0-9",
       "data_type": "float",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "I_10-19",
       "data_type": "float",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "I_20-29",
       "data_type": "float",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "I_30-39",
       "data_type": "float",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "I_40-49",
       "data_type": "float",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "I_50-59",
       "data_type": "float",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "I_60-69",
       "data_type": "float",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "I_70-79",
       "data_type": "float",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_0-9",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_10-19",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_20-29",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_30-39",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_40-49",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_50-59",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_60-69",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_70-79",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_80-89",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_90-99",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     },
     {
       "name": "N_100+",
       "data_type": "integer",
-      "annotations": {},
-      "metadata": {},
-      "grounding": {}
+      "annotations": [],
+      "metadata": {}
     }
   ],
   "metadata": {},
-  "source": "https://github.com/DARPA-ASKEM/experiments/blob/main/thin-thread-examples/milestone_6month/evaluation/ta1/usa-IRDVHN_age.csv",
-  "grounding": {
-    "additionalProp1": {
-      "identifiers": {},
-      "context": {}
-    }
-  }
+  "source": "https://github.com/DARPA-ASKEM/experiments/blob/main/thin-thread-examples/milestone_6month/evaluation/ta1/usa-IRDVHN_age.csv"
 }
