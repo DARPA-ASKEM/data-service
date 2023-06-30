@@ -163,11 +163,7 @@ def model_configurations_get(model_id: str) -> JSONResponse | Response:
     Retrieve a model 'description' from ElasticSearch
     """
     try:
-        query = {
-            "bool": {
-                "must": [{"match": {"model_id": model_id}}],
-            }
-        }
+        query = {"match_phrase": {"model_id": model_id}}
         res = es.search(index=ModelConfiguration.index, query=query)
         logger.info("model retrieved for description: %s", model_id)
 
