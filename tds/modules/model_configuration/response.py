@@ -2,6 +2,7 @@
 TDS Model Configuration Response object.
 """
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -18,6 +19,9 @@ class ModelConfigurationResponse(BaseModel):
     model_id: str
     configuration: object
     amr_configuration: object
+    calibrated: Optional[bool]
+    calibration: Optional[object]
+    calibration_score: Optional[float]
     model_id: str
 
 
