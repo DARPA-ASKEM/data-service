@@ -18,7 +18,7 @@ from tds.db.graph.provenance_handler import ProvenanceHandler
 from tds.db.graph.search_provenance import SearchProvenance
 from tds.modules.provenance.model import Provenance, ProvenancePayload, ProvenanceSearch
 from tds.modules.provenance.response import ProvenanceResponse
-from tds.operation import create, delete, retrieve, update
+from tds.operation import create, delete, retrieve
 
 provenance_router = APIRouter()
 logger = Logger(__name__)
