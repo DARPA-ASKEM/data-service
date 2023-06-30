@@ -10,7 +10,6 @@ from fastapi import APIRouter, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
-from tds import settings
 from tds.db import es_client
 from tds.lib.s3 import get_presigned_url
 from tds.modules.simulation.model import Simulation
