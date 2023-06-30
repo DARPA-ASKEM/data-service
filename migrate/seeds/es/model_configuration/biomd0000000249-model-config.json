@@ -6,6 +6,7 @@
   "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",
   "description": "BioModels model BIOMD0000000294 processed using MIRA.",
   "model_version": "1.0",
+  "calibrated": false,
   "configuration": {
     "name": "BIOMD0000000249",
     "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",

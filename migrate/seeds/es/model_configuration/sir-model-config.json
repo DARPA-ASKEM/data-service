@@ -5,6 +5,11 @@
   "description": "SIR....",
   "timestamp": "2023-06-12 23:25:26",
   "model_version": "1.0",
+  "calibrated": true,
+  "calibration_score": 1.047,
+  "calibration": {
+    "dataset_id": "covid-19-us-data"
+  },
   "configuration": {
     "name": "SIR Model",
     "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json",
