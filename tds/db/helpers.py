@@ -1,7 +1,6 @@
 """
 Easy initialization and deletion of db content
 """
-import json
 from typing import Any
 
 from sqlalchemy.engine.base import Connection
