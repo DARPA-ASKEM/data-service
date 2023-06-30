@@ -18,6 +18,9 @@ class ModelConfiguration(TdsModel):
     model_id: str
     configuration: object
     amr_configuration: Optional[object]
+    calibrated: Optional[bool] = False
+    calibration: Optional[object]
+    calibration_score: Optional[float]
     concepts: Optional[List] = []
     exists: Optional[bool] = False
 
