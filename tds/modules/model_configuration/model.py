@@ -18,6 +18,9 @@ class ModelConfiguration(TdsModel):
     model_id: str
     configuration: object
     amr_configuration: Optional[object]
+    calibrated: Optional[bool] = False
+    calibration: Optional[object]
+    calibration_score: Optional[float]
     concepts: Optional[List] = []
     exists: Optional[bool] = False
 
@@ -40,9 +43,14 @@ class ModelConfiguration(TdsModel):
 
         schema_extra = {
             "example": {
-                "name": "Configuration Name",
-                "description": "Configuration Description",
-                "model_id": "unique_uuid",
-                "configuration": {""},
+                "model_id": "Model ID",
+                "name": "Name",
+                "description": "Description",
+                "timestamp": "2023-01-01 00:00:00",
+                "model_version": "1.0",
+                "calibrated": True,
+                "calibration_score": 1.047,
+                "calibration": {"dataset_id": "covid-19-us-data"},
+                "configuration": {},
             }
         }
