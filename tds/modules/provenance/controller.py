@@ -1,43 +1,58 @@
 """
+    TDS Provenance Controller.
 
-Create, Delete and Search operations for Provenance
-
+    Description: Defines the basic rest endpoints for the TDS Module.
 """
-
-import json
 from logging import Logger
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 
-from tds.autogen import enums, orm
-from tds.db import ProvenanceHandler, SearchProvenance, request_graph_db, request_rdb
+from tds.autogen import enums
+from tds.db import request_graph_db, request_rdb
+from tds.db.graph.provenance_handler import ProvenanceHandler
+from tds.db.graph.search_provenance import SearchProvenance
+from tds.modules.provenance.model import Provenance, ProvenancePayload, ProvenanceSearch
+from tds.modules.provenance.response import ProvenanceResponse
 from tds.operation import create, delete, retrieve
-from tds.schema.provenance import Provenance, ProvenancePayload
 
+provenance_router = APIRouter()
 logger = Logger(__name__)
-router = APIRouter()
 
 
-@router.get("", **retrieve.fastapi_endpoint_config)
-def get_provenance(id: int, rdb: Engine = Depends(request_rdb)):
-    """
-    Searches for a provenance entry in TDS
-    """
-    with Session(rdb) as session:
-        return Provenance.from_orm(session.query(orm.Provenance).get(id))
-
-
-@router.post("/search")
-def search_provenance(
+@provenance_router.post("", **create.fastapi_endpoint_config)
+def provenance_post(
     payload: ProvenancePayload,
+    rdb: Engine = Depends(request_rdb),
+    graph_db=Depends(request_graph_db),
+) -> JSONResponse:
+    """
+    Create provenance and return its ID
+    """
+    provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+    provenance_id: int = provenance_handler.create_entry(payload)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        headers={
+            "content-type": "application/json",
+        },
+        content={"id": provenance_id},
+    )
+
+
+@provenance_router.post("/search")
+def search_provenance(
+    payload: ProvenanceSearch,
     search_type: enums.ProvenanceSearchTypes = Query(
         default=enums.ProvenanceSearchTypes.connected_nodes
     ),
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
-) -> Response:
+) -> JSONResponse:
     """
     Search provenance of for all artifacts that helped derive this artifact.
 
@@ -84,8 +99,8 @@ def search_provenance(
     The payload for searching needs to match the schema below.
 
     Provenance Types are :
-    Dataset, Model, ModelParameter, Plan, PlanParameter, ModelRevision, Intermediate,
-    Publication, SimulationRun, Project, Concept.
+    Dataset, Model, ModelConfiguration, Publication, Simulation,
+    Project, Concept.
 
 
     ***edges*** set to true: edges will be returned if found
@@ -115,11 +130,8 @@ def search_provenance(
             "nodes": true,
             "types": [
                 "Dataset",
-                "Intermediate",
                 "Model",
-                "ModelParameter",
-                "Plan",
-                "PlanParameter",
+                "ModelConfiguration",
                 "Publication",
                 "SimulationRun"
             ],
@@ -135,75 +147,103 @@ def search_provenance(
     search_function = search_provenance_handler[search_type]
     results = search_function(payload=payload)
 
-    return Response(
+    return JSONResponse(
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps({"result": results}),
+        content={"result": results},
     )
 
 
-@router.post("", **create.fastapi_endpoint_config)
-def create_provenance(
-    payload: Provenance,
-    rdb: Engine = Depends(request_rdb),
-    graph_db=Depends(request_graph_db),
-) -> Response:
-    """
-    Create provenance relationship
-    """
-
-    provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
-    id: int = provenance_handler.create_entry(payload)
-
-    logger.info("new provenance with %i", id)
-    return Response(
-        status_code=status.HTTP_201_CREATED,
-        headers={
-            "content-type": "application/json",
-        },
-        content=json.dumps({"id": id}),
-    )
-
-
-@router.delete("/hanging_nodes")
+@provenance_router.delete("/hanging_nodes")
 def delete_hanging_nodes(
     rdb: Engine = Depends(request_rdb), graph_db=Depends(request_graph_db)
-) -> Response:
+) -> JSONResponse:
     """
     Prunes nodes that have 0 edges
     """
     provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
     success = provenance_handler.delete_nodes()
-    return Response(
+    return JSONResponse(
         status_code=status.HTTP_204_NO_CONTENT,
         headers={
             "content-type": "application/json",
         },
-        content=json.dumps({"success": success}),
+        content={"success": success},
     )
 
 
-@router.delete("/{id}", **delete.fastapi_endpoint_config)
-def delete_provenance(
-    id: int,
+@provenance_router.get(
+    "/{provenance_id}",
+    response_model=ProvenanceResponse,
+    **retrieve.fastapi_endpoint_config,
+)
+def provenance_get(
+    provenance_id: int, rdb: Engine = Depends(request_rdb)
+) -> JSONResponse | Response:
+    """
+    Retrieve a provenance from ElasticSearch
+    """
+    try:
+        with Session(rdb) as session:
+            res = session.query(Provenance).get(provenance_id)
+
+        logger.info("Provenance retrieved: %s", provenance_id)
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content=jsonable_encoder(res),
+        )
+    except NoResultFound:
+        return Response(
+            status_code=status.HTTP_404_NOT_FOUND,
+            headers={
+                "content-type": "application/json",
+            },
+        )
+
+
+@provenance_router.delete("/{provenance_id}", **delete.fastapi_endpoint_config)
+def provenance_delete(
+    provenance_id: int,
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
-) -> Response:
+) -> JSONResponse:
     """
-    Delete provenance metadata
+    Delete a Provenance in ElasticSearch
     """
-    with Session(rdb) as session:
-        if session.query(orm.Provenance).filter(orm.Provenance.id == id).count() == 1:
-            provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
-            success = provenance_handler.delete(id=id)
+    try:
+        with Session(rdb) as session:
+            if (
+                session.query(Provenance).filter(Provenance.id == provenance_id).count()
+                == 1
+            ):
+                provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
+                success = provenance_handler.delete(id=provenance_id)
 
-        else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return Response(
-        status_code=status.HTTP_204_NO_CONTENT,
-        headers={
-            "content-type": "application/json",
-        },
-        content=json.dumps({"id": id, "success": success}),
-    )
+                success_msg = f"Provenance successfully deleted: {provenance_id}"
+
+                logger.info(success_msg)
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    headers={
+                        "content-type": "application/json",
+                    },
+                    content={
+                        "id": provenance_id,
+                        "message": success_msg,
+                        "success": success,
+                    },
+                )
+            raise NoResultFound
+    except NoResultFound:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            headers={
+                "content-type": "application/json",
+            },
+            content={"message": f"Provenance record for id {provenance_id} not found"},
+        )

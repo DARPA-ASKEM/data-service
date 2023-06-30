@@ -127,8 +127,8 @@ services:
     entrypoint: /run_migrations.sh
     env_file:
       - api.env
-    volumes:
-      - $PWD/migrate:/migrate
+#    volumes:
+#      - $PWD/migrate:/migrate
     depends_on:
       rdb:
         condition: service_healthy

@@ -9,8 +9,9 @@ import openai
 from fastapi import APIRouter, Depends
 from sqlalchemy.engine.base import Engine
 
-from tds.db import ProvenanceHandler, request_graph_db, request_rdb
-from tds.db.helpers import return_graph_validations
+from tds.db import request_graph_db, request_rdb
+from tds.db.graph.provenance_handler import ProvenanceHandler
+from tds.modules.provenance.utils import return_graph_validations
 from tds.settings import settings
 
 logger = Logger(__name__)
@@ -22,7 +23,7 @@ valid_relations = return_graph_validations()
 DB_DESC = "Valid relations include:\n"
 # NOTE: Should we make these sentences more natural language related?
 for relation, mapping in valid_relations.items():
-    for (dom, codom) in mapping:
+    for dom, codom in mapping:
         DB_DESC += f"{dom}-[relation]->{codom}\n"
 
 PREAMBLE = """

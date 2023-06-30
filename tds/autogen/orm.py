@@ -5,18 +5,10 @@ Skipping linter to prevent class docstring errors.
 @TODO: Clean up file to pass linting.
 """
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
-from tds.autogen.enums import (
-    ExtractedType,
-    ProvenanceType,
-    RelationType,
-    ResourceType,
-    Role,
-    ValueType,
-)
+from tds.autogen.enums import ExtractedType, ResourceType, Role, ValueType
 
 Base = declarative_base()
 
@@ -84,20 +76,6 @@ class ProjectAsset(Base):
     resource_id = sa.Column(sa.String(), nullable=False)
     resource_type = sa.Column(sa.Enum(ResourceType), nullable=False)
     external_ref = sa.Column(sa.String())
-
-
-class Provenance(Base):
-    __tablename__ = "provenance"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    relation_type = sa.Column(sa.Enum(RelationType), nullable=False)
-    left = sa.Column(sa.String(), nullable=False)
-    left_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
-    right = sa.Column(sa.String(), nullable=False)
-    right_type = sa.Column(sa.Enum(ProvenanceType), nullable=False)
-    user_id = sa.Column(sa.Integer(), sa.ForeignKey("person.id"))
-    concept = sa.Column(sa.String())
 
 
 class Association(Base):

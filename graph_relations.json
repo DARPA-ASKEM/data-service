@@ -1,36 +1,30 @@
 {
     "COPIED_FROM":[
-        ["Model","Model"],
-        ["ModelRevision","ModelRevision"]
+        ["Model","Model"]
     ],
     "GLUED_FROM":[
-        ["Model","Model"],
-        ["ModelRevision","ModelRevision"]
+        ["Model","Model"]
     ],
     "STRATIFIED_FROM":[
-        ["Model","Model"],
-        ["ModelRevision","ModelRevision"]
+        ["Model","Model"]
     ],
     "EDITED_FROM":[
-        ["Model","Model"],
-        ["ModelRevision","ModelRevision"]
+        ["Model","Model"]
     ],
     "DECOMPOSED_FROM":[
-        ["Model","Model"],
-        ["ModelRevision","ModelRevision"]
+        ["Model","Model"]
     ],
     "BEGINS_AT":[
-        ["Model","ModelRevision"]
+        ["Model","Model"]
     ],
     "PARAMETER_OF":[
-        ["ModelParameter","ModelRevision"],
-        ["PlanParameter","Simulation"]
+        ["ModelParameter","Model"],
+        ["SimulationParameter","Simulation"]
     ],
     "GENERATED_BY":[
-        ["Simulation","Plan"]
+        ["Simulation","ModelConfiguration"]
     ],
     "USES":[
-        ["Plan","ModelRevision"],
         ["ModelConfiguration","Model"]
     ],
     "CITES":[
@@ -43,14 +37,15 @@
     "CONTAINS":[
         ["Project","Publication"],
         ["Project","Model"],
-        ["Project","Plan"],
+        ["Project","ModelConfiguration"],
         ["Project","Simulation"],
-        ["Project","Dataset"]
+        ["Project","Dataset"],
+        ["Project","Artifact"]
     ],
     "IS_CONCEPT_OF":[
         ["Concept","Publication"],
         ["Concept","Model"],
-        ["Concept","Plan"],
+        ["Concept","ModelConfiguration"],
         ["Concept","Simulation"],
         ["Concept","Dataset"]
     ]
