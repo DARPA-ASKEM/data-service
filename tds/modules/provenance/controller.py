@@ -206,32 +206,6 @@ def provenance_get(
         )
 
 
-@provenance_router.put("/{provenance_id}", **update.fastapi_endpoint_config)
-def provenance_put(
-    provenance_id: int, payload: ProvenancePayload
-) -> JSONResponse | Response:
-    """
-    Update a provenance in ElasticSearch
-    """
-    try:
-        # res = payload.save(provenance_id)
-        # logger.info("provenance updated: %s", res["_id"])
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            headers={
-                "content-type": "application/json",
-            },
-            content={"id": provenance_id},
-        )
-    except NotFoundError:
-        return Response(
-            status_code=status.HTTP_404_NOT_FOUND,
-            headers={
-                "content-type": "application/json",
-            },
-        )
-
-
 @provenance_router.delete("/{provenance_id}", **delete.fastapi_endpoint_config)
 def provenance_delete(
     provenance_id: int,
@@ -250,9 +224,7 @@ def provenance_delete(
                 provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
                 success = provenance_handler.delete(id=provenance_id)
 
-                success_msg = "Provenance successfully deleted: {}".format(
-                    provenance_id
-                )
+                success_msg = f"Provenance successfully deleted: {provenance_id}"
 
                 logger.info(success_msg)
                 return JSONResponse(
@@ -266,9 +238,7 @@ def provenance_delete(
                         "success": success,
                     },
                 )
-            else:
-                raise NoResultFound
-
+            raise NoResultFound
     except NoResultFound:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
