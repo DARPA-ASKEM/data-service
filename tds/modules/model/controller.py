@@ -158,13 +158,21 @@ def model_descriptions_get(model_id: str) -> JSONResponse | Response:
     response_model=list[ModelConfigurationResponse],
     **retrieve.fastapi_endpoint_config,
 )
-def model_configurations_get(model_id: str) -> JSONResponse | Response:
+def model_configurations_get(
+    model_id: str,
+    page_size: int = 10,
+    page: int = 0,
+) -> JSONResponse | Response:
     """
     Retrieve a model 'description' from ElasticSearch
     """
     try:
-        query = {"match_phrase": {"model_id": model_id}}
-        res = es.search(index=ModelConfiguration.index, query=query)
+        query = {
+            "match_phrase": {"model_id": model_id},
+        }
+        res = es.search(
+            index=ModelConfiguration.index, query=query, from_=page, size=page_size
+        )
         logger.info("model retrieved for description: %s", model_id)
 
         return JSONResponse(
