@@ -39,6 +39,10 @@ class Provenance(Base):
 
 
 class ProvenancePayload(BaseModel):
+    """
+    Provenance Payload Data Model
+    """
+
     id: Optional[int] = None
     timestamp: datetime.datetime = datetime.datetime.now()
     relation_type: RelationType
@@ -51,6 +55,10 @@ class ProvenancePayload(BaseModel):
 
 
 class ProvenanceSearch(BaseModel):
+    """
+    Provenance Data Model.
+    """
+
     root_id: Optional[int]
     root_type: Optional[ProvenanceType]
     user_id: Optional[int]
