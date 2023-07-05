@@ -36,6 +36,7 @@ class Simulation(TdsModel):
     engine: SimulationEngine
     type: SimulationType
     status: Optional[SimulationStatus] = Field(default="queued")
+    reason: Optional[str]
     execution_payload: ExecutionPayload
     start_time: Optional[datetime]
     completed_time: Optional[datetime]
