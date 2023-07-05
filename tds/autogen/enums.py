@@ -128,3 +128,4 @@ class SimulationStatus(str, Enum):
     error = "error"
     queued = "queued"
     running = "running"
+    failed = "failed"
