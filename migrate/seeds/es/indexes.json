@@ -18,6 +18,9 @@
   "dataset": {},
   "model_configuration": {
     "properties": {
+      "model_id": {
+        "type": "keyword"
+      },
       "configuration.model": {
         "type": "object",
         "enabled": false

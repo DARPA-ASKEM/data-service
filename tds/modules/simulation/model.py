@@ -36,6 +36,7 @@ class Simulation(TdsModel):
     engine: SimulationEngine
     type: SimulationType
     status: Optional[SimulationStatus] = Field(default="queued")
+    reason: Optional[str]
     execution_payload: ExecutionPayload
     start_time: Optional[datetime]
     completed_time: Optional[datetime]
@@ -71,7 +72,8 @@ class Simulation(TdsModel):
                 "execution_payload": {},
                 "result_files": [],
                 "type": "ensemble|simulation|calibration",
-                "status": "queued|running|complete|error|cancelled",
+                "status": "queued|running|complete|error|cancelled|failed",
+                "reason": "Only filled if simulation failed.",
                 "start_time": "timestamp",
                 "completed_time": "timestamp",
                 "engine": "ciemss|julia",
