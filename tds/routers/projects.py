@@ -15,6 +15,7 @@ from sqlalchemy.orm import Query, Session
 from tds.autogen import orm
 from tds.db import entry_exists, es_client, list_by_id, request_rdb
 from tds.lib.projects import adjust_project_assets, save_project_assets
+from tds.modules.artifact.response import artifact_response
 from tds.modules.dataset.response import dataset_response
 from tds.modules.model.utils import model_list_fields, model_list_response
 from tds.modules.model_configuration.response import configuration_response
@@ -38,6 +39,7 @@ es_list_response = {
     ResourceType.datasets: {"function": dataset_response, "fields": None},
     ResourceType.simulations: {"fields": None, "function": simulation_response},
     ResourceType.workflows: {"fields": None, "function": workflow_response},
+    ResourceType.artifacts: {"fields": None, "function": artifact_response},
 }
 
 es_resources = [
@@ -46,6 +48,7 @@ es_resources = [
     ResourceType.model_configurations,
     ResourceType.simulations,
     ResourceType.workflows,
+    ResourceType.artifacts,
 ]
 
 
@@ -256,6 +259,7 @@ def get_project_assets(
             ResourceType.publications,
             ResourceType.simulations,
             ResourceType.workflows,
+            ResourceType.artifacts,
         ]
     ),
     rdb: Engine = Depends(request_rdb),
