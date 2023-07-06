@@ -8,6 +8,7 @@ from typing import Dict, Optional, Type
 
 from tds.autogen import orm, schema
 from tds.autogen.schema import ResourceType
+from tds.modules.artifact.model import Artifact
 from tds.modules.dataset.model import Dataset
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
@@ -36,6 +37,7 @@ obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Publication: ResourceType.publications,
     Simulation: ResourceType.simulations,
     Workflow: ResourceType.workflows,
+    Artifact: ResourceType.artifacts,
 }
 
 obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
@@ -45,6 +47,7 @@ obj_to_enum_desc: Dict[Type[Resource], ResourceType] = {
     Publication: ResourceType.publications,
     Simulation: ResourceType.simulations,
     Workflow: ResourceType.workflows,
+    Artifact: ResourceType.artifacts,
 }
 
 
