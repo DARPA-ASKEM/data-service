@@ -168,7 +168,7 @@ def model_configurations_get(
     """
     try:
         query = {
-            "term": {"model_id.keyword": {"value": model_id}},
+            "term": {"model_id": {"value": model_id}},
         }
         res = es.search(
             index=ModelConfiguration.index,
