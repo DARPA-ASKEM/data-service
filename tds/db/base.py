@@ -30,6 +30,7 @@ class TdsModel(BaseModel):
     )
     _index: str
     timestamp: Optional[datetime]
+    _date_format = "%Y-%m-%d %H:%M:%S"
 
     @classmethod
     @property
@@ -43,7 +44,7 @@ class TdsModel(BaseModel):
         """
         Method creates the entity in ES.
         """
-        self.timestamp = datetime.now()
+        self.timestamp = datetime.now().strftime(self._date_format)
         try:
             res = es.create(
                 index=self.index,
@@ -60,7 +61,7 @@ class TdsModel(BaseModel):
         """
         Method saves the entity in ES.
         """
-        self.timestamp = datetime.now()
+        self.timestamp = datetime.now().strftime(self._date_format)
         res = es.index(
             index=self.index,
             document=self.dict(),

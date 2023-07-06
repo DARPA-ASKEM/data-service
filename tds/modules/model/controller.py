@@ -175,7 +175,7 @@ def model_configurations_get(
             query=query,
             from_=page,
             size=page_size,
-            sort="_doc",
+            sort="timestamp:desc",
         )
         logger.info("model retrieved for description: %s", model_id)
 
