@@ -35,6 +35,7 @@ def list_model_configurations(page_size: int = 100, page: int = 0) -> JSONRespon
         "size": page_size,
         # "fields": [],
         "from_": page,
+        "sort": "timestamp:desc",
     }
     res = es.search(index=es_index, **list_body)
 

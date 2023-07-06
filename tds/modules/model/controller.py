@@ -168,10 +168,14 @@ def model_configurations_get(
     """
     try:
         query = {
-            "term": {"model_id.keyword": {"value": model_id}},
+            "term": {"model_id": {"value": model_id}},
         }
         res = es.search(
-            index=ModelConfiguration.index, query=query, from_=page, size=page_size
+            index=ModelConfiguration.index,
+            query=query,
+            from_=page,
+            size=page_size,
+            sort="timestamp:desc",
         )
         logger.info("model retrieved for description: %s", model_id)
 
