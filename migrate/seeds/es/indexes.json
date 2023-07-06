@@ -12,14 +12,29 @@
       "metadata": {
         "type": "object",
         "enabled": false
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
       }
     }
   },
-  "dataset": {},
+  "dataset": {
+    "properties": {
+      "timestamp": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    }
+  },
   "model_configuration": {
     "properties": {
       "model_id": {
         "type": "keyword"
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
       },
       "configuration.model": {
         "type": "object",
@@ -39,15 +54,33 @@
       }
     }
   },
-  "simulation": {},
+  "simulation": {
+    "properties": {
+      "timestamp": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    }
+  },
   "workflow": {
     "dynamic": false,
     "properties": {
       "document": {
         "type": "object",
         "enabled": false
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
       }
     }
   },
-  "artifact": {}
+  "artifact": {
+    "properties": {
+      "timestamp": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    }
+  }
 }
