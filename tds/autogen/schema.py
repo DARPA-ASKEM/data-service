@@ -60,14 +60,6 @@ class Extraction(BaseModel):
     img: bytes
 
 
-class ProjectAsset(BaseModel):
-    id: Optional[int] = None
-    project_id: Optional[int] = None
-    resource_id: Optional[int] = None
-    resource_type: ResourceType
-    external_ref: Optional[str]
-
-
 class OntologyConcept(BaseModel):
     id: Optional[int] = None
     curie: str
@@ -114,15 +106,6 @@ class Publication(BaseModel):
     id: Optional[int] = None
     xdd_uri: str
     title: str
-
-
-class Project(BaseModel):
-    id: Optional[int] = None
-    name: str
-    description: str
-    timestamp: Optional[datetime.datetime] = datetime.datetime.now()
-    active: bool
-    username: Optional[str]
 
 
 class Person(BaseModel):
