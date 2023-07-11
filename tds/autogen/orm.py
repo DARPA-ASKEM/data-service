@@ -8,7 +8,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
-from tds.autogen.enums import ExtractedType, ResourceType, Role, ValueType
+from tds.autogen.enums import ExtractedType, ValueType
 
 Base = declarative_base()
 
@@ -21,18 +21,6 @@ class QualifierXref(Base):
         sa.Integer(), sa.ForeignKey("qualifier.id"), nullable=False
     )
     feature_id = sa.Column(sa.Integer(), sa.ForeignKey("feature.id"), nullable=False)
-
-
-class ModelRuntime(Base):
-    __tablename__ = "model_runtime"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    timestamp = sa.Column(sa.DateTime(), nullable=False, server_default=func.now())
-    name = sa.Column(sa.String(), nullable=False)
-    left = sa.Column(sa.String(), sa.ForeignKey("model_framework.name"), nullable=False)
-    right = sa.Column(
-        sa.String(), sa.ForeignKey("model_framework.name"), nullable=False
-    )
 
 
 class Feature(Base):
@@ -68,16 +56,6 @@ class Extraction(Base):
     img = sa.Column(sa.LargeBinary(), nullable=False)
 
 
-class Association(Base):
-    __tablename__ = "association"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    person_id = sa.Column(sa.Integer(), sa.ForeignKey("person.id"), nullable=False)
-    resource_id = sa.Column(sa.Integer(), nullable=False)
-    resource_type = sa.Column(sa.Enum(ResourceType))
-    role = sa.Column(sa.Enum(Role))
-
-
 class ModelFramework(Base):
     __tablename__ = "model_framework"
 
@@ -102,14 +80,3 @@ class Publication(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     xdd_uri = sa.Column(sa.String(), nullable=False)
     title = sa.Column(sa.String(), nullable=False)
-
-
-class Person(Base):
-    __tablename__ = "person"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    email = sa.Column(sa.String(), nullable=False)
-    org = sa.Column(sa.String())
-    website = sa.Column(sa.String())
-    is_registered = sa.Column(sa.Boolean(), nullable=False)
