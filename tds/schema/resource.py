@@ -7,7 +7,7 @@ from collections import defaultdict
 from typing import Dict, Optional, Type
 
 from tds.autogen import orm, schema
-from tds.autogen.schema import ResourceType
+from tds.autogen.enums import ResourceType
 from tds.modules.artifact.model import Artifact
 from tds.modules.dataset.model import Dataset
 from tds.modules.model.model import Model
