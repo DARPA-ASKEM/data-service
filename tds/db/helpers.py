@@ -23,12 +23,12 @@ def drop_content(connection: Connection):
     return orm.Base.metadata.drop_all(connection)
 
 
-def entry_exists(connection: Connection, orm_type: Any, id: int) -> bool:
+def entry_exists(connection: Connection, orm_type: Any, orm_id: int) -> bool:
     """
     Check if entry exists
     """
     with Session(connection) as session:
-        return session.query(orm_type).filter(orm_type.id == id).count() == 1
+        return session.query(orm_type).filter(orm_type.id == orm_id).count() == 1
 
 
 def list_by_id(connection: Connection, orm_type: Any, page_size: int, page: int = 0):
