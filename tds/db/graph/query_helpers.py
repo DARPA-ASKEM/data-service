@@ -6,6 +6,7 @@ from typing import List
 from fastapi import HTTPException
 
 from tds.autogen import schema
+from tds.autogen.enums import ProvenanceType
 from tds.schema.provenance import provenance_type_to_abbr
 
 
@@ -25,7 +26,7 @@ def dynamic_relationship_direction(direction, relationship_type):
     )
 
 
-def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
+def derived_models_query_generater(root_type: ProvenanceType, root_id):
     """
     return all models, model revisions
     (sometimes intermediates) that were derived from a publication or intermediate
@@ -63,7 +64,7 @@ def derived_models_query_generater(root_type: schema.ProvenanceType, root_id):
     )
 
 
-def parent_model_query_generator(root_type: schema.ProvenanceType, root_id):
+def parent_model_query_generator(root_type: ProvenanceType, root_id):
     """
     Return match query to ModelRevision depending on root_type
     """
@@ -71,19 +72,19 @@ def parent_model_query_generator(root_type: schema.ProvenanceType, root_id):
     relationships_str = relationships_array_as_str(
         exclude=["CONTAINS", "IS_CONCEPT_OF"]
     )
-    model_revision_node = node_builder(node_type=schema.ProvenanceType.Model)
+    model_revision_node = node_builder(node_type=ProvenanceType.Model)
     query_templates_index = {
-        schema.ProvenanceType.Model: f"-[r:BEGINS_AT]->{model_revision_node} ",
-        schema.ProvenanceType.ModelConfiguration: f"-[r:USES]->{model_revision_node} ",
-        schema.ProvenanceType.Simulation: ""
+        ProvenanceType.Model: f"-[r:BEGINS_AT]->{model_revision_node} ",
+        ProvenanceType.ModelConfiguration: f"-[r:USES]->{model_revision_node} ",
+        ProvenanceType.Simulation: ""
         + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
-        schema.ProvenanceType.Dataset: ""
+        ProvenanceType.Dataset: ""
         + f"-[r:{relationships_str} *1..]->{model_revision_node} ",
     }
     return match_node + query_templates_index[root_type]
 
 
-def match_node_builder(node_type: schema.ProvenanceType = None, node_id=None):
+def match_node_builder(node_type: ProvenanceType = None, node_id=None):
     """
     return node with match statement
     """
@@ -95,7 +96,7 @@ def match_node_builder(node_type: schema.ProvenanceType = None, node_id=None):
     return f"Match ({node_type_character}:{node_type}  {{id: '{node_id}'}}) "
 
 
-def return_node_abbr(root_type: schema.ProvenanceType):
+def return_node_abbr(root_type: ProvenanceType):
     """
     Return node type abbr
     """
@@ -121,7 +122,7 @@ def relationships_array_as_str(exclude=None, include=None):
     return relationship_str[:-1]
 
 
-def node_builder(node_type: schema.ProvenanceType = None, node_id=None):
+def node_builder(node_type: ProvenanceType = None, node_id=None):
     """
     Return node
     """
@@ -223,7 +224,7 @@ def nodes_edges(
     nodes=True,
     edges=False,
     versions=False,
-    types=List[schema.ProvenanceType],
+    types=List[ProvenanceType],
 ):
     """
     Return connected nodes and edges
