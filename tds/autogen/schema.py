@@ -7,18 +7,9 @@ Skipping linter to prevent class docstring errors.
 import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Json
+from pydantic import BaseModel
 
-from tds.autogen.enums import (
-    ExtractedType,
-    OntologicalField,
-    ProvenanceType,
-    RelationType,
-    ResourceType,
-    Role,
-    TaggableType,
-    ValueType,
-)
+from tds.autogen.enums import ExtractedType, OntologicalField, TaggableType, ValueType
 
 
 class QualifierXref(BaseModel):
@@ -68,26 +59,6 @@ class OntologyConcept(BaseModel):
     status: OntologicalField
 
 
-class Provenance(BaseModel):
-    id: Optional[int] = None
-    timestamp: datetime.datetime = datetime.datetime.now()
-    relation_type: RelationType
-    left: str
-    left_type: ProvenanceType
-    right: str
-    right_type: ProvenanceType
-    user_id: Optional[int]
-    concept: Optional[str]
-
-
-class Association(BaseModel):
-    id: Optional[int] = None
-    person_id: Optional[int] = None
-    resource_id: Optional[int] = None
-    resource_type: Optional[ResourceType]
-    role: Optional[Role]
-
-
 class ModelFramework(BaseModel):
     name: str
     version: str
@@ -106,17 +77,3 @@ class Publication(BaseModel):
     id: Optional[int] = None
     xdd_uri: str
     title: str
-
-
-class Person(BaseModel):
-    id: Optional[int] = None
-    name: str
-    email: str
-    org: Optional[str]
-    website: Optional[str]
-    is_registered: bool
-
-
-class ActiveConcept(BaseModel):
-    curie: str
-    name: Optional[str]
