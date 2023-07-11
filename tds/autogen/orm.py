@@ -112,6 +112,7 @@ class Publication(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     xdd_uri = sa.Column(sa.String(), nullable=False)
     title = sa.Column(sa.String(), nullable=False)
+    publication_data = sa.Column(sa.JSON, nullable=True)
 
 
 class Project(Base):
