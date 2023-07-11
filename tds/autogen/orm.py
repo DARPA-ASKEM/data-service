@@ -68,16 +68,6 @@ class Extraction(Base):
     img = sa.Column(sa.LargeBinary(), nullable=False)
 
 
-class ProjectAsset(Base):
-    __tablename__ = "project_asset"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    project_id = sa.Column(sa.Integer(), sa.ForeignKey("project.id"), nullable=False)
-    resource_id = sa.Column(sa.String(), nullable=False)
-    resource_type = sa.Column(sa.Enum(ResourceType), nullable=False)
-    external_ref = sa.Column(sa.String())
-
-
 class Association(Base):
     __tablename__ = "association"
 
@@ -112,17 +102,6 @@ class Publication(Base):
     id = sa.Column(sa.Integer(), primary_key=True)
     xdd_uri = sa.Column(sa.String(), nullable=False)
     title = sa.Column(sa.String(), nullable=False)
-
-
-class Project(Base):
-    __tablename__ = "project"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    name = sa.Column(sa.String(), nullable=False)
-    description = sa.Column(sa.String(), nullable=False)
-    timestamp = sa.Column(sa.DateTime(), server_default=func.now())
-    active = sa.Column(sa.Boolean(), nullable=False)
-    username = sa.Column(sa.String())
 
 
 class Person(Base):
