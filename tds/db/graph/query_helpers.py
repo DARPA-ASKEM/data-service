@@ -5,8 +5,7 @@ from typing import List
 
 from fastapi import HTTPException
 
-from tds.autogen import schema
-from tds.db.enums import ProvenanceType
+from tds.db.enums import ProvenanceType, RelationType
 from tds.schema.provenance import provenance_type_to_abbr
 
 
@@ -109,13 +108,13 @@ def relationships_array_as_str(exclude=None, include=None):
     """
     relationship_str = ""
     if exclude is not None:
-        for type_ in schema.RelationType:
+        for type_ in RelationType:
             value = type_.value
             if value in exclude:
                 continue
             relationship_str += value + "|"
         return relationship_str[:-1]
-    for type_ in schema.RelationType:
+    for type_ in RelationType:
         value = type_.value
         if value in include:
             relationship_str += value + "|"
