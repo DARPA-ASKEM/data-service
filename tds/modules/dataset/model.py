@@ -7,10 +7,8 @@ from typing import Any, List, Optional
 
 from pydantic import AnyUrl, BaseModel, Field
 
+from tds.autogen.orm import Base
 from tds.db.base import TdsModel
-
-# from sqlalchemy.orm import Session
-# from tds.db.relational import engine as pg_engine
 
 
 class ColumnTypes(str, Enum):
@@ -187,3 +185,17 @@ class Dataset(TdsModel):
 
     # def _establish_provenance(self):
     #     pass
+
+
+class QualifierXref(Base):
+    """
+    QualifierXref Data Model.
+    """
+
+    __tablename__ = "qualifier_xref"
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    qualifier_id = sa.Column(
+        sa.Integer(), sa.ForeignKey("qualifier.id"), nullable=False
+    )
+    feature_id = sa.Column(sa.Integer(), sa.ForeignKey("feature.id"), nullable=False)
