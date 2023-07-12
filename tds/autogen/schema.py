@@ -12,20 +12,6 @@ from pydantic import BaseModel
 from tds.autogen.enums import ExtractedType, OntologicalField, TaggableType, ValueType
 
 
-class QualifierXref(BaseModel):
-    id: Optional[int] = None
-    qualifier_id: Optional[int] = None
-    feature_id: Optional[int] = None
-
-
-class ModelRuntime(BaseModel):
-    id: Optional[int] = None
-    timestamp: datetime.datetime = datetime.datetime.now()
-    name: str
-    left: str
-    right: str
-
-
 class Feature(BaseModel):
     id: Optional[int] = None
     dataset_id: Optional[int] = None
@@ -49,14 +35,6 @@ class Extraction(BaseModel):
     type: ExtractedType
     data: bytes
     img: bytes
-
-
-class OntologyConcept(BaseModel):
-    id: Optional[int] = None
-    curie: str
-    type: TaggableType
-    object_id: str
-    status: OntologicalField
 
 
 class ModelFramework(BaseModel):
