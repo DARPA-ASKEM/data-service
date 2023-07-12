@@ -196,3 +196,18 @@ class Qualifier(Base):
     description = sa.Column(sa.Text())
     name = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
+
+
+class Feature(Base):
+    """
+    Feature Data Model.
+    """
+
+    __tablename__ = "feature"
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
+    description = sa.Column(sa.Text())
+    display_name = sa.Column(sa.String())
+    name = sa.Column(sa.String(), nullable=False)
+    value_type = sa.Column(sa.Enum(ValueType), nullable=False)

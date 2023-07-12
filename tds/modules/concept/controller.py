@@ -12,7 +12,6 @@ from sqlalchemy import and_, func, or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
 from tds.db import request_rdb
 from tds.db.enums import TaggableType
 from tds.lib.concepts import fetch_from_dkg, mark_concept_active
@@ -21,7 +20,7 @@ from tds.modules.concept.model import (
     OntologyConcept,
     OntologyConceptPayload,
 )
-from tds.modules.dataset.model import Dataset
+from tds.modules.dataset.model import Dataset, Feature, Qualifier
 from tds.modules.external.model import Publication
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
@@ -81,8 +80,8 @@ def get_taggable_orm(taggable_type: TaggableType):
     Maps resource type to ORM
     """
     enum_to_orm = {
-        TaggableType.features: orm.Feature,
-        TaggableType.qualifiers: orm.Qualifier,
+        TaggableType.features: Feature,
+        TaggableType.qualifiers: Qualifier,
         TaggableType.datasets: Dataset,
         TaggableType.model_configurations: ModelConfiguration,
         TaggableType.models: Model,
@@ -120,7 +119,6 @@ def search_concept_using_facets(
             ).filter(
                 or_(
                     OntologyConcept.type != TaggableType.datasets,
-                    Dataset.simulation_run == is_simulation,
                 )
             )
         result = {
