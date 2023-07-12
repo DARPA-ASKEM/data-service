@@ -3,9 +3,11 @@ TDS Model
 """
 from typing import List, Optional
 
-from pydantic import Field
+import sqlalchemy as sa
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
+from tds.db import Base
 from tds.db.base import TdsModel
 from tds.db.relational import engine as pg_engine
 from tds.lib.concepts import mark_concept_active
@@ -113,3 +115,27 @@ class Model(TdsModel):
         """
 
         schema_extra = {"example": model_config}
+
+
+class ModelFramework(Base):
+    """
+    ModelFramework Data Model.
+    """
+
+    __tablename__ = "model_framework"
+
+    name = sa.Column(sa.String(), primary_key=True)
+    version = sa.Column(sa.String(), nullable=False)
+    semantics = sa.Column(sa.String(), nullable=False)
+    schema_url = sa.Column(sa.String())
+
+
+class ModelFrameworkPayload(BaseModel):
+    """
+    ModelFrameworkPayload Model.
+    """
+
+    name: str
+    version: str
+    semantics: str
+    schema_url: Optional[str]
