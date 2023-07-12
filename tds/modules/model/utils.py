@@ -10,8 +10,8 @@ import pandas as pd
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
 from tds.db.relational import engine as pg_engine
+from tds.modules.model.model import ModelFramework
 from tds.modules.model.model_description import ModelDescription
 
 model_list_fields = [
@@ -100,7 +100,7 @@ def get_frameworks() -> dict:
     Get model frameworks from postgres.
     """
     with Session(pg_engine) as pg_db:
-        frameworks = pg_db.query(orm.ModelFramework).all()
+        frameworks = pg_db.query(ModelFramework).all()
         framework_map = {}
         for framework in frameworks:
             framework_map[framework.schema_url] = framework.name
