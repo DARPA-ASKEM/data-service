@@ -204,6 +204,10 @@ class QualifierXref(Base):
 
 
 class Qualifier(Base):
+    """
+    Qualifier Data Model.
+    """
+
     __tablename__ = "qualifier"
 
     id = sa.Column(sa.Integer(), primary_key=True)
