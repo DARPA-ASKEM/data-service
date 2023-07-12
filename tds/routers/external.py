@@ -10,8 +10,8 @@ from sqlalchemy import or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
 from tds.db import request_rdb
+from tds.modules.external.model import Publication, Software
 from tds.operation import create, delete, retrieve
 from tds.schema.resource import Publication, Software
 
@@ -25,8 +25,8 @@ def get_software(id: int, rdb: Engine = Depends(request_rdb)) -> Software:
     Retrieve software metadata
     """
     with Session(rdb) as session:
-        if session.query(orm.Software).filter(orm.Software.id == id).count() == 1:
-            return Software.from_orm(session.query(orm.Software).get(id))
+        if session.query(Software).filter(Software.id == id).count() == 1:
+            return Software.from_orm(session.query(Software).get(id))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
@@ -37,7 +37,7 @@ def create_software(payload: Software, rdb: Engine = Depends(request_rdb)) -> Re
     """
     with Session(rdb) as session:
         software_payload = payload.dict()
-        software = orm.Software(**software_payload)
+        software = Software(**software_payload)
         session.add(software)
         session.commit()
         id: int = software.id
@@ -57,8 +57,8 @@ def delete_software(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
     Delete software metadata
     """
     with Session(rdb) as session:
-        if session.query(orm.Software).filter(orm.Software.id == id).count() == 1:
-            software = session.query(orm.Software).get(id)
+        if session.query(Software).filter(Software.id == id).count() == 1:
+            software = session.query(Software).get(id)
             session.delete(software)
             session.commit()
         else:
@@ -75,11 +75,11 @@ def get_publication(id: int | str, rdb: Engine = Depends(request_rdb)) -> Public
     """
     with Session(rdb) as session:
         publications = (
-            session.query(orm.Publication)
+            session.query(Publication)
             .filter(
                 or_(
-                    str(id) == orm.Publication.xdd_uri,
-                    (str(id).isdigit()) and (int(id) == orm.Publication.id),
+                    str(id) == Publication.xdd_uri,
+                    (str(id).isdigit()) and (int(id) == Publication.id),
                 )
             )
             .all()
@@ -101,9 +101,9 @@ def create_publication(
     with Session(rdb) as session:
         publication_payload = payload.dict()
         publications = (
-            session.query(orm.Publication)
+            session.query(Publication)
             .filter(
-                str(publication_payload["xdd_uri"]) == orm.Publication.xdd_uri,
+                str(publication_payload["xdd_uri"]) == Publication.xdd_uri,
             )
             .all()
         )
@@ -119,7 +119,7 @@ def create_publication(
                 content=json.dumps(publication),
             )
         # pylint: disable-next=unused-variable
-        publication = orm.Publication(**publication_payload)
+        publication = Publication(**publication_payload)
         session.add(publication)
         session.commit()
         id: int = publication.id
@@ -140,8 +140,8 @@ def delete_publication(id: int, rdb: Engine = Depends(request_rdb)) -> Response:
     Delete publications metadata
     """
     with Session(rdb) as session:
-        if session.query(orm.Publication).filter(orm.Publication.id == id).count() == 1:
-            publication = session.query(orm.Publication).get(id)
+        if session.query(Publication).filter(Publication.id == id).count() == 1:
+            publication = session.query(Publication).get(id)
             session.delete(publication)
             session.commit()
         else:
