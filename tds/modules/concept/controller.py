@@ -12,8 +12,9 @@ from sqlalchemy import and_, func, or_
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm, schema
+from tds.autogen import orm
 from tds.db import request_rdb
+from tds.db.enums import TaggableType
 from tds.lib.concepts import fetch_from_dkg, mark_concept_active
 from tds.modules.concept.model import (
     ActiveConcept,
@@ -21,8 +22,10 @@ from tds.modules.concept.model import (
     OntologyConceptPayload,
 )
 from tds.modules.dataset.model import Dataset
+from tds.modules.external.model import Publication
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
+from tds.modules.project.model import Project
 from tds.modules.simulation.model import Simulation
 
 logger = Logger(__file__)
@@ -73,26 +76,26 @@ def get_concept_definition(curie: str):
     return fetch_from_dkg(params)
 
 
-def get_taggable_orm(taggable_type: schema.TaggableType):
+def get_taggable_orm(taggable_type: TaggableType):
     """
     Maps resource type to ORM
     """
     enum_to_orm = {
-        schema.TaggableType.features: orm.Feature,
-        schema.TaggableType.qualifiers: orm.Qualifier,
-        schema.TaggableType.datasets: Dataset,
-        schema.TaggableType.model_configurations: ModelConfiguration,
-        schema.TaggableType.models: Model,
-        schema.TaggableType.projects: orm.Project,
-        schema.TaggableType.publications: orm.Publication,
-        schema.TaggableType.simulations: Simulation,
+        TaggableType.features: orm.Feature,
+        TaggableType.qualifiers: orm.Qualifier,
+        TaggableType.datasets: Dataset,
+        TaggableType.model_configurations: ModelConfiguration,
+        TaggableType.models: Model,
+        TaggableType.projects: Project,
+        TaggableType.publications: Publication,
+        TaggableType.simulations: Simulation,
     }
     return enum_to_orm[taggable_type]
 
 
 @concept_router.get("/facets")
 def search_concept_using_facets(
-    types: List[schema.TaggableType] = Query(default=list(schema.TaggableType)),
+    types: List[TaggableType] = Query(default=list(TaggableType)),
     curies: Optional[List[str]] = Query(default=None),
     is_simulation: Optional[bool] = Query(default=None),
     rdb: Engine = Depends(request_rdb),
@@ -110,13 +113,13 @@ def search_concept_using_facets(
             base_query = base_query.join(
                 Dataset,
                 and_(
-                    OntologyConcept.type == schema.TaggableType.datasets,
+                    OntologyConcept.type == TaggableType.datasets,
                     OntologyConcept.object_id == Dataset.id,
                 ),
                 isouter=True,
             ).filter(
                 or_(
-                    OntologyConcept.type != schema.TaggableType.datasets,
+                    OntologyConcept.type != TaggableType.datasets,
                     Dataset.simulation_run == is_simulation,
                 )
             )
