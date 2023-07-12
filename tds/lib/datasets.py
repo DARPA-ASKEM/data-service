@@ -9,6 +9,7 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
+from tds.modules.dataset.model import QualifierXref
 
 logger = Logger(__file__)
 
@@ -19,9 +20,7 @@ def get_qualifier_xrefs(count: int, rdb: Engine):
     """
     with Session(rdb) as session:
         result = (
-            session.query(orm.QualifierXref)
-            .order_by(orm.QualifierXref.id.asc())
-            .limit(count)
+            session.query(QualifierXref).order_by(QualifierXref.id.asc()).limit(count)
         )
         result = result[::]
         return result
@@ -32,7 +31,7 @@ def get_qualifier_xref(id: int, rdb: Engine) -> str:
     Get a specific qualifier xref by ID
     """
     with Session(rdb) as session:
-        result = session.query(orm.QualifierXref).get(id)
+        result = session.query(QualifierXref).get(id)
         return result
 
 
@@ -49,9 +48,9 @@ def create_qualifier_xref(payload: schema.QualifierXref, rdb: Engine):
             qualifier_xrefp = payload
             logger.info("Set qualifier_xref to raw payload.")
         del qualifier_xrefp["id"]
-        qualifier_xref = orm.QualifierXref(**qualifier_xrefp)
+        qualifier_xref = QualifierXref(**qualifier_xrefp)
         exists = (
-            session.query(orm.QualifierXref).filter_by(**qualifier_xrefp).first()
+            session.query(QualifierXref).filter_by(**qualifier_xrefp).first()
             is not None
         )
         if exists:
@@ -72,9 +71,7 @@ def update_qualifier_xref(payload: schema.Qualifier, id: int, rdb: Engine) -> st
         data_payload["id"] = id
         logger.info(data_payload)
 
-        data_to_update = session.query(orm.QualifierXref).filter(
-            orm.QualifierXref.id == id
-        )
+        data_to_update = session.query(QualifierXref).filter(QualifierXref.id == id)
         data_to_update.update(data_payload)
         session.commit()
     return "Updated Qualifier xref"
@@ -85,5 +82,5 @@ def delete_qualifier_xref(id: int, rdb: Engine) -> str:
     Delete a qualifier xref by ID
     """
     with Session(rdb) as session:
-        session.query(orm.QualifierXref).filter(orm.QualifierXref.id == id).delete()
+        session.query(QualifierXref).filter(QualifierXref.id == id).delete()
         session.commit()
