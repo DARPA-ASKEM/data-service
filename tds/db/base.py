@@ -7,11 +7,13 @@ from typing import Optional
 
 from elasticsearch import ConflictError
 from pydantic import BaseModel, Field
+from sqlalchemy.ext.declarative import declarative_base
 
 from tds.db import es_client
 from tds.settings import settings
 
 es = es_client()
+Base = declarative_base()
 
 
 def new_uuid() -> str:

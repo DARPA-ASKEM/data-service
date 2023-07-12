@@ -6,7 +6,7 @@ from typing import Optional
 import sqlalchemy as sa
 from pydantic import BaseModel
 
-from tds.db import Base
+from tds.db.base import Base
 from tds.db.enums import OntologicalField, TaggableType
 
 

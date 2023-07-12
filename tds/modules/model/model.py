@@ -7,8 +7,7 @@ import sqlalchemy as sa
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from tds.db import Base
-from tds.db.base import TdsModel
+from tds.db.base import Base, TdsModel
 from tds.db.relational import engine as pg_engine
 from tds.lib.concepts import mark_concept_active
 from tds.lib.model_configs import model_config

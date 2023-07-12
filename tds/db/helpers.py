@@ -6,7 +6,7 @@ from typing import Any
 from sqlalchemy.engine.base import Connection
 from sqlalchemy.orm import Session
 
-from tds.db import Base
+from tds.db.base import Base
 
 
 def init_dev_content(connection: Connection):

@@ -7,7 +7,7 @@ import sqlalchemy as sa
 from pydantic import BaseModel
 from sqlalchemy.orm import relationship
 
-from tds.db import Base
+from tds.db.base import Base
 from tds.db.enums import ResourceType, Role
 
 
