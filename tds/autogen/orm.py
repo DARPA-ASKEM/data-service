@@ -21,12 +21,3 @@ class Feature(Base):
     display_name = sa.Column(sa.String())
     name = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
-
-
-class ModelFramework(Base):
-    __tablename__ = "model_framework"
-
-    name = sa.Column(sa.String(), primary_key=True)
-    version = sa.Column(sa.String(), nullable=False)
-    semantics = sa.Column(sa.String(), nullable=False)
-    schema_url = sa.Column(sa.String())
