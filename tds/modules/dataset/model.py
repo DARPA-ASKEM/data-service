@@ -5,10 +5,12 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, List, Optional
 
+import sqlalchemy as sa
 from pydantic import AnyUrl, BaseModel, Field
 
 from tds.autogen.orm import Base
 from tds.db.base import TdsModel
+from tds.db.enums import ValueType
 
 
 class ColumnTypes(str, Enum):
@@ -199,3 +201,13 @@ class QualifierXref(Base):
         sa.Integer(), sa.ForeignKey("qualifier.id"), nullable=False
     )
     feature_id = sa.Column(sa.Integer(), sa.ForeignKey("feature.id"), nullable=False)
+
+
+class Qualifier(Base):
+    __tablename__ = "qualifier"
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
+    description = sa.Column(sa.Text())
+    name = sa.Column(sa.String(), nullable=False)
+    value_type = sa.Column(sa.Enum(ValueType), nullable=False)
