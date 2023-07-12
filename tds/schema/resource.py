@@ -6,29 +6,30 @@ Redirects general types to restricted resource typing
 from collections import defaultdict
 from typing import Dict, Optional, Type
 
-from tds.autogen import orm, schema
 from tds.db.enums import ResourceType
 from tds.modules.artifact.model import Artifact
 from tds.modules.dataset.model import Dataset
+from tds.modules.external.model import Publication as PublicationModel
+from tds.modules.external.model import PublicationPayload, SoftwarePayload
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
 from tds.modules.simulation.model import Simulation
 from tds.modules.workflow.model import Workflow
 
 
-class Publication(schema.Publication):
+class Publication(PublicationPayload):
     class Config:
         orm_mode = True
 
 
-class Software(schema.Software):
+class Software(SoftwarePayload):
     class Config:
         orm_mode = True
 
 
 Resource = Dataset | Model | ModelConfiguration | Publication | Simulation | Workflow
 
-ORMResource = Dataset | orm.Publication | Simulation
+ORMResource = Dataset | PublicationModel | Simulation
 
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Dataset: ResourceType.datasets,
@@ -82,7 +83,7 @@ def get_resource_orm(resource_type: ResourceType) -> Optional[ORMResource]:
         lambda: None,
         {
             ResourceType.datasets: Dataset,
-            ResourceType.publications: orm.Publication,
+            ResourceType.publications: PublicationModel,
             ResourceType.simulations: Simulation,
         },
     )
