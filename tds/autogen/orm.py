@@ -23,16 +23,6 @@ class Feature(Base):
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class Qualifier(Base):
-    __tablename__ = "qualifier"
-
-    id = sa.Column(sa.Integer(), primary_key=True)
-    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
-    description = sa.Column(sa.Text())
-    name = sa.Column(sa.String(), nullable=False)
-    value_type = sa.Column(sa.Enum(ValueType), nullable=False)
-
-
 class ModelFramework(Base):
     __tablename__ = "model_framework"
 
