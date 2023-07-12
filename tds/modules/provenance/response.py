@@ -6,7 +6,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from tds.autogen.enums import ProvenanceType, RelationType
+from tds.db.enums import ProvenanceType, RelationType
 
 
 class ProvenanceResponse(BaseModel):

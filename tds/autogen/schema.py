@@ -9,7 +9,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from tds.autogen.enums import ExtractedType, OntologicalField, TaggableType, ValueType
+from tds.db.enums import ExtractedType, ValueType
 
 
 class Feature(BaseModel):

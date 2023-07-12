@@ -8,8 +8,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from tds.autogen.enums import ResourceType
 from tds.autogen.orm import Base
+from tds.db.enums import ResourceType
 
 
 class Project(Base):

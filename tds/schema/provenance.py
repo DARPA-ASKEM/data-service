@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Type
 from pydantic import BaseModel, Field
 
 # pylint: disable=missing-class-docstring
-from tds.autogen.enums import ProvenanceType
+from tds.db.enums import ProvenanceType
 from tds.modules.provenance.model import Provenance as ProvenanceModel
 
 

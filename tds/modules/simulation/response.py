@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from tds.autogen.enums import SimulationEngine, SimulationStatus, SimulationType
+from tds.db.enums import SimulationEngine, SimulationStatus, SimulationType
 from tds.modules.simulation.model import ExecutionPayload
 
 

@@ -13,8 +13,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
 
-from tds.autogen.enums import ResourceType
 from tds.db import entry_exists, es_client, request_rdb
+from tds.db.enums import ResourceType
 from tds.modules.project.helpers import (
     ResourceDoesNotExist,
     adjust_project_assets,

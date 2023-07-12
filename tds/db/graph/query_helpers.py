@@ -6,7 +6,7 @@ from typing import List
 from fastapi import HTTPException
 
 from tds.autogen import schema
-from tds.autogen.enums import ProvenanceType
+from tds.db.enums import ProvenanceType
 from tds.schema.provenance import provenance_type_to_abbr
 
 

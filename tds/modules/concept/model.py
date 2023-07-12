@@ -6,8 +6,8 @@ from typing import Optional
 import sqlalchemy as sa
 from pydantic import BaseModel
 
-from tds.autogen.enums import OntologicalField, TaggableType
 from tds.autogen.orm import Base
+from tds.db.enums import OntologicalField, TaggableType
 
 
 class OntologyConcept(Base):

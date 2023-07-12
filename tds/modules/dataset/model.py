@@ -9,24 +9,7 @@ from pydantic import AnyUrl, BaseModel, Field
 
 from tds.autogen.orm import Base
 from tds.db.base import TdsModel
-from tds.db.enums import ValueType
-
-
-class ColumnTypes(str, Enum):
-    """Column type enum"""
-
-    UNKNOWN = "unknown"
-    BOOLEAN = "boolean"
-    STRING = "string"
-    CHAR = "string"
-    INTEGER = "integer"
-    INT = "integer"
-    FLOAT = "float"
-    DOUBLE = "double"
-    TIMESTAMP = "timestamp"
-    DATETIME = "datetime"
-    DATE = "date"
-    TIME = "time"
+from tds.db.enums import ColumnTypes, ValueType
 
 
 class Grounding(BaseModel):
