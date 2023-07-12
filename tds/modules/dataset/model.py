@@ -158,17 +158,6 @@ class Dataset(TdsModel):
             }
         }
 
-    # def _extract_concepts(self):
-    #     """
-    #     Method extracts concepts from the dataset and saves them to the db.
-    #     """
-    #     curies = []
-    #     with Session(pg_engine) as pg_db:
-    #         pass
-
-    # def _establish_provenance(self):
-    #     pass
-
 
 class QualifierXref(Base):
     """
