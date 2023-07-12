@@ -7,7 +7,7 @@ from typing import Any, List, Optional
 import sqlalchemy as sa
 from pydantic import AnyUrl, BaseModel, Field
 
-from tds.autogen.orm import Base
+from tds.db import Base
 from tds.db.base import TdsModel
 from tds.db.enums import ColumnTypes, ValueType
 
