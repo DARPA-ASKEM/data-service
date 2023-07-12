@@ -184,6 +184,16 @@ class QualifierXref(Base):
     feature_id = sa.Column(sa.Integer(), sa.ForeignKey("feature.id"), nullable=False)
 
 
+class QualifierXrefPayload(BaseModel):
+    """
+    QualifierXref Payload Model.
+    """
+
+    id: Optional[int] = None
+    qualifier_id: Optional[int] = None
+    feature_id: Optional[int] = None
+
+
 class Qualifier(Base):
     """
     Qualifier Data Model.
@@ -196,6 +206,18 @@ class Qualifier(Base):
     description = sa.Column(sa.Text())
     name = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
+
+
+class QualifierPayload(BaseModel):
+    """
+    Qualifier Payload Model.
+    """
+
+    id: Optional[int] = None
+    dataset_id: Optional[int] = None
+    description: Optional[str]
+    name: str
+    value_type: ValueType
 
 
 class Feature(Base):
