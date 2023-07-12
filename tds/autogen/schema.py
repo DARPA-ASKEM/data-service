@@ -18,11 +18,3 @@ class Feature(BaseModel):
     display_name: Optional[str]
     name: str
     value_type: ValueType
-
-
-class Qualifier(BaseModel):
-    id: Optional[int] = None
-    dataset_id: Optional[int] = None
-    description: Optional[str]
-    name: str
-    value_type: ValueType
