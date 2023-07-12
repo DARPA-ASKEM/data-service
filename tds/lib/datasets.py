@@ -8,7 +8,7 @@ from logging import Logger
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm, schema
+from tds.autogen import schema
 from tds.modules.dataset.model import QualifierXref
 
 logger = Logger(__file__)
