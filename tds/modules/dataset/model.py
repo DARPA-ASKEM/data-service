@@ -222,3 +222,16 @@ class Feature(Base):
     display_name = sa.Column(sa.String())
     name = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
+
+
+class FeaturePayload(BaseModel):
+    """
+    Feature Payload Model.
+    """
+
+    id: Optional[int] = None
+    dataset_id: Optional[int] = None
+    description: Optional[str]
+    display_name: Optional[str]
+    name: str
+    value_type: ValueType
