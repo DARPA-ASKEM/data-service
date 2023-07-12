@@ -77,3 +77,4 @@ class Publication(BaseModel):
     id: Optional[int] = None
     xdd_uri: str
     title: str
+    publication_data: Optional[dict]

@@ -23,6 +23,7 @@ tidy:
 
 .PHONY:up
 up:
+	docker compose --env-file api.env build migrations;
 	docker compose --env-file api.env up -d;
 
 .PHONY:build
@@ -32,6 +33,11 @@ build:
 .PHONY: gen-migration
 gen-migration:
 	docker compose --env-file api.env exec api bash -c "alembic -c migrate/alembic.ini revision -m \"${message}\""
+
+.PHONY: run-migrations
+run-migrations:
+	docker compose --env-file api.env build migrations --no-cache;
+	docker compose --env-file api.env start migrations;
 
 .PHONY:populate
 populate:up
@@ -49,18 +55,9 @@ down:
 db-clean:
 	docker volume rm data-service_elasticsearch_data data-service_kibanadata data-service_tds_data data-service_neo4j_data
 
-.PHONY:db-full
-db-full: | $(SCHEMA_SQL_FILE) $(DATA_SQL_FILE)
-
 .PHONY:repopulate-db
 repopulate-db:
 	# Check if we need to rebuild the .sql files by checking if any prerequisite files are newer than the .sql files
-	if [ "$(SQL_HASH)" != "$$(cat $(SQL_HASH_FILE))" ]; then \
-		make down; \
-		make db-clean; \
-		NEO4J_ENABLED=False make up && \
-		sleep 1 && \
-		NEO4J_ENABLED=False make populate && \
-		make db-full && \
-		echo '$(SQL_HASH)' > $(SQL_HASH_FILE); \
-	fi
+	make down; \
+	make db-clean; \
+	SEED_DATA=true make up

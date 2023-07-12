@@ -6,9 +6,8 @@ Skipping linter to prevent class docstring errors.
 """
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql import func
 
-from tds.autogen.enums import ExtractedType, ValueType
+from tds.autogen.enums import ValueType
 
 Base = declarative_base()
 
