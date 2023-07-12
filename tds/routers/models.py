@@ -9,10 +9,9 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
 from tds.db import request_rdb
+from tds.modules.model.model import ModelFramework, ModelFrameworkPayload
 from tds.operation import create, delete, retrieve
-from tds.schema.model import ModelFramework
 
 logger = Logger(__name__)
 router = APIRouter()
@@ -20,7 +19,7 @@ router = APIRouter()
 
 @router.post("/frameworks", **create.fastapi_endpoint_config)
 def create_framework(
-    payload: ModelFramework, rdb: Engine = Depends(request_rdb)
+    payload: ModelFrameworkPayload, rdb: Engine = Depends(request_rdb)
 ) -> Response:
     """
     Create framework metadata
@@ -28,7 +27,7 @@ def create_framework(
 
     with Session(rdb) as session:
         framework_payload = payload.dict()
-        framework = orm.ModelFramework(**framework_payload)
+        framework = ModelFramework(**framework_payload)
         session.add(framework)
         session.commit()
         name: str = framework.name
@@ -49,12 +48,10 @@ def get_framework(name: str, rdb: Engine = Depends(request_rdb)) -> ModelFramewo
     """
     with Session(rdb) as session:
         if (
-            session.query(orm.ModelFramework)
-            .filter(orm.ModelFramework.name == name)
-            .count()
+            session.query(ModelFramework).filter(ModelFramework.name == name).count()
             == 1
         ):
-            return ModelFramework.from_orm(session.query(orm.ModelFramework).get(name))
+            return ModelFramework.from_orm(session.query(ModelFramework).get(name))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
@@ -65,12 +62,10 @@ def delete_framework(name: str, rdb: Engine = Depends(request_rdb)) -> Response:
     """
     with Session(rdb) as session:
         if (
-            session.query(orm.ModelFramework)
-            .filter(orm.ModelFramework.name == name)
-            .count()
+            session.query(ModelFramework).filter(ModelFramework.name == name).count()
             == 1
         ):
-            framework = session.query(orm.ModelFramework).get(name)
+            framework = session.query(ModelFramework).get(name)
             session.delete(framework)
             session.commit()
         else:
