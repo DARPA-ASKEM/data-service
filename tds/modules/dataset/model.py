@@ -2,7 +2,6 @@
 TDS Dataset
 """
 from datetime import datetime
-from enum import Enum
 from typing import Any, List, Optional
 
 import sqlalchemy as sa
