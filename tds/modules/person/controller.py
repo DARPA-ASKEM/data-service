@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy.engine.base import Engine
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -63,7 +64,7 @@ def person_post(
                 },
                 content={"id": record.id},
             )
-    except Exception as error:
+    except SQLAlchemyError as error:
         logger.error(error)
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
