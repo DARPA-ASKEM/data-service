@@ -70,8 +70,6 @@ class Association(Base):
     resource_type = sa.Column(sa.Enum(ResourceType))
     role = sa.Column(sa.Enum(Role))
 
-    person = relationship("Person", cascade=False, single_parent=True)
-
 
 class AssociationPayload(BaseModel):
     """
