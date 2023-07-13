@@ -4,7 +4,6 @@ CRUD operations for Project
 from logging import Logger
 from typing import List, Optional
 
-from elasticsearch import NotFoundError
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi import Query as FastAPIQuery
 from fastapi import status
@@ -12,6 +11,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm.exc import NoResultFound
 
 from tds.db import entry_exists, es_client, request_rdb
 from tds.db.enums import ResourceType
@@ -110,7 +110,7 @@ def project_get(project_id: int, rdb: Engine = Depends(request_rdb)) -> JSONResp
             headers={"content-type": "application/json"},
             content=jsonable_encoder(project),
         )
-    except NotFoundError:
+    except NoResultFound:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             headers={"content-type": "application/json"},
@@ -183,7 +183,7 @@ def project_delete(project_id: int, rdb: Engine = Depends(request_rdb)) -> JSONR
             headers={"content-type": "application/json"},
             content={"id": project_id, "status": project_["active"]},
         )
-    except NotFoundError:
+    except NoResultFound:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             headers={"content-type": "application/json"},
