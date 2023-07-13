@@ -64,12 +64,13 @@ def person_post(
                 content={"id": record.id},
             )
     except Exception as error:
+        logger.error(error)
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             headers={
                 "content-type": "application/json",
             },
-            content={"message": f"Person was not created. {error}"},
+            content={"message": f"Person was not created."},
         )
 
 
