@@ -4,7 +4,6 @@ Constructs API given specified router
 
 from importlib import import_module, metadata
 from pkgutil import iter_modules
-from typing import List
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,7 +23,7 @@ def load_module_routers(api):
         )
 
 
-def build_api(*args: str) -> FastAPI:
+def build_api() -> FastAPI:
     """
     Build an API using a group of specified router modules
     """
