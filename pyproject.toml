@@ -33,6 +33,7 @@ boto3 = "1.24"
 psycopg2 = "^2.9.5"
 alembic = "^1.9.4"
 elasticsearch = {extras = ["async"], version = "8.5.3"}
+jsonschema = "^4.18.3"
 
 [tool.poetry.scripts]
 tds = "tds.main:cli"
