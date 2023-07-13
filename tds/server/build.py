@@ -18,9 +18,10 @@ def load_module_routers(api):
     modules = import_module("tds.modules")
     for mod in iter_modules(modules.__path__):
         module = import_module(f"tds.modules.{mod.name}")
-        api.include_router(
-            module.router, tags=module.TAGS, prefix="/" + module.ROUTE_PREFIX
-        )
+        if hasattr(module, "router"):
+            api.include_router(
+                module.router, tags=module.TAGS, prefix="/" + module.ROUTE_PREFIX
+            )
 
 
 def build_api() -> FastAPI:
