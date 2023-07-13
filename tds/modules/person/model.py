@@ -1,7 +1,7 @@
 """
 TDS Person Data Model Definition.
 """
-from typing import Any, List, Optional
+from typing import Optional
 
 import sqlalchemy as sa
 from pydantic import BaseModel
