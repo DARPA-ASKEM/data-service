@@ -23,9 +23,7 @@ logger = Logger(__name__)
 @framework_router.get(
     "", response_model=list[ModelFrameworkResponse], **retrieve.fastapi_endpoint_config
 )
-def list_frameworks(
-    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
-) -> JSONResponse:
+def list_frameworks(rdb: Engine = Depends(request_rdb)) -> JSONResponse:
     """
     Retrieve the list of frameworks.
     """

@@ -71,7 +71,7 @@ def person_post(
             headers={
                 "content-type": "application/json",
             },
-            content={"message": f"Person was not created."},
+            content={"message": "Person was not created."},
         )
 
 
@@ -129,6 +129,7 @@ def person_put(
                 headers={"content-type": "application/json"},
                 content={"id": person_id},
             )
+        raise NoResultFound
     except NoResultFound as error:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

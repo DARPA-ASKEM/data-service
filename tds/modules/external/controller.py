@@ -30,9 +30,7 @@ logger = Logger(__name__)
     response_model=list[SoftwarePayload],
     **retrieve.fastapi_endpoint_config,
 )
-def list_software(
-    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
-) -> JSONResponse:
+def list_software(rdb: Engine = Depends(request_rdb)) -> JSONResponse:
     """
     Retrieve list of software from db.
     """
@@ -124,6 +122,7 @@ def software_put(
                     },
                     content={"id": software_id},
                 )
+        raise NoResultFound
     except NoResultFound:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -172,9 +171,7 @@ def software_delete(
     response_model=PublicationPayload,
     **retrieve.fastapi_endpoint_config,
 )
-def publication_list(
-    page_size: int = 100, page: int = 0, rdb: Engine = Depends(request_rdb)
-) -> JSONResponse:
+def publication_list(rdb: Engine = Depends(request_rdb)) -> JSONResponse:
     """
     Retrieve a publication record from DB.
     """
@@ -284,6 +281,7 @@ def publication_put(
                     },
                     content={"id": publication_id},
                 )
+        raise NoResultFound
     except NoResultFound:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -56,7 +56,6 @@ def save_project(project: dict, session):
     Function saves the project from a payload dict.
     """
     asset_dict = project.pop("assets")
-    asset_records = []
     assets = check_assets(assets=asset_dict)
 
     if assets:
