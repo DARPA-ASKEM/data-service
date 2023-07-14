@@ -119,7 +119,7 @@ def model_post(payload: Model) -> JSONResponse:
     Create model and return its ID
     """
     try:
-        validate_json_schema(payload.dict())
+        validate_json_schema(obj_to_validate=payload.dict(), schema_key="model_schema")
         res = payload.create()
         logger.info("new model created: %s", res["_id"])
         return JSONResponse(
@@ -135,7 +135,7 @@ def model_post(payload: Model) -> JSONResponse:
             headers={
                 "content-type": "application/json",
             },
-            content={"message": e_.message},
+            content={"message": f"Model is not valid. {e_.message}"},
         )
 
 
