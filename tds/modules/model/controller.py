@@ -10,8 +10,10 @@ from fastapi import APIRouter, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
+from jsonschema import ValidationError
 
 from tds.db import es_client
+from tds.db.validation import validate_json_schema
 from tds.modules.model.model import Model
 from tds.modules.model.model_description import ModelDescription
 from tds.modules.model.utils import (
@@ -116,16 +118,25 @@ def model_post(payload: Model) -> JSONResponse:
     """
     Create model and return its ID
     """
-
-    res = payload.create()
-    logger.info("new model created: %s", res["_id"])
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        headers={
-            "content-type": "application/json",
-        },
-        content={"id": res["_id"]},
-    )
+    try:
+        validate_json_schema(payload.dict())
+        res = payload.create()
+        logger.info("new model created: %s", res["_id"])
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content={"id": res["_id"]},
+        )
+    except ValidationError as e_:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            headers={
+                "content-type": "application/json",
+            },
+            content={"message": e_.message},
+        )
 
 
 @model_router.get("/{model_id}/descriptions", **retrieve.fastapi_endpoint_config)
