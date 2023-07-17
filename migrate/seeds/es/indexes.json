@@ -82,5 +82,14 @@
         "format": "yyyy-MM-dd HH:mm:ss"
       }
     }
+  },
+  "notebook_session":{
+    "dynamic": false,
+    "properties": {
+      "timestamp": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    }
   }
 }

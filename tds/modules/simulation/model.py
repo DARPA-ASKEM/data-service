@@ -21,6 +21,10 @@ class ExecutionPayload(BaseModel):
     timespan: Optional[dict]
     num_samples: Optional[int]
     extra: Optional[dict]
+    interventions: Optional[List]
+
+    class Config:
+        extra = "allow"
 
 
 class Simulation(TdsModel):
