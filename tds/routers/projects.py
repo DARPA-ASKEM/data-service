@@ -288,6 +288,7 @@ def get_project_assets(
                     index = f"{settings.ES_INDEX_PREFIX}{index_singular}"
                     es_items = es.search(
                         index=index,
+                        size=1000,
                         query={"ids": {"values": assets_key_ids[key]}},
                         fields=responder["fields"],
                     )
