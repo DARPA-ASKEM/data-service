@@ -100,7 +100,8 @@ def artifact_put(artifact_id: str, payload: Artifact) -> JSONResponse | Response
     Update a artifact in ElasticSearch
     """
     try:
-        res = payload.save(artifact_id)
+        payload.id = artifact_id
+        res = payload.save()
         logger.info("artifact updated: %s", res["_id"])
         return JSONResponse(
             status_code=status.HTTP_200_OK,
