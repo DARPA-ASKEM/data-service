@@ -7,8 +7,10 @@ from elasticsearch import NotFoundError
 from fastapi import APIRouter, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from jsonschema import ValidationError
 
 from tds.db import es_client
+from tds.db.validation import validate_json_schema
 from tds.modules.model_configuration.model import ModelConfiguration
 from tds.modules.model_configuration.response import (
     ModelConfigurationResponse,
@@ -53,15 +55,28 @@ def model_configuration_post(payload: ModelConfiguration) -> JSONResponse:
     """
     Create model_configuration and return its ID
     """
-    res = payload.save()
-    logger.info("New model_configuration created: %s", res["_id"])
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        headers={
-            "content-type": "application/json",
-        },
-        content={"id": res["_id"]},
-    )
+    try:
+        payload_dict = payload.dict()
+        configuration = payload_dict["configuration"]
+        schema_key = "model_schema" if "model_schema" in configuration else "schema"
+        validate_json_schema(obj_to_validate=configuration, schema_key=schema_key)
+        res = payload.save()
+        logger.info("New model_configuration created: %s", res["_id"])
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content={"id": res["_id"]},
+        )
+    except ValidationError as e_:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            headers={
+                "content-type": "application/json",
+            },
+            content={"message": f"Model is not valid. {e_.message}"},
+        )
 
 
 @model_configuration_router.get(
