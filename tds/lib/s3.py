@@ -47,3 +47,20 @@ def get_presigned_url(entity_id: str | int, file_name: str, method: str, path: s
     )
 
     return presigned_url
+
+
+def copy_object(origin_path: str, destination_path: str):
+    """
+    Function copies an object in s3.
+    """
+    s3_ = s3_client()
+    print(settings.S3_BUCKET)
+    print(origin_path)
+    print(destination_path)
+    response = s3_.copy_object(
+        CopySource=f"{settings.S3_BUCKET}/{origin_path}",
+        Bucket=settings.S3_BUCKET,
+        Key=destination_path,
+    )
+
+    return response
