@@ -9,6 +9,11 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
+from tds.db import rdb as rdb_engine
+from tds.lib.s3 import copy_object, get_file_path
+from tds.modules.dataset.model import Dataset
+from tds.modules.simulation.model import Simulation
+from tds.settings import settings
 
 logger = Logger(__file__)
 
@@ -80,10 +85,49 @@ def update_qualifier_xref(payload: schema.Qualifier, id: int, rdb: Engine) -> st
     return "Updated Qualifier xref"
 
 
-def delete_qualifier_xref(id: int, rdb: Engine) -> str:
+def delete_qualifier_xref(id: int, rdb: Engine) -> None:
     """
     Delete a qualifier xref by ID
     """
     with Session(rdb) as session:
         session.query(orm.QualifierXref).filter(orm.QualifierXref.id == id).delete()
         session.commit()
+
+
+def copy_simulation_result_to_dataset(simulation: Simulation):
+    """
+    Function copies a simulation object to a dataset.
+    """
+    sim_id = simulation["id"]
+    sim_name = simulation["name"]
+    dataset_obj = {
+        "name": f"{sim_name} Result Dataset",
+        "description": simulation["description"],
+        "metadata": {"simulation_id": sim_id},
+        "file_names": simulation["result_files"],
+        "data_source_date": simulation["timestamp"],
+        "columns": [],
+    }
+
+    # Get the user name and attach it to dataset.
+    if simulation["user_id"]:
+        with Session(rdb_engine) as session:
+            user = session.query(orm.Person).get(simulation["user_id"])
+            dataset_obj["username"] = user.name
+
+    dataset = Dataset(**dataset_obj)
+    dataset.save()
+    if simulation["result_files"]:
+        for f in simulation["result_files"]:
+            print(f)
+            origin_path = get_file_path(
+                entity_id=sim_id, file_name=f, path=settings.S3_RESULTS_PATH
+            )
+            dest_path = get_file_path(
+                entity_id=dataset.id, file_name=f, path=settings.S3_DATASET_PATH
+            )
+            copy_object(origin_path=origin_path, destination_path=dest_path)
+
+    print(dataset)
+
+    return {"id": dataset.id}

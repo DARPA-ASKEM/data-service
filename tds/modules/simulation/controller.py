@@ -11,6 +11,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from tds.db import es_client
+from tds.lib.datasets import copy_simulation_result_to_dataset
 from tds.lib.s3 import get_presigned_url
 from tds.modules.simulation.model import Simulation
 from tds.modules.simulation.response import SimulationResponse, simulation_response
@@ -103,6 +104,34 @@ def simulation_put(simulation_id: str, payload: Simulation) -> JSONResponse | Re
                 "content-type": "application/json",
             },
             content={"id": simulation_id},
+        )
+    except NotFoundError:
+        return Response(
+            status_code=status.HTTP_404_NOT_FOUND,
+            headers={
+                "content-type": "application/json",
+            },
+        )
+
+
+@simulation_router.get(
+    "/{simulation_id}/copy_results", **update.fastapi_endpoint_config
+)
+def simulation_copy_results(simulation_id: str) -> JSONResponse | Response:
+    """
+    Update a simulation in ElasticSearch
+    """
+    try:
+        es = es_client()
+        simulation = es.get(index=es_index, id=simulation_id)
+        dataset = copy_simulation_result_to_dataset(simulation=simulation["_source"])
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content={"id": dataset["id"]},
         )
     except NotFoundError:
         return Response(
