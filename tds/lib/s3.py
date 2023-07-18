@@ -54,9 +54,6 @@ def copy_object(origin_path: str, destination_path: str):
     Function copies an object in s3.
     """
     s3_ = s3_client()
-    print(settings.S3_BUCKET)
-    print(origin_path)
-    print(destination_path)
     response = s3_.copy_object(
         CopySource=f"{settings.S3_BUCKET}/{origin_path}",
         Bucket=settings.S3_BUCKET,
@@ -64,3 +61,17 @@ def copy_object(origin_path: str, destination_path: str):
     )
 
     return response
+
+
+def parse_filename(path: str):
+    """
+    Function grabs filename via brute force.
+    """
+    filename = path
+    if path.find("http") or path.find("s3"):
+        pieces = path.split("/")
+        filename = pieces[-1]
+
+        if filename.find("?"):
+            filename = filename.split("?")[0]
+    return filename
