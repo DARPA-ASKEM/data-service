@@ -25,8 +25,14 @@ def post_to_destination(url: str, body: dict | None):
     return obj_create.json()
 
 
+def handle_file():
+    pass
+
+
 class CopyProject:
     asset_url = "{host}/projects/{project_id}/assets/{asset_type}/{asset_id}"
+    download_url = "{host}/{asset_type}/{asset_id}/download-url"
+    upload_url = "{host}/{asset_type}/{asset_id}/upload-url"
     resource_url = "{host}/{resource_uri}/{entity_id}"
     post_url = "{host}/{resource}"
     source_project = None
@@ -75,7 +81,39 @@ class CopyProject:
                     )
                     asset_relationship = post_to_destination(url=asset_url, body=None)
                     if key in ["datasets", "artifacts"]:
+                        files = (
+                            asset_json["result_files"]
+                            if key == "simulation"
+                            else asset_json["file_names"]
+                        )
                         print(f"Processing file.")
+                        source_download_url = self.download_url.format(
+                            host=self.source_url,
+                            asset_type=key,
+                            asset_id=asset,
+                        )
+                        destination_upload_url = self.upload_url.format(
+                            host=self.destination_url,
+                            asset_type=key,
+                            asset_id=asset_id,
+                        )
+                        for file in files:
+                            download_url_request = requests.get(
+                                url=source_download_url, params={"filename": file}
+                            )
+                            download_response = download_url_request.json()
+                            download_url = download_response["url"]
+                            download_file = requests.get(download_url)
+
+                            upload_url_request = requests.get(
+                                url=destination_upload_url, params={"filename": file}
+                            )
+                            upload_url = upload_url_request.json()
+
+                            upload_file = requests.put(
+                                url=upload_url["url"],
+                                files={f"{file}": download_file.content},
+                            )
 
     def post_asset(self, asset, asset_type):
         post_url = self.post_url.format(host=self.destination_url, resource=asset_type)
