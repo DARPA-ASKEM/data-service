@@ -46,6 +46,7 @@ class Simulation(TdsModel):
     completed_time: Optional[datetime]
     workflow_id: str
     user_id: Optional[int]
+    username: Optional[str]
     project_id: Optional[int]
     result_files: Optional[List[str]] = []
 
