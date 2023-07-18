@@ -158,10 +158,16 @@ if __name__ == "__main__":
         "-i", "--id", help="The id for the project in the source system."
     )
     parser.add_argument(
-        "-s", "--source", help="The source URL to copy the project from."
+        "-s",
+        "--source",
+        help="The source URL to copy the project from including protocol and port (if needed). "
+        "E.g. http://localhost:8001",
     )
     parser.add_argument(
-        "-d", "--destination", help="The destination URL to copy the project to."
+        "-d",
+        "--destination",
+        help="The destination URL to copy the project to including protocol and port "
+        "(if needed). E.g. http://localhost:8001",
     )
     args = parser.parse_args()
     project_id, source_url, destination_url = extract_args(args)
