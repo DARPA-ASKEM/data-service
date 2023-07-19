@@ -11,22 +11,6 @@ from tds.db.base import TdsModel
 from tds.settings import settings
 
 
-class ExecutionPayload(BaseModel):
-    """
-    Simulation execution payload.
-    """
-
-    engine: SimulationEngine
-    model_config_id: str
-    timespan: Optional[dict]
-    num_samples: Optional[int]
-    extra: Optional[dict]
-    interventions: Optional[List]
-
-    class Config:
-        extra = "allow"
-
-
 class Simulation(TdsModel):
     """
     Simulation Data Model
@@ -41,7 +25,7 @@ class Simulation(TdsModel):
     type: SimulationType
     status: Optional[SimulationStatus] = Field(default="queued")
     reason: Optional[str]
-    execution_payload: ExecutionPayload
+    execution_payload: dict
     start_time: Optional[datetime]
     completed_time: Optional[datetime]
     workflow_id: str

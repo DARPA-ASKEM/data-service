@@ -7,7 +7,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from tds.autogen.enums import SimulationEngine, SimulationStatus, SimulationType
-from tds.modules.simulation.model import ExecutionPayload
 
 
 class SimulationResponse(BaseModel):
@@ -22,7 +21,7 @@ class SimulationResponse(BaseModel):
     engine: SimulationEngine
     type: SimulationType
     status: SimulationStatus
-    execution_payload: ExecutionPayload
+    execution_payload: dict
     start_time: Optional[datetime]
     completed_time: Optional[datetime]
     workflow_id: str

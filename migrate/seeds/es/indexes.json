@@ -54,14 +54,6 @@
       }
     }
   },
-  "simulation": {
-    "properties": {
-      "timestamp": {
-        "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss"
-      }
-    }
-  },
   "workflow": {
     "dynamic": false,
     "properties": {
