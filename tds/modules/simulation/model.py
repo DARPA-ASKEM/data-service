@@ -4,7 +4,7 @@ TDS Simulation Data Model Definition.
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from tds.autogen.enums import SimulationEngine, SimulationStatus
 from tds.db.base import TdsModel
