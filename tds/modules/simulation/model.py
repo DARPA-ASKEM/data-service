@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from tds.autogen.enums import SimulationEngine, SimulationStatus, SimulationType
+from tds.autogen.enums import SimulationEngine, SimulationStatus
 from tds.db.base import TdsModel
 from tds.settings import settings
 
@@ -22,7 +22,7 @@ class Simulation(TdsModel):
 
     _index = "simulation"
     engine: SimulationEngine
-    type: SimulationType
+    type: str
     status: Optional[SimulationStatus] = Field(default="queued")
     reason: Optional[str]
     execution_payload: dict
