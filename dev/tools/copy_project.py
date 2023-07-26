@@ -109,13 +109,7 @@ class CopyProject:
                     )
                     asset_id = asset_resp["id"]
                     self.id_mapper[key][asset] = asset_id
-                    asset_url = self.asset_url.format(
-                        host=self.destination_url,
-                        project_id=self.destination_project_id,
-                        asset_type=key,
-                        asset_id=asset_id,
-                    )
-                    post_to_destination(url=asset_url, body=None)
+                    self._add_asset_to_project(entity_type=key, entity_id=asset_id)
                     if key in ["datasets", "artifacts"]:
                         files = (
                             asset_json["result_files"]
@@ -159,10 +153,6 @@ class CopyProject:
         """
         Function processes workflows.
         """
-        # with open(
-        #     "/Users/hephaestus/Sites/Jataware/data-service/mapper.json", "r"
-        # ) as f:
-        #     self.id_mapper = json.loads(f.read())
 
         for source_workflow_id in self.source_project_workflows:
             workflow_json = self._fetch_from_source(
@@ -190,6 +180,7 @@ class CopyProject:
                 host=self.destination_url, resource=f"workflows/{workflow_id}"
             )
             put_to_destination(url=workflow_put_url, body=workflow_json)
+            self._add_asset_to_project(entity_type="workflows", entity_id=workflow_id)
 
     def validate_copy(self):
         """
@@ -199,8 +190,10 @@ class CopyProject:
             resource_uri="projects", resource_id=self.destination_project_id
         )
         failed_resources = []
-        for entity in self.source_project.keys():
-            if len(new_project[entity]) == len(self.source_project[entity]):
+        for entity in self.source_project_assets.keys():
+            if len(new_project["assets"][entity]) == len(
+                self.source_project_assets[entity]
+            ):
                 print(f"{entity} length is correct.")
             else:
                 failed_resources.append(entity)
@@ -219,6 +212,18 @@ class CopyProject:
         )
         self.source_project_assets = self.source_project.pop("assets")
         self.source_project_workflows = self.source_project_assets["workflows"]
+
+    def _add_asset_to_project(self, entity_type: str, entity_id: str | int):
+        """
+        Method posts a project asset relationship to destination.
+        """
+        asset_url = self.asset_url.format(
+            host=self.destination_url,
+            project_id=self.destination_project_id,
+            asset_type=entity_type,
+            asset_id=entity_id,
+        )
+        post_to_destination(url=asset_url, body=None)
 
     def _process_workflow_nodes(self, nodes: list, workflow_id: str):
         """
