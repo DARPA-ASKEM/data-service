@@ -37,6 +37,20 @@ def scrub_obj(obj: dict):
     return new_obj
 
 
+def parse_filename(path: str):
+    """
+    Function grabs filename via brute force.
+    """
+    filename = path
+    if path.find("http") or path.find("s3"):
+        pieces = path.split("/")
+        filename = pieces[-1]
+
+        if filename.find("?"):
+            filename = filename.split("?")[0]
+    return filename
+
+
 class CopyProjectFailed(Exception):
     def __init__(self, message="Copy project failed for reasons."):
         super().__init__()
@@ -400,9 +414,10 @@ class CopyProject:
             asset_id=destination_resource_id,
         )
         for file in files:
+            filename = parse_filename(file)
             download_url_request = requests.get(
                 url=source_download_url,
-                params={"filename": file},
+                params={"filename": filename},
                 timeout=120,
             )
             download_response = download_url_request.json()
@@ -411,14 +426,14 @@ class CopyProject:
 
             upload_url_request = requests.get(
                 url=destination_upload_url,
-                params={"filename": file},
+                params={"filename": filename},
                 timeout=120,
             )
             upload_url = upload_url_request.json()
 
             requests.put(
                 url=upload_url["url"],
-                files={f"{file}": download_file.content},
+                files={f"{filename}": download_file.content},
                 timeout=120,
             )
 
