@@ -97,7 +97,11 @@ class CopyProject:
 
         for key in self.source_project_assets:
             if len(self.source_project_assets[key]) and key != "workflows":
-                resource_uri = key if key != "publications" else "external/publications"
+                resource_uri = (
+                    key
+                    if key not in ["publications", "software"]
+                    else f"external/{key}"
+                )
                 for asset in self.source_project_assets[key]:
                     asset_url = self.resource_url.format(
                         host=self.source_url, resource_uri=resource_uri, entity_id=asset
@@ -116,38 +120,12 @@ class CopyProject:
                             if key == "simulation"
                             else asset_json["file_names"]
                         )
-                        source_download_url = self.download_url.format(
-                            host=self.source_url,
-                            asset_type=key,
-                            asset_id=asset,
+                        self._upload_artifact(
+                            resource=key,
+                            source_resource_id=asset,
+                            destination_resource_id=asset_id,
+                            files=files,
                         )
-                        destination_upload_url = self.upload_url.format(
-                            host=self.destination_url,
-                            asset_type=key,
-                            asset_id=asset_id,
-                        )
-                        for file in files:
-                            download_url_request = requests.get(
-                                url=source_download_url,
-                                params={"filename": file},
-                                timeout=120,
-                            )
-                            download_response = download_url_request.json()
-                            download_url = download_response["url"]
-                            download_file = requests.get(url=download_url, timeout=120)
-
-                            upload_url_request = requests.get(
-                                url=destination_upload_url,
-                                params={"filename": file},
-                                timeout=120,
-                            )
-                            upload_url = upload_url_request.json()
-
-                            requests.put(
-                                url=upload_url["url"],
-                                files={f"{file}": download_file.content},
-                                timeout=120,
-                            )
 
     def process_workflows(self):
         """
@@ -271,10 +249,16 @@ class CopyProject:
         for model in models:
             new_model_id = self.id_mapper["models"][model["state"]["modelId"]]
 
+            # Currently no projects I have looked at have model inputs. - Todd R. July 27, 2023
             if len(model["inputs"]):
-                print("WE HAVE INPUTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 for model_input in model["inputs"]:
-                    print(model_input)
+                    input_id = model_input["id"]
+                    model_error_id = model["state"]["modelId"]
+                    error_msg = (
+                        f"Model inputs are not currently supported. "
+                        f"Model ID: {model_error_id} | Input id: {input_id}"
+                    )
+                    raise CopyProjectFailed(message=error_msg)
             if len(model["outputs"]):
                 for model_output in model["outputs"]:
                     if model_output["type"] == "modelConfigId":
@@ -353,7 +337,8 @@ class CopyProject:
         sim_obj = self._fetch_from_source(
             resource_uri="simulations", resource_id=simulation_id
         )
-        sim_id_parts = sim_obj["id"].split("-")
+        source_sim_id = sim_obj["id"]
+        sim_id_parts = source_sim_id.split("-")
         sim_obj = scrub_obj(sim_obj)
         prefix = sim_id_parts.pop(0)
         sim_id_parts.pop(-1)
@@ -371,12 +356,19 @@ class CopyProject:
                 sim_obj["execution_payload"]["model_config_id"] = self.id_mapper[
                     "model_configurations"
                 ][sim_exec_payload["model_config_id"]]
-        # Blank out result files for now - Todd R. July 26, 2023.
+        result_files = sim_obj["result_files"]
         sim_obj["result_files"] = []
         sim_url = self.post_url.format(
             host=self.destination_url, resource="simulations"
         )
         post_to_destination(url=sim_url, body=sim_obj)
+        if result_files:
+            self._upload_artifact(
+                resource="simulations",
+                source_resource_id=source_sim_id,
+                destination_resource_id=sim_obj["id"],
+                files=result_files,
+            )
         return sim_obj
 
     def _post_asset(self, asset, asset_type):
@@ -386,6 +378,49 @@ class CopyProject:
         post_url = self.post_url.format(host=self.destination_url, resource=asset_type)
 
         return post_to_destination(url=post_url, body=scrub_obj(asset))
+
+    def _upload_artifact(
+        self,
+        resource: str,
+        source_resource_id: int | str,
+        destination_resource_id: int | str,
+        files: list,
+    ) -> None:
+        """
+        Method uploads file to the destination system.
+        """
+        source_download_url = self.download_url.format(
+            host=self.source_url,
+            asset_type=resource,
+            asset_id=source_resource_id,
+        )
+        destination_upload_url = self.upload_url.format(
+            host=self.destination_url,
+            asset_type=resource,
+            asset_id=destination_resource_id,
+        )
+        for file in files:
+            download_url_request = requests.get(
+                url=source_download_url,
+                params={"filename": file},
+                timeout=120,
+            )
+            download_response = download_url_request.json()
+            download_url = download_response["url"]
+            download_file = requests.get(url=download_url, timeout=120)
+
+            upload_url_request = requests.get(
+                url=destination_upload_url,
+                params={"filename": file},
+                timeout=120,
+            )
+            upload_url = upload_url_request.json()
+
+            requests.put(
+                url=upload_url["url"],
+                files={f"{file}": download_file.content},
+                timeout=120,
+            )
 
     def _fetch_from_source(self, resource_uri: str, resource_id):
         """
@@ -405,7 +440,7 @@ class CopyProject:
             resource_id=resource_id,
         )
 
-    def _fetch_from_url(self, host: str, resource_uri: str, resource_id):
+    def _fetch_from_url(self, host: str, resource_uri: str, resource_id) -> dict:
         """
         Method fetches resource from url.
         """
@@ -413,5 +448,4 @@ class CopyProject:
             host=host, resource_uri=resource_uri, entity_id=resource_id
         )
         entity_fetch = requests.get(entity_url, timeout=120)
-        fetch_json = entity_fetch.json()
-        return fetch_json
+        return entity_fetch.json()
