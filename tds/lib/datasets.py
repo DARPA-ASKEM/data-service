@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from tds.autogen import orm, schema
 from tds.db import rdb as rdb_engine
-from tds.lib.s3 import copy_object, get_file_path
+from tds.lib.s3 import copy_object, get_file_path, parse_filename
 from tds.modules.dataset.model import Dataset
 from tds.modules.simulation.model import Simulation
 from tds.settings import settings
@@ -119,15 +119,13 @@ def copy_simulation_result_to_dataset(simulation: Simulation):
     dataset.save()
     if simulation["result_files"]:
         for f in simulation["result_files"]:
-            print(f)
+            filename = parse_filename(f)
             origin_path = get_file_path(
-                entity_id=sim_id, file_name=f, path=settings.S3_RESULTS_PATH
+                entity_id=sim_id, file_name=filename, path=settings.S3_RESULTS_PATH
             )
             dest_path = get_file_path(
-                entity_id=dataset.id, file_name=f, path=settings.S3_DATASET_PATH
+                entity_id=dataset.id, file_name=filename, path=settings.S3_DATASET_PATH
             )
             copy_object(origin_path=origin_path, destination_path=dest_path)
-
-    print(dataset)
 
     return {"id": dataset.id}

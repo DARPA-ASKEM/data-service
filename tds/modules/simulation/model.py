@@ -4,27 +4,11 @@ TDS Simulation Data Model Definition.
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from tds.autogen.enums import SimulationEngine, SimulationStatus, SimulationType
+from tds.autogen.enums import SimulationEngine, SimulationStatus
 from tds.db.base import TdsModel
 from tds.settings import settings
-
-
-class ExecutionPayload(BaseModel):
-    """
-    Simulation execution payload.
-    """
-
-    engine: SimulationEngine
-    model_config_id: str
-    timespan: Optional[dict]
-    num_samples: Optional[int]
-    extra: Optional[dict]
-    interventions: Optional[List]
-
-    class Config:
-        extra = "allow"
 
 
 class Simulation(TdsModel):
@@ -38,10 +22,10 @@ class Simulation(TdsModel):
 
     _index = "simulation"
     engine: SimulationEngine
-    type: SimulationType
+    type: str
     status: Optional[SimulationStatus] = Field(default="queued")
     reason: Optional[str]
-    execution_payload: ExecutionPayload
+    execution_payload: dict
     start_time: Optional[datetime]
     completed_time: Optional[datetime]
     workflow_id: str
