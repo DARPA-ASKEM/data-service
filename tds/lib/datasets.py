@@ -118,8 +118,8 @@ def copy_simulation_result_to_dataset(simulation: Simulation):
     dataset = Dataset(**dataset_obj)
     dataset.save()
     if simulation["result_files"]:
-        for f in simulation["result_files"]:
-            filename = parse_filename(f)
+        for result_file in simulation["result_files"]:
+            filename = parse_filename(result_file)
             origin_path = get_file_path(
                 entity_id=sim_id, file_name=filename, path=settings.S3_RESULTS_PATH
             )
