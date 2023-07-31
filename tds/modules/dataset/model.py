@@ -57,7 +57,7 @@ class Dataset(TdsModel):
 
     _index = "dataset"
 
-    username: str = Field(
+    username: Optional[str] = Field(
         description="The username of the user that created the dataset."
     )
     name: str = Field(
