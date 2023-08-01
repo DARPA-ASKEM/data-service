@@ -47,4 +47,5 @@ provenance_type_to_abbr: Dict[Type[schema.ProvenanceType], str] = {
     schema.ProvenanceType.Simulation: "Si",
     schema.ProvenanceType.Project: "Pr",
     schema.ProvenanceType.Concept: "Cn",
+    schema.ProvenanceType.Artifact: "Ar",
 }

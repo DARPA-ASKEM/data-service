@@ -94,6 +94,11 @@ def search_provenance(
     * Requirements: “root_type”, “root_id”
     * Allowed root _types are Model *will be expanded.
 
+    **models_from_code** - Returns the artifact `id` for the artifact
+    from which a model was extracted
+    * Requirements: "root_type", “root_id”
+    * Allowed `root_types` are Model
+
     ## Payload format
 
     The payload for searching needs to match the schema below.
