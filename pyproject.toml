@@ -46,6 +46,9 @@ pre-commit = "^3.1.1"
 pytest-alembic = "^0.10.0"
 pytest-mock-resources = "^2.6.8"
 python-on-whales = "^0.59.0"
+moto = "^4.1.14"
+pytest-elasticsearch = "^4.0.0"
+pytest-mock = "^3.11.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -63,7 +66,9 @@ profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "--ignore-glob=*utils.py"
-python_files = ["tests/service.py", "tests/unittest.py", "tests/search.py", "tests/migrations.py"]
+testpaths = [
+    "tests",
+]
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.pylint.master]
