@@ -130,3 +130,18 @@ class SimulationStatus(str, Enum):
     queued = "queued"
     running = "running"
     failed = "failed"
+
+
+class ColumnTypes(str, Enum):
+    UNKNOWN = "unknown"
+    BOOLEAN = "boolean"
+    STRING = "string"
+    CHAR = "string"
+    INTEGER = "integer"
+    INT = "integer"
+    FLOAT = "float"
+    DOUBLE = "double"
+    TIMESTAMP = "timestamp"
+    DATETIME = "datetime"
+    DATE = "date"
+    TIME = "time"

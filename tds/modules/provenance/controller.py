@@ -12,8 +12,7 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-from tds.autogen import enums
-from tds.db import request_graph_db, request_rdb
+from tds.db import enums, request_graph_db, request_rdb
 from tds.db.graph.provenance_handler import ProvenanceHandler
 from tds.db.graph.search_provenance import SearchProvenance
 from tds.modules.provenance.model import Provenance, ProvenancePayload, ProvenanceSearch

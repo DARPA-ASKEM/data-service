@@ -11,7 +11,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm
+from tds.modules.external.model import Publication
+from tds.modules.model.model import ModelFramework
+from tds.modules.person.model import Person
+from tds.modules.project.model import Project, ProjectAsset
 from tds.modules.provenance.model import Provenance
 
 migrate_dir = Path(os.path.dirname(__file__))
@@ -24,12 +27,12 @@ SQL_PORT = str(os.getenv("SQL_PORT"))
 SQL_DB = os.getenv("SQL_DB")
 
 pg_data_load = {
-    "model_framework": orm.ModelFramework,
-    "persons": orm.Person,
-    "projects": orm.Project,
-    "project_assets": orm.ProjectAsset,
+    "model_framework": ModelFramework,
+    "persons": Person,
+    "projects": Project,
+    "project_assets": ProjectAsset,
     "provenance": Provenance,
-    "publications": orm.Publication,
+    "publications": Publication,
 }
 
 

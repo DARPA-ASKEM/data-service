@@ -4,23 +4,25 @@ Provides the API interface for models.
 # pylint: disable=missing-class-docstring
 from typing import Dict, List, Optional, Set
 
-from tds.autogen import orm, schema
+from tds.db.enums import ResourceType
+from tds.modules.project.model import Project as ProjectModel
+from tds.modules.project.model import ProjectAsset, ProjectPayload
 from tds.schema.concept import Concept
 
 
-class Project(schema.Project):
+class Project(ProjectPayload):
     concept: Optional[Concept] = None
     active = True
-    assets: Dict[schema.ResourceType, Set[int | str]] = {}
+    assets: Dict[ResourceType, Set[int | str]] = {}
 
     @classmethod
     def from_orm(
-        cls, body: orm.Project, project_assets: List[orm.ProjectAsset]
+        cls, body: ProjectModel, project_assets: List[ProjectAsset]
     ) -> "Project":
         """
         Handle the creation of asset dict
         """
-        assets = {type: [] for type in schema.ResourceType}
+        assets = {type: [] for type in ResourceType}
         for asset in project_assets:
             assets[asset.resource_type].append(asset.resource_id)
 
@@ -39,7 +41,7 @@ class Project(schema.Project):
         }
 
 
-class ProjectMetadata(schema.Project):
+class ProjectMetadata(ProjectPayload):
     concept: Optional[Concept] = None
 
     class Config:

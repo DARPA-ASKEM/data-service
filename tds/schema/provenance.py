@@ -6,10 +6,11 @@ from typing import Dict, List, Optional, Type
 from pydantic import BaseModel, Field
 
 # pylint: disable=missing-class-docstring
-from tds.autogen import schema
+from tds.db.enums import ProvenanceType
+from tds.modules.provenance.model import Provenance as ProvenanceModel
 
 
-class Provenance(schema.Provenance):
+class Provenance(ProvenanceModel):
     class Config:
         orm_mode = True
 
@@ -22,15 +23,15 @@ class NodeSchema(BaseModel):
 
 class ProvenancePayload(BaseModel):
     root_id: Optional[str] = Field(default=1)
-    root_type: Optional[schema.ProvenanceType] = Field(default="Publication")
+    root_type: Optional[ProvenanceType] = Field(default="Publication")
     user_id: Optional[int]
     curie: Optional[str]
     edges: Optional[bool] = Field(default=False)
     nodes: Optional[bool] = Field(default=True)
-    types: List[schema.ProvenanceType] = Field(
+    types: List[ProvenanceType] = Field(
         default=[
             type
-            for type in schema.ProvenanceType
+            for type in ProvenanceType
             if type not in ["Concept", "ModelRevision", "Project"]
         ]
     )

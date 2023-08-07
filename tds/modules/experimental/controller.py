@@ -1,7 +1,8 @@
 """
-Experimental provenance search
-"""
+    TDS Experimental Controller.
 
+    Description: Defines the basic rest endpoints for the TDS Module.
+"""
 import re
 from logging import Logger
 
@@ -9,15 +10,13 @@ import openai
 from fastapi import APIRouter, Depends
 from sqlalchemy.engine.base import Engine
 
-from tds.db import request_graph_db, request_rdb
-from tds.db.graph.provenance_handler import ProvenanceHandler
+from tds.db.graph.neo4j import request_engine as request_graph_db
+from tds.db.relational import request_engine as request_rdb
 from tds.modules.provenance.utils import return_graph_validations
 from tds.settings import settings
 
+experimental_router = APIRouter()
 logger = Logger(__name__)
-router = APIRouter()
-
-
 valid_relations = return_graph_validations()
 
 DB_DESC = "Valid relations include:\n"
@@ -27,8 +26,8 @@ for relation, mapping in valid_relations.items():
         DB_DESC += f"{dom}-[relation]->{codom}\n"
 
 PREAMBLE = """
-I will type "Question:" followed by a question or command in English like "Question: Count all Publications" and you will return a 
-single line print "Query:" Followed by an openCypher query like "Query: `match (p:Publication) return count(p)`. 
+I will type "Question:" followed by a question or command in English like "Question: Count all Publications" and you will return a
+single line print "Query:" Followed by an openCypher query like "Query: `match (p:Publication) return count(p)`.
 """
 
 EXAMPLES = """
@@ -52,7 +51,7 @@ Query: `Match (rev:ModelRevision)<-[r:BEGINS_AT]-(m:Model) where (m.id=5) match 
 """
 
 
-@router.get("/cql")
+@experimental_router.get("/cql")
 def convert_to_cypher(
     query: str,
 ) -> str:
@@ -76,7 +75,7 @@ def convert_to_cypher(
     return cypher
 
 
-@router.get("/provenance")
+@experimental_router.get("/provenance")
 def search_provenance(
     query: str,
     # rdb: Engine = Depends(request_rdb),
@@ -89,7 +88,7 @@ def search_provenance(
     raise NotImplementedError
 
 
-@router.get("/set_properties")
+@experimental_router.get("/set_properties")
 def set_properties(
     rdb: Engine = Depends(request_rdb),
     graph_db=Depends(request_graph_db),
@@ -97,6 +96,10 @@ def set_properties(
     """
     Modify DB contents to work with Neoviz
     """
+    # Importing ProvenanceHandler here to bypass circular import issue.
+    # pylint: disable-next=import-outside-toplevel
+    from tds.db.graph.provenance_handler import ProvenanceHandler
+
     if settings.NEO4J_ENABLED:
         print("Neo4j is set")
         provenance_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)

@@ -25,3 +25,12 @@ def patchable(model: BaseModel) -> BaseModel:
 
     _PATCHABLE_MODELS[model_name] = PatchableModel
     return PatchableModel
+
+
+def get_singular_index(index_str: str):
+    """
+    Function strips the s off of an index str.
+    """
+    if index_str[-1] == "s":
+        return index_str.rstrip(index_str[-1])
+    return index_str

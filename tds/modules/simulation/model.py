@@ -6,8 +6,8 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from tds.autogen.enums import SimulationEngine, SimulationStatus
 from tds.db.base import TdsModel
+from tds.db.enums import SimulationEngine, SimulationStatus
 from tds.settings import settings
 
 
