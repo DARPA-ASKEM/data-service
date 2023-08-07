@@ -59,7 +59,7 @@ class ProvenanceSearch(BaseModel):
     Provenance Data Model.
     """
 
-    root_id: Optional[int]
+    root_id: Optional[int | str]
     root_type: Optional[ProvenanceType]
     user_id: Optional[int]
     curie: Optional[str]
