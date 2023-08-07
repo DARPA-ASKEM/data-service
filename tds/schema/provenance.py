@@ -40,13 +40,13 @@ class ProvenancePayload(BaseModel):
     verbose: Optional[bool] = Field(default=False)
 
 
-provenance_type_to_abbr: Dict[Type[schema.ProvenanceType], str] = {
-    schema.ProvenanceType.Dataset: "Ds",
-    schema.ProvenanceType.Model: "Md",
-    schema.ProvenanceType.ModelConfiguration: "Mc",
-    schema.ProvenanceType.Publication: "Pu",
-    schema.ProvenanceType.Simulation: "Si",
-    schema.ProvenanceType.Project: "Pr",
-    schema.ProvenanceType.Concept: "Cn",
-    schema.ProvenanceType.Artifact: "Ar",
+provenance_type_to_abbr: Dict[Type[ProvenanceType], str] = {
+    ProvenanceType.Dataset: "Ds",
+    ProvenanceType.Model: "Md",
+    ProvenanceType.ModelConfiguration: "Mc",
+    ProvenanceType.Publication: "Pu",
+    ProvenanceType.Simulation: "Si",
+    ProvenanceType.Project: "Pr",
+    ProvenanceType.Concept: "Cn",
+    ProvenanceType.Artifact: "Ar",
 }
