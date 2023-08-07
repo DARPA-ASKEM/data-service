@@ -8,20 +8,21 @@ from typing import Dict, List
 
 from sqlalchemy.orm import Session
 
-from tds.autogen import orm, schema
+from tds.db.enums import ResourceType
+from tds.modules.project.model import ProjectAsset
 
 logger = Logger(__file__)
 
 
 def save_project_assets(
-    project_id: int, assets: Dict[schema.ResourceType, List[int]], session: Session
+    project_id: int, assets: Dict[ResourceType, List[int]], session: Session
 ):
     """
     Save project assets to relational DB
     """
     for resource_type, resource_ids in assets.items():
         project_assets = [
-            orm.ProjectAsset(
+            ProjectAsset(
                 project_id=project_id,
                 resource_id=resource_id,
                 resource_type=resource_type,
@@ -33,20 +34,20 @@ def save_project_assets(
 
 
 def adjust_project_assets(
-    project_id: int, assets: Dict[schema.ResourceType, List[int]], session: Session
+    project_id: int, assets: Dict[ResourceType, List[int]], session: Session
 ):
     """
     Add new entries and remove unused entries
     """
     active = defaultdict(list)
-    for asset in session.query(orm.ProjectAsset).filter(
-        orm.ProjectAsset.project_id == project_id
+    for asset in session.query(ProjectAsset).filter(
+        ProjectAsset.project_id == project_id
     ):
         active[asset.resource_type].append(asset.resource_id)
 
     for resource_type, resource_ids in assets.items():
         project_assets = [
-            orm.ProjectAsset(
+            ProjectAsset(
                 project_id=project_id,
                 resource_id=resource_id,
                 resource_type=resource_type,
@@ -60,4 +61,4 @@ def adjust_project_assets(
     for resource_type, resource_ids in active.items():
         inactive_ids = set(resource_ids) - set(assets.get(resource_type, []))
         for id in inactive_ids:
-            session.delete(session.query(orm.ProjectAsset).get(id))
+            session.delete(session.query(ProjectAsset).get(id))

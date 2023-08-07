@@ -2,32 +2,13 @@
 TDS Dataset
 """
 from datetime import datetime
-from enum import Enum
 from typing import Any, List, Optional
 
+import sqlalchemy as sa
 from pydantic import AnyUrl, BaseModel, Field
 
-from tds.db.base import TdsModel
-
-# from sqlalchemy.orm import Session
-# from tds.db.relational import engine as pg_engine
-
-
-class ColumnTypes(str, Enum):
-    """Column type enum"""
-
-    UNKNOWN = "unknown"
-    BOOLEAN = "boolean"
-    STRING = "string"
-    CHAR = "string"
-    INTEGER = "integer"
-    INT = "integer"
-    FLOAT = "float"
-    DOUBLE = "double"
-    TIMESTAMP = "timestamp"
-    DATETIME = "datetime"
-    DATE = "date"
-    TIME = "time"
+from tds.db.base import Base, TdsModel
+from tds.db.enums import ColumnTypes, ValueType
 
 
 class Grounding(BaseModel):
@@ -177,13 +158,80 @@ class Dataset(TdsModel):
             }
         }
 
-    # def _extract_concepts(self):
-    #     """
-    #     Method extracts concepts from the dataset and saves them to the db.
-    #     """
-    #     curies = []
-    #     with Session(pg_engine) as pg_db:
-    #         pass
 
-    # def _establish_provenance(self):
-    #     pass
+class QualifierXref(Base):
+    """
+    QualifierXref Data Model.
+    """
+
+    __tablename__ = "qualifier_xref"
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    qualifier_id = sa.Column(
+        sa.Integer(), sa.ForeignKey("qualifier.id"), nullable=False
+    )
+    feature_id = sa.Column(sa.Integer(), sa.ForeignKey("feature.id"), nullable=False)
+
+
+class QualifierXrefPayload(BaseModel):
+    """
+    QualifierXref Payload Model.
+    """
+
+    id: Optional[int] = None
+    qualifier_id: Optional[int] = None
+    feature_id: Optional[int] = None
+
+
+class Qualifier(Base):
+    """
+    Qualifier Data Model.
+    """
+
+    __tablename__ = "qualifier"
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
+    description = sa.Column(sa.Text())
+    name = sa.Column(sa.String(), nullable=False)
+    value_type = sa.Column(sa.Enum(ValueType), nullable=False)
+
+
+class QualifierPayload(BaseModel):
+    """
+    Qualifier Payload Model.
+    """
+
+    id: Optional[int] = None
+    dataset_id: Optional[int] = None
+    description: Optional[str]
+    name: str
+    value_type: ValueType
+
+
+class Feature(Base):
+    """
+    Feature Data Model.
+    """
+
+    __tablename__ = "feature"
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
+    description = sa.Column(sa.Text())
+    display_name = sa.Column(sa.String())
+    name = sa.Column(sa.String(), nullable=False)
+    value_type = sa.Column(sa.Enum(ValueType), nullable=False)
+
+
+class FeaturePayload(BaseModel):
+    """
+    Feature Payload Model.
+    """
+
+    id: Optional[int] = None
+    dataset_id: Optional[int] = None
+    description: Optional[str]
+    display_name: Optional[str]
+    name: str
+    value_type: ValueType

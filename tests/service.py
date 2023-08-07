@@ -7,8 +7,8 @@ from pytest import mark
 from sqlalchemy.orm import Session
 
 from tds.autogen import orm
-from tds.autogen.schema import ResourceType, ValueType
-from tds.schema.model import ModelFramework
+from tds.db.enums import ResourceType, ValueType
+from tds.modules.model.model import ModelFramework
 from tds.schema.resource import Publication, Software
 from tests.suite import AllowedMethod
 from tests.suite import ASKEMEntityTestSuite as AETS
@@ -22,7 +22,7 @@ class TestProject(AETS):
     def init_test_data(self):
         with Session(self.rdb) as session:
             # Arrange Models
-            framework = orm.ModelFramework(name="dummy", version="v0", semantics="")
+            framework = ModelFramework(name="dummy", version="v0", semantics="")
             session.add(framework)
             session.commit()
             state = orm.ModelState(content="")
@@ -126,7 +126,7 @@ class TestRun(AETS):
     def init_test_data(self):
         with Session(self.rdb) as session:
             # Arrange Model
-            framework = orm.ModelFramework(name="dummy", version="v0", semantics="")
+            framework = ModelFramework(name="dummy", version="v0", semantics="")
             session.add(framework)
             session.commit()
             state = orm.ModelState(content="")
@@ -215,7 +215,7 @@ class TestModelConfig(AETS):
     def init_test_data(self):
         with Session(self.rdb) as session:
             # Arrange Model
-            framework = orm.ModelFramework(name="dummy", version="v0", semantics="")
+            framework = ModelFramework(name="dummy", version="v0", semantics="")
             session.add(framework)
             session.commit()
             state = orm.ModelState(content="")
@@ -284,7 +284,7 @@ class TestModel(AETS):
 
     def init_test_data(self):
         with Session(self.rdb) as session:
-            framework = orm.ModelFramework(name="dummy", version="v0", semantics="")
+            framework = ModelFramework(name="dummy", version="v0", semantics="")
             session.add(framework)
             session.commit()
             state = orm.ModelState(content="")
@@ -375,7 +375,7 @@ class TestFramework(AETS):
 
     def init_test_data(self):
         with Session(self.rdb) as session:
-            framework = orm.ModelFramework(name="dummy", version="v0", semantics="")
+            framework = ModelFramework(name="dummy", version="v0", semantics="")
             session.add(framework)
             session.commit()
 

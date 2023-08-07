@@ -9,8 +9,8 @@ from pydantic import Field
 from pydantic.main import BaseModel
 from sqlalchemy import func
 
-from tds.autogen.enums import ProvenanceType, RelationType
-from tds.autogen.orm import Base
+from tds.db.base import Base
+from tds.db.enums import ProvenanceType, RelationType
 
 
 class Provenance(Base):

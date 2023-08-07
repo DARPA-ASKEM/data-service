@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
-from tds.autogen import schema
+from tds.modules.model.model import ModelFrameworkPayload
 
 ModelParameters = List[Dict]
 
@@ -59,6 +59,6 @@ class ModelOptPayload(BaseModel):
         }
 
 
-class ModelFramework(schema.ModelFramework):
+class ModelFramework(ModelFrameworkPayload):
     class Config:
         orm_mode = True
