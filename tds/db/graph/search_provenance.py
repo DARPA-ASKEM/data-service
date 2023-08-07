@@ -322,7 +322,8 @@ class SearchProvenance:
         if payload.get("root_type") not in ("Model"):
             raise HTTPException(
                 status_code=400,
-                detail="Code artifacts used for model extraction can only be found by providing a Model",
+                detail="Code artifacts used for model extraction can "
+                "only be found by providing a Model",
             )
         with self.graph_db.session() as session:
             model_id = payload["root_id"]
