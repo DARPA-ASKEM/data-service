@@ -15,10 +15,12 @@ class Settings(BaseSettings):
     GENERATED_PATH: str = "./tds/autogen"
     DBML_PATH: str = "./askem.dbml"
     SQL_URL: str = "rdb"
+    SQL_PROTOCOL: Optional[str] = "postgresql+psycopg2"
     SQL_PORT: int = 8032
     SQL_USER: str = "dev"
     SQL_PASSWORD: str = "dev"
     SQL_DB: str = "askem"
+    SQL_CONN_STR: Optional[str] = None
     DKG_URL = "http://34.230.33.149"
     DKG_API_PORT = 8771
     DKG_DESC_PORT = 8772
