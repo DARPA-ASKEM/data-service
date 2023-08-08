@@ -18,8 +18,10 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column("publication", sa.Column("publication_data", sa.JSON, nullable=True))
+    with op.batch_alter_table("publication") as batch_op:
+        batch_op.add_column(sa.Column("publication_data", sa.JSON, nullable=True))
 
 
 def downgrade() -> None:
-    op.drop_column("publication", "publication_data")
+    with op.batch_alter_table("publication") as batch_op:
+        batch_op.drop_column("publication", "publication_data")
