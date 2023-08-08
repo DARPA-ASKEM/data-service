@@ -10,14 +10,6 @@ from tds.db.base import Base
 
 
 class TestModelEndpoints:
-    _model_id = None
-
-    def setup_class(self):
-        sql_url = os.getenv("SQL_CONN_STR")
-        print(sql_url)
-        engine = create_engine(sql_url)
-        Base.metadata.create_all(engine)
-
     def test_post(self, fast_api_fixture, fast_api_test_url, model_json):
         response = fast_api_fixture.post(
             url=f"{fast_api_test_url}/models",
@@ -29,7 +21,6 @@ class TestModelEndpoints:
         pytest.model_id = response_json["id"]
 
     def test_put(self, fast_api_fixture, fast_api_test_url, model_json):
-        print(pytest.model_id)
         put_data = model_json
         new_name = "{name} updated".format(name=model_json["name"])
         put_data["id"] = pytest.model_id
@@ -39,7 +30,6 @@ class TestModelEndpoints:
             json=put_data,
         )
         response_json = response.json()
-        print(response_json)
         assert response.status_code == 200
         assert "id" in response_json and response_json["id"] == pytest.model_id
 
@@ -48,9 +38,11 @@ class TestModelEndpoints:
             url=f"{fast_api_test_url}/models/{pytest.model_id}",
         )
         response_json = response.json()
+        new_name = "{name} updated".format(name=model_json["name"])
         assert response.status_code == 200
         assert "id" in response_json and response_json["id"] == pytest.model_id
         assert "timestamp" in response_json
+        assert "name" in response_json and response_json["name"] == new_name
 
     def test_post_fail(self, fast_api_fixture, fast_api_test_url, model_json):
         fail_data = model_json
@@ -69,14 +61,14 @@ class TestModelEndpoints:
         del fail_data["name"]
         del fail_data["model"]
         response = fast_api_fixture.put(
-            url=f"{fast_api_test_url}/models/{self._model_id}",
+            url=f"{fast_api_test_url}/models/{pytest.model_id}",
             json=model_json,
         )
         response_json = response.json()
         assert response.status_code == 422
         assert "detail" in response_json
 
-    def test_get_fail(self, fast_api_fixture, fast_api_test_url, model_json):
+    def test_get_fail(self, fast_api_fixture, fast_api_test_url):
         response = fast_api_fixture.get(
             url=f"{fast_api_test_url}/models/id-does-not-exist",
         )
