@@ -38,6 +38,9 @@ def setup_context() -> str:
     url = config.get_main_option("sqlalchemy.url")
     url = re.sub(r"\${(.+?)}", lambda m: tokens[m.group(1)], url)
 
+    if os.getenv("SQL_CONN_STR", None):
+        url = os.getenv("SQL_CONN_STR")
+
     return url
 
 
