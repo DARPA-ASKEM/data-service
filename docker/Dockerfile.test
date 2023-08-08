@@ -1,0 +1,17 @@
+FROM python:3.10
+RUN apt update 2> /dev/null
+RUN apt install -y postgresql postgresql-contrib sqlite3
+RUN pip install poetry
+WORKDIR /api
+ADD poetry.lock poetry.lock
+ADD pyproject.toml pyproject.toml
+RUN poetry config virtualenvs.create false
+COPY tests tests
+COPY tds tds
+COPY tds /tds_package/tds
+RUN find tds_package/tds/modules \! -name "model.py" -mindepth 2 -maxdepth 2 -print | xargs rm -rf
+COPY graph_relations.json graph_relations.json
+
+COPY migrate migrate
+COPY docker/scripts/tds_test.sh tds_test.sh
+RUN poetry install
