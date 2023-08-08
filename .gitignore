@@ -35,3 +35,4 @@ api.env
 .minio.sys
 data/askem-staging-data-service
 migrate/seeds/files/*.csv
+docker-compose.override.yml
