@@ -17,7 +17,3 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
-    volumes:
-      - $PWD/tests:/api/tests
-      - $PWD/tds:/api/tds
-      - $PWD/migrate:/api/migrate
