@@ -6,11 +6,23 @@ Create Date: 2023-02-22 14:12:14.238575
 
 """
 # pylint: disable=no-member, invalid-name
-from typing import Iterator
+import os
 
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
+
+from migrate.scripts.enums import (
+    drop_enums,
+    extracted_type,
+    ontological_field,
+    provenance_type,
+    relation_type,
+    resource_type,
+    role,
+    taggable_type,
+    value_type,
+)
 
 # revision identifiers, used by Alembic.
 revision = "1f5853959c65"
@@ -18,72 +30,7 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-
-# Alembic 1.9.4 does not support dropping enums on downgrade on autogen. So,
-# ... we separate enum declarations from upgrade.
-def drop_enums(enums: Iterator[sa.Enum]):
-    """
-    Drop a list of enums
-    """
-    for enum in enums:
-        enum.drop(op.get_bind(), checkfirst=True)
-
-
-resource_type = sa.Enum(
-    "datasets",
-    "models",
-    "model_configurations",
-    "publications",
-    "simulations",
-    "workflows",
-    name="resourcetype",
-)
-extracted_type = sa.Enum("equation", "figure", "table", name="extractedtype")
-taggable_type = sa.Enum(
-    "datasets",
-    "models",
-    "projects",
-    "publications",
-    "qualifiers",
-    "simulation_parameters",
-    "model_configurations",
-    "simulations",
-    "workflows",
-    name="taggabletype",
-)
-role = sa.Enum("author", "contributor", "maintainer", "other", name="role")
-ontological_field = sa.Enum("obj", "unit", name="ontologicalfield")
-relation_type = sa.Enum(
-    "BEGINS_AT",
-    "CITES",
-    "COMBINED_FROM",
-    "CONTAINS",
-    "COPIED_FROM",
-    "DECOMPOSED_FROM",
-    "DERIVED_FROM",
-    "EDITED_FROM",
-    "EQUIVALENT_OF",
-    "EXTRACTED_FROM",
-    "GENERATED_BY",
-    "GLUED_FROM",
-    "IS_CONCEPT_OF",
-    "PARAMETER_OF",
-    "REINTERPRETS",
-    "STRATIFIED_FROM",
-    "USES",
-    name="relationtype",
-)
-provenance_type = sa.Enum(
-    "Concept",
-    "Dataset",
-    "Model",
-    "ModelConfiguration",
-    "Project",
-    "Publication",
-    "Simulation",
-    name="provenancetype",
-)
-value_type = sa.Enum("binary", "bool", "float", "int", "str", name="valuetype")
+now_text = os.getenv("SQL_NOW_STATEMENT", "now()")
 
 
 def upgrade() -> None:
@@ -121,7 +68,10 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("description", sa.String(), nullable=False),
         sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=True
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text(f"{now_text}"),
+            nullable=True,
         ),
         sa.Column("active", sa.Boolean(), nullable=False),
         sa.Column("username", sa.String(), nullable=True),
@@ -138,7 +88,10 @@ def upgrade() -> None:
         "software",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text(f"{now_text}"),
+            nullable=False,
         ),
         sa.Column("source", sa.String(), nullable=False),
         sa.Column("storage_uri", sa.String(), nullable=False),
@@ -187,7 +140,10 @@ def upgrade() -> None:
         "model_runtime",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text(f"{now_text}"),
+            nullable=False,
         ),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("left", sa.String(), nullable=False),
@@ -240,7 +196,10 @@ def upgrade() -> None:
         "provenance",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text(f"{now_text}"),
+            nullable=False,
         ),
         sa.Column(
             "relation_type",
