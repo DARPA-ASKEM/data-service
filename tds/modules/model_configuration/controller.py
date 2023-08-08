@@ -56,7 +56,7 @@ def model_configuration_post(payload: ModelConfiguration) -> JSONResponse:
     res = payload.save()
     logger.info("New model_configuration created: %s", res["_id"])
     return JSONResponse(
-        status_code=status.HTTP_200_OK,
+        status_code=status.HTTP_201_CREATED,
         headers={
             "content-type": "application/json",
         },
