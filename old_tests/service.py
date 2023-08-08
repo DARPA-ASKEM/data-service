@@ -5,14 +5,14 @@ Enforce client-expected features
 
 from pytest import mark
 from sqlalchemy.orm import Session
-from tests.suite import AllowedMethod
-from tests.suite import ASKEMEntityTestSuite as AETS
-from tests.suite import expected_status
 
 from tds.autogen import orm
 from tds.db.enums import ResourceType, ValueType
 from tds.modules.model.model import ModelFramework
 from tds.schema.resource import Publication, Software
+from tests.suite import AllowedMethod
+from tests.suite import ASKEMEntityTestSuite as AETS
+from tests.suite import expected_status
 
 
 # TODO: The assets endpoints need testing

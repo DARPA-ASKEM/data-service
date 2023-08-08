@@ -50,6 +50,7 @@ class ProvenanceSearchTypes(str, Enum):
     parent_model_revisions = "parent_model_revisions"
     parent_models = "parent_models"
     parent_nodes = "parent_nodes"
+    models_from_code = "models_from_code"
 
 
 class RelationType(str, Enum):
