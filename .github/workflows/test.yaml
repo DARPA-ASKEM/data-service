@@ -1,5 +1,5 @@
 ---
-name: Correctness
+name: Testing
 on:
   workflow_call:
   push:
