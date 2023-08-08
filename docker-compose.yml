@@ -8,6 +8,7 @@ networks:
     name: data-annotation-stack
 services:
   rdb:
+    profiles: ["tds-api", "local"]
     container_name: data-service-rdb
     image: "postgres:15.1"
     ports:
@@ -50,6 +51,7 @@ services:
       - $PWD/tds:/api/tds
       - $PWD/migrate:/api/migrate
   graphdb:
+    profiles: ["tds-api", "local"]
     build:
       context: ./
       dockerfile: docker/Dockerfile.neo4j
@@ -69,6 +71,7 @@ services:
     networks:
       - data-api
   minio:
+    profiles: ["local"]
     build:
       context: ./
       dockerfile: docker/Dockerfile.minio
@@ -84,6 +87,7 @@ services:
       - data-api
       - data-annotation-stack
   elasticsearch:
+    profiles: ["local", "tds-testing"]
     image: elasticsearch:${STACK_VERSION}
     environment:
       - discovery.type=single-node
@@ -103,6 +107,7 @@ services:
       timeout: 20s
       retries: 5
   kibana:
+    profiles: ["local"]
     depends_on:
       - elasticsearch
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
@@ -120,6 +125,7 @@ services:
       - data-api
       - data-annotation-stack
   migrations:
+    profiles: ["tds-api-only", "tds-api", "local"]
     container_name: data-service-migrations
     build:
       context: ./
