@@ -1,14 +1,24 @@
 """
 Model test for TDS.
 """
+import os
+
+import pytest
+from sqlalchemy import create_engine
+
+from tds.db.base import Base
 
 
 class TestModelEndpoints:
     _model_id = None
 
-    def test_post(
-        self, _mock_elasticsearch, fast_api_fixture, fast_api_test_url, model_json
-    ):
+    def setup_class(self):
+        sql_url = os.getenv("SQL_CONN_STR")
+        print(sql_url)
+        engine = create_engine(sql_url)
+        Base.metadata.create_all(engine)
+
+    def test_post(self, fast_api_fixture, fast_api_test_url, model_json):
         response = fast_api_fixture.post(
             url=f"{fast_api_test_url}/models",
             json=model_json,
@@ -16,37 +26,33 @@ class TestModelEndpoints:
         response_json = response.json()
         assert response.status_code == 201
         assert "id" in response_json
-        self._model_id = response_json["id"]
+        pytest.model_id = response_json["id"]
 
-    def test_put(
-        self, _mock_elasticsearch, fast_api_fixture, fast_api_test_url, model_json
-    ):
+    def test_put(self, fast_api_fixture, fast_api_test_url, model_json):
+        print(pytest.model_id)
         put_data = model_json
         new_name = "{name} updated".format(name=model_json["name"])
-        put_data["id"] = self._model_id
+        put_data["id"] = pytest.model_id
         put_data["name"] = new_name
         response = fast_api_fixture.put(
-            url=f"{fast_api_test_url}/models/{self._model_id}",
+            url=f"{fast_api_test_url}/models/{pytest.model_id}",
             json=put_data,
         )
         response_json = response.json()
+        print(response_json)
         assert response.status_code == 200
-        assert "id" in response_json and response_json["id"] == self._model_id
+        assert "id" in response_json and response_json["id"] == pytest.model_id
 
-    def test_get(
-        self, _mock_elasticsearch, fast_api_fixture, fast_api_test_url, model_json
-    ):
+    def test_get(self, fast_api_fixture, fast_api_test_url, model_json):
         response = fast_api_fixture.get(
-            url=f"{fast_api_test_url}/models/{self._model_id}",
+            url=f"{fast_api_test_url}/models/{pytest.model_id}",
         )
         response_json = response.json()
         assert response.status_code == 200
-        assert "id" in response_json and response_json["id"] == self._model_id
+        assert "id" in response_json and response_json["id"] == pytest.model_id
         assert "timestamp" in response_json
 
-    def test_post_fail(
-        self, _mock_elasticsearch, fast_api_fixture, fast_api_test_url, model_json
-    ):
+    def test_post_fail(self, fast_api_fixture, fast_api_test_url, model_json):
         fail_data = model_json
         del fail_data["name"]
         del fail_data["model"]
@@ -58,9 +64,7 @@ class TestModelEndpoints:
         assert response.status_code == 422
         assert "detail" in response_json
 
-    def test_put_fail(
-        self, _mock_elasticsearch, fast_api_fixture, fast_api_test_url, model_json
-    ):
+    def test_put_fail(self, fast_api_fixture, fast_api_test_url, model_json):
         fail_data = model_json
         del fail_data["name"]
         del fail_data["model"]
@@ -72,9 +76,7 @@ class TestModelEndpoints:
         assert response.status_code == 422
         assert "detail" in response_json
 
-    def test_get_fail(
-        self, _mock_elasticsearch, fast_api_fixture, fast_api_test_url, model_json
-    ):
+    def test_get_fail(self, fast_api_fixture, fast_api_test_url, model_json):
         response = fast_api_fixture.get(
             url=f"{fast_api_test_url}/models/id-does-not-exist",
         )
