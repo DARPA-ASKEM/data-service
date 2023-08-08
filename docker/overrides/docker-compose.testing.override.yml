@@ -11,7 +11,9 @@ services:
       - api.env
     environment:
       - NEO4J_ENABLED
-      - SQL_URL=""
+      - SQL_CONN_STR=sqlite:///test.db
+      - SEED_DATA=false
+      - SQL_NOW_STATEMENT='CURRENT_TIMESTAMP'
     depends_on:
       elasticsearch:
         condition: service_healthy
