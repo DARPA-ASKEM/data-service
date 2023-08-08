@@ -21,13 +21,6 @@ services:
     networks:
       - data-annotation-stack
       - data-api
-    depends_on:
-      migrations:
-        condition: service_completed_successfully
-      graphdb:
-        condition: service_started
-      minio:
-        condition: service_started
   elasticsearch:
     profiles: ["local", "tds-testing"]
     image: elasticsearch:${STACK_VERSION}
