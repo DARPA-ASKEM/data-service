@@ -15,8 +15,9 @@ jobs:
       - name: Set up test.
         run: |
           cp api.env.sample api.env
+          cp docker/overrides/docker-compose.testing.override.yml docker-compose.override.yml
       - name: Start containers
-        run: docker-compose --env-file api.env -f "docker-compose.yml" -f "docker/overrides/docker-compose.testing.override.yml" --profile tds-testing up -d --build
+        run: docker-compose --env-file api.env --profile tds-testing up -d --build
       - name: Stop containers
         if: always()
-        run: docker-compose --env-file api.env -f "docker-compose.yml" -f "docker/overrides/docker-compose.testing.override.yml" --profile tds-testing down
+        run: docker-compose --env-file api.env --profile tds-testing down
