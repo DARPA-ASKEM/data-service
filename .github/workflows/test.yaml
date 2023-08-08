@@ -12,8 +12,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v1
+      - name: Set up test.
+        run: |
+          cp api.env.sample api.env
       - name: Start containers
-        run: docker-compose --env-file api.env.sample -f "docker-compose.yml" -f "docker/overrides/docker-compose.testing.override.yml" --profile tds-testing up -d --build
+        run: docker-compose --env-file api.env -f "docker-compose.yml" -f "docker/overrides/docker-compose.testing.override.yml" --profile tds-testing up -d --build
       - name: Stop containers
         if: always()
-        run: docker-compose --env-file api.env.sample -f "docker-compose.yml" -f "docker/overrides/docker-compose.testing.override.yml" --profile tds-testing down
+        run: docker-compose --env-file api.env -f "docker-compose.yml" -f "docker/overrides/docker-compose.testing.override.yml" --profile tds-testing down
