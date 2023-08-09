@@ -18,29 +18,29 @@ class TestWorkflowEndpoints:
         response_json = response.json()
         assert response.status_code == 201
         assert "id" in response_json
-        pytest.model_id = response_json["id"]
+        pytest.workflow_id = response_json["id"]
 
     def test_put(self, fast_api_fixture, fast_api_test_url, workflow_json):
         put_data = workflow_json
         new_name = "{name} updated".format(name=workflow_json["name"])
-        put_data["id"] = pytest.model_id
+        put_data["id"] = pytest.workflow_id
         put_data["name"] = new_name
         response = fast_api_fixture.put(
-            url=f"{fast_api_test_url}/workflows/{pytest.model_id}",
+            url=f"{fast_api_test_url}/workflows/{pytest.workflow_id}",
             json=put_data,
         )
         response_json = response.json()
         assert response.status_code == 200
-        assert "id" in response_json and response_json["id"] == pytest.model_id
+        assert "id" in response_json and response_json["id"] == pytest.workflow_id
 
     def test_get(self, fast_api_fixture, fast_api_test_url, workflow_json):
         response = fast_api_fixture.get(
-            url=f"{fast_api_test_url}/workflows/{pytest.model_id}",
+            url=f"{fast_api_test_url}/workflows/{pytest.workflow_id}",
         )
         response_json = response.json()
         new_name = "{name} updated".format(name=workflow_json["name"])
         assert response.status_code == 200
-        assert "id" in response_json and response_json["id"] == pytest.model_id
+        assert "id" in response_json and response_json["id"] == pytest.workflow_id
         assert "timestamp" in response_json
         assert "name" in response_json and response_json["name"] == new_name
 
@@ -63,7 +63,7 @@ class TestWorkflowEndpoints:
         del fail_data["transform"]
         del fail_data["nodes"]
         response = fast_api_fixture.put(
-            url=f"{fast_api_test_url}/workflows/{pytest.model_id}",
+            url=f"{fast_api_test_url}/workflows/{pytest.workflow_id}",
             json=workflow_json,
         )
         response_json = response.json()
