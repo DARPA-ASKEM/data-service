@@ -6,11 +6,10 @@ WORKDIR /api
 ADD poetry.lock poetry.lock
 ADD pyproject.toml pyproject.toml
 RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev
-COPY tds tds 
+COPY tds tds
 COPY graph_relations.json graph_relations.json
+RUN mkdir /api/tests && touch /api/tests/test.py
+RUN poetry install --no-dev
 
-# Poetry complains if the README doesn't exist
-COPY README.md README.md
 EXPOSE 8000
 CMD ["poetry", "run", "tds"]
