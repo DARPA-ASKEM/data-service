@@ -38,8 +38,8 @@ services:
       - data-api
     healthcheck:
       test: curl http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1
-      interval: 20s
-      timeout: 60s
+      interval: 30s
+      timeout: 180s
       retries: 10
   migrations:
     profiles: ["tds-api-only", "tds-api", "local"]
