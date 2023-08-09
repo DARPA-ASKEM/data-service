@@ -13,3 +13,6 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+  elasticsearch:
+    environment:
+      - action.auto_create_index=true
