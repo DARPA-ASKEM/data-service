@@ -64,11 +64,12 @@ value_type = sa.Enum("binary", "bool", "float", "int", "str", name="valuetype")
 
 def update_enum(name: str, enum_obj: sa.Enum, cols: dict, enum_entities: list) -> None:
     for key in cols:
+        print(key)
         if type(cols[key]) is list:
             for col_key in cols[key]:
-                alter_enum_col(table_name=key, col_name=col_key)
+                alter_enum_col(table_name=key, col_name=col_key, enum_obj=enum_obj)
         else:
-            alter_enum_col(table_name=key, col_name=cols[key])
+            alter_enum_col(table_name=key, col_name=cols[key], enum_obj=enum_obj)
     drop_enums([enum_obj])
     new_enum = sa.Enum(*enum_entities, name=name)
     for key_1 in cols:
@@ -81,11 +82,11 @@ def update_enum(name: str, enum_obj: sa.Enum, cols: dict, enum_entities: list) -
             convert_enum_col(table_name=key_1, col_name=cols[key_1], new_enum=new_enum)
 
 
-def alter_enum_col(table_name: str, col_name: str):
+def alter_enum_col(table_name: str, col_name: str, enum_obj: sa.Enum):
     with op.batch_alter_table(table_name) as batch_op:
         batch_op.alter_column(
             col_name,
-            existing_type=sa.Enum,
+            existing_type=enum_obj,
             type=sa.String(),
         )
 
@@ -107,4 +108,4 @@ def drop_enums(enums: Iterator[sa.Enum]):
     Drop a list of enums
     """
     for enum in enums:
-        enum.drop(op.get_bind(), checkfirst=True)
+        enum.drop(op.get_bind(), checkfirst=False)
