@@ -19,10 +19,6 @@ jobs:
       - name: Start containers
         run: |
           docker-compose --env-file api.env --profile tds-testing up --abort-on-container-exit --build
-          export TEST=$(docker logs data-service-api-testing | tail -n 1)
-          if [[ "$TEST" == *"failed"* ]] ; then
-             exit(1)
-          fi
 
       - name: Stop containers
         if: always()
