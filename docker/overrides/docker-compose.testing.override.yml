@@ -13,6 +13,8 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+    entrypoint: ["bash", "/api/tds_test.sh"]
   elasticsearch:
     environment:
       - action.auto_create_index=true
+      - ingest.geoip.downloader.enabled=false
