@@ -77,6 +77,9 @@ services:
       - $PWD/tests:/api/tests
       - $PWD/tds:/api/tds
       - $PWD/migrate:/api/migrate
+  elasticsearch:
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
   kibana:
     profiles: [ "local" ]
     depends_on:
