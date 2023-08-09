@@ -315,6 +315,7 @@ def get_project_assets(
                         index=index,
                         query={"ids": {"values": assets_key_ids[key]}},
                         fields=responder["fields"],
+                        size=1000,
                     )
                     assets_key_objects[key] = (
                         []
