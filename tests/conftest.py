@@ -11,6 +11,9 @@ from tds.server.build import build_api
 
 def pytest_configure():
     pytest.model_id = None
+    pytest.project_id = None
+    pytest.model_configuration_id = None
+    pytest.workflow_id = None
 
 
 @fixture(autouse=True)
