@@ -1,6 +1,10 @@
 version: "3.9"
 services:
   api:
+    container_name: data-service-api-testing
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile.test
     environment:
       - NEO4J_ENABLED
       - SQL_CONN_STR=sqlite:///test.db
