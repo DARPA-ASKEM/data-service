@@ -41,7 +41,7 @@ def list_projects(rdb: Engine = Depends(request_rdb)) -> JSONResponse:
     Retrieve the list of projects.
     """
     with Session(rdb) as session:
-        projects = session.query(Project).all()
+        projects = session.query(Project).filter(Project.active == True).all()
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
