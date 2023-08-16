@@ -14,6 +14,7 @@ def pytest_configure():
     pytest.project_id = None
     pytest.model_configuration_id = None
     pytest.workflow_id = None
+    pytest.code_id = None
 
 
 @fixture(autouse=True)
