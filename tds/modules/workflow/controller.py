@@ -49,7 +49,7 @@ def workflow_post(payload: Workflow) -> JSONResponse:
     res = payload.save()
     logger.info("New workflow created: %s", res["_id"])
     return JSONResponse(
-        status_code=status.HTTP_200_OK,
+        status_code=status.HTTP_201_CREATED,
         headers={
             "content-type": "application/json",
         },

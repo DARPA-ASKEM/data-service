@@ -19,34 +19,32 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.alter_column(
-        "provenance",
-        "left",
-        existing_type=sa.INTEGER(),
-        type_=sa.String(),
-        existing_nullable=False,
-    )
-    op.alter_column(
-        "provenance",
-        "right",
-        existing_type=sa.INTEGER(),
-        type_=sa.String(),
-        existing_nullable=False,
-    )
+    with op.batch_alter_table("provenance") as batch_op:
+        batch_op.alter_column(
+            "left",
+            existing_type=sa.INTEGER(),
+            type_=sa.String(),
+            existing_nullable=False,
+        )
+        batch_op.alter_column(
+            "right",
+            existing_type=sa.INTEGER(),
+            type_=sa.String(),
+            existing_nullable=False,
+        )
 
 
 def downgrade() -> None:
-    op.alter_column(
-        "provenance",
-        "right",
-        existing_type=sa.String(),
-        type_=sa.INTEGER(),
-        existing_nullable=False,
-    )
-    op.alter_column(
-        "provenance",
-        "left",
-        existing_type=sa.String(),
-        type_=sa.INTEGER(),
-        existing_nullable=False,
-    )
+    with op.batch_alter_table("provenance") as batch_op:
+        batch_op.alter_column(
+            "right",
+            existing_type=sa.String(),
+            type_=sa.INTEGER(),
+            existing_nullable=False,
+        )
+        batch_op.alter_column(
+            "left",
+            existing_type=sa.String(),
+            type_=sa.INTEGER(),
+            existing_nullable=False,
+        )

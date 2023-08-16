@@ -6,7 +6,7 @@
 from logging import Logger
 
 from elasticsearch import NotFoundError
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
@@ -56,7 +56,7 @@ def code_post(payload: Code) -> JSONResponse:
     res = payload.save()
     logger.info("New code created: %s", res["_id"])
     return JSONResponse(
-        status_code=status.HTTP_200_OK,
+        status_code=status.HTTP_201_CREATED,
         headers={
             "content-type": "application/json",
         },

@@ -7,24 +7,6 @@ networks:
     driver: bridge
     name: data-annotation-stack
 services:
-  rdb:
-    container_name: data-service-rdb
-    image: "postgres:15.1"
-    ports:
-      - 8032:$SQL_PORT
-    environment:
-      - POSTGRES_PASSWORD=$SQL_PASSWORD
-      - POSTGRES_USER=$SQL_USER
-      - POSTGRES_DB=$SQL_DB
-    volumes:
-      - tds_data:/var/lib/postgresql/data
-    networks:
-      - data-api
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${SQL_USER} -d ${SQL_DB}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
   api:
     container_name: data-service-api
     build:
@@ -39,51 +21,8 @@ services:
     networks:
       - data-annotation-stack
       - data-api
-    depends_on:
-      migrations:
-        condition: service_completed_successfully
-      graphdb:
-        condition: service_started
-      minio:
-        condition: service_started
-    volumes:
-      - $PWD/tds:/api/tds
-      - $PWD/migrate:/api/migrate
-  graphdb:
-    build:
-      context: ./
-      dockerfile: docker/Dockerfile.neo4j
-    ports:
-      - 7474:7474
-      - 7687:7687
-    environment:
-      - NEO4J_AUTH=$NEO4J_AUTH
-      - NEO4J_dbms_memory_pagecache_size=512M
-    volumes:
-      - neo4j_data:/data
-    depends_on:
-      rdb:
-        condition: service_healthy
-      migrations:
-        condition: service_completed_successfully
-    networks:
-      - data-api
-  minio:
-    build:
-      context: ./
-      dockerfile: docker/Dockerfile.minio
-    environment:
-      MINIO_ROOT_USER: $MINIO_USER
-      MINIO_ROOT_PASSWORD: $MINIO_PWD
-    ports:
-      - 9000:9000
-      - 9001:9001
-    volumes:
-      - $PWD/data:/data
-    networks:
-      - data-api
-      - data-annotation-stack
   elasticsearch:
+    profiles: ["local", "tds-testing"]
     image: elasticsearch:${STACK_VERSION}
     environment:
       - discovery.type=single-node
@@ -100,26 +39,10 @@ services:
     healthcheck:
       test: curl http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1
       interval: 10s
-      timeout: 20s
-      retries: 5
-  kibana:
-    depends_on:
-      - elasticsearch
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
-    volumes:
-      - kibanadata:/usr/share/kibana/data
-    ports:
-      - ${KIBANA_PORT}:5601
-    environment:
-      - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-    mem_limit: ${MEM_LIMIT}
-    networks:
-      - data-api
-      - data-annotation-stack
+      timeout: 10s
+      retries: 10
   migrations:
+    profiles: ["tds-api-only", "tds-api", "local"]
     container_name: data-service-migrations
     build:
       context: ./
@@ -127,15 +50,6 @@ services:
     entrypoint: /run_migrations.sh
     env_file:
       - api.env
-#    volumes:
-#      - $PWD/migrate:/migrate
-    depends_on:
-      rdb:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      minio:
-        condition: service_started
     networks:
       - data-api
 volumes:

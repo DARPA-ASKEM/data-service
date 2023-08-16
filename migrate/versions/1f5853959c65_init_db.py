@@ -6,11 +6,10 @@ Create Date: 2023-02-22 14:12:14.238575
 
 """
 # pylint: disable=no-member, invalid-name
-from typing import Iterator
+import os
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "1f5853959c65"
@@ -18,72 +17,7 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-
-# Alembic 1.9.4 does not support dropping enums on downgrade on autogen. So,
-# ... we separate enum declarations from upgrade.
-def drop_enums(enums: Iterator[sa.Enum]):
-    """
-    Drop a list of enums
-    """
-    for enum in enums:
-        enum.drop(op.get_bind(), checkfirst=True)
-
-
-resource_type = sa.Enum(
-    "datasets",
-    "models",
-    "model_configurations",
-    "publications",
-    "simulations",
-    "workflows",
-    name="resourcetype",
-)
-extracted_type = sa.Enum("equation", "figure", "table", name="extractedtype")
-taggable_type = sa.Enum(
-    "datasets",
-    "models",
-    "projects",
-    "publications",
-    "qualifiers",
-    "simulation_parameters",
-    "model_configurations",
-    "simulations",
-    "workflows",
-    name="taggabletype",
-)
-role = sa.Enum("author", "contributor", "maintainer", "other", name="role")
-ontological_field = sa.Enum("obj", "unit", name="ontologicalfield")
-relation_type = sa.Enum(
-    "BEGINS_AT",
-    "CITES",
-    "COMBINED_FROM",
-    "CONTAINS",
-    "COPIED_FROM",
-    "DECOMPOSED_FROM",
-    "DERIVED_FROM",
-    "EDITED_FROM",
-    "EQUIVALENT_OF",
-    "EXTRACTED_FROM",
-    "GENERATED_BY",
-    "GLUED_FROM",
-    "IS_CONCEPT_OF",
-    "PARAMETER_OF",
-    "REINTERPRETS",
-    "STRATIFIED_FROM",
-    "USES",
-    name="relationtype",
-)
-provenance_type = sa.Enum(
-    "Concept",
-    "Dataset",
-    "Model",
-    "ModelConfiguration",
-    "Project",
-    "Publication",
-    "Simulation",
-    name="provenancetype",
-)
-value_type = sa.Enum("binary", "bool", "float", "int", "str", name="valuetype")
+now_text = os.getenv("SQL_NOW_STATEMENT", "now()")
 
 
 def upgrade() -> None:
@@ -121,7 +55,10 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("description", sa.String(), nullable=False),
         sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=True
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text(f"{now_text}"),
+            nullable=True,
         ),
         sa.Column("active", sa.Boolean(), nullable=False),
         sa.Column("username", sa.String(), nullable=True),
@@ -138,7 +75,10 @@ def upgrade() -> None:
         "software",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text(f"{now_text}"),
+            nullable=False,
         ),
         sa.Column("source", sa.String(), nullable=False),
         sa.Column("storage_uri", sa.String(), nullable=False),
@@ -151,12 +91,12 @@ def upgrade() -> None:
         sa.Column("resource_id", sa.Integer(), nullable=False),
         sa.Column(
             "resource_type",
-            resource_type,
+            sa.String(),
             nullable=True,
         ),
         sa.Column(
             "role",
-            role,
+            sa.String(),
             nullable=True,
         ),
         sa.ForeignKeyConstraint(
@@ -172,7 +112,7 @@ def upgrade() -> None:
         sa.Column("publication_id", sa.Integer(), nullable=False),
         sa.Column(
             "type",
-            extracted_type,
+            sa.String(),
             nullable=False,
         ),
         sa.Column("data", sa.LargeBinary(), nullable=False),
@@ -187,7 +127,10 @@ def upgrade() -> None:
         "model_runtime",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text(f"{now_text}"),
+            nullable=False,
         ),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("left", sa.String(), nullable=False),
@@ -208,11 +151,11 @@ def upgrade() -> None:
         sa.Column("curie", sa.String(), nullable=False),
         sa.Column(
             "type",
-            taggable_type,
+            sa.String(),
             nullable=False,
         ),
         sa.Column("object_id", sa.Integer(), nullable=False),
-        sa.Column("status", ontological_field, nullable=False),
+        sa.Column("status", sa.String(), nullable=False),
         sa.ForeignKeyConstraint(
             ["curie"],
             ["active_concept.curie"],
@@ -226,7 +169,7 @@ def upgrade() -> None:
         sa.Column("resource_id", sa.Integer(), nullable=False),
         sa.Column(
             "resource_type",
-            resource_type,
+            sa.String(),
             nullable=False,
         ),
         sa.Column("external_ref", sa.String(), nullable=True),
@@ -240,23 +183,26 @@ def upgrade() -> None:
         "provenance",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
-            "timestamp", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text(f"{now_text}"),
+            nullable=False,
         ),
         sa.Column(
             "relation_type",
-            relation_type,
+            sa.String(),
             nullable=False,
         ),
         sa.Column("left", sa.Integer(), nullable=False),
         sa.Column(
             "left_type",
-            provenance_type,
+            sa.String(),
             nullable=False,
         ),
         sa.Column("right", sa.Integer(), nullable=False),
         sa.Column(
             "right_type",
-            provenance_type,
+            sa.String(),
             nullable=False,
         ),
         sa.Column("user_id", sa.Integer(), nullable=True),
@@ -276,7 +222,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column(
             "value_type",
-            value_type,
+            sa.String(),
             nullable=False,
         ),
         sa.PrimaryKeyConstraint("id"),
@@ -289,7 +235,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column(
             "value_type",
-            value_type,
+            sa.String(),
             nullable=False,
         ),
         sa.PrimaryKeyConstraint("id"),
@@ -330,17 +276,3 @@ def downgrade() -> None:
     op.drop_table("person")
     op.drop_table("model_framework")
     op.drop_table("active_concept")
-    new_enums = iter(
-        (
-            resource_type,
-            extracted_type,
-            taggable_type,
-            role,
-            ontological_field,
-            resource_type,
-            relation_type,
-            provenance_type,
-            value_type,
-        )
-    )
-    drop_enums(new_enums)

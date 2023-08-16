@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  api:
+    container_name: data-service-api-testing
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile.test
+    environment:
+      - NEO4J_ENABLED
+      - SQL_CONN_STR=sqlite:///test.db
+      - SEED_DATA=false
+      - SQL_NOW_STATEMENT=CURRENT_TIMESTAMP
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    entrypoint: ["bash", "/api/tds_test.sh"]

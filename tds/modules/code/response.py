@@ -1,6 +1,7 @@
 """
 TDS Code Response object.
 """
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
@@ -18,6 +19,7 @@ class CodeResponse(BaseModel):
     description: str
     filename: str
     repo_url: str
+    timestamp: datetime
     language: ProgrammingLanguage
     metadata: Optional[dict]
 

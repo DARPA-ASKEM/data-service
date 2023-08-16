@@ -18,6 +18,9 @@ jobs:
   formatting:
     uses: ./.github/workflows/formatting.yaml
 
+  test:
+    uses: ./.github/workflows/test.yaml
+
   # Call the Tag Generator to generate an image tag to use
   tag-generator:
     uses: darpa-askem/.github/.github/workflows/tag-generator.yaml@main
@@ -27,9 +30,9 @@ jobs:
   # Build and Publish all targets associated with specified group
   bake:
     needs:
-  # Temorarily remove these to allow build while we fix testing
-  #      - correctness
-  #      - formatting
+      - correctness
+      - formatting
+      - test
       - tag-generator
     uses: darpa-askem/.github/.github/workflows/bake-publish.yml@main
     with:

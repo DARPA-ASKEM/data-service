@@ -144,7 +144,7 @@ def project_put(
 
             logger.info("new project created: %i", project_id)
             return JSONResponse(
-                status_code=status.HTTP_202_ACCEPTED,
+                status_code=status.HTTP_200_OK,
                 headers={"content-type": "application/json"},
                 content={"id": project_id},
             )

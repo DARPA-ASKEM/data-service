@@ -18,18 +18,18 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.alter_column(
-        table_name="project_asset",
-        column_name="resource_id",
-        nullable=False,
-        type_=sa.String(),
-    )
+    with op.batch_alter_table("project_asset") as batch_op:
+        batch_op.alter_column(
+            column_name="resource_id",
+            nullable=False,
+            type_=sa.String(),
+        )
 
 
 def downgrade() -> None:
-    op.alter_column(
-        table_name="project_asset",
-        column_name="resource_id",
-        nullable=False,
-        type_=sa.Integer(),
-    )
+    with op.batch_alter_table("project_asset") as batch_op:
+        batch_op.alter_column(
+            column_name="resource_id",
+            nullable=False,
+            type_=sa.Integer(),
+        )
