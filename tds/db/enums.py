@@ -145,3 +145,9 @@ class ColumnTypes(str, Enum):
     DATETIME = "datetime"
     DATE = "date"
     TIME = "time"
+
+
+class ProgrammingLanguage(str, Enum):
+    PYTHON = "python"
+    JULIA = "julia"
+    R = "r"
