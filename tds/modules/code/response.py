@@ -19,6 +19,7 @@ class CodeResponse(BaseModel):
     description: str
     filename: str
     repo_url: str
+    timestamp: datetime
     language: ProgrammingLanguage
     metadata: Optional[dict]
 
