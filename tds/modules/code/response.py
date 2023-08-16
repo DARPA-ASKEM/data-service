@@ -1,9 +1,11 @@
 """
 TDS Code Response object.
 """
-from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
+
+from tds.db.enums import ProgrammingLanguage
 
 
 class CodeResponse(BaseModel):
@@ -14,7 +16,10 @@ class CodeResponse(BaseModel):
     id: str
     name: str
     description: str
-    timestamp: datetime
+    filename: str
+    repo_url: str
+    language: ProgrammingLanguage
+    metadata: Optional[dict]
 
 
 def code_response(code_list):
