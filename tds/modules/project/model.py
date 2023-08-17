@@ -31,7 +31,6 @@ class Project(Base):
         uselist=True,
         foreign_keys=[id],
         primaryjoin="Project.id == ProjectAsset.project_id",
-        backref="project",
     )
 
     class Config:

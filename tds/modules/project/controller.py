@@ -37,12 +37,17 @@ es = es_client()
 @project_router.get(
     "", response_model=list[ProjectResponse], **retrieve.fastapi_endpoint_config
 )
-def list_projects(rdb: Engine = Depends(request_rdb)) -> JSONResponse:
+def list_projects(
+    include_inactive: bool = False, rdb: Engine = Depends(request_rdb)
+) -> JSONResponse:
     """
     Retrieve the list of projects.
     """
     with Session(rdb) as session:
-        projects = session.query(Project).all()
+        if include_inactive is True:
+            projects = session.query(Project).all()
+        else:
+            projects = session.query(Project).filter(Project.active).all()
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
@@ -228,7 +233,7 @@ def delete_asset(
             session.delete(asset)
         session.commit()
         return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_200_OK,
             headers={"content-type": "application/json"},
             content={"message": "Asset has been deleted."},
         )
