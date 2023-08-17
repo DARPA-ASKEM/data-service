@@ -81,6 +81,7 @@ class ResourceType(str, Enum):
     simulations = "simulations"
     workflows = "workflows"
     artifacts = "artifacts"
+    code = "code"
 
 
 class Role(str, Enum):
@@ -101,6 +102,7 @@ class TaggableType(str, Enum):
     qualifiers = "qualifiers"
     simulations = "simulations"
     artifacts = "artifacts"
+    code = "code"
 
 
 class ValueType(str, Enum):
