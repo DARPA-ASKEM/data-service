@@ -44,7 +44,6 @@ def list_projects(
     """
     with Session(rdb) as session:
         if include_inactive is True:
-            print("Getting inactive?")
             projects = session.query(Project).all()
         else:
             projects = session.query(Project).filter(Project.active).all()
