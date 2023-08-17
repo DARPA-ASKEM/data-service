@@ -37,6 +37,7 @@ es_resources = [
     ResourceType.simulations,
     ResourceType.workflows,
     ResourceType.artifacts,
+    ResourceType.code,
 ]
 
 
