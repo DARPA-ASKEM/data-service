@@ -223,7 +223,7 @@ def delete_asset(
             session.delete(asset)
         session.commit()
         return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_200_OK,
             headers={"content-type": "application/json"},
             content={"message": "Asset has been deleted."},
         )
