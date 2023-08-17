@@ -38,6 +38,7 @@ class ProvenanceType(str, Enum):
     Publication = "Publication"
     Simulation = "Simulation"
     Artifact = "Artifact"
+    Code = "Code"
 
 
 class ProvenanceSearchTypes(str, Enum):
