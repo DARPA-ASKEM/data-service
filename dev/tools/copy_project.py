@@ -88,17 +88,20 @@ class CopyProject:
         "SimulateCiemssOperation",
     ]
 
-    def __init__(self, pid: int, source: str, dest: str):
+    def __init__(self, pid: int, source: str, dest: str, copy_configs: bool):
         self.project_id = pid
         self.source_url = source
         self.destination_url = dest
+        self._copy_model_configurations = copy_configs
 
     def copy_project_obj(self):
         """
         Function copies base project to destination.
         """
         self._fetch_project()
+        print(self.source_project)
         new_project = scrub_obj(self.source_project)
+        new_project["assets"] = {}
         post_url = self.post_url.format(host=self.destination_url, resource="projects")
         response = post_to_destination(url=post_url, body=new_project)
         new_project["id"] = response["id"]
@@ -183,6 +186,11 @@ class CopyProject:
         )
         failed_resources = []
         for entity in self.source_project_assets.keys():
+            if self._copy_model_configurations is False and entity in [
+                "model_configurations",
+                "simulations",
+            ]:
+                continue
             if len(new_project["assets"][entity]) == len(
                 self.source_project_assets[entity]
             ):
@@ -275,7 +283,10 @@ class CopyProject:
                     raise CopyProjectFailed(message=error_msg)
             if len(model["outputs"]):
                 for model_output in model["outputs"]:
-                    if model_output["type"] == "modelConfigId":
+                    if (
+                        model_output["type"] == "modelConfigId"
+                        and self._copy_model_configurations
+                    ):
                         for val in model_output["value"]:
                             self._process_model_config(
                                 model_config_id=val, new_model_id=new_model_id
@@ -311,7 +322,7 @@ class CopyProject:
         if (
             self.id_mapper["simulations"]
             and simulation_node in self.id_mapper["simulations"].keys()
-        ):
+        ) or self._copy_model_configurations is False:
             return
         new_simulation_node = simulation_node
         if len(new_simulation_node["inputs"]):
