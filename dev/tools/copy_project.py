@@ -444,7 +444,7 @@ class CopyProject:
 
             requests.put(
                 url=upload_url["url"],
-                files={f"{filename}": download_file.content},
+                data=download_file.content,
                 timeout=120,
             )
 
