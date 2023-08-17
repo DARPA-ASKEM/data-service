@@ -99,7 +99,6 @@ class CopyProject:
         Function copies base project to destination.
         """
         self._fetch_project()
-        print(self.source_project)
         new_project = scrub_obj(self.source_project)
         new_project["assets"] = {}
         post_url = self.post_url.format(host=self.destination_url, resource="projects")
