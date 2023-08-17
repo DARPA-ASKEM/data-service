@@ -10,11 +10,12 @@ from fastapi import status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from tds.db import entry_exists, es_client, request_rdb
 from tds.db.enums import ResourceType
+from tds.lib.projects import clean_up_asset_return
 from tds.modules.project.helpers import (
     ResourceDoesNotExist,
     adjust_project_assets,
@@ -97,18 +98,22 @@ def project_get(project_id: int, rdb: Engine = Depends(request_rdb)) -> JSONResp
     try:
         if entry_exists(rdb.connect(), Project, project_id):
             with Session(rdb) as session:
-                project = session.query(Project).get(project_id)
-                # pylint: disable-next=unused-variable
-                parameters: Query[ProjectAsset] = session.query(ProjectAsset).filter(
-                    ProjectAsset.project_id == project_id
+                project = (
+                    session.query(Project)
+                    .options(joinedload(Project.assets))
+                    .get(project_id)
                 )
+                project_response = {
+                    **project.__dict__,
+                    "assets": clean_up_asset_return(project.assets),
+                }
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             headers={"content-type": "application/json"},
-            content=jsonable_encoder(project),
+            content=jsonable_encoder(project_response),
         )
     except NoResultFound:
         return JSONResponse(
