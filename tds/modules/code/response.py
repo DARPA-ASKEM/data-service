@@ -17,7 +17,7 @@ class CodeResponse(BaseModel):
     name: str
     description: str
     filename: str
-    repo_url: str
+    repo_url: Optional[str]
     language: ProgrammingLanguage
     metadata: Optional[dict]
 
