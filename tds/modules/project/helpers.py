@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from tds.db import entry_exists, es_client, rdb
 from tds.lib.utils import get_singular_index
 from tds.modules.artifact.response import artifact_response
+from tds.modules.code.response import code_response
 from tds.modules.dataset.response import dataset_response
 from tds.modules.model.utils import model_list_fields, model_list_response
 from tds.modules.model_configuration.response import configuration_response
@@ -28,6 +29,7 @@ es_list_response = {
     ResourceType.simulations: {"fields": None, "function": simulation_response},
     ResourceType.workflows: {"fields": None, "function": workflow_response},
     ResourceType.artifacts: {"fields": None, "function": artifact_response},
+    ResourceType.code: {"fields": None, "function": code_response},
 }
 
 es_resources = [
