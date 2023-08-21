@@ -4,6 +4,7 @@ The module hosts the API using a command line interface.
 """
 
 import logging
+import os
 from sys import exit as sys_exit
 
 from click import command, echo, option
@@ -37,4 +38,9 @@ def cli(host: str, port: int, dev: bool, server_config: str) -> None:
 
 
 if __name__ == "__main__":
-    cli()  # pylint: disable=no-value-for-parameter
+    opts = {
+        "host": os.getenv("TDS_HOST", "0.0.0.0"),
+        "port": os.getenv("TDS_LISTEN_PORT"),
+        "dev": os.getenv("DEV_MODE", True),
+    }
+    cli(**opts)  # pylint: disable=no-value-for-parameter
