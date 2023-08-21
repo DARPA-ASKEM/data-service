@@ -15,5 +15,5 @@ COPY graph_relations.json graph_relations.json
 COPY README.md README.md
 COPY migrate migrate
 RUN poetry install --only-root
-EXPOSE 8000
+EXPOSE 8000-8100
 CMD ["poetry", "run", "tds"]
