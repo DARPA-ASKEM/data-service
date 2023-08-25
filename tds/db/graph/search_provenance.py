@@ -329,10 +329,10 @@ class SearchProvenance:
             model_id = payload["root_id"]
 
             query = """
-            MATCH (a:Artifact)<-[r:EXTRACTED_FROM]-(m:Model {id: $model_id})
-            RETURN a
+            MATCH (c:Code)<-[r:EXTRACTED_FROM]-(m:Model {id: $model_id})
+            RETURN c
             """
 
             response = session.run(query, {"model_id": model_id})
-            response_data = [res.data()["a"]["id"] for res in response]
+            response_data = [res.data()["c"]["id"] for res in response]
         return response_data

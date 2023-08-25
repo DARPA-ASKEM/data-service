@@ -49,4 +49,5 @@ provenance_type_to_abbr: Dict[Type[ProvenanceType], str] = {
     ProvenanceType.Project: "Pr",
     ProvenanceType.Concept: "Cn",
     ProvenanceType.Artifact: "Ar",
+    ProvenanceType.Code: "Co",
 }
