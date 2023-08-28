@@ -31,7 +31,7 @@ services:
       context: ./
       dockerfile: docker/Dockerfile
     ports:
-      - "8001:8000"
+      - ${TDS_HOST_PORT:-8001}:${TDS_LISTEN_PORT:-8099}
     env_file:
       - api.env
     environment:
