@@ -15,7 +15,7 @@ logger = logging.Logger("main.py")
 
 @command()
 @option("--host", default="0.0.0.0", type=str, help="Address for the API")
-@option("--port", default=8000, type=int, help="Port to expose API")
+@option("--port", default=8099, type=int, help="Port to expose API")
 @option("--dev", default=True, type=bool, help="Set development flag")
 @option(
     "--server-config",
@@ -40,7 +40,7 @@ def cli(host: str, port: int, dev: bool, server_config: str) -> None:
 if __name__ == "__main__":
     opts = {
         "host": os.getenv("TDS_HOST", "0.0.0.0"),
-        "port": os.getenv("TDS_LISTEN_PORT"),
+        "port": os.getenv("TDS_LISTEN_PORT", 8099),
         "dev": os.getenv("DEV_MODE", True),
     }
     cli(**opts)  # pylint: disable=no-value-for-parameter
