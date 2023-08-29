@@ -6,7 +6,7 @@
 from logging import Logger
 
 from elasticsearch import NotFoundError
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
