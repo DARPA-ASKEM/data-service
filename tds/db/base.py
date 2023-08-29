@@ -52,6 +52,7 @@ class TdsModel(BaseModel):
                 index=self.index,
                 document=self.dict(),
                 id=self.id,
+                refresh="wait_for",
             )
         except ConflictError:
             # ID is already in use, create a new id and resave
