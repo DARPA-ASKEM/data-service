@@ -6,7 +6,7 @@
 from logging import Logger
 
 from elasticsearch import NotFoundError
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
@@ -99,6 +99,7 @@ def code_put(code_id: str, payload: Code) -> JSONResponse:
     Update a code in ElasticSearch
     """
     try:
+        payload.id = code_id
         res = payload.save()
         logger.info("code updated: %s", res["_id"])
         return JSONResponse(
@@ -154,7 +155,7 @@ def code_delete(code_id: str) -> JSONResponse:
 
 
 @code_router.get("/{code_id}/upload-url")
-def dataset_upload_url(code_id: str, filename: str) -> JSONResponse:
+def code_upload_url(code_id: str, filename: str) -> JSONResponse:
     """
     Generates a pre-signed url to allow a user to upload to a secure S3 bucket
     without end-user authentication.
@@ -175,7 +176,7 @@ def dataset_upload_url(code_id: str, filename: str) -> JSONResponse:
 
 
 @code_router.get("/{code_id}/download-url")
-def dataset_download_url(code_id: str, filename: str) -> JSONResponse:
+def code_download_url(code_id: str, filename: str) -> JSONResponse:
     """
     Generates a pre-signed url to allow a user to donwload from a secure S3 bucket
     without the bucket being public or end-user authentication.

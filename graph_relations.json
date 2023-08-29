@@ -33,7 +33,7 @@
     "EXTRACTED_FROM":[
         ["Model","Publication"],
         ["Dataset","Publication"],
-        ["Model", "Artifact"]
+        ["Model", "Code"]
     ],
     "CONTAINS":[
         ["Project","Publication"],

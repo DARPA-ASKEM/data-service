@@ -26,4 +26,11 @@ class Code(TdsModel):
         Code Data Model Swagger Example
         """
 
-        schema_extra = {"example": {}}
+        schema_extra = {
+            "example": {
+                "name": "Example Model Code",
+                "description": "Example of a Python based code object for a model",
+                "filename": "code.py",
+                "language": "python",
+            }
+        }
