@@ -15,18 +15,22 @@ from tds.modules.concept.model import ActiveConcept, OntologyConcept
 from tds.settings import settings
 
 
+class Header(BaseModel):
+    name: str
+    description: str
+    model_schema: Optional[str] = Field(alias="schema")
+    schema_name: Optional[str]
+    model_version: str
+
+
 class Model(TdsModel):
     """
     TDS Model Data Model
     """
 
-    name: str
-    description: str
+    header: Header
     username: Optional[str]
     model: dict
-    model_schema: Optional[str] = Field(alias="schema")
-    schema_name: Optional[str]
-    model_version: str
     semantics: Optional[dict]
     metadata: Optional[dict]
 
