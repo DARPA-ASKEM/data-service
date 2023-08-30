@@ -31,10 +31,11 @@ class Settings(BaseSettings):
     ES_USERNAME: str = ""
     ES_PASSWORD: str = ""
     ES_INDEX_PREFIX: str = "tds_"
-    S3_DATASET_PATH: str = ""
-    S3_RESULTS_PATH: str = ""
-    S3_ARTIFACT_PATH: str = ""
-    S3_CODE_PATH: str = ""
+    S3_DATASET_PATH: str = "datasets"
+    S3_RESULTS_PATH: str = "simulations"
+    S3_ARTIFACT_PATH: str = "artifacts"
+    S3_DOCUMENT_PATH: str = "documents"
+    S3_CODE_PATH: str = "code"
     S3_BUCKET: str = ""
     STORAGE_HOST: Optional[str] = None
     AWS_REGION: Optional[str] = None
