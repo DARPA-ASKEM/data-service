@@ -16,6 +16,10 @@ from tds.settings import settings
 
 
 class Header(BaseModel):
+    """
+    Header object for AMR
+    """
+
     name: str
     description: str
     model_schema: Optional[str] = Field(alias="schema")

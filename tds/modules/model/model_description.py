@@ -10,6 +10,10 @@ from tds.db.base import TdsModel
 
 
 class Header(BaseModel):
+    """
+    Header object for AMR
+    """
+
     name: str
     description: str
     model_schema: Optional[str] = Field(alias="schema")
