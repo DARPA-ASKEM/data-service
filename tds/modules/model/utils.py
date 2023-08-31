@@ -71,8 +71,10 @@ def restructure_model_header(model: dict) -> dict:
         model["header"] = header_data
 
     # Rename 'schema' to 'model_schema' if present
-    if "model_schema" in header_data:
-        header_data["schema"] = header_data.pop("model_schema")
+    if "model_schema" in model["header"]:
+        schema = model["header"].pop("model_schema")
+        if "schema" not in model["header"]:
+            model["header"]["schema"] = schema
 
     return model
 
