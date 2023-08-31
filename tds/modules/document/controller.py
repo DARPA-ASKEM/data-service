@@ -183,7 +183,7 @@ def document_download_url(document_id: str, filename: str) -> JSONResponse:
         entity_id=document_id,
         file_name=filename,
         method="get_object",
-        path=settings.S3_document_PATH,
+        path=settings.S3_DOCUMENT_PATH,
     )
     return JSONResponse(
         content={

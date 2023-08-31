@@ -4,9 +4,21 @@ TDS Model Description
 from datetime import datetime
 from typing import Optional
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from tds.db.base import TdsModel
+
+
+class Header(BaseModel):
+    """
+    Header object for AMR
+    """
+
+    name: str
+    description: str
+    model_schema: Optional[str] = Field(alias="schema")
+    schema_name: Optional[str]
+    model_version: str
 
 
 class ModelDescription(TdsModel):
@@ -14,13 +26,11 @@ class ModelDescription(TdsModel):
     Model description for list response.
     """
 
-    name: str
-    description: str
+    header: Header
     username: Optional[str]
-    model_schema: Optional[str] = Field(alias="schema")
-    schema_name: Optional[str]
-    timestamp = datetime
-    model_version: str
+    timestamp: datetime = (
+        datetime.now()
+    )  # Assuming you meant it to be a default current datetime value
 
     class Config:
         """
@@ -29,10 +39,13 @@ class ModelDescription(TdsModel):
 
         schema_extra = {
             "example": {
-                "name": "Model Name",
-                "description": "Model Description",
-                "model": {},
-                "schema": "Model Schema",
-                "model_version": "1.0",
+                "header": {
+                    "name": "Model Name",
+                    "description": "Model Description",
+                    "schema": "Model Schema",
+                    "model_version": "1.0",
+                },
+                "username": "user123",
+                "timestamp": "2023-08-30T00:00:00",  # Example datetime value in ISO format
             }
         }

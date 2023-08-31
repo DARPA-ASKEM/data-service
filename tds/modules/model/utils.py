@@ -16,6 +16,7 @@ from tds.modules.model.model_description import ModelDescription
 
 model_list_fields = [
     "id",
+    "header",
     "name",
     "model",
     "description",
@@ -42,6 +43,40 @@ def orm_to_params(parameters: List):
     ]
 
 
+def restructure_model_header(model: dict) -> dict:
+    """
+    Restructures the Model data by moving specific keys into the 'header' sub-dictionary.
+    This makes all seeds and prior models comply with https://github.com/DARPA-ASKEM/Model-Representations/issues/56
+    Parameters:
+    - model (dict): The original Model data.
+    Returns:
+    - dict: The restructured Model data.
+    """
+
+    if "header" not in model:
+        # The keys to be moved to the 'header'
+        header_keys = [
+            "name",
+            "description",
+            "model_schema",
+            "schema",
+            "schema_name",
+            "model_version",
+        ]
+
+        # Create the 'header' sub-dictionary
+        header_data = {key: model.pop(key) for key in header_keys if key in model}
+
+        # Add the 'header' sub-dictionary to the original data
+        model["header"] = header_data
+
+    # Rename 'schema' to 'model_schema' if present
+    if "model_schema" in header_data:
+        header_data["schema"] = header_data.pop("model_schema")
+
+    return model
+
+
 def model_response(model_from_es, delete_fields=None) -> dict:
     """
     Function builds model response object from an ElasticSearch model.
@@ -51,9 +86,9 @@ def model_response(model_from_es, delete_fields=None) -> dict:
     # model["state_id"] = es_response["_id"]
     # frameworks = get_frameworks()
     # model["framework"] = frameworks.get(model["model_schema"], model["model_schema"])
-    if "model_schema" in model:
-        model["schema"] = model["model_schema"]
-        del model["model_schema"]
+
+    model = restructure_model_header(model)
+
     if "concepts" in model:
         del model["concepts"]
 
@@ -68,6 +103,7 @@ def model_list_response(model_list_from_es) -> list:
     """
     Function builds model response object from an ElasticSearch model.
     """
+
     model_df = pd.DataFrame(model_list_from_es)
     # framework_map = get_frameworks()
     # We need to get the fields and then merge back to make the id available.
@@ -77,12 +113,9 @@ def model_list_response(model_list_from_es) -> list:
         .join(model_df)
         .reset_index(drop=True)
     )
+
     models["model_version"] = models["model_version"].fillna(0)
-    # we should use the same terminology here as is used in the ASKEM model
-    # representation e.g. instead of `model_schema` that should just be `schema`
-    # models["framework"] = models["model_schema"].map(
-    #   lambda x: framework_map.get(x, x)
-    # )
+
     models.drop(columns=["_index", "_score"], inplace=True)
 
     # Drop _ignored column when it is present.
@@ -90,7 +123,7 @@ def model_list_response(model_list_from_es) -> list:
         models.drop(columns=["_ignored"], inplace=True)
 
     return [
-        jsonable_encoder(ModelDescription(**x))
+        jsonable_encoder(ModelDescription(**restructure_model_header(x)))
         for x in models.to_dict(orient="records")
     ]
 
