@@ -55,28 +55,26 @@ def restructure_model_header(model: dict) -> dict:
     - dict: The restructured Model data.
     """
 
-    if "header" in model:
-        return model
+     if "header" not in model:
+        # The keys to be moved to the 'header'
+        header_keys = [
+            "name",
+            "description",
+            "model_schema",
+            "schema",
+            "schema_name",
+            "model_version",
+        ]
 
-    # The keys to be moved to the 'header'
-    header_keys = [
-        "name",
-        "description",
-        "model_schema",
-        "schema",
-        "schema_name",
-        "model_version",
-    ]
+        # Create the 'header' sub-dictionary
+        header_data = {key: model.pop(key) for key in header_keys if key in model}
 
-    # Create the 'header' sub-dictionary
-    header_data = {key: model.pop(key) for key in header_keys if key in model}
+        # Add the 'header' sub-dictionary to the original data
+        model["header"] = header_data
 
     # Rename 'schema' to 'model_schema' if present
     if "model_schema" in header_data:
         header_data["schema"] = header_data.pop("model_schema")
-
-    # Add the 'header' sub-dictionary to the original data
-    model["header"] = header_data
 
     return model
 
