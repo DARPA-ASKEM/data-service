@@ -47,15 +47,13 @@ def restructure_model_header(model: dict) -> dict:
     """
     Restructures the Model data by moving specific keys into the 'header' sub-dictionary.
     This makes all seeds and prior models comply with https://github.com/DARPA-ASKEM/Model-Representations/issues/56
-
     Parameters:
     - model (dict): The original Model data.
-
     Returns:
     - dict: The restructured Model data.
     """
 
-     if "header" not in model:
+    if "header" not in model:
         # The keys to be moved to the 'header'
         header_keys = [
             "name",
@@ -91,10 +89,6 @@ def model_response(model_from_es, delete_fields=None) -> dict:
 
     model = restructure_model_header(model)
 
-    # Rename 'schema' to 'model_schema' if present
-    if "model_schema" in model["header"]:
-        model["header"]["schema"] = model["header"].pop("model_schema")
-
     if "concepts" in model:
         del model["concepts"]
 
@@ -109,7 +103,7 @@ def model_list_response(model_list_from_es) -> list:
     """
     Function builds model response object from an ElasticSearch model.
     """
-    print(model_list_from_es[0])
+
     model_df = pd.DataFrame(model_list_from_es)
     # framework_map = get_frameworks()
     # We need to get the fields and then merge back to make the id available.
