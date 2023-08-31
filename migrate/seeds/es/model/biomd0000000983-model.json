@@ -1,12 +1,7 @@
 {
   "id": "biomd0000000983-model-id",
-  "name": "BIOMD0000000983",
   "username": "Adam Smith",
   "timestamp": "2023-06-12 23:25:26",
-  "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.5/petrinet/petrinet_schema.json",
-  "schema_name": "petrinet",
-  "description": "BioModels model BIOMD0000000983 processed using MIRA.",
-  "model_version": "1.0",
   "properties": {},
   "model": {
     "states": [
@@ -399,11 +394,11 @@
         },
         {
           "id": "tau_1",
-          "value": 21.0
+          "value": 21
         },
         {
           "id": "tau_3",
-          "value": 76.0
+          "value": 76
         },
         {
           "id": "beta",
@@ -470,5 +465,12 @@
         "mamo:0000028"
       ]
     }
+  },
+  "header": {
+    "name": "BIOMD0000000983",
+    "description": "BioModels model BIOMD0000000983 processed using MIRA.",
+    "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.5/petrinet/petrinet_schema.json",
+    "schema_name": "petrinet",
+    "model_version": "1.0"
   }
 }

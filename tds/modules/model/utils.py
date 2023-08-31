@@ -106,28 +106,7 @@ def model_list_response(model_list_from_es) -> list:
     Function builds model response object from an ElasticSearch model.
     """
 
-    model_df = pd.DataFrame(model_list_from_es)
-    # framework_map = get_frameworks()
-    # We need to get the fields and then merge back to make the id available.
-    models = (
-        pd.concat({i: pd.DataFrame(x) for i, x in model_df.pop("fields").items()})
-        .reset_index(level=1, drop=True)
-        .join(model_df)
-        .reset_index(drop=True)
-    )
-
-    models["model_version"] = models["model_version"].fillna(0)
-
-    models.drop(columns=["_index", "_score"], inplace=True)
-
-    # Drop _ignored column when it is present.
-    if "_ignored" in models.columns:
-        models.drop(columns=["_ignored"], inplace=True)
-
-    return [
-        jsonable_encoder(ModelDescription(**restructure_model_header(x)))
-        for x in models.to_dict(orient="records")
-    ]
+    return [ModelDescription(**(model["_source"])) for model in model_list_from_es]
 
 
 def get_frameworks() -> dict:

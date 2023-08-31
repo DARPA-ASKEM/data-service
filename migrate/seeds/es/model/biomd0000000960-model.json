@@ -1,12 +1,7 @@
 {
   "id": "biomd0000000960-model-id",
-  "name": "BIOMD0000000960",
   "username": "Adam Smith",
   "timestamp": "2023-06-12 23:25:26",
-  "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.5/petrinet/petrinet_schema.json",
-  "schema_name": "petrinet",
-  "description": "BioModels model BIOMD0000000960 processed using MIRA.",
-  "model_version": "1.0",
   "properties": {},
   "model": {
     "states": [
@@ -380,34 +375,34 @@
       "parameters": [
         {
           "id": "ModelValue_0",
-          "value": 1.0
+          "value": 1
         },
         {
           "id": "ModelValue_1"
         },
         {
           "id": "ModelValue_130",
-          "value": 11000000.0
+          "value": 11000000
         },
         {
           "id": "ModelValue_131",
-          "value": 60400000.0
+          "value": 60400000
         },
         {
           "id": "ModelValue_132",
-          "value": 46900000.0
+          "value": 46900000
         },
         {
           "id": "ModelValue_133",
-          "value": 67000000.0
+          "value": 67000000
         },
         {
           "id": "ModelValue_134",
-          "value": 83000000.0
+          "value": 83000000
         },
         {
           "id": "ModelValue_135",
-          "value": 328200000.0
+          "value": 328200000
         },
         {
           "id": "ModelValue_2"
@@ -451,11 +446,11 @@
         },
         {
           "id": "l_a_1_China",
-          "value": 8.0
+          "value": 8
         },
         {
           "id": "l_a_1_France",
-          "value": 8.0
+          "value": 8
         },
         {
           "id": "l_a_1_Germany",
@@ -475,7 +470,7 @@
         },
         {
           "id": "l_1_France",
-          "value": 8.0
+          "value": 8
         },
         {
           "id": "l_1_Germany",
@@ -483,7 +478,7 @@
         },
         {
           "id": "l_1_Italy",
-          "value": 8.0
+          "value": 8
         },
         {
           "id": "l_1_Spain",
@@ -657,5 +652,12 @@
         "mamo:0000028"
       ]
     }
+  },
+  "header": {
+    "name": "BIOMD0000000960",
+    "description": "BioModels model BIOMD0000000960 processed using MIRA.",
+    "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.5/petrinet/petrinet_schema.json",
+    "schema_name": "petrinet",
+    "model_version": "1.0"
   }
 }

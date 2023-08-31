@@ -1,12 +1,7 @@
 {
   "id": "biomd0000000294-model-id",
-  "name": "BIOMD0000000294",
   "username": "Adam Smith",
   "timestamp": "2023-06-12 23:25:26",
-  "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.5/petrinet/petrinet_schema.json",
-  "schema_name": "petrinet",
-  "description": "BioModels model BIOMD0000000294 processed using MIRA.",
-  "model_version": "1.0",
   "properties": {},
   "model": {
     "states": [
@@ -710,11 +705,11 @@
       "parameters": [
         {
           "id": "N",
-          "value": 1.0
+          "value": 1
         },
         {
           "id": "l_e",
-          "value": 50.0,
+          "value": 50,
           "units": {
             "expression": "year",
             "expression_mathml": "<ci>year</ci>"
@@ -722,7 +717,7 @@
         },
         {
           "id": "p",
-          "value": 1.0,
+          "value": 1,
           "units": {
             "expression": "1",
             "expression_mathml": "<cn>1</cn>"
@@ -730,7 +725,7 @@
         },
         {
           "id": "R0",
-          "value": 17.0,
+          "value": 17,
           "units": {
             "expression": "1",
             "expression_mathml": "<cn>1</cn>"
@@ -738,7 +733,7 @@
         },
         {
           "id": "tInf",
-          "value": 21.0,
+          "value": 21,
           "units": {
             "expression": "day",
             "expression_mathml": "<ci>day</ci>"
@@ -778,7 +773,7 @@
         },
         {
           "id": "tImm",
-          "value": 20.0,
+          "value": 20,
           "units": {
             "expression": "year",
             "expression_mathml": "<ci>year</ci>"
@@ -786,7 +781,7 @@
         },
         {
           "id": "tImm_V",
-          "value": 50.0,
+          "value": 50,
           "units": {
             "expression": "year",
             "expression_mathml": "<ci>year</ci>"
@@ -823,5 +818,12 @@
         "mamo:0000046"
       ]
     }
+  },
+  "header": {
+    "name": "BIOMD0000000294",
+    "description": "BioModels model BIOMD0000000294 processed using MIRA.",
+    "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.5/petrinet/petrinet_schema.json",
+    "schema_name": "petrinet",
+    "model_version": "1.0"
   }
 }
