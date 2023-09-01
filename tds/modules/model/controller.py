@@ -44,8 +44,7 @@ def list_models(page_size: int = 100, page: int = 0) -> JSONResponse:
     """
     list_body = {
         "size": page_size,
-        "fields": model_list_fields,
-        "source": False,
+        "source_excludes": ["model", "semantics"],
     }
     if page != 0:
         list_body["from"] = page
@@ -81,8 +80,7 @@ def search_models(
     """
     list_body = {
         "size": page_size,
-        "fields": model_list_fields,
-        "source": False,
+        "source_excludes": ["model", "semantics"],
         "query": payload,
     }
     if page != 0:

@@ -106,10 +106,19 @@ def model_list_response(model_list_from_es) -> list:
     Function builds model response object from an ElasticSearch model.
     """
 
-    return [
-        ModelDescription(**(restructure_model_header(model["_source"])))
-        for model in model_list_from_es
-    ]
+    models = []
+    for model_obj in model_list_from_es:
+        if "_source" in model_obj:
+            model_dict = restructure_model_header(model_obj["_source"])
+        elif "fields" in model_obj:
+            # Reformat fields to what it should look like
+            field_dict = {
+                k: (v[0] if (isinstance(v, list) and len(v) == 1) else v)
+                for k, v in model_obj["fields"].items()
+            }
+            model_dict = restructure_model_header(field_dict)
+        models.append(jsonable_encoder(ModelDescription(**model_dict)))
+    return models
 
 
 def get_frameworks() -> dict:
