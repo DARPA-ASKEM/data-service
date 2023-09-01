@@ -1,12 +1,7 @@
 {
   "id": "sir-model-id",
-  "name": "SIR Model",
   "username": "Adam Smith",
   "timestamp": "2023-06-12 23:25:26",
-  "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.5/petrinet/petrinet_schema.json",
-  "description": "SIR model",
-  "schema_name": "petrinet",
-  "model_version": "0.1",
   "model": {
     "states": [
       {
@@ -123,12 +118,12 @@
             "expression": "1/(person*day)",
             "expression_mathml": "<apply><divide/><cn>1</cn><apply><times/><ci>person</ci><ci>day</ci></apply></apply>"
           },
-          "value": 2.7e-7,
+          "value": 2.7e-07,
           "distribution": {
             "type": "Uniform1",
             "parameters": {
-              "minimum": 2.6e-7,
-              "maximum": 2.8e-7
+              "minimum": 2.6e-07,
+              "maximum": 2.8e-07
             }
           }
         },
@@ -418,7 +413,7 @@
               "id": {
                 "id": "v10"
               },
-              "name": "\u03b1",
+              "name": "α",
               "extraction_source": null,
               "provenance": {
                 "method": "MIT extractor V1.0 - text, dataset, formula annotation (chunwei@mit.edu)",
@@ -477,7 +472,7 @@
               "grounding_text": "Van",
               "grounding_id": "geonames:298117",
               "source": [],
-              "score": 1.0,
+              "score": 1,
               "provenance": {
                 "method": "MIT extractor V1.0 - text, dataset, formula annotation (chunwei@mit.edu)",
                 "timestamp": "2023-06-15T22:59:13.177022"
@@ -487,7 +482,7 @@
               "grounding_text": "Sanaa",
               "grounding_id": "geonames:71137",
               "source": [],
-              "score": 1.0,
+              "score": 1,
               "provenance": {
                 "method": "MIT extractor V1.0 - text, dataset, formula annotation (chunwei@mit.edu)",
                 "timestamp": "2023-06-15T22:59:13.177022"
@@ -648,5 +643,12 @@
         }
       }
     ]
+  },
+  "header": {
+    "name": "SIR Model",
+    "description": "SIR model",
+    "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.5/petrinet/petrinet_schema.json",
+    "schema_name": "petrinet",
+    "model_version": "0.1"
   }
 }

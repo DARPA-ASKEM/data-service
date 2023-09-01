@@ -51,13 +51,15 @@ def save_data_to_es(directory, data):
         if res["result"] != "created":
             print(res)
         else:
-            name = data_dict["name"]
+            name = data_dict.get("name", "???")
             print(f"Created {name}.")
     except ConflictError as error:
         fail_id = data_dict["id"]
         print(
             f"Item with id {fail_id} already exists in {index}. ({error.status_code})"
         )
+    except:
+        print("FAIL", data_dict)
 
 
 def seed_es_data():
