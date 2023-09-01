@@ -106,7 +106,10 @@ def model_list_response(model_list_from_es) -> list:
     Function builds model response object from an ElasticSearch model.
     """
 
-    return [ModelDescription(**(model["_source"])) for model in model_list_from_es]
+    return [
+        ModelDescription(**(restructure_model_header(model["_source"])))
+        for model in model_list_from_es
+    ]
 
 
 def get_frameworks() -> dict:
