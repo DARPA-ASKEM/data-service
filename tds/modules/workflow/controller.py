@@ -130,3 +130,28 @@ def workflow_delete(workflow_id: str) -> Response:
         )
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@workflow_router.get(
+    "/{workflow_node_id}",
+    response_model=Response,
+    **retrieve.fastapi_endpoint_config,
+)
+def workflow_get(workflow_node_id: str) -> JSONResponse | Response:
+    """
+    Retrieve a workflow node from ElasticSearch
+    """
+    try:
+        es = es_client()
+        res = es.get(index=es_index, id=workflow_node_id)
+        logger.info("Workflow node retrieved: %s", workflow_node_id)
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            headers={
+                "content-type": "application/json",
+            },
+            content=jsonable_encoder(res["_source"]),
+        )
+    except NotFoundError:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
