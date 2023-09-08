@@ -157,11 +157,11 @@ def workflow_get(workflow_node_id: str) -> JSONResponse | Response:
             }
         }
         res = es.search(index=es_index, body=query)
-        # Check if any matching nodes were found
+        
         hits = res.get("hits", {}).get("hits", [])
         if not hits:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
-            
+
         else:
             logger.info("Workflow node retrieved: %s", workflow_node_id)
 
