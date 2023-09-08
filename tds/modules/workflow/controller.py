@@ -143,15 +143,34 @@ def workflow_get(workflow_node_id: str) -> JSONResponse | Response:
     """
     try:
         es = es_client()
-        res = es.get(index=es_index, id=workflow_node_id)
-        logger.info("Workflow node retrieved: %s", workflow_node_id)
+        query = {
+            "query": {
+                "nested": {
+                    "path": "nodes",
+                    "query": {
+                        "term": {
+                            "nodes.id": workflow_node_id
+                        }
+                    },
+                    "inner_hits": {}
+                }
+            }
+        }
+        res = es.search(index=es_index, body=query)
+        # Check if any matching nodes were found
+        hits = res.get("hits", {}).get("hits", [])
+        if not hits:
+            return Response(status_code=status.HTTP_404_NOT_FOUND)
+            
+        else:
+            logger.info("Workflow node retrieved: %s", workflow_node_id)
 
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            headers={
-                "content-type": "application/json",
-            },
-            content=jsonable_encoder(res["_source"]),
-        )
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                headers={
+                    "content-type": "application/json",
+                },
+                content=jsonable_encoder(res["_source"]),
+            )
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
