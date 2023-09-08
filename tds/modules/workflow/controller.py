@@ -157,7 +157,7 @@ def workflow_get(workflow_node_id: str) -> JSONResponse | Response:
             }
         }
         res = es.search(index=es_index, body=query)
-        
+
         hits = res.get("hits", {}).get("hits", [])
         if not hits:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
