@@ -1,8 +1,9 @@
 FROM python:3.10
+ENV PYTHONPATH=/tds_package
+COPY migrate/requirements.txt /migrate/requirements.txt
+RUN pip install -r /migrate/requirements.txt
 COPY migrate /migrate
 COPY tds /tds_package/tds
 RUN find tds_package/tds/modules \! -name "model.py" -mindepth 2 -maxdepth 2 -print | xargs rm -rf
-ENV PYTHONPATH=/tds_package
-RUN pip install -r /migrate/requirements.txt
 COPY migrate/run_migrations.sh /run_migrations.sh
 RUN chmod +x /run_migrations.sh
