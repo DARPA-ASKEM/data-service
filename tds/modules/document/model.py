@@ -3,10 +3,21 @@ TDS Document Data Model Definition.
 """
 from typing import Any, List, Optional
 
-from pydantic import AnyUrl, Field
+from pydantic import AnyUrl, BaseModel, Field
 
 from tds.db.base import TdsModel
 from tds.modules.dataset.model import Grounding
+
+
+class Asset(BaseModel):
+    """
+    Asset class for storing document assets in TDS.
+    """
+
+    file_name: str = Field(description="The file name of the asset")
+    metadata: Optional[dict[str, Any]] = Field(
+        description="(Optional) Unformatted metadata field that should contain the asset type of the object under a 'type' key. Supported types are currently: 'equations', 'images', and 'figures'"
+    )
 
 
 class Document(TdsModel):
@@ -19,33 +30,28 @@ class Document(TdsModel):
     username: str = Field(
         description="The username of the user that created the document."
     )
-    name: str = Field(
-        description="Display/human name for the document",
-    )
+    name: str = Field(description="Display/human name for the document")
     description: Optional[str] = Field(
-        description="(Optional) Texual description of the document",
+        description="(Optional) Texual description of the document"
     )
-    file_names: List[str] = Field(
-        description="List of file names used for storage",
-    )
+    file_names: List[str] = Field(description="List of file names used for storage")
     document_url: Optional[AnyUrl] = Field(
-        description="(Optional) Url from which the document can be downloaded/fetched (e.g. xDD URI)",
+        description="(Optional) Url from which the document can be downloaded/fetched (e.g. xDD URI)"
     )
     metadata: Optional[dict[str, Any]] = Field(
-        description="(Optional) Unformatted metadata about the dataset",
+        description="(Optional) Unformatted metadata about the dataset"
     )
-    source: Optional[str] = Field(
-        description="(Optional) Source of document",
-    )
+    source: Optional[str] = Field(description="(Optional) Source of document")
     text: Optional[str] = Field(
-        description="(Optional) Plain text extracted from the document",
+        description="(Optional) Plain text extracted from the document"
     )
     grounding: Optional[Grounding] = Field(
-        description=(
-            "(Optional) Grounding of ontological concepts related to the document"
-        ),
+        description="(Optional) Grounding of ontological concepts related to the document"
     )
     concepts: Optional[List] = []
+    assets: Optional[List[Asset]] = Field(
+        description="(Optional) List of assets extracted from the document by Cosmos, containing file names and metadata about each asset"
+    )
 
     class Config:
         """
