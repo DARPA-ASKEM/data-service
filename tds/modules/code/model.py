@@ -6,7 +6,6 @@ from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 
 from tds.db.base import TdsModel
-from tds.db.enums import ProgrammingLanguage
 
 
 class CodeFile(BaseModel):
@@ -14,9 +13,7 @@ class CodeFile(BaseModel):
     CodeFile Data Model for individual file entries in the main Code model.
     """
 
-    language: Optional[ProgrammingLanguage] = Field(
-        description="Programming language of the file."
-    )
+    language: Optional[str] = Field(description="Programming language of the file.")
     dynamics: Optional[str] = Field(
         None,
         description="String indicating the line numbers in the file that contain the dynamics, e.g., 'L205-L213'.",
