@@ -15,6 +15,7 @@ class Asset(BaseModel):
     """
 
     file_name: str = Field(description="The file name of the asset")
+    asset_type: str = Field(description="The type of the asset")
     metadata: Optional[dict[str, Any]] = Field(
         description=(
             "(Optional) Unformatted metadata field that should contain the "
