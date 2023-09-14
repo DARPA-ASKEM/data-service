@@ -14,7 +14,6 @@ class CodeFile(BaseModel):
     CodeFile Data Model for individual file entries in the main Code model.
     """
 
-    path: str = Field(description="Path to the file within the repository.")
     language: Optional[ProgrammingLanguage] = Field(
         description="Programming language of the file."
     )
