@@ -82,4 +82,4 @@ good-names=["id", "type", "es"]
 allowed-redefined-builtins=["id", "type"]
 
 [tool.pylint.format]
-max-line-length=88
+max-line-length=158

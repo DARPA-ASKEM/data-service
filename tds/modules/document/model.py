@@ -16,7 +16,11 @@ class Asset(BaseModel):
 
     file_name: str = Field(description="The file name of the asset")
     metadata: Optional[dict[str, Any]] = Field(
-        description="(Optional) Unformatted metadata field that should contain the asset type of the object under a 'type' key. Supported types are currently: 'equations', 'images', and 'figures'"
+        description=(
+            "(Optional) Unformatted metadata field that should contain the "
+            "asset type of the object under a 'type' key. Supported types are currently:"
+            "'equations', 'images', and 'figures'"
+        )
     )
 
 
@@ -69,7 +73,13 @@ class Document(TdsModel):
                 "metadata": {},
                 "document_url": "https://github.com/DARPA-ASKEM/knowledge-middleware/blob/main/tests/scenarios/sidarthe/paper.pdf",
                 "source": "Science Advances",
-                "text": "INTRODUCTION\nThe pandemic caused by severe acute respiratory syndrome\ncoronavirus-2 is challenging humanity in an unprecedented way\n(1), with the disease, which in a few months has spread around the\nworld, affecting large parts of the population (2, 3) and often requir-\ning hospitalization or even intensive care (4, 5). Mitigating the impact\nof coronavirus disease 2019 (COVID-19) urges synergistic efforts to\nunderstand, predict, and control the many, often elusive, facets of\n...",
+                "text": (
+                    "INTRODUCTION\nThe pandemic caused by severe acute respiratory syndrome\ncoronavirus-2 is challenging humanity in "
+                    "an unprecedented way\n(1), with the disease, which in a few months has spread around the\nworld, affecting large "
+                    "parts of the population (2, 3) and often requir-\ning hospitalization or even intensive care (4, 5). Mitigating "
+                    "the impact\nof coronavirus disease 2019 (COVID-19) urges synergistic efforts to\nunderstand, predict, and control "
+                    "the many, often elusive, facets of\n..."
+                ),
                 "grounding": {"identifiers": {}, "context": {}},
             }
         }
