@@ -8,15 +8,26 @@ from pydantic import BaseModel, Field
 from tds.db.base import TdsModel
 
 
+class Dynamics(BaseModel):
+    """
+    Dynamics Data Model for capturing dynamics within a CodeFile.
+    """
+
+    name: Optional[str] = Field(description="Name of the dynamics section.")
+    description: Optional[str] = Field(description="Description of the dynamics.")
+    block: str = Field(
+        description="String indicating the line numbers in the file that contain the dynamics, e.g., 'L205-L213'."
+    )
+
+
 class CodeFile(BaseModel):
     """
     CodeFile Data Model for individual file entries in the main Code model.
     """
 
     language: Optional[str] = Field(description="Programming language of the file.")
-    dynamics: Optional[str] = Field(
-        None,
-        description="String indicating the line numbers in the file that contain the dynamics, e.g., 'L205-L213'.",
+    dynamics: Optional[Dynamics] = Field(
+        description="Dynamics details associated with the file."
     )
 
 
@@ -52,13 +63,15 @@ class Code(TdsModel):
                 "description": "Example of a Python-based code object for a model",
                 "files": {
                     "path/to/test.py": {
-                        "path": "path/to/test.py",
                         "language": "python",
                     },
                     "path/to/fun.py": {
-                        "path": "path/to/fun.py",
                         "language": "python",
-                        "dynamics": "L205-L213",
+                        "dynamics": {
+                            "name": "Main Dynamics",
+                            "description": "Dynamics section for the ODE.",
+                            "block": "L205-L213",
+                        },
                     },
                 },
                 "repo_url": "https://github.com/user/repo.git",
