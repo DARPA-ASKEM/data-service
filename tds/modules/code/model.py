@@ -31,7 +31,7 @@ class Code(TdsModel):
 
     name: str = Field(description="Name of the code/repo.")
     description: str = Field(description="Description for code/repo.")
-    files: Dict[str, CodeFile] = Field(
+    files: Optional[Dict[str, CodeFile]] = Field(
         description="Dictionary of code files with file paths as keys."
     )
     repo_url: Optional[str] = Field(
