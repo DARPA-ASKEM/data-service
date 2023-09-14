@@ -1,7 +1,7 @@
 """
 TDS Code Response object.
 """
-from typing import Optional
+from typing import Dict, Optional
 
 from pydantic import BaseModel
 
@@ -16,9 +16,10 @@ class CodeResponse(BaseModel):
     id: str
     name: str
     description: str
-    filename: str
+    files: Optional[Dict]
     repo_url: Optional[str]
-    language: ProgrammingLanguage
+    commit: Optional[str]
+    branch: Optional[str]
     metadata: Optional[dict]
 
 
