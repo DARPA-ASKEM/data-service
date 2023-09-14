@@ -1,7 +1,7 @@
 """
 TDS Code Data Model Definition.
 """
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +15,7 @@ class CodeFile(BaseModel):
     """
 
     path: str = Field(description="Path to the file within the repository.")
-    language: ProgrammingLanguage = Field(
+    language: Optional[ProgrammingLanguage] = Field(
         description="Programming language of the file."
     )
     dynamics: Optional[str] = Field(
@@ -36,9 +36,6 @@ class Code(TdsModel):
     )
     repo_url: Optional[str] = Field(
         None, description="URL to the repository where the code resides."
-    )
-    tree_structure: dict = Field(
-        description="JSON representation of the tree structure of the code."
     )
     commit: Optional[str] = Field(None, description="Commit hash or ID for the repo.")
     branch: Optional[str] = Field(None, description="Branch name of the repo.")
@@ -68,7 +65,6 @@ class Code(TdsModel):
                         "dynamics": "L205-L213",
                     },
                 },
-                "tree_structure": {},
                 "repo_url": "https://github.com/user/repo.git",
                 "commit": "abcd1234",
                 "branch": "main",
