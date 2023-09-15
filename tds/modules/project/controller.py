@@ -37,8 +37,8 @@ es = es_client()
     "", response_model=list[ProjectResponse], **retrieve.fastapi_endpoint_config
 )
 def list_projects(
-    include_inactive: bool = False, 
-    search_query: str = None, 
+    include_inactive: bool = False,
+    search_query: str = None,
     rdb: Engine = Depends(request_rdb)
 ) -> JSONResponse:
     """
