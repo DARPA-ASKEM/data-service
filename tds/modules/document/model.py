@@ -65,7 +65,6 @@ class Document(TdsModel):
 
         schema_extra = {
             "example": {
-                "id": "sidarthe",
                 "name": "SIDARTHE - Lack of practical identifiability may hamper reliable predictions in COVID-19 epidemic models",
                 "username": "Adam Smith",
                 "description": "string",
@@ -82,5 +81,24 @@ class Document(TdsModel):
                     "the many, often elusive, facets of\n..."
                 ),
                 "grounding": {"identifiers": {}, "context": {}},
+                "assets": [
+                    {
+                        "file_name": "figure1.png",
+                        "asset_type": "image",
+                        "metadata": {
+                            "type": "figures",
+                            "description": "Figure showing the spread rate",
+                            "dimensions": "1200x800",
+                        },
+                    },
+                    {
+                        "file_name": "equation1.tex",
+                        "asset_type": "equation",
+                        "metadata": {
+                            "type": "equations",
+                            "content": "\\frac{dI}{dt} = \\beta SI",
+                        },
+                    },
+                ],
             }
         }
