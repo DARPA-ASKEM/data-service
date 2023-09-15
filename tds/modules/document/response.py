@@ -7,6 +7,7 @@ from typing import Any, List, Optional
 from pydantic import AnyUrl, BaseModel
 
 from tds.modules.dataset.model import Grounding
+from tds.modules.document.model import Asset
 
 
 class DocumentResponse(BaseModel):
@@ -25,6 +26,7 @@ class DocumentResponse(BaseModel):
     source: Optional[str]
     text: Optional[str]
     grounding: Optional[Grounding]
+    assets: Optional[List[Asset]]
 
 
 def document_response(document_list):

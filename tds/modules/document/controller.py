@@ -176,7 +176,7 @@ def document_upload_url(document_id: str, filename: str) -> JSONResponse:
 @document_router.get("/{document_id}/download-url")
 def document_download_url(document_id: str, filename: str) -> JSONResponse:
     """
-    Generates a pre-signed url to allow a user to donwload from a secure S3 bucket
+    Generates a pre-signed url to allow a user to download from a secure S3 bucket
     without the bucket being public or end-user authentication.
     """
     get_url = get_presigned_url(
@@ -191,3 +191,43 @@ def document_download_url(document_id: str, filename: str) -> JSONResponse:
             "method": "GET",
         }
     )
+
+
+# May need to enable discrete asset endpoints in the future, uncomment below:
+# @document_router.get("/{document_id}/upload-url/asset")
+# def asset_upload_url(document_id: str, filename: str) -> JSONResponse:
+#     """
+#     Generates a pre-signed url to allow a user to upload to a secure S3 bucket
+#     without end-user authentication.
+#     """
+#     put_url = get_presigned_url(
+#         entity_id=document_id,
+#         file_name=filename,
+#         method="put_object",
+#         path=settings.S3_ASSET_PATH,
+#     )
+#     return JSONResponse(
+#         content={
+#             "url": put_url,
+#             "method": "PUT",
+#         }
+#     )
+
+# @document_router.get("/{document_id}/download-url/asset")
+# def asset_download_url(document_id: str, filename: str) -> JSONResponse:
+#     """
+#     Generates a pre-signed url to allow a user to download from a secure S3 bucket
+#     without the bucket being public or end-user authentication.
+#     """
+#     get_url = get_presigned_url(
+#         entity_id=document_id,
+#         file_name=filename,
+#         method="get_object",
+#         path=settings.S3_ASSET_PATH,
+#     )
+#     return JSONResponse(
+#         content={
+#             "url": get_url,
+#             "method": "GET",
+#         }
+#     )

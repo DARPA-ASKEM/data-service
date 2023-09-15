@@ -14,11 +14,7 @@ from fastapi.responses import JSONResponse
 from tds.db import es_client
 from tds.modules.model.model import Model
 from tds.modules.model.model_description import ModelDescription
-from tds.modules.model.utils import (
-    model_list_fields,
-    model_list_response,
-    model_response,
-)
+from tds.modules.model.utils import model_list_response, model_response
 from tds.modules.model_configuration.model import ModelConfiguration
 from tds.modules.model_configuration.response import (
     ModelConfigurationResponse,

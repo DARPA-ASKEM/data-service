@@ -6,7 +6,6 @@ response form.
 """
 from typing import List
 
-import pandas as pd
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
