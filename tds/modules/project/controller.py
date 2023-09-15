@@ -37,16 +37,20 @@ es = es_client()
     "", response_model=list[ProjectResponse], **retrieve.fastapi_endpoint_config
 )
 def list_projects(
-    include_inactive: bool = False, rdb: Engine = Depends(request_rdb)
+    include_inactive: bool = False, search_query: str = None, rdb: Engine = Depends(request_rdb)
 ) -> JSONResponse:
     """
     Retrieve the list of projects.
     """
     with Session(rdb) as session:
-        if include_inactive is True:
-            projects = session.query(Project).all()
-        else:
-            projects = session.query(Project).filter(Project.active).all()
+        query = session.query(Project)
+
+        if include_inactive is False:
+            query = query.filter(Project.active)
+        if search_query:
+            query = query.filter(Project.name.ilike(f"%{search_query}%"))
+
+        projects = query.all()
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
