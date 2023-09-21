@@ -43,3 +43,17 @@ def list_by_id(connection: Connection, orm_type: Any, page_size: int, page: int 
             .offset(page * page_size)
             .all()
         )
+
+
+def ensure_models_are_loaded():
+    from importlib import import_module, metadata
+    from pkgutil import iter_modules
+
+    # Find and import all models in to scope so that the MRO tree for `Base` is properly
+    # populated with all module models.
+
+    modules = import_module("tds.modules")
+    for mod in iter_modules(modules.__path__):
+        module = import_module(f"tds.modules.{mod.name}")
+        if hasattr(module, "model"):
+            import_module(f"tds.modules.{mod.name}.model")

@@ -90,6 +90,6 @@ class ProjectAssetPayload(BaseModel):
 
     id: Optional[int] = None
     project_id: Optional[int] = None
-    resource_id: Optional[int] = None
+    resource_id: Optional[str] = None
     resource_type: ResourceType
     external_ref: Optional[str]

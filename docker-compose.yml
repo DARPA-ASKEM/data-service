@@ -49,7 +49,7 @@ services:
         condition: service_started
     volumes:
       - $PWD/tds:/api/tds
-      - $PWD/migrate:/api/migrate
+      - $PWD/migrations:/api/migrations
   graphdb:
     build:
       context: ./
@@ -65,8 +65,8 @@ services:
     depends_on:
       rdb:
         condition: service_healthy
-      migrations:
-        condition: service_completed_successfully
+#      migrations:
+#        condition: service_completed_successfully
     networks:
       - data-api
   minio:
@@ -118,16 +118,16 @@ services:
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
     mem_limit: ${MEM_LIMIT}
     networks:
-      - data-api
+      - data-api 
       - data-annotation-stack
   migrations:
     container_name: data-service-migrations
     image: data-service
-    entrypoint: /api/migrate/run_migrations.sh
+    command: ['/api/migrations/run_migrations.sh']
     env_file:
       - api.env
-#    volumes:
-#      - $PWD/migrate:/migrate
+    volumes:
+      - $PWD:/api
     depends_on:
       rdb:
         condition: service_healthy

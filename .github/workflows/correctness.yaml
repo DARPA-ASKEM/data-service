@@ -22,8 +22,6 @@ jobs:
       - name: Create environment
         run: poetry install
       - name: Pylint source
-        run: poetry run pylint ./tds
-      - name: Pylint alembic
-        run: poetry run pylint ./migrate
-      - name: Pytest
+        run: poetry run pylint ./tds ./migrations
+      - name: pytest
         run: poetry run pytest

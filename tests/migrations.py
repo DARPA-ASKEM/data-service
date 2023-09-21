@@ -32,7 +32,7 @@ def pmr_postgres_config():
 @fixture
 def alembic_config():
     """Override this fixture to configure the exact alembic context setup required."""
-    return {"file": "migrate/alembic.ini"}
+    return {"file": "migrations/alembic.ini"}
 
 
 alembic_engine = create_postgres_fixture()

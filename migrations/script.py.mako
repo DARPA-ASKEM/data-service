@@ -9,6 +9,8 @@ Create Date: ${create_date}
 from alembic import op
 import sqlalchemy as sa
 ${imports if imports else ""}
+# Elasticsearch operators such as es.create_index, es.remove_index, es.update_index_schema, es.bulk_load_index_from_jsonl, etc
+from migrations import es
 
 # revision identifiers, used by Alembic.
 revision = ${repr(up_revision)}
