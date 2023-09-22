@@ -3,11 +3,22 @@ Elasticsearch functions and helpers useful for migrations
 """
 
 from tds.db.elasticsearch import es_client
+from tds.settings import settings
 
 es = es_client()
 
 
-def create_index(index_name, schema=None, **extra_options):
+def normalize_index(index_name: str):
+    if (
+        index_name.startswith(settings.ES_INDEX_PREFIX)
+        and index_name != settings.ES_INDEX_PREFIX
+    ):
+        return index_name
+    else:
+        return f"{settings.ES_INDEX_PREFIX}{index_name}"
+
+
+def create_index(index_name: str, schema=None, **extra_options):
     try:
         result = es.indices.create(index=index_name, mappings=schema, **extra_options)
     except:
@@ -15,11 +26,11 @@ def create_index(index_name, schema=None, **extra_options):
         raise
 
 
-def retrieve_index_schema(index_name):
+def retrieve_index_schema(index_name: str):
     return es.indices.get_mapping(index=index_name)
 
 
-def update_index_schema(index_name, new_schema, old_schema=None):
+def update_index_schema(index_name: str, new_schema, old_schema=None):
     current_schema = retrieve_index_schema(index_name)
     if old_schema is not None:
         if current_schema != old_schema:
@@ -35,16 +46,16 @@ def update_index_schema(index_name, new_schema, old_schema=None):
     remove_index(temp_index)
 
 
-def remove_index(index_name):
+def remove_index(index_name: str):
     es.indices.delete(index=index_name)
 
 
-def truncate_index(index_name):
+def truncate_index(index_name: str):
     schema = retrieve_index_schema(index_name)
     settings = es.indices.get_settings(index=index_name)
     remove_index(index_name)
     es.indices.create(index=index_name, mappings=schema, settings=settings)
 
 
-def bulk_load_index_from_jsonl(index_name, jsonl_file_path):
-    pass
+def add_seed_document(index_name: str, document: dict):
+    es.create(index=index_name, document=document, id=document.get("id", None))
