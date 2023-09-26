@@ -15,8 +15,8 @@ class Dynamics(BaseModel):
 
     name: Optional[str] = Field(description="Name of the dynamics section.")
     description: Optional[str] = Field(description="Description of the dynamics.")
-    block: str = Field(
-        description="String indicating the line numbers in the file that contain the dynamics, e.g., 'L205-L213'."
+    block: List[str] = Field(
+        description="A list containing strings indicating the line numbers in the file that contain the dynamics, e.g., ['L205-L213', 'L225-L230']."
     )
 
 
