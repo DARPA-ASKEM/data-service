@@ -1,7 +1,7 @@
 """Prepopulate data from seed files
 
-Revision ID: 030bffd9ef5a
-Revises: b3bdf1b266ff
+Revision ID: f905fe63226c
+Revises: f905fe63226c
 Create Date: 2023-09-21 17:03:41.966060
 
 """
@@ -25,8 +25,8 @@ from tds.settings import settings
 
 
 # revision identifiers, used by Alembic.
-revision = "030bffd9ef5a"
-down_revision = "b3bdf1b266ff"
+revision = "f905fe63226c"
+down_revision = "bf6efc7e4e34"
 branch_labels = None
 depends_on = None
 
@@ -35,6 +35,11 @@ file_dir = os.path.abspath("migrations/seeds/files")
 
 
 def upgrade() -> None:
+    # Do not do any work if seeding disabled
+    if not settings.SEED_DATA:
+        print("Skipping data seeding based on setting of SEED_DATA")
+        return
+
     target_metadata = Base.metadata
     # Add Elasticsearch seed documents
     for index, file_path in es_seeds():
@@ -60,6 +65,11 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # Do not do any work if seeding disabled
+    if not settings.SEED_DATA:
+        print("Skipping removal of seeded data based on setting of SEED_DATA")
+        return
+
     # Remove installed elasticsearch seed documents
     for index, file_path in es_seeds():
         data = json.load(open(file_path))

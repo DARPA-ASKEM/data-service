@@ -126,6 +126,8 @@ services:
     command: ['/api/migrations/run_migrations.sh']
     env_file:
       - api.env
+    environment:
+      - SEED_DATA=true
     volumes:
       - $PWD:/api
     depends_on:

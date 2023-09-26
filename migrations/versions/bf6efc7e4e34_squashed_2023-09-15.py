@@ -1,6 +1,6 @@
 """squash2
 
-Revision ID: 9cdb54699108
+Revision ID: bf6efc7e4e34
 Revises:
 Create Date: 2023-09-15 15:41:35.379063
 
@@ -14,7 +14,7 @@ from alembic import op
 from migrations import es
 
 # revision identifiers, used by Alembic.
-revision = "f905fe63226c"
+revision = "bf6efc7e4e34"
 down_revision = None
 branch_labels = None
 depends_on = None
