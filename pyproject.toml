@@ -69,7 +69,7 @@ filterwarnings = ["ignore::DeprecationWarning"]
 [tool.pylint.master]
 # Since the data store is part of an R&D project, it makes sense to move fast
 # and leave TODOs for later.
-disable=["fixme", "too-few-public-methods", "broad-exception-raised"]
+disable=["fixme", "too-few-public-methods", "broad-exception-raised", "import-outside-toplevel", "R"]
 # Pylint should not run on the the generated files
 #ignore=["autogen"]
 extension-pkg-whitelist=["pydantic"]

@@ -9,8 +9,6 @@ The environment file provides the necessary context for the migrations
 
 Source: 'https://alembic.sqlalchemy.org/en/latest/tutorial.html'
 """
-import os
-import re
 from logging.config import fileConfig
 
 # pylint: disable=no-member

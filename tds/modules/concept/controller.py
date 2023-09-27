@@ -103,6 +103,8 @@ def search_concept_using_facets(
     """
     Search along type and curie facets
     """
+    from tds.modules.dataset.model import Dataset
+
     with Session(rdb) as session:
         base_query = session.query(OntologyConcept).filter(
             OntologyConcept.type.in_(types)

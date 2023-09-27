@@ -46,7 +46,11 @@ def list_by_id(connection: Connection, orm_type: Any, page_size: int, page: int 
 
 
 def ensure_models_are_loaded():
-    from importlib import import_module, metadata
+    """
+    Ensures that all modules are fully loaded so that the the Pydantic registry is full.
+    This is required for running migrations.
+    """
+    from importlib import import_module
     from pkgutil import iter_modules
 
     # Find and import all models in to scope so that the MRO tree for `Base` is properly

@@ -10,7 +10,7 @@ import sqlalchemy as sa
 # pylint: disable=no-member, invalid-name
 from alembic import op
 
-# Elasticsearch operators such as es.create_index, es.remove_index, es.update_index_schema, es.bulk_load_index_from_jsonl, etc
+# Elasticsearch operators such as es.create_index, es.remove_index, es.update_index_mapping, es.bulk_load_index_from_jsonl, etc
 from migrations import es
 
 # revision identifiers, used by Alembic.
@@ -319,7 +319,7 @@ def upgrade() -> None:
     # ### end Alembic commands ###
 
     for index_name, index_dict in es_indexes.items():
-        es.create_index(index_name=es.normalize_index(index_name), schema=index_dict)
+        es.create_index(index_name=es.normalize_index(index_name), mapping=index_dict)
 
 
 def downgrade() -> None:

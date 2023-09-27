@@ -1,3 +1,6 @@
+"""
+Storage utilities for use in migrations
+"""
 import boto3
 import requests
 
@@ -5,6 +8,9 @@ from tds.settings import settings
 
 
 def create_s3_client():
+    """
+    Generates a boto3 s3 client instance based on the current settings.
+    """
     if settings.STORAGE_HOST:
         s3_client = boto3.client(
             "s3",
@@ -21,7 +27,11 @@ def create_s3_client():
 
 
 def download_file(url: str, file_path: dict):
-    file_dl = requests.get(url, allow_redirects=True, stream=True)
+    """
+    Downloads a file, streaming 8 mb at a time to keep memory usage low.
+    Allows downloading very large files without running out of memory at a nominal performance cost.
+    """
+    file_dl = requests.get(url, allow_redirects=True, stream=True, timeout=120)
     with open(file_path, "wb") as downloaded_file:
         while file_dl.raw.length_remaining > 0:
             downloaded_file.write(file_dl.raw.read(8_388_608))  # Download 8mb at a time

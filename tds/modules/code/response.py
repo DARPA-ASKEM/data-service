@@ -5,8 +5,6 @@ from typing import Dict, Optional
 
 from pydantic import BaseModel
 
-from tds.db.enums import ProgrammingLanguage
-
 
 class CodeResponse(BaseModel):
     """

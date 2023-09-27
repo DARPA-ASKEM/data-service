@@ -12,7 +12,7 @@ import sqlalchemy as sa
 # pylint: disable=no-member, invalid-name
 from alembic import op
 
-# Elasticsearch operators such as es.create_index, es.remove_index, es.update_index_schema, es.bulk_load_index_from_jsonl, etc
+# Elasticsearch operators such as es.create_index, es.remove_index, es.update_index_mapping, es.bulk_load_index_from_jsonl, etc
 from migrations import es
 
 # revision identifiers, used by Alembic.
@@ -23,18 +23,18 @@ depends_on = None
 
 
 def upgrade() -> None:
-    es.update_index_schema(
-        index_name=es.normalize_index("dataset"), new_schema=new_schema
+    es.update_index_mapping(
+        index_name=es.normalize_index("dataset"), new_mapping=new_mapping
     )
 
 
 def downgrade() -> None:
-    es.update_index_schema(
-        index_name=es.normalize_index("dataset"), new_schema=orig_schema
+    es.update_index_mapping(
+        index_name=es.normalize_index("dataset"), new_mapping=orig_mapping
     )
 
 
-orig_schema = json.loads(
+orig_mapping = json.loads(
     """{
     "properties": {
       "timestamp": {
@@ -46,7 +46,7 @@ orig_schema = json.loads(
 """
 )
 
-new_schema = json.loads(
+new_mapping = json.loads(
     """{
     "properties": {
       "timestamp": {
