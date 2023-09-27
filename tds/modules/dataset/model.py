@@ -109,51 +109,55 @@ class Dataset(TdsModel):
                         "name": "Date Administered",
                         "data_type": "date",
                         "format_str": "MM/dd/yy",
-                        "annotations": {},
-                        "metadata": {},
-                        "grounding": {},
+                        "annotations": [],
                     },
                     {
                         "name": "Country",
                         "data_type": "string",
-                        "annotations": {},
+                        "annotations": [],
                         "metadata": {},
-                        "grounding": {},
+                        "grounding": {
+                            "identifiers": {"onto:123": "epi_concept_here"},
+                        },
                     },
                     {
                         "name": "AgeGroupVacc",
                         "data_type": "string",
-                        "annotations": {},
+                        "annotations": [],
                         "metadata": {},
-                        "grounding": {},
+                        "grounding": {
+                            "identifiers": {"onto:123": "epi_concept_here"},
+                        },
                     },
                     {
                         "name": "7-day_avg_group_cases_per_100k",
                         "data_type": "float",
-                        "annotations": {},
+                        "annotations": [],
                         "metadata": {},
-                        "grounding": {},
                     },
                     {
                         "name": "Administered_Dose1_pct_agegroup",
                         "data_type": "float",
-                        "annotations": {},
+                        "annotations": [],
                         "metadata": {},
-                        "grounding": {},
                     },
                     {
                         "name": "Series_Complete_Pop_pct_agegroup",
                         "data_type": "float",
-                        "annotations": {},
+                        "annotations": [],
                         "metadata": {},
-                        "grounding": {},
                     },
                 ],
                 "metadata": {},
                 # pylint: disable-next=line-too-long
                 "source": "https://data.cdc.gov/Vaccinations/Archive-COVID-19-Vaccination-and-Case-Trends-by-Ag/gxj9-t96f/data",
-                "grounding": {
-                    "additionalProp1": {"identifiers": {}, "context": {}},
+                "groundings": {
+                    "identifiers": {
+                        "oboinowl:date": "date",
+                        "dc:date": "Date",
+                        "opmi:0000488": "visit end date",
+                        "opmi:0000510": "procedure end date",
+                    }
                 },
             }
         }
