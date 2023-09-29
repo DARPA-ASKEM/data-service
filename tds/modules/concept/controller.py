@@ -20,12 +20,6 @@ from tds.modules.concept.model import (
     OntologyConcept,
     OntologyConceptPayload,
 )
-from tds.modules.dataset.model import Dataset, Feature, Qualifier
-from tds.modules.external.model import Publication
-from tds.modules.model.model import Model
-from tds.modules.model_configuration.model import ModelConfiguration
-from tds.modules.project.model import Project
-from tds.modules.simulation.model import Simulation
 
 logger = Logger(__file__)
 concept_router = APIRouter()
@@ -79,6 +73,13 @@ def get_taggable_orm(taggable_type: TaggableType):
     """
     Maps resource type to ORM
     """
+    from tds.modules.dataset.model import Dataset, Feature, Qualifier
+    from tds.modules.external.model import Publication
+    from tds.modules.model.model import Model
+    from tds.modules.model_configuration.model import ModelConfiguration
+    from tds.modules.project.model import Project
+    from tds.modules.simulation.model import Simulation
+
     enum_to_orm = {
         TaggableType.features: Feature,
         TaggableType.qualifiers: Qualifier,
@@ -102,6 +103,8 @@ def search_concept_using_facets(
     """
     Search along type and curie facets
     """
+    from tds.modules.dataset.model import Dataset
+
     with Session(rdb) as session:
         base_query = session.query(OntologyConcept).filter(
             OntologyConcept.type.in_(types)

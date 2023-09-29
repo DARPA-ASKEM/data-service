@@ -13,7 +13,7 @@ COPY graph_relations.json graph_relations.json
 
 # Poetry complains if the README doesn't exist
 COPY README.md README.md
-COPY migrate migrate
+COPY migrations migrations
 RUN poetry install --only-root
 EXPOSE 8000
 CMD ["poetry", "run", "tds"]

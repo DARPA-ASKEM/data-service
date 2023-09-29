@@ -195,7 +195,7 @@ class Qualifier(Base):
     __tablename__ = "qualifier"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
+    dataset_id = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.Text())
     name = sa.Column(sa.String(), nullable=False)
     value_type = sa.Column(sa.Enum(ValueType), nullable=False)
@@ -207,7 +207,7 @@ class QualifierPayload(BaseModel):
     """
 
     id: Optional[int] = None
-    dataset_id: Optional[int] = None
+    dataset_id: Optional[str] = None
     description: Optional[str]
     name: str
     value_type: ValueType
@@ -221,7 +221,7 @@ class Feature(Base):
     __tablename__ = "feature"
 
     id = sa.Column(sa.Integer(), primary_key=True)
-    dataset_id = sa.Column(sa.Integer(), sa.ForeignKey("dataset.id"), nullable=False)
+    dataset_id = sa.Column(sa.String(), nullable=False)
     description = sa.Column(sa.Text())
     display_name = sa.Column(sa.String())
     name = sa.Column(sa.String(), nullable=False)
@@ -234,7 +234,7 @@ class FeaturePayload(BaseModel):
     """
 
     id: Optional[int] = None
-    dataset_id: Optional[int] = None
+    dataset_id: Optional[str] = None
     description: Optional[str]
     display_name: Optional[str]
     name: str

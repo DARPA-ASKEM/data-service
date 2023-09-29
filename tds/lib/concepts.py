@@ -10,7 +10,6 @@ import requests
 from sqlalchemy.orm import Session
 
 from tds.lib.errors import DKGError
-from tds.modules.concept.model import ActiveConcept
 from tds.settings import settings
 
 logger = Logger(__file__)
@@ -41,6 +40,8 @@ def mark_concept_active(session: Session, curie):
     """
     Page through table using given ORM
     """
+    from tds.modules.concept.model import ActiveConcept
+
     if session.query(ActiveConcept).filter(ActiveConcept.curie == curie).count() == 0:
         for _ in range(RETRIES):
             try:

@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     AWS_REGION: Optional[str] = None
     AWS_ACCESS_KEY_ID: Optional[str] = None
     AWS_SECRET_ACCESS_KEY: Optional[str] = None
+    SEED_DATA: bool = False
 
 
 settings = Settings()

@@ -30,6 +30,7 @@ services:
     build:
       context: ./
       dockerfile: docker/Dockerfile
+    image: data-service
     ports:
       - "8001:8000"
     env_file:
@@ -48,7 +49,7 @@ services:
         condition: service_started
     volumes:
       - $PWD/tds:/api/tds
-      - $PWD/migrate:/api/migrate
+      - $PWD/migrations:/api/migrations
   graphdb:
     build:
       context: ./
@@ -117,18 +118,18 @@ services:
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
     mem_limit: ${MEM_LIMIT}
     networks:
-      - data-api
+      - data-api 
       - data-annotation-stack
   migrations:
     container_name: data-service-migrations
-    build:
-      context: ./
-      dockerfile: docker/Dockerfile.migrations
-    entrypoint: /run_migrations.sh
+    image: data-service
+    command: ['/api/migrations/run_migrations.sh']
     env_file:
       - api.env
-#    volumes:
-#      - $PWD/migrate:/migrate
+    environment:
+      - SEED_DATA=true
+    volumes:
+      - $PWD:/api
     depends_on:
       rdb:
         condition: service_healthy

@@ -27,11 +27,10 @@ dist
 .vscode
 .cache
 .sqlite
-experiments-main
 api.env
 .env
 
 # Minio
 .minio.sys
 data/askem-staging-data-service
-migrate/seeds/files/*.csv
+migrations/seeds/files/*.csv

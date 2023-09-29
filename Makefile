@@ -17,13 +17,14 @@ init:
 .PHONY:tidy
 tidy: 
 	poetry run pre-commit run;
-	poetry run pylint ./tds
-	poetry run pylint ./migrate
+	poetry run pylint ./tds ./migrations
+
+.PHONY:test
+test: 
 	poetry run pytest
 
 .PHONY:up
 up:
-	docker compose --env-file api.env build migrations;
 	docker compose --env-file api.env up -d;
 
 .PHONY:build
@@ -32,7 +33,11 @@ build:
 	
 .PHONY: gen-migration
 gen-migration:
-	docker compose --env-file api.env exec api bash -c "alembic -c migrate/alembic.ini revision -m \"${message}\""
+	@echo -n -e "\\nEnter a description of the migration: "; \
+	read message; \
+	docker compose --env-file api.env exec -u $${UID} api alembic -c migrations/alembic.ini revision -m "$${message:-$$(date -u +'%Y%m%d%H%M%S')}" | \
+	sed 's|/api/||'
+
 
 .PHONY: run-migrations
 run-migrations:
