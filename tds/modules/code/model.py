@@ -70,7 +70,7 @@ class Code(TdsModel):
                         "dynamics": {
                             "name": "Main Dynamics",
                             "description": "Dynamics section for the ODE.",
-                            "block": "L205-L213",
+                            "block": "[`L205-L213`, `L225-L230`]",
                         },
                     },
                 },
