@@ -22,6 +22,16 @@ depends_on = ${repr(depends_on)}
 def upgrade() -> None:
     ${upgrades if upgrades else "pass"}
 
+% if extra_ops:
+    #  Extra operations
+
+% for extra_op in extra_ops:
+    ${extra_op}
+% endfor
+
+    # End extra operations
+% endif
+
 
 def downgrade() -> None:
     ${downgrades if downgrades else "pass"}
