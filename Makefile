@@ -35,7 +35,7 @@ build:
 gen-migration:
 	@echo -n -e "\\nEnter a description of the migration: "; \
 	read message; \
-	docker compose --env-file api.env exec -u $${UID} api alembic -c migrations/alembic.ini revision -m "$${message:-$$(date -u +'%Y%m%d%H%M%S')}" | \
+	docker compose --env-file api.env exec -u $${UID} api alembic -c migrations/alembic.ini revision --autogenerate -m "$${message:-$$(date -u +'%Y%m%d%H%M%S')}" | \
 	sed 's|/api/||'
 
 
