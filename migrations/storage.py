@@ -37,18 +37,25 @@ def download_file(url: str, file_path: dict):
             downloaded_file.write(file_dl.raw.read(8_388_608))  # Download 8mb at a time
 
 
-def create_bucket(s3_client):
+def create_default_bucket(s3_client):
+    """
+    Function creates the default bucket defined in settings in S3.
+    """
+    create_bucket(s3_client, settings.S3_BUCKET)
+
+
+def create_bucket(s3_client, bucket_name):
     """
     Function creates a bucket in S3.
     """
     bucket_response = s3_client.list_buckets()
     buckets = [x["Name"] for x in bucket_response["Buckets"]]
 
-    if settings.S3_BUCKET in buckets:
-        print(f"Bucket {settings.S3_BUCKET} exists, no need to create.")
+    if bucket_name in buckets:
+        print(f"Bucket {bucket_name} exists, no need to create.")
     else:
-        print(f"Creating bucket: {settings.S3_BUCKET}")
-        s3_client.create_bucket(Bucket=settings.S3_BUCKET)
+        print(f"Creating bucket: {bucket_name}")
+        s3_client.create_bucket(Bucket=bucket_name)
 
 
 def upload_file(s3_client, file_path, storage_path):

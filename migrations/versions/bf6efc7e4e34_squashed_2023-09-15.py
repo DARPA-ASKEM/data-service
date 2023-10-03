@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # Elasticsearch operators such as es.create_index, es.remove_index, es.update_index_mapping, es.bulk_load_index_from_jsonl, etc
-from migrations import es
+from migrations import es, storage
 
 # revision identifiers, used by Alembic.
 revision = "bf6efc7e4e34"
@@ -320,6 +320,10 @@ def upgrade() -> None:
 
     for index_name, index_dict in es_indexes.items():
         es.create_index(index_name=es.normalize_index(index_name), mapping=index_dict)
+
+    # Create S3 bucket if required
+    s3_client = storage.create_s3_client()
+    storage.create_default_bucket(s3_client)
 
 
 def downgrade() -> None:
