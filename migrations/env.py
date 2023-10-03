@@ -74,9 +74,8 @@ def custom_type_comparison(context, insp_col, metadata_col, insp_type, metadata_
     if isinstance(insp_type, Enum) or isinstance(metadata_type, Enum):
         old_enums = set(insp_type.enums)
         new_enums = set(metadata_type.enums)
-        if old_enums != new_enums:
-            # print(f"We need to remove and recreate the enums for {insp_col} so that\n{insp_type.enums}\nequals\n{metadata_type.enums}\n")
 
+        if old_enums != new_enums:
             template_args = context.environment_context.context_opts["template_args"]
             extra_ops = template_args.get("extra_ops", None)
             if extra_ops is None:
