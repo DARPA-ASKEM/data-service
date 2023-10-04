@@ -44,60 +44,67 @@ class Model(TdsModel):
 
     def create(self):
         res = super().create()
-        self._extract_concepts()
+        curies = self._extract_concepts(self.model)
+        self.save_concepts(curies)
         if settings.NEO4J_ENABLED:
             self._establish_provenance()
         return res
 
     def save(self):
         res = super().save()
-        self._extract_concepts()
+        curies = self._extract_concepts(self.model)
+        self.save_concepts(curies)
         return res
 
-    def _extract_concepts(self):
+    def save_concepts(self, curies):
+        with Session(pg_engine) as pg_db:
+            for curie in curies:
+                # @TODO: Break this code out for reuse where other
+                # data types can use it to handle concepts.
+
+                if (
+                    pg_db.query(ActiveConcept)
+                    .filter(ActiveConcept.curie == curie)
+                    .count()
+                    == 0
+                ):
+                    mark_concept_active(pg_db, curie)
+                concept = (
+                    pg_db.query(ActiveConcept)
+                    .filter(ActiveConcept.curie == curie)
+                    .first()
+                )
+
+                if concept.name not in self.concepts:
+                    concept_association = OntologyConcept(
+                        curie=curie,
+                        type="models",
+                        object_id=self.id,
+                        status="obj",
+                    )
+                    pg_db.add(concept_association)
+                    self.concepts.append(concept.name)
+            pg_db.commit()
+
+    @classmethod
+    def _extract_concepts(cls, head):
         """
         Method extracts concepts from the model and saves them to the db.
         """
-        states = self.model["states"]
-        curies = []
-        with Session(pg_engine) as pg_db:
-            for state in states:
-                if (
-                    "grounding" in state
-                    and "identifiers" in state["grounding"]
-                    and bool(state["grounding"]["identifiers"])
-                ):
-                    for key in state["grounding"]["identifiers"]:
-                        value = state["grounding"]["identifiers"][key]
-                        curie = f"{key}:{value}"
-                        # @TODO: Break this code out for reuse where other
-                        # data types can use it to handle concepts.
-                        concept = (
-                            pg_db.query(ActiveConcept)
-                            .filter(ActiveConcept.curie == curie)
-                            .first()
-                        )
-                        if concept is None:
-                            mark_concept_active(pg_db, curie)
-                            concept = (
-                                pg_db.query(ActiveConcept)
-                                .filter(ActiveConcept.curie == curie)
-                                .first()
-                            )
-
-                        if concept.name not in self.concepts:
-                            curies.append(
-                                curie
-                            )  # Append to local list to prevent repeated queries.
-                            concept_association = OntologyConcept(
-                                curie=curie,
-                                type="models",
-                                object_id=self.id,
-                                status="obj",
-                            )
-                            pg_db.add(concept_association)
-                            pg_db.commit()
-                            self.concepts.append(concept.name)
+        concepts = set()
+        if isinstance(head, dict):
+            if "grounding" in head:
+                for key, value in head["grounding"].get("identifiers", {}).items():
+                    curie = f"{key}:{value}"
+                    concepts.add(curie)
+            children = head.values()
+        elif isinstance(head, list):
+            children = head
+        else:
+            return concepts
+        for child in children:
+            concepts.update(cls._extract_concepts(child))
+        return concepts
 
     def _establish_provenance(self):
         # add ModelParameter nodes
