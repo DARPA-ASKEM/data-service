@@ -8,19 +8,14 @@ from typing import Dict, Optional, Type
 
 from tds.db.enums import ResourceType
 from tds.modules.artifact.model import Artifact
+from tds.modules.code.model import Code
 from tds.modules.dataset.model import Dataset
 from tds.modules.document.model import Document
-from tds.modules.external.model import Publication as PublicationModel
-from tds.modules.external.model import PublicationPayload, SoftwarePayload
+from tds.modules.external.model import Publication, SoftwarePayload
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
 from tds.modules.simulation.model import Simulation
 from tds.modules.workflow.model import Workflow
-
-
-class Publication(PublicationPayload):
-    class Config:
-        orm_mode = True
 
 
 class Software(SoftwarePayload):
@@ -29,7 +24,8 @@ class Software(SoftwarePayload):
 
 
 Resource = (
-    Dataset
+    Code
+    | Dataset
     | Document
     | Model
     | ModelConfiguration
@@ -38,9 +34,11 @@ Resource = (
     | Workflow
 )
 
-ORMResource = Dataset | PublicationModel | Simulation
+ORMResource = Dataset | Publication | Simulation
 
 obj_to_enum: Dict[Type[Resource], ResourceType] = {
+    Artifact: ResourceType.artifacts,
+    Code: ResourceType.code,
     Dataset: ResourceType.datasets,
     Document: ResourceType.documents,
     Model: ResourceType.models,
@@ -48,7 +46,6 @@ obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Publication: ResourceType.publications,
     Simulation: ResourceType.simulations,
     Workflow: ResourceType.workflows,
-    Artifact: ResourceType.artifacts,
 }
 
 
