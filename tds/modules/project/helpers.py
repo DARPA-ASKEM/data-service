@@ -11,6 +11,7 @@ from tds.lib.utils import get_singular_index
 from tds.modules.artifact.response import artifact_response
 from tds.modules.code.response import code_response
 from tds.modules.dataset.response import dataset_response
+from tds.modules.document.response import document_response
 from tds.modules.model.utils import model_list_fields, model_list_response
 from tds.modules.model_configuration.response import configuration_response
 from tds.modules.project.model import Project, ProjectAsset
@@ -30,17 +31,10 @@ es_list_response = {
     ResourceType.workflows: {"fields": None, "function": workflow_response},
     ResourceType.artifacts: {"fields": None, "function": artifact_response},
     ResourceType.code: {"fields": None, "function": code_response},
+    ResourceType.documents: {"fields": None, "function": document_response},
 }
 
-es_resources = [
-    ResourceType.datasets,
-    ResourceType.models,
-    ResourceType.model_configurations,
-    ResourceType.simulations,
-    ResourceType.workflows,
-    ResourceType.artifacts,
-    ResourceType.code,
-]
+es_resources = list(es_list_response.keys())
 
 
 class ResourceDoesNotExist(Exception):
