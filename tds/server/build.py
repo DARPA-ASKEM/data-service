@@ -2,6 +2,7 @@
 Constructs API given specified router
 """
 
+import os
 from importlib import import_module, metadata
 from pkgutil import iter_modules
 
@@ -47,6 +48,18 @@ def build_api() -> FastAPI:
     )
 
     # Load routers from the modules package.
+    @api.get("/health")
+    def get_health():
+        """
+        Get health and version
+        """
+        version_file = "../.version"
+        if os.path.exists(version_file):
+            version = open(version_file).read().strip("\n")
+        else:
+            version = "unknown"
+        return {"status": "ok", "git_sha": version}
+
     load_module_routers(api)
 
     return api
