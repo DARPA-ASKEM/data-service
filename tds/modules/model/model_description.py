@@ -6,7 +6,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from tds.db.base import TdsModel
+from tds.db.base import BaseElasticSearchModel
 
 
 class Header(BaseModel):
@@ -21,7 +21,7 @@ class Header(BaseModel):
     model_version: str
 
 
-class ModelDescription(TdsModel):
+class ModelDescription(BaseElasticSearchModel):
     """
     Model description for list response.
     """

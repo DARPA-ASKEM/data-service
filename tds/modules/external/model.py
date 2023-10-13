@@ -8,10 +8,10 @@ import sqlalchemy as sa
 from pydantic import BaseModel
 from sqlalchemy import func
 
-from tds.db.base import Base
+from tds.db.base import RelationalDatabaseBase
 
 
-class Publication(Base):
+class Publication(RelationalDatabaseBase):
     """
     External Publication Data Model.
     """
@@ -35,7 +35,7 @@ class PublicationPayload(BaseModel):
     publication_data: Optional[dict]
 
 
-class Software(Base):
+class Software(RelationalDatabaseBase):
     """
     External Software Data Model.
     """

@@ -3,11 +3,11 @@ TDS Model Configuration Data Model
 """
 from typing import List, Optional
 
-from tds.db.base import TdsModel
+from tds.db.base import BaseElasticSearchModel
 from tds.settings import settings
 
 
-class ModelConfiguration(TdsModel):
+class ModelConfiguration(BaseElasticSearchModel):
     """
     TDS Model Configuration Data Model.
     """

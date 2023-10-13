@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 # Elasticsearch operators such as es.create_index, es.remove_index, es.update_index_schema, es.bulk_load_index_from_jsonl, etc
 from migrations import es, storage
-from tds.db.base import Base
+from tds.db.base import RelationalDatabaseBase
 from tds.settings import settings
 
 # from migrations.env import target_metadata
@@ -40,7 +40,7 @@ def upgrade() -> None:
         print("Skipping data seeding based on setting of SEED_DATA")
         return
 
-    target_metadata = Base.metadata
+    target_metadata = RelationalDatabaseBase.metadata
     # Add Elasticsearch seed documents
     for index, file_path in es_seeds():
         data = json.load(open(file_path))

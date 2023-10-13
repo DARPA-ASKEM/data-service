@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from tds.db.base import TdsModel
+from tds.db.base import BaseElasticSearchModel
 from tds.settings import settings
 
 
@@ -20,7 +20,7 @@ class Transform(BaseModel):
     k: float
 
 
-class Workflow(TdsModel):
+class Workflow(BaseElasticSearchModel):
     """
     Workflow Data Model
     """

@@ -8,11 +8,11 @@ from pydantic import BaseModel
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from tds.db.base import Base
+from tds.db.base import RelationalDatabaseBase
 from tds.db.enums import ResourceType
 
 
-class Project(Base):
+class Project(RelationalDatabaseBase):
     """
     Project data model.
     """
@@ -69,7 +69,7 @@ class ProjectPayload(BaseModel):
         }
 
 
-class ProjectAsset(Base):
+class ProjectAsset(RelationalDatabaseBase):
     """
     ProjectAsset Data Model.
     """

@@ -6,11 +6,11 @@ from typing import Optional
 import sqlalchemy as sa
 from pydantic import BaseModel
 
-from tds.db.base import Base
+from tds.db.base import RelationalDatabaseBase
 from tds.db.enums import OntologicalField, TaggableType
 
 
-class OntologyConcept(Base):
+class OntologyConcept(RelationalDatabaseBase):
     """
     OntologyConcept Data Model.
     """
@@ -26,7 +26,7 @@ class OntologyConcept(Base):
     status = sa.Column(sa.Enum(OntologicalField), nullable=False)
 
 
-class ActiveConcept(Base):
+class ActiveConcept(RelationalDatabaseBase):
     """
     ActiveConcept Data Model.
     """

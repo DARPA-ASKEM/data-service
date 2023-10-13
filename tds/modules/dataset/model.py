@@ -7,7 +7,7 @@ from typing import Any, List, Optional
 import sqlalchemy as sa
 from pydantic import AnyUrl, BaseModel, Field
 
-from tds.db.base import Base, TdsModel
+from tds.db.base import BaseElasticSearchModel, RelationalDatabaseBase
 from tds.db.enums import ColumnTypes, ValueType
 
 
@@ -52,7 +52,7 @@ class DatasetColumn(BaseModel):
     )
 
 
-class Dataset(TdsModel):
+class Dataset(BaseElasticSearchModel):
     """Dataset model"""
 
     _index = "dataset"
@@ -163,7 +163,7 @@ class Dataset(TdsModel):
         }
 
 
-class QualifierXref(Base):
+class QualifierXref(RelationalDatabaseBase):
     """
     QualifierXref Data Model.
     """
@@ -187,7 +187,7 @@ class QualifierXrefPayload(BaseModel):
     feature_id: Optional[int] = None
 
 
-class Qualifier(Base):
+class Qualifier(RelationalDatabaseBase):
     """
     Qualifier Data Model.
     """
@@ -213,7 +213,7 @@ class QualifierPayload(BaseModel):
     value_type: ValueType
 
 
-class Feature(Base):
+class Feature(RelationalDatabaseBase):
     """
     Feature Data Model.
     """

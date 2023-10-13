@@ -17,13 +17,13 @@ from alembic import context
 from sqlalchemy import create_engine
 from sqlalchemy.types import Enum
 
-from tds.db.base import Base
+from tds.db.base import RelationalDatabaseBase
 from tds.db.helpers import ensure_models_are_loaded
 from tds.settings import settings
 
 ensure_models_are_loaded()
 
-target_metadata = Base.metadata
+target_metadata = RelationalDatabaseBase.metadata
 config = context.config
 
 if config.config_file_name is not None:

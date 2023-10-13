@@ -5,7 +5,7 @@ from typing import Any, List, Optional
 
 from pydantic import AnyUrl, BaseModel, Field
 
-from tds.db.base import TdsModel
+from tds.db.base import BaseElasticSearchModel
 from tds.modules.dataset.model import Grounding
 
 
@@ -25,7 +25,7 @@ class Asset(BaseModel):
     )
 
 
-class Document(TdsModel):
+class Document(BaseElasticSearchModel):
     """
     Document Data Model
     """

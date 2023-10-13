@@ -5,10 +5,10 @@ from typing import Any, List, Optional
 
 from pydantic import Field
 
-from tds.db.base import TdsModel
+from tds.db.base import BaseElasticSearchModel
 
 
-class Artifact(TdsModel):
+class Artifact(BaseElasticSearchModel):
     """
     Artifact Data Model
     """

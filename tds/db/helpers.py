@@ -6,21 +6,21 @@ from typing import Any
 from sqlalchemy.engine.base import Connection
 from sqlalchemy.orm import Session
 
-from tds.db.base import Base
+from tds.db.base import RelationalDatabaseBase
 
 
 def init_dev_content(connection: Connection):
     """
     Initialize tables in the connected DB
     """
-    Base.metadata.create_all(connection)
+    RelationalDatabaseBase.metadata.create_all(connection)
 
 
 def drop_content(connection: Connection):
     """
     Drop all tables from the DB
     """
-    return Base.metadata.drop_all(connection)
+    return RelationalDatabaseBase.metadata.drop_all(connection)
 
 
 def entry_exists(connection: Connection, orm_type: Any, orm_id: int) -> bool:

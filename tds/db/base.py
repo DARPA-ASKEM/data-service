@@ -13,7 +13,7 @@ from tds.db import es_client
 from tds.settings import settings
 
 es = es_client()
-Base = declarative_base()
+RelationalDatabaseBase = declarative_base()
 
 
 def new_uuid() -> str:
@@ -21,7 +21,7 @@ def new_uuid() -> str:
     return str(uuid.uuid4())
 
 
-class TdsModel(BaseModel):
+class BaseElasticSearchModel(BaseModel):
     """
     TDS Base Model class.
     """

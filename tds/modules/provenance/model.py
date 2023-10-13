@@ -9,11 +9,11 @@ from pydantic import Field
 from pydantic.main import BaseModel
 from sqlalchemy import func
 
-from tds.db.base import Base
+from tds.db.base import RelationalDatabaseBase
 from tds.db.enums import ProvenanceType, RelationType
 
 
-class Provenance(Base):
+class Provenance(RelationalDatabaseBase):
     """
     Provenance Data Model
     """

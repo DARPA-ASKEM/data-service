@@ -3,10 +3,10 @@ TDS  Notebook Session Data Model Definition.
 """
 from typing import Optional
 
-from tds.db.base import TdsModel
+from tds.db.base import BaseElasticSearchModel
 
 
-class NotebookSession(TdsModel):
+class NotebookSession(BaseElasticSearchModel):
     """
     NotebookSession Data Model
     """

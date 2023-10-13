@@ -6,12 +6,12 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from tds.db.base import TdsModel
+from tds.db.base import BaseElasticSearchModel
 from tds.db.enums import SimulationEngine, SimulationStatus
 from tds.settings import settings
 
 
-class Simulation(TdsModel):
+class Simulation(BaseElasticSearchModel):
     """
     Simulation Data Model
     """

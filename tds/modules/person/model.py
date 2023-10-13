@@ -7,11 +7,11 @@ import sqlalchemy as sa
 from pydantic import BaseModel
 from sqlalchemy.orm import relationship
 
-from tds.db.base import Base
+from tds.db.base import RelationalDatabaseBase
 from tds.db.enums import ResourceType, Role
 
 
-class Person(Base):
+class Person(RelationalDatabaseBase):
     """
     Person Data Model
     """
@@ -57,7 +57,7 @@ class PersonPayload(BaseModel):
     is_registered: bool
 
 
-class Association(Base):
+class Association(RelationalDatabaseBase):
     """
     Association Data Model
     """

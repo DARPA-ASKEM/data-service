@@ -7,7 +7,7 @@ import sqlalchemy as sa
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from tds.db.base import Base, TdsModel
+from tds.db.base import BaseElasticSearchModel, RelationalDatabaseBase
 from tds.db.relational import engine as pg_engine
 from tds.lib.concepts import mark_concept_active
 from tds.lib.model_configs import model_config
@@ -27,7 +27,7 @@ class Header(BaseModel):
     model_version: str
 
 
-class Model(TdsModel):
+class Model(BaseElasticSearchModel):
     """
     TDS Model Data Model
     """
@@ -131,7 +131,7 @@ class Model(TdsModel):
         schema_extra = {"example": model_config}
 
 
-class ModelFramework(Base):
+class ModelFramework(RelationalDatabaseBase):
     """
     ModelFramework Data Model.
     """
