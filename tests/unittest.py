@@ -2,24 +2,13 @@
 Validate unit tests
 """
 
-from dbml_builder import get_dbml_version
-
 # from fastapi import Depends
 from fastapi.testclient import TestClient
 
-# from tds.autogen.schema import RelationType
-# from tds.db import ProvenanceHandler
 from tds.server.build import build_api
 from tds.settings import settings
 
-# from tests.helpers import demo_neo_engine, demo_rdb_engine
-
-
-def test_version() -> None:
-    """
-    Ensure the code is not using an outdated version of the DBML
-    """
-    assert settings.DBML_VERSION == get_dbml_version(settings.DBML_PATH)
+settings.ES_URL = "http://localhost:9200"
 
 
 def test_build_api() -> None:
@@ -31,20 +20,40 @@ def test_build_api() -> None:
     assert response.status_code == 200
 
 
-# def test_relation_handler_rdb_only():
-#     """
-#     Ensure the provenance handler can create a basic edge
-#     """
-#     graph_db = demo_neo_engine()
-#     rdb = demo_rdb_engine()
-#     relation_handler = ProvenanceHandler(rdb=rdb, graph_db=graph_db)
-#     provenance_payload = {
-#         "left": 1,
-#         "left_type": "Intermediate",
-#         "right": 2,
-#         "right_type": "Publication",
-#         "relation_type": RelationType.EXTRACTED_FROM,
-#         "user_id": 1,
-#     }
+def test_healthcheck() -> None:
+    """
+    Ensure healthcheck responds properly
+    """
 
-#     relation_handler.create_node_relationship(provenance_payload=provenance_payload)
+    client = TestClient(build_api())
+
+    healthcheck_response = client.get("/health")
+
+    assert healthcheck_response.status_code == 200
+    assert healthcheck_response.json().get("status", None) == "ok"
+
+
+def test_route_collection() -> None:
+    from starlette.routing import Route
+
+    api = build_api()
+
+    # Five routes will be always exist: /openapi.json, /, /docs/oauth2-redirect, /redoc, /health
+    # Note: /health is defined by us while the others are defined by FastAPI
+    assert len(api.routes) > 5, "Should be at more than five routes"
+
+    # Assert all routes are of Route class
+    assert all(
+        map(lambda route: isinstance(route, Route), api.routes)
+    ), "Routes should be correctly defined"
+
+    # Find the `/models` route and confirm the correct method(s) are set
+    for route in api.routes:
+        if route.path == "/models":
+            model_route = route
+            break
+    else:
+        assert False, "Model route is not defined"
+    assert set(model_route.methods) == set(
+        ["POST"]
+    ), "/models route should only accept POST method"

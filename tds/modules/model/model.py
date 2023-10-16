@@ -57,6 +57,9 @@ class Model(BaseElasticSearchModel):
         return res
 
     def save_concepts(self, curies):
+        """
+        Saves all the curies as concepts associated with the model.
+        """
         with Session(pg_engine) as pg_db:
             for curie in curies:
                 # @TODO: Break this code out for reuse where other
