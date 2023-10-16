@@ -62,3 +62,13 @@ def adjust_project_assets(
         inactive_ids = set(resource_ids) - set(assets.get(resource_type, []))
         for id in inactive_ids:
             session.delete(session.query(ProjectAsset).get(id))
+
+
+def clean_up_asset_return(project_assets):
+    return_obj = {}
+    for asset in project_assets:
+        if asset.resource_type not in return_obj:
+            return_obj[asset.resource_type] = []
+        return_obj[asset.resource_type].append(asset.resource_id)
+
+    return return_obj

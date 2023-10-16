@@ -11,7 +11,7 @@ def extract_args(cli_args) -> tuple:
     """
     Function extracts args from cli command.
     """
-    return cli_args.id, cli_args.source, cli_args.destination
+    return cli_args.id, cli_args.source, cli_args.destination, cli_args.model_config
 
 
 # @TODO: Add STRATIFY = "Stratify" handling?
@@ -34,13 +34,22 @@ if __name__ == "__main__":
         help="The destination URL to copy the project to including protocol and port "
         "(if needed). E.g. http://localhost:8001",
     )
+    parser.add_argument(
+        "-c",
+        "--model_config",
+        help="Boolean to determine if the model configurations should be copied.",
+        default="true",
+    )
     args = parser.parse_args()
-    project_id, source_url, destination_url = extract_args(args)
+    project_id, source_url, destination_url, copy_configs = extract_args(args)
 
     if project_id and source_url and destination_url:
         print("Running copy project operation.")
         copy_class = CopyProject(
-            pid=project_id, source=source_url, dest=destination_url
+            pid=project_id,
+            source=source_url,
+            dest=destination_url,
+            copy_configs=copy_configs == "true",
         )
         # Copy the project.
         copy_class.copy_project_obj()
