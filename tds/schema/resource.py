@@ -3,7 +3,6 @@ Redirects general types to restricted resource typing
 """
 # pylint: disable=missing-class-docstring, unhashable-member
 
-from collections import defaultdict
 from typing import Dict, Optional, Type
 
 from tds.db.enums import ResourceType

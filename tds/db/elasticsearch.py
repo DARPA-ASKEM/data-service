@@ -14,6 +14,9 @@ def es_client():
     """
     Factory Function that provides an ElasticSearch connection.
     """
-    return Elasticsearch(
-        [settings.ES_URL], basic_auth=(settings.ES_USERNAME, settings.ES_PASSWORD)
-    )
+    if settings.ES_URL:
+        return Elasticsearch(
+            [settings.ES_URL], basic_auth=(settings.ES_USERNAME, settings.ES_PASSWORD)
+        )
+    else:
+        return None

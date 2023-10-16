@@ -70,7 +70,12 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+# pylint: disable-next=unused-argument,redefined-outer-name
 def custom_type_comparison(context, insp_col, metadata_col, insp_type, metadata_type):
+    """
+    Used to determine if enums have changed for a column and if so, adds extra operations
+    to fix the enums if possible.
+    """
     if isinstance(insp_type, Enum) or isinstance(metadata_type, Enum):
         old_enums = set(insp_type.enums)
         new_enums = set(metadata_type.enums)
@@ -83,7 +88,7 @@ def custom_type_comparison(context, insp_col, metadata_col, insp_type, metadata_
                 template_args["extra_ops"] = extra_ops
 
             if old_enums.issubset(new_enums):
-                print(f"Adding new values for enum type `{{metadata_type.name}}`.")
+                print(f"Adding new values for enum type `{metadata_type.name}`.")
                 sql = "\n".join(
                     [
                         f"ALTER TYPE {metadata_type.name} ADD VALUE '{value}';"

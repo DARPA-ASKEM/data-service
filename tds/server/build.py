@@ -55,7 +55,7 @@ def build_api() -> FastAPI:
         """
         version_file = "../.version"
         if os.path.exists(version_file):
-            version = open(version_file).read().strip("\n")
+            version = open(version_file, encoding="ascii").read().strip("\n")
         else:
             version = "unknown"
         return {"status": "ok", "git_sha": version}
