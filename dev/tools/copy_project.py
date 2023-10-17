@@ -236,9 +236,10 @@ class CopyProject:
                     node["state"]["datasetId"]
                 ]
             elif op == "ModelOperation":
-                node_obj["state"]["modelId"] = self.id_mapper["models"][
-                    node["state"]["modelId"]
-                ]
+                if "state" in node and "modelId" in node["state"]:
+                    node_obj["state"]["modelId"] = self.id_mapper["models"][
+                        node["state"]["modelId"]
+                    ]
             else:
                 print(f"{op} is not currently supported.")
             updated_nodes.append(node_obj)
@@ -261,7 +262,11 @@ class CopyProject:
         Method processes the workflow model objects to extract configurations.
         """
         for model in models:
-            new_model_id = self.id_mapper["models"][model["state"]["modelId"]]
+            model_state = model["state"] if "state" in model else None
+            if "modelId" in model_state:
+                new_model_id = self.id_mapper["models"][model_state["modelId"]]
+            else:
+                new_model_id = None
 
             # Currently no projects I have looked at have model inputs. - Todd R. July 27, 2023
             if len(model["inputs"]):
