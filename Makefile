@@ -8,7 +8,7 @@ DATA_PY_FILES = $(shell find scripts/ -type f -name '*.py')
 DOCKER_COMPOSE_FILE = ./docker/docker-compose.yml
 ENV_FILE=.env
 
-S3_BUCKET := $(shell grep S3_BUCKET api.env | cut -d '=' -f2)
+S3_BUCKET := $(shell grep S3_BUCKET .env | cut -d '=' -f2)
 
 .PHONY:init
 init:
