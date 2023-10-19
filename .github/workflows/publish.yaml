@@ -49,8 +49,9 @@ jobs:
       - bake
     steps:
       - name: Report
+        env: 
+          - GITHUB_TOKEN: ${{ secrets.GHP_ACCESS_TOKEN }}
         run: |
-          gh login --with-token ${{ secrets.GHP_ACCESS_TOKENS }}
           gh workflow run report.yaml --repo DARPA-ASKEM/simulation-integration --ref main
 
   # Execute knowledeg-middleware reporting
@@ -60,6 +61,7 @@ jobs:
       - bake
     steps:
       - name: Report
+        env: 
+          - GITHUB_TOKEN: ${{ secrets.GHP_ACCESS_TOKEN }}
         run: |
-          gh login --with-token ${{ secrets.GHP_ACCESS_TOKENS }}
           gh workflow run report.yaml --repo DARPA-ASKEM/knowledge-middleware --ref main
