@@ -28,15 +28,15 @@
         ["ModelConfiguration","Model"]
     ],
     "CITES":[
-        ["Publication","Publication"]
+        ["Document","Document"]
     ],
     "EXTRACTED_FROM":[
-        ["Model","Publication"],
-        ["Dataset","Publication"],
+        ["Model","Document"],
+        ["Dataset","Document"],
         ["Model", "Code"]
     ],
     "CONTAINS":[
-        ["Project","Publication"],
+        ["Project","Document"],
         ["Project","Model"],
         ["Project","ModelConfiguration"],
         ["Project","Simulation"],
@@ -44,7 +44,7 @@
         ["Project","Artifact"]
     ],
     "IS_CONCEPT_OF":[
-        ["Concept","Publication"],
+        ["Concept","Document"],
         ["Concept","Model"],
         ["Concept","ModelConfiguration"],
         ["Concept","Simulation"],
