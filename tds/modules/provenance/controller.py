@@ -98,6 +98,11 @@ def search_provenance(
     * Requirements: "root_type", “root_id”
     * Allowed `root_types` are Model
 
+    **models_from_document** - Returns the document `id` for the code
+    from which a model was extracted
+    * Requirements: "root_type", “root_id”
+    * Allowed `root_types` are Model
+
     ## Payload format
 
     The payload for searching needs to match the schema below.

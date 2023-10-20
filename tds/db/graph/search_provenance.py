@@ -315,7 +315,7 @@ class SearchProvenance:
             """
 
             response = session.run(query, {"model_id": model_id})
-            response_data = [res.data()["c"]["id"] for res in response]
+            response_data = list(set([res.data()["c"]["id"] for res in response]))
         return response_data
 
     def models_from_document(self, payload):
@@ -337,7 +337,7 @@ class SearchProvenance:
             """
 
             response = session.run(query, {"model_id": model_id})
-            response_data = [res.data()["d"]["id"] for res in response]
+            response_data = list(set([res.data()["d"]["id"] for res in response]))
         return response_data
 
     def extracted_models(self, payload):
@@ -356,5 +356,5 @@ class SearchProvenance:
             )
 
             response = session.run(generated_query)
-            response_data = [res.data()["m"]["id"] for res in response]
+            response_data = list(set([res.data()["m"]["id"] for res in response]))
             return response_data
