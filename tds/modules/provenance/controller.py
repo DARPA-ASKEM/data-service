@@ -76,10 +76,10 @@ def search_provenance(
     * Requirements: “root_type”, “root_id”
 
 
-    **derived_models** - Return all models that were derived
-        from a publication or intermediate.
+    **extracted_models** - Return all models that were derived
+        from a document or code.
     * Requirements: “root_type”, “root_id”
-    * Allowed root _types are Publication and Intermediate
+    * Allowed root _types are Document and Code
 
 
     **parent_model_revisions** - Returns the model revisions
@@ -94,6 +94,11 @@ def search_provenance(
     * Allowed root _types are Model *will be expanded.
 
     **models_from_code** - Returns the code `id` for the code
+    from which a model was extracted
+    * Requirements: "root_type", “root_id”
+    * Allowed `root_types` are Model
+
+    **models_from_document** - Returns the document `id` for the code
     from which a model was extracted
     * Requirements: "root_type", “root_id”
     * Allowed `root_types` are Model

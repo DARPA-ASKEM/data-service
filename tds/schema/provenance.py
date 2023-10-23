@@ -44,7 +44,7 @@ provenance_type_to_abbr: Dict[Type[ProvenanceType], str] = {
     ProvenanceType.Dataset: "Ds",
     ProvenanceType.Model: "Md",
     ProvenanceType.ModelConfiguration: "Mc",
-    ProvenanceType.Publication: "Pu",
+    ProvenanceType.Document: "Do",
     ProvenanceType.Simulation: "Si",
     ProvenanceType.Project: "Pr",
     ProvenanceType.Concept: "Cn",

@@ -25,38 +25,19 @@ def dynamic_relationship_direction(direction, relationship_type):
     )
 
 
-def derived_models_query_generater(root_type: ProvenanceType, root_id):
+def extracted_models_query_generator(root_type: ProvenanceType, root_id):
     """
-    return all models, model revisions
-    (sometimes intermediates) that were derived from a publication or intermediate
+    return all models that were derived from a document or code
     """
-    if root_type == "Publication":
+    if root_type == "Document":
         return f"""
-            Match(Pu:Publication {{id:{root_id}}})
-            <-[r:EXTRACTED_FROM]-(In:Intermediate) 
-            Optional Match(Mr)
-            -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
-            with *,collect(r)+collect(r2)+collect(r3) as r4, 
-            collect(Mr)+collect(Mr2) as ms 
-            unwind ms as mss 
-            unwind r4 as r5 
-            Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) 
-            with *, collect(r5)+collect(r6) as r7 
-            unwind r7 as r8 
-            return Pu, In, ms,Md, r8
+            MATCH (m:Model)-[:EXTRACTED_FROM]->(d:Document {{id:'{root_id}'}})
+            RETURN m
             """
-    if root_type == "Intermediate":
+    if root_type == "Code":
         return f"""
-            Match (In:Intermediate {{id:{root_id}}})<-[r2:REINTERPRETS *1..]
-            Optional Match(Mr)
-            -[r3:EDITED_FROM|COPIED_FROM|GLUED_FROM|STRATIFED_FROM  *1..]-
-            with *,collect(r2)+collect(r3) as r4, collect(Mr)+collect(Mr2) as ms 
-            unwind ms as mss 
-            unwind r4 as r5 
-            Optional Match(mss)<-[r6:BEGINS_AT]-(Md:Model) 
-            with *, collect(r5)+collect(r6) as r7 
-            unwind r7 as r8 
-            return  In, ms,Md, r8
+            MATCH (m:Model)-[:EXTRACTED_FROM]->(c:Code {{id:'{root_id}'}})
+            RETURN m
             """
     raise HTTPException(
         status_code=400, detail=f"Models can not be derived from this type: {root_type}"

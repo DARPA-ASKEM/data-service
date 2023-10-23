@@ -10,8 +10,8 @@ from neo4j import Driver
 from sqlalchemy.engine.base import Engine
 
 from tds.db.graph.query_helpers import (
-    derived_models_query_generater,
     dynamic_relationship_direction,
+    extracted_models_query_generator,
     match_node_builder,
     nodes_edges,
     parent_model_query_generator,
@@ -32,22 +32,22 @@ class SearchProvenance:
     def __getitem__(self, key):
         return self.__getattribute__(key)
 
-    def model_publication(self, payload):
+    def model_document(self, payload):
         """
-        find publication that was extracted to create model
+        Find document from which a model was extracted
         """
         with self.graph_db.session() as session:
             query = (
                 f"Match (Md:Model {{id:'{payload.get('root_id')}'}})"
                 "<-[r:REINTERPRETS|EXTRACTED_FROM|BEGINS_AT *1..]->"
-                "(Pu:Publication) return Pu"
+                "(Do:Document) return Do"
             )
 
             response = session.run(query)
             results = list(response.data())
             if len(results) == 0:
                 return None
-            return results[0]["Pu"]
+            return results[0]["Do"]
 
     def connected_nodes_by_direction(self, payload, direction):
         """
@@ -138,25 +138,6 @@ class SearchProvenance:
         Return all parent nodes
         """
         return self.connected_nodes_by_direction(payload=payload, direction="parent")
-
-    def derived_models(self, payload):
-        """
-        Return models derived from artifact (Publication or Intermediate)
-        """
-        if payload.get("root_type") not in ("Publication", "Intermediate"):
-            raise HTTPException(
-                status_code=400,
-                detail="Derived models can only be found from "
-                + "root types of Publication or Intermediates",
-            )
-        with self.graph_db.session() as session:
-            generated_query = derived_models_query_generater(
-                root_type=payload.get("root_type"), root_id=payload.get("root_id")
-            )
-
-            response = session.run(generated_query)
-
-            return nodes_edges(response)
 
     def parent_model_revisions(self, payload):
         """
@@ -317,12 +298,12 @@ class SearchProvenance:
 
     def models_from_code(self, payload):
         """
-        Identifies the code source artifact from which a model was extracted
+        Identifies the code from which a model was extracted
         """
         if payload.get("root_type") not in ("Model"):
             raise HTTPException(
                 status_code=400,
-                detail="Code artifacts used for model extraction can "
+                detail="Code used for model extraction can "
                 "only be found by providing a Model",
             )
         with self.graph_db.session() as session:
@@ -334,5 +315,46 @@ class SearchProvenance:
             """
 
             response = session.run(query, {"model_id": model_id})
-            response_data = [res.data()["c"]["id"] for res in response]
+            response_data = list(set([res.data()["c"]["id"] for res in response]))
         return response_data
+
+    def models_from_document(self, payload):
+        """
+        Identifies the document from which a model was extracted
+        """
+        if payload.get("root_type") not in ("Model"):
+            raise HTTPException(
+                status_code=400,
+                detail="Document used for model extraction can "
+                "only be found by providing a Model",
+            )
+        with self.graph_db.session() as session:
+            model_id = payload["root_id"]
+
+            query = """
+            MATCH (d:Document)<-[r:EXTRACTED_FROM]-(m:Model {id: $model_id})
+            RETURN d
+            """
+
+            response = session.run(query, {"model_id": model_id})
+            response_data = list(set([res.data()["d"]["id"] for res in response]))
+        return response_data
+
+    def extracted_models(self, payload):
+        """
+        Return models extracted from a document or code.
+        """
+        if payload.get("root_type") not in ("Document", "Code"):
+            raise HTTPException(
+                status_code=400,
+                detail="Derived models can only be found from "
+                + "root types of Document or Code",
+            )
+        with self.graph_db.session() as session:
+            generated_query = extracted_models_query_generator(
+                root_type=payload.get("root_type"), root_id=payload.get("root_id")
+            )
+
+            response = session.run(generated_query)
+            response_data = list(set([res.data()["m"]["id"] for res in response]))
+            return response_data
