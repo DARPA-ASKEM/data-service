@@ -15,8 +15,8 @@ class TypeEnum(str, Enum):
     Enumermation of mathml and latex equation types
     """
 
-    mathml: str = "MathML"
-    latex: str = "LaTeX"
+    MATHML: str = "MathML"
+    LATEX: str = "LaTeX"
 
 
 class EquationSource(BaseModel):
@@ -35,9 +35,9 @@ class EquationSource(BaseModel):
     )
 
 
-class equation(BaseElasticSearchModel):
+class Equation(BaseElasticSearchModel):
     """
-    equation Data Model
+    Equation Data Model
     """
 
     _index = "equation"

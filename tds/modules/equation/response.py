@@ -2,15 +2,14 @@
 TDS equation Response object.
 """
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any, Optional
 
-from pydantic import AnyUrl, BaseModel
+from pydantic import BaseModel
 
-from tds.modules.dataset.model import Grounding
 from tds.modules.equation.model import EquationSource, TypeEnum
 
 
-class equationResponse(BaseModel):
+class EquationResponse(BaseModel):
     """
     equation Response Object.
     """
@@ -30,4 +29,4 @@ def equation_response(equation_list):
     """
     Function builds list of equations for response.
     """
-    return [equationResponse(**x["_source"]) for x in equation_list]
+    return [EquationResponse(**x["_source"]) for x in equation_list]

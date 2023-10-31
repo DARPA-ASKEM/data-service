@@ -11,19 +11,17 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from tds.db import es_client
-from tds.lib.s3 import get_presigned_url
-from tds.modules.equation.model import equation
-from tds.modules.equation.response import equation_response, equationResponse
+from tds.modules.equation.model import Equation
+from tds.modules.equation.response import EquationResponse, equation_response
 from tds.operation import create, delete, retrieve, update
-from tds.settings import settings
 
 equation_router = APIRouter()
 logger = Logger(__name__)
-es_index = equation.index
+es_index = Equation.index
 
 
 @equation_router.get(
-    "", response_model=list[equationResponse], **retrieve.fastapi_endpoint_config
+    "", response_model=list[EquationResponse], **retrieve.fastapi_endpoint_config
 )
 def list_equations(page_size: int = 100, page: int = 0) -> JSONResponse:
     """
@@ -49,7 +47,7 @@ def list_equations(page_size: int = 100, page: int = 0) -> JSONResponse:
 
 
 @equation_router.post("", **create.fastapi_endpoint_config)
-def equation_post(payload: equation) -> JSONResponse:
+def equation_post(payload: Equation) -> JSONResponse:
     """
     Create equation and return its ID
     """
@@ -66,7 +64,7 @@ def equation_post(payload: equation) -> JSONResponse:
 
 @equation_router.get(
     "/{equation_id}",
-    response_model=equationResponse,
+    response_model=EquationResponse,
     **retrieve.fastapi_endpoint_config,
 )
 def equation_get(equation_id: str) -> JSONResponse | Response:
@@ -83,7 +81,7 @@ def equation_get(equation_id: str) -> JSONResponse | Response:
             headers={
                 "content-type": "application/json",
             },
-            content=jsonable_encoder(equationResponse(**res["_source"])),
+            content=jsonable_encoder(EquationResponse(**res["_source"])),
         )
     except NotFoundError:
         return Response(
@@ -95,7 +93,7 @@ def equation_get(equation_id: str) -> JSONResponse | Response:
 
 
 @equation_router.put("/{equation_id}", **update.fastapi_endpoint_config)
-def equation_put(equation_id: str, payload: equation) -> JSONResponse | Response:
+def equation_put(equation_id: str, payload: Equation) -> JSONResponse | Response:
     """
     Update a equation in ElasticSearch
     """
