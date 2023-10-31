@@ -32,6 +32,9 @@ class Asset(BaseModel):
         )
     )
 
+    class Config:
+        use_enum_values = True
+
 
 class Document(BaseElasticSearchModel):
     """
