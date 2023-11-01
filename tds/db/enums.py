@@ -40,6 +40,7 @@ class ProvenanceType(str, Enum):
     Artifact = "Artifact"
     Code = "Code"
     Document = "Document"
+    Equation = "Equation"
 
 
 class ProvenanceSearchTypes(str, Enum):
@@ -54,6 +55,7 @@ class ProvenanceSearchTypes(str, Enum):
     parent_nodes = "parent_nodes"
     models_from_code = "models_from_code"
     models_from_document = "models_from_document"
+    models_from_equation = "models_from_equation"
 
 
 class RelationType(str, Enum):

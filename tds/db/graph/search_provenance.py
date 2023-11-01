@@ -340,15 +340,37 @@ class SearchProvenance:
             response_data = list(set([res.data()["d"]["id"] for res in response]))
         return response_data
 
+    def models_from_equation(self, payload):
+        """
+        Identifies the equation from which a model was extracted
+        """
+        if payload.get("root_type") not in ("Model"):
+            raise HTTPException(
+                status_code=400,
+                detail="Equation used for model extraction can "
+                "only be found by providing a Model",
+            )
+        with self.graph_db.session() as session:
+            model_id = payload["root_id"]
+
+            query = """
+            MATCH (e:Equation)<-[r:EXTRACTED_FROM]-(m:Model {id: $model_id})
+            RETURN e
+            """
+
+            response = session.run(query, {"model_id": model_id})
+            response_data = list(set([res.data()["e"]["id"] for res in response]))
+        return response_data
+
     def extracted_models(self, payload):
         """
-        Return models extracted from a document or code.
+        Return models extracted from a document, code, or equation.
         """
-        if payload.get("root_type") not in ("Document", "Code"):
+        if payload.get("root_type") not in ("Document", "Code", "Equation"):
             raise HTTPException(
                 status_code=400,
                 detail="Derived models can only be found from "
-                + "root types of Document or Code",
+                + "root types of Document, Code, or Equation",
             )
         with self.graph_db.session() as session:
             generated_query = extracted_models_query_generator(

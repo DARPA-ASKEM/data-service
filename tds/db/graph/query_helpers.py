@@ -39,6 +39,11 @@ def extracted_models_query_generator(root_type: ProvenanceType, root_id):
             MATCH (m:Model)-[:EXTRACTED_FROM]->(c:Code {{id:'{root_id}'}})
             RETURN m
             """
+    if root_type == "Equation":
+        return f"""
+            MATCH (m:Model)-[:EXTRACTED_FROM]->(e:Equation {{id:'{root_id}'}})
+            RETURN m
+            """
     raise HTTPException(
         status_code=400, detail=f"Models can not be derived from this type: {root_type}"
     )
