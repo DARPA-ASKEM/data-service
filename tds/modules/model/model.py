@@ -25,6 +25,9 @@ class Header(BaseModel):
     model_schema: Optional[str] = Field(alias="schema")
     schema_name: Optional[str]
     model_version: str
+    derived_from: Optional[str] = Field(
+        description="The id of the equation this model is derived from."
+    )
 
 
 class Model(BaseElasticSearchModel):

@@ -45,7 +45,9 @@ class Equation(BaseElasticSearchModel):
     username: str = Field(
         description="The username of the user that created the equation."
     )
-    name: str = Field(description="Display/human name for the equation")
+    name: Optional[str] = Field(
+        description="(Optional) Display/human name for the equation"
+    )
     description: Optional[str] = Field(
         description="(Optional) Texual description of the equation"
     )
