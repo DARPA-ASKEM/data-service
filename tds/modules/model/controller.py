@@ -111,7 +111,7 @@ def model_post(payload: Model) -> JSONResponse:
     Create model and return its ID
     """
 
-    res = payload.create()
+    res = payload.save()
     logger.info("new model created: %s", res["_id"])
     return JSONResponse(
         status_code=status.HTTP_200_OK,

@@ -45,7 +45,7 @@ def create_dataset(payload: Dataset) -> JSONResponse:
     """
     Create model and return its ID
     """
-    res = payload.create()
+    res = payload.save()
     logger.info("New dataset created: %s", id)
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
