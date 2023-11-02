@@ -88,6 +88,7 @@ class ResourceType(str, Enum):
     artifacts = "artifacts"
     code = "code"
     documents = "documents"
+    equations = "equations"
 
 
 class Role(str, Enum):
