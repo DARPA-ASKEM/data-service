@@ -15,8 +15,8 @@ class TypeEnum(str, Enum):
     Enumermation of mathml and latex equation types
     """
 
-    MATHML: str = "MathML"
-    LATEX: str = "LaTeX"
+    MATHML: str = "mathml"
+    LATEX: str = "latex"
 
 
 class EquationSource(BaseModel):
