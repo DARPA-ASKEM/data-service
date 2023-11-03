@@ -23,8 +23,8 @@ depends_on = None
 def upgrade() -> None:
     op.execute(sqltext="""ALTER TYPE resourcetype ADD VALUE 'equations';""")
 
-    es.create_index(index_name=es.normalize_index("equations"), mapping={})
+    es.create_index(index_name=es.normalize_index("equation"), mapping={})
 
 
 def downgrade() -> None:
-    es.remove_index(index_name=es.normalize_index("equations"))
+    es.remove_index(index_name=es.normalize_index("equation"))
