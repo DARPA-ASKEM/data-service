@@ -22,6 +22,7 @@ depends_on = None
 
 def upgrade() -> None:
     op.execute(sqltext="""ALTER TYPE resourcetype ADD VALUE 'equations';""")
+    op.execute(sqltext="""ALTER TYPE provenancetype ADD VALUE 'Equation';""")
 
     es.create_index(index_name=es.normalize_index("equation"), mapping={})
 
