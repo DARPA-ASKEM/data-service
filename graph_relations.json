@@ -33,7 +33,9 @@
     "EXTRACTED_FROM":[
         ["Model","Document"],
         ["Dataset","Document"],
-        ["Model", "Code"]
+        ["Model", "Code"],
+        ["Model","Equation"],
+        ["Equation", "Document"]
     ],
     "CONTAINS":[
         ["Project","Document"],
@@ -41,7 +43,8 @@
         ["Project","ModelConfiguration"],
         ["Project","Simulation"],
         ["Project","Dataset"],
-        ["Project","Artifact"]
+        ["Project","Artifact"],
+        ["Project", "Equation"]
     ],
     "IS_CONCEPT_OF":[
         ["Concept","Document"],

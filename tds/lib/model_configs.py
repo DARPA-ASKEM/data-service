@@ -7,6 +7,7 @@ model_config = {
         "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.2/petrinet/petrinet_schema.json",  # pylint: disable=line-too-long
         "description": "Test Model Post from Swagger.",
         "model_version": "1.0",
+        "extracted_from": "0",
     },
     "model": {
         "states": [
