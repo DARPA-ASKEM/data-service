@@ -12,6 +12,7 @@ from tds.modules.artifact.response import artifact_response
 from tds.modules.code.response import code_response
 from tds.modules.dataset.response import dataset_response
 from tds.modules.document.response import document_response
+from tds.modules.equation.response import equation_response
 from tds.modules.model.utils import model_list_fields, model_list_response
 from tds.modules.model_configuration.response import configuration_response
 from tds.modules.project.model import Project, ProjectAsset
@@ -32,6 +33,7 @@ es_list_response = {
     ResourceType.artifacts: {"fields": None, "function": artifact_response},
     ResourceType.code: {"fields": None, "function": code_response},
     ResourceType.documents: {"fields": None, "function": document_response},
+    ResourceType.equations: {"fields": None, "function": equation_response},
 }
 
 es_resources = list(es_list_response.keys())
