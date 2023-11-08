@@ -10,6 +10,7 @@ from tds.modules.artifact.model import Artifact
 from tds.modules.code.model import Code
 from tds.modules.dataset.model import Dataset
 from tds.modules.document.model import Document
+from tds.modules.equation.model import Equation
 from tds.modules.external.model import Publication, SoftwarePayload
 from tds.modules.model.model import Model
 from tds.modules.model_configuration.model import ModelConfiguration
@@ -31,6 +32,7 @@ Resource = (
     | Publication
     | Simulation
     | Workflow
+    | Equation
 )
 
 ORMResource = Dataset | Publication | Simulation
@@ -45,6 +47,7 @@ obj_to_enum: Dict[Type[Resource], ResourceType] = {
     Publication: ResourceType.publications,
     Simulation: ResourceType.simulations,
     Workflow: ResourceType.workflows,
+    Equation: ResourceType.equations,
 }
 
 

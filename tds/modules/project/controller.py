@@ -295,6 +295,7 @@ def get_project_assets(
             ResourceType.artifacts,
             ResourceType.code,
             ResourceType.documents,
+            ResourceType.equations,
         ]
     ),
     rdb: Engine = Depends(request_rdb),
