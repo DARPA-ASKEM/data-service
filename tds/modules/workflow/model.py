@@ -28,10 +28,10 @@ class OperationType(str, Enum):
     SimulateCiemssOperation = "SimulateCiemssOperation"
     CalibrateEnsembleCiemms = "CalibrateEnsembleCiemms"
     SimulateEnsembleCiemss = "SimulateEnsembleCiemss"
-    CalibrationOperationSciml = "CalibrationOperationSciml"
-    SimulateScimlOperation = "SimulateScimlOperation"
-    CalibrateEnsembleSciml = "CalibrateEnsembleSciml"
-    SimulateEnsembleSciml = "SimulateEnsembleSciml"
+    CalibrationOperationJulia = "CalibrationOperationJulia"
+    SimulateJuliaOperation = "SimulateJuliaOperation"
+    CalibrateEnsembleJulia = "CalibrateEnsembleJulia"
+    SimulateEnsembleJulia = "SimulateEnsembleJulia"
 
 
 class Output(BaseModel):
