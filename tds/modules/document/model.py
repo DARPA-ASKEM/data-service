@@ -11,7 +11,7 @@ from tds.modules.dataset.model import Grounding
 
 
 class AssetType(Enum):
-    IMAGE = "table"
+    TABLE = "table"
     EQUATION = "equation"
     FIGURE = "figure"
     OTHER = "other"
@@ -95,7 +95,7 @@ class Document(BaseElasticSearchModel):
                 "assets": [
                     {
                         "file_name": "figure1.png",
-                        "asset_type": "image",
+                        "asset_type": "figure",
                         "metadata": {
                             "type": "figures",
                             "description": "Figure showing the spread rate",
