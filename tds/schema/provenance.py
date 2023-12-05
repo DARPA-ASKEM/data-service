@@ -51,4 +51,5 @@ provenance_type_to_abbr: Dict[Type[ProvenanceType], str] = {
     ProvenanceType.Artifact: "Ar",
     ProvenanceType.Code: "Co",
     ProvenanceType.Equation: "Eq",
+    ProvenanceType.Publication: "Pu",
 }
