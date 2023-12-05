@@ -1,6 +1,7 @@
 """
 TDS Document Data Model Definition.
 """
+from enum import Enum
 from typing import Any, List, Optional
 
 from pydantic import AnyUrl, BaseModel, Field
@@ -9,13 +10,20 @@ from tds.db.base import BaseElasticSearchModel
 from tds.modules.dataset.model import Grounding
 
 
+class AssetType(Enum):
+    IMAGE = "table"
+    EQUATION = "equation"
+    FIGURE = "figure"
+    OTHER = "other"
+
+
 class Asset(BaseModel):
     """
     Asset class for storing document assets in TDS.
     """
 
     file_name: str = Field(description="The file name of the asset")
-    asset_type: str = Field(description="The type of the asset")
+    asset_type: AssetType = Field(description="The type of the asset")
     metadata: Optional[dict[str, Any]] = Field(
         description=(
             "(Optional) Unformatted metadata field that should contain the "
@@ -23,6 +31,9 @@ class Asset(BaseModel):
             "'equations', 'images', and 'figures'"
         )
     )
+
+    class Config:
+        use_enum_values = True
 
 
 class Document(BaseElasticSearchModel):
