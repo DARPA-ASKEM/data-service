@@ -12,8 +12,8 @@ We will most likely want to use beaker.
             # Modify Calibration - Example Request: 
             # Delete Calibration - Example Request: 
 - [ ] add more information on workflow dict to prompt - 
-    # Model Node Dictionaries will be in the following format:
-    # {'id': (str) , 'workflowId': (str) Id of the workflow the node is in, 'operationType': 'ModelOperation', 'displayName': 'Model', 'x': (int) x location of node on screen, 'y': (int) y location of node on screen, 'state': {'modelId': terarium data service id of the model, 'modelConfigurationIds': list of terarium data service model config ids associated with this model in the workflow}, 'inputs': empty list, there are no inputs to a model node, 'outputs': list of dictionaries of model config[{'id': '0e7634fa-3db5-422a-af1c-9b04431aaca2', 'type': 'modelConfigId', 'label': 'Default config', 'value': ['37d81396-c399-4e05-9d00-0c5d94b9d939'], 'status': 'not connected'}
+      Model Node Dictionaries will be in the following format:
+      {'id': (str) , 'workflowId': (str) Id of the workflow the node is in, 'operationType': 'ModelOperation', 'displayName': 'Model', 'x': (int) x location of node on screen, 'y': (int) y location of node on screen, 'state': {'modelId': terarium data service id of the model, 'modelConfigurationIds': list of terarium data service model config ids associated with this model in the workflow}, 'inputs': empty list, there are no inputs to a model node, 'outputs': list of dictionaries of model config[{'id': '0e7634fa-3db5-422a-af1c-9b04431aaca2', 'type': 'modelConfigId', 'label': 'Default config', 'value': ['37d81396-c399-4e05-9d00-0c5d94b9d939'], 'status': 'not connected'}
 - [ ] Add editing existing simulations and calibrations as tools
 - [ ] add more information on order of operations in Terarium. - 
     Some typical workflows that a user will want to perform in Terarium are: \n
